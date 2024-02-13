@@ -4,3 +4,5 @@ node_modules
 cache
 artifacts
 .vscode
+docs/Demo.sol
+
