@@ -52,6 +52,7 @@ contract BSVault is IERC3156FlashLender {
         // transfer appropriate amount of underlying from _from to vault
         token.safeTransferFrom(_from, address(this), _amount);
         balanceOf[_token][_to] = balanceOf[_token][_to] + _amount;
+        totals[IERC20] = totals[IERC20] + _amount;
         emit Deposit(_token, _from, _to, _amount);
     }
 
@@ -66,7 +67,7 @@ contract BSVault is IERC3156FlashLender {
         _token.safeTransfer(_to, _amount);
 
         balanceOf[_token][_from] = balanceOf[_token][_from] - _amount;
-        // 
+        totals[IERC20] = totals[IERC20] - _amount;
         emit Withdraw(_token, _from, _to, _amount);
     }
 
