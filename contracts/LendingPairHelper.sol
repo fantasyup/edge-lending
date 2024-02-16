@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-// helper methods to interact with a pair
+// helper methods to get data out of a pair
+
 contract BSPairHelper {
-    
+        
 }
 
 // function viewPriceOfToken(address token, uint256 amount)
