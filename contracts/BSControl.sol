@@ -1,193 +1,162 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-import "./interfaces/IBSLendingVault.sol";
+import "./interfaces/IBSLendingPair.sol";
+import "./interfaces/IBSCollateralPair.sol";
+import "./interfaces/IBSControl.sol";
+import "./interfaces/IBSVault.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./compound/JumpRateModelV2.sol";
+import "./compound/Exponential.sol";
+import "./compound/InterestRateModel.sol";
 
-contract BSControl {
+import "./BSLendingPair.sol";
+import "./BSCollateralPair.sol";
+import "./BSPair.sol";
 
-    // underlying => vault
-    uint256 public totalLendingPairs;
+contract BSControl is IBSControl, Ownable, Exponential {
 
-    // vaults
-    address[] public vaults;
+    address public edgeTeam;
+    address public newEdgeControl;
+    uint256 public graceSpace;
+    
+    IBSVault public vault;
+    address[] public allPairs;
+    // pairId => pair
+    mapping(address => bool) public pairs;
 
-    // pairIds
-    bytes32[] public pairIds;
-
-    // mapping underlying => exists
-    mapping (address => bool) vaults;
-
-    // pairId => vaults
-    mapping(bytes32 => address[]) public lendingPairs;
-
-    uint256 public flashLoanRate;
-
-    event LendingPairAdded(
-        address indexed creator,
-        address indexed asset0,
-        address indexed asset1,
-        bytes32 pairId,
-        uint256 totalLendingPairs,
-        uint256 created
-    );
-
-    event LendingVault(
-        address indexed underlying,
-        address indexed vault,
-        uint256 created
-    );
-
-    event VaultAdded(
-        address indexed vault,
-        address indexed underlying
-    );
-
-    event FlashLoanRateUpdate(
-        uint256 newRate
-    );
-
-    modifier vaultExists(address _vault) {
-        require(vaults[_vault] == true, "VAULT_DOES_NOT_EXIST");
+    /**
+      @dev Throws if called by any account other than a edge vault
+     */
+    modifier onlyVault() {
+        // require(isVault[msg.sender] == true, "Only a vault may call this");
         _;
     }
-
-    modifier pairExists(bytes32 _pairId) {
-        require(lendingPairs[_pairId].length != 0, "PAIR_DOES_NOT_EXIST");
-        _;
-    }
-
-    modifier vaultExistsForPair(bytes32 _pairId, address _vault) {
-        require(
-            lendingPairs[_pairId][0] == _vault || lendPairs[_pairId][1] == _vault, 
-            "VAULT_DOES_NOT_EXIST_FOR_PAIR"
-        );
-        _;
-    }
-
+    
     function initialize(
-       uint256 _flashloanRate
-    ) external {
-
+        IBSVault _vault
+    ) public {
+        vault = _vault;
+        // instantiate the contracts
+        // Oracle = UniswapLPOracleFactoryI(_oracle);
+        // WVLPF = EdgeVaultLPFactoryI(_WVLPF);
+        // WVSCF = EdgeVaultSCFactoryI(_WVSCF);
+        // edgeTeam = _edgeTeam;
     }
 
-    function updateFlashLoanRate(
-        uint256 _newFlashloanRate
-    ) external onlyOwner {
-        flashLoanRate = _newFlashloanRate;
-
-        emit FlashLoanRateUpdate(
-            _newFlashloanRate
-        );
+    /**
+    @notice viewNumOfPairs returns the number of pairs on the blacksmith platform
+    **/
+    function viewNumOfPairs() external view returns (uint256) {
+        return allPairs.length;
     }
 
-    function addVault(
-        IBSLendingVault _vault
-    ) external {
-        // vault has not been added
-        require(assetLendingVaults[address(_vault)] == address(0), "vault exists");
-
-        // do some assertions
-        address underlying = address(_vault.underlying());
-        address control  = address(_vault.bsControl());
-
-        require(control == address(this), "invalid control");
-        require(underlying != address(0), "invalid underlying");
-        
-        // add vault to
-        vaults[address(_vault)] = true;
-        vaults.push(address(_vault));
-
-        emit VaultAdded(
-            address(vault),
-            underlying
-        );
-    }
-
-    function createLendingPair(
-        address _vault0,
-        address _vault1,
-        bool _singleSided
-    ) external {
-
-        // retreive lending vaults
-        address asset0Vault = assetLendingVaults[_asset0];
-        address asset1Vault = assetLendingVaults[_asset1];
-
-        require(
-             asset0Vault != address(0),
-            'ASSET0_LENDING_VAULT_DOES_NOT_EXIST'
-        );
-        
-        require(
-            asset1Vault != address(0),
-            'ASSET1_LENDING_VAULT_DOES_NOT_EXIST'
+    // @TODO missing oracle
+    function createPair(
+        IBSLendingPair _lendingPair,
+        IBSCollateralPair _collateralPair
+    ) public returns (address newPairAddr){
+        BSPair pair = new BSPair();
+        pair.initialize(
+            IBSControl(address(this)), 
+            _lendingPair, 
+            _collateralPair
         );
 
-        bytes32 pairId = keccak256(
-            abi.encode(
-                _asset0,
-                _asset1,
-                totalLendingPairs
-            )
-        );
-        
-        // ensure the lending pair hasn't been created
-        require(lendingPairs[pairId].length == 0, "PAIR_EXISTS");
+        newPairAddr = address(pair);
 
-        address[] memory newPairs = new address[](2);
-        newPairs[0] = _asset0;
-        newPairs[1] = _asset1;
+        allPairs.push(newPairAddr);
+        pairs[newPairAddr] = true;
 
-        // store the pairId in the db
-        lendingPairs[pairId] = newPairs;
-        pairIds.push(pairId);
-
-        // make single sided if the
-        // if(!_singleSided) lendingPairs[_asset1][_asset0] = pairId;
-        // totalLendingPairs = totalLendingPairs + 1;
-
-        // @TODO add pairId to both lendingVault
-        emit LendingPairAdded(
-            msg.sender,
-            _asset0,
-            _asset1, 
-            pairId,
-            totalLendingPairs, 
-            block.timestamp
-        );
-    }
-
-    // function to deposit for a pair lending vault
-    function deposit(
-        bytes32 _pairId,
-        IBSLendingVault _vaultToDeposit,
-        address _tokenReceipeint,
-        uint256 _amount
-    ) external pairExists(_pairId) vaultExistsForPair(_pairId, address(_vaultToDeposit)) {
-        //@TODO is a user is not allowed to deposit for asset they borrowed in pair
-        _vaultToDeposit._deposit(
-            _pairId, 
-            msg.sender,
-            _tokenReceipeint, 
-            _amount
-        );
-    }
-
-    function borrow(
-        bytes32 _pairId,
-        IBSLendingVault _vaultToBorrowFrom,
-        address _tokenReceipeint,
-        uint256 _amount
-    ) external pairExists(_pairId) vaultExistsForPair(_pairId, address(_vaultToBorrowFrom)) {
-        // @TODO a user is not allowed to borrow asset they deposited in pair
+        emit NewBSPair(newPairAddr, block.timestamp);
     }
 
 
-    function repay(
+    struct NewLendingVaultIRLocalVars {
+        uint256 _baseRatePerYear;
+        uint256 _multiplierPerYear;
+        uint256 _jumpMultiplierPerYear;
+        uint256 _optimal;
+    }
 
-    ) {
+    function newLendingVault(
+        IBSVault _vault,
+        IERC20 _asset,
+        uint256 _initialExchangeRateMantissa,
+        uint256 _reserveFactorMantissa,
+        NewLendingVaultIRLocalVars _interestRateVars
+    ) public returns (address lendingVaultAddr) {
+        // create the interest rate model
+        InterestRateModel ir = new JumpRateModelV2(
+            _interestRateVars.baseRatePerYear,
+            _interestRateVars.multiplierPerYear,
+            _interestRateVars.jumpMultiplierPerYear,
+            _interestRateVars.optimal,
+            address(this)
+        );
 
+        // create
+        BSLendingPair pair = new BSLendingPair();
+        // init pair
+        pair.initialize(
+            IBSControl(address(this)),
+            vault,
+            _asset,
+            ir,
+            _initialExchangeRateMantissa,
+            _reserveFactorMantissa
+        );
+
+        lendingVaultAddr = address(pair);
+
+        emit NewLendingVault(lendingVaultAddr, block.timestamp);
+    }
+
+    function createNewCollateralVault(
+        IERC20 _collateral
+    ) public returns (address collateralVaultAddr) {
+        BSCollateralPair pair = new BSCollateralPair();
+        pair.initialize(_collateral, IBSControl(address(this)), vault);
+        collateralVaultAddr = address(pair);
+        emit NewCollateralVault(collateralVaultAddr, block.timestamp);
+    }
+
+    /**
+    @notice startUpgradeTimer starts a two day timer signaling that this contract will soon be updated to a new version
+    @param _newEdgeControl is the address of the new Edge control contract being upgraded to
+    **/
+    function startUpgradeTimer(address _newEdgeControl) public onlyOwner {
+        newEdgeControl = _newEdgeControl;
+        graceSpace = now.add(172800);
+    }
+
+    /**
+    @notice upgradeEdge is used to upgrade the Edge platform to use a new version of the EdgeControl contract
+    **/
+    function upgradeEdge() public onlyOwner {
+        // require(now >= graceSpace, "you cant ugrade yet, less than two days");
+        // require(newEdgeControl != address(0), "no new edge control set");
+
+        // Oracle.transferOwnership(newEdgeControl);
+
+        // uint256 numVaults = lpVaults.length;
+        // uint256 numSCVaults = scVaults.length;
+
+        // for (uint256 i = 0; i < numVaults; ++i) {
+        //     EdgeVaultLPI vault = EdgeVaultLPI(lpVaults[i]);
+        //     vault.updateEdgeControl(newEdgeControl);
+        // }
+
+        // for (uint256 i = 0; i < numSCVaults; ++i) {
+        //     EdgeVaultSCI vault = EdgeVaultSCI(scVaults[i]);
+        //     vault.updateEdgeControl(newEdgeControl);
+        // }
+    }
+
+    function transferControl(IBSControl _newControl, address[] pairAddr) public onlyOwner {
+        for (uint256 i = 0; i < pairAddr.length; ++i) {
+
+        }
     }
 
 }
-

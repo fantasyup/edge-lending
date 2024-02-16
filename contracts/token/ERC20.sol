@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 
 /**
@@ -37,9 +38,9 @@ contract ERC20 is IERC20 {
 
   uint256 internal _totalSupply;
 
-  string public override name;
-  uint8 public override decimals;
-  string public override symbol;
+  string public name;
+  uint8 public decimals;
+  string public symbol;
 
   function initializeERC20(string memory name_, string memory symbol_, uint8 decimals_) internal {
     name = name_;
@@ -77,12 +78,12 @@ contract ERC20 is IERC20 {
     return true;
   }
 
-  function increaseAllowance(address spender, uint256 addedValue) public virtual override returns (bool) {
+  function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
     _approve(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
     return true;
   }
 
-  function decreaseAllowance(address spender, uint256 subtractedValue) public virtual override returns (bool) {
+  function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
     _approve(msg.sender, spender, _allowances[msg.sender][spender] - subtractedValue);
     return true;
   }

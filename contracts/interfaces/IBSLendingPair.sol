@@ -1,20 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.1;
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-interface IBSLendingVault {
-    /**
-     * Emitted on addPair
-     *
-     * @param vault The vault being interacted with
-     **/
-    event NewPair(
-        address indexed vault,
-        address indexed pair,
-        address indexed interestRateModel,
-        uint256 initialExchangeRateMantissa,
-        uint256 reserveFactorMantissa
-    );
-
+interface IBSLendingPair {
     /**
      * Emitted on deposit
      *
@@ -104,10 +92,10 @@ interface IBSLendingVault {
 
     /**
      * @dev Emitted on interest accrued
-     * @param accrualBlockNumber
-     * @param borrowIndex
-     * @param totalBorrows
-     * @param totalReserves
+     * @param accrualBlockNumber block number
+     * @param borrowIndex borrow index
+     * @param totalBorrows total borrows
+     * @param totalReserves total reserves
      **/
     event InterestAccrued(
         address indexed pair,
@@ -117,22 +105,24 @@ interface IBSLendingVault {
         uint256 totalReserves
     );
 
-    function _deposit(
-        IBSPair _pair,
-        address _depositor,
-        address _tokenReceipeint,
-        uint256 _amount
-    ) external;
+    function asset() external view returns (IERC20);
 
-    function depositWithPermit() external returns (uint256);
+    // function _deposit(
+    //     IBSPair _pair,
+    //     address _depositor,
+    //     address _tokenReceipeint,
+    //     uint256 _amount
+    // ) external;
 
-    function withdraw() external;
+    // function depositWithPermit() external returns (uint256);
 
-    function withdrawWithPermit() external;
+    // function withdraw() external;
 
-    function borrow() external returns (uint256);
+    // function withdrawWithPermit() external;
 
-    function liquidate() external;
+    // function borrow() external returns (uint256);
 
-    function updatePriceOracle() external returns (address);
+    // function liquidate() external;
+
+    // function updatePriceOracle() external returns (address);
 }

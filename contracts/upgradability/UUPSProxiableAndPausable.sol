@@ -2,7 +2,7 @@
 pragma solidity 0.8.1;
 
 import { UUPSProxiable } from "./UUPSProxiable.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
 /**
  * @dev UUPS (Universal Upgradeable Proxy Standard) Proxiable contract.
