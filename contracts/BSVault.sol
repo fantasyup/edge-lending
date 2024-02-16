@@ -128,7 +128,8 @@ contract BSVault is IBSVault, IERC3156FlashLender {
 
     }
 
-    function shareValueOf(address _token) public pure returns(uint256) {
-        return 0;
+    function shareValueOf(address _token) public view override returns(uint256) {
+        // control.getMaxWithdrawAllowed(address(0), 1);
+        return 1;
     }
 }

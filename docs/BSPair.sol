@@ -207,53 +207,53 @@ contract BSPair {
     @param _borrower is the address of the borrower whos loan is non-compliant
     **/
     function liquidateAccount(address _borrower) public {
-        //require the liquidator is not also the borrower
+        // require the liquidator is not also the borrower
         require(msg.sender != _borrower, "you cant liquidate yourself");
         //retreive the number of stablecoin vaults in the edge platform
-        uint256 numSCVaults = scVaults.length;
+        // uint256 numSCVaults = scVaults.length;
         //retreive the number of LP vaults in the edge platform
-        uint256 numLPVaults = lpVaults.length;
+        // uint256 numLPVaults = lpVaults.length;
         // This is how much USDC worth of Stablecoin the user has borrowed
         uint256 borrowedAmount = 0;
         //initialize the stable coin balances array
-        uint256[] memory scBalances = new uint256[](numSCVaults);
+        // uint256[] memory scBalances = new uint256[](numSCVaults);
         // loop through and retreive the Borrowed Amount From All Vaults
-        for (uint256 i = 0; i < numSCVaults; ++i) {
+        // for (uint256 i = 0; i < numSCVaults; ++i) {
             //instantiate the vault at the current  position in the array
-            EdgeVaultSCI scVault = EdgeVaultSCI(scVaults[i]);
+            // EdgeVaultSCI scVault = EdgeVaultSCI(scVaults[i]);
             //retreive the borrowers borrow balance from this vault and add it to the scBalances array
-            scBalances[i] = scVault.borrowBalanceCurrent(_borrower);
-            uint256 borrowedAmountInUSDC = viewPriceOfToken(
-                getAssetByVault[address(scVault)],
-                scBalances[i]
+            borrowedAmount = borrowBalanceCurrent(_borrower);
+            uint256 borrowedAmountInUSD = getPriceOfToken(
+                address(collateralAsset),
+                borrowedAmount
             );
 
             //add the borrowed amount to the total borrowed balance
-            borrowedAmount = borrowedAmount.add(borrowedAmountInUSDC);
-        }
+            // borrowedAmount = borrowedAmount.add(borrowedAmountInUSDC);
+        // }
         //retreve the USDC borrow limit for the borrower
         uint256 borrowLimit = getBorrowLimit(_borrower);
         //check if the borrow is less than the borrowed amount
         if (borrowLimit <= borrowedAmount) {
             // If it is Liquidate the account
             //loop through each SC vault so the  Liquidator can pay off Stable Coin loans
-            for (uint256 i = 0; i < numSCVaults; ++i) {
+            // for (uint256 i = 0; i < numSCVaults; ++i) {
                 //instantiate the Edge SC Vault at the current position
-                EdgeVaultSCI scVault = EdgeVaultSCI(scVaults[i]);
+                // EdgeVaultSCI scVault = EdgeVaultSCI(scVaults[i]);
                 //call repayLiquidatedLoan function to repay the loan
-                scVault._repayLiquidatedLoan(
+                _repayLiquidatedLoan(
                     _borrower,
                     msg.sender,
                     scBalances[i]
                 );
-            }
+            // }
             //loop through each LP vault so the Liquidator gets the LP tokens the borrower had
-            for (uint256 i = 0; i < numLPVaults; ++i) {
+            // for (uint256 i = 0; i < numLPVaults; ++i) {
                 //instantiate the Edge LP Vault at the current position
-                EdgeVaultLPI lpVault = EdgeVaultLPI(lpVaults[i]);
+                // EdgeVaultLPI lpVault = EdgeVaultLPI(lpVaults[i]);
                 //call liquidateAccount function on that LP vault
-                lpVault._liquidateAccount(_borrower, msg.sender);
-            }
+                _liquidateAccount(_borrower, msg.sender);
+            // }
             emit Liquidation(_borrower, msg.sender);
         }
     }

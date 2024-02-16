@@ -42,4 +42,6 @@ interface IBSVault {
         address _to,
         uint256 _amount
     ) external;
+
+    function shareValueOf(address _token) external view returns(uint256);
 }

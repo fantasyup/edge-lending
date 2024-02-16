@@ -14,7 +14,7 @@ interface IBSCollateralPair {
         address liquidator
     );
 
-    function asset() external view returns (IERC20);
+    // function asset() external view returns (IERC20);
     function collateralOfAccount(address _account)
         external
         view
