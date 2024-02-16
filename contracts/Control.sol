@@ -11,11 +11,12 @@ import "./compound/Exponential.sol";
 import "./compound/InterestRateModel.sol";
 import "./LendingPair.sol";
 import "./LendingPairFactory.sol";
+import "./PairConfigurationBase.sol";
 
-contract BSControl is IBSControl, Ownable, Exponential {
+contract BSControl is IBSControl, Ownable, Exponential, PairConfigurationBase {
 
-    address public edgeTeam;
-    address public newEdgeControl;
+    address public blackSmithteam;
+    address public newBSControl;
     uint256 public graceSpace;
     
     IBSVault public vault;
@@ -40,11 +41,6 @@ contract BSControl is IBSControl, Ownable, Exponential {
     ) public {
         vault = _vault;
         lendingPairFactory = _lendingPairFactory;
-        // instantiate the contracts
-        // Oracle = UniswapLPOracleFactoryI(_oracle);
-        // WVLPF = EdgeVaultLPFactoryI(_WVLPF);
-        // WVSCF = EdgeVaultSCFactoryI(_WVSCF);
-        // edgeTeam = _edgeTeam;
     }
 
     /**
@@ -53,26 +49,24 @@ contract BSControl is IBSControl, Ownable, Exponential {
     function viewNumOfPairs() external view returns (uint256) {
         return allPairs.length;
     }
-
-    struct NewLendingVaultIRLocalVars {
-        uint256 baseRatePerYear;
-        uint256 multiplierPerYear;
-        uint256 jumpMultiplierPerYear;
-        uint256 optimal;
-    }
     
     function createPair(
-        IBSControl _control,
         IOracle _oracle,
-        IBSVault _vault,
         IERC20 _asset, 
         IERC20 _collateralAsset,
         uint256 _initialExchangeRateMantissa,
         uint256 _reserveFactorMantissa,
-        NewLendingVaultIRLocalVars calldata _interestRateVars
+        NewLendingVaultIRLocalVars memory _interestRateVars
     ) public returns (address newPairAddr){
         newPairAddr = lendingPairFactory.createPair(
-
+            IBSControl(address(this)),
+            _oracle,
+            vault,
+            _asset,
+            _collateralAsset,
+            _initialExchangeRateMantissa,
+            _reserveFactorMantissa,
+            _interestRateVars
         );
 
         allPairs.push(newPairAddr);
@@ -93,7 +87,7 @@ contract BSControl is IBSControl, Ownable, Exponential {
 
     function transferControl(IBSControl _newControl, address[] calldata pairAddr) public onlyOwner {
         for (uint256 i = 0; i < pairAddr.length; ++i) {
-
+            // transfer control to another pair
         }
     }
 

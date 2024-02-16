@@ -6,16 +6,10 @@ import "./compound/InterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSCollateralPair.sol";
 import "./LendingPair.sol";
+import "./PairConfigurationBase.sol";
 
 
-contract LendingPairFactory {
-
-    struct NewLendingVaultIRLocalVars {
-        uint256 baseRatePerYear;
-        uint256 multiplierPerYear;
-        uint256 jumpMultiplierPerYear;
-        uint256 optimal;
-    }
+contract LendingPairFactory is PairConfigurationBase {
 
     function createPair(
         IBSControl _control,
@@ -34,7 +28,7 @@ contract LendingPairFactory {
             _interestRateVars.multiplierPerYear,
             _interestRateVars.jumpMultiplierPerYear,
             _interestRateVars.optimal,
-            address(this)
+            address(_control)
         ));
 
         LendingPair pair = new LendingPair();

@@ -551,16 +551,11 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
         emit Deposit(msg.sender, _amount);
     }
 
-    /**
-    @notice withdraw allows the user to trade in his EdgeLP tokens for hiss underlying LP token collateral
-    @param _amount is the amount of LP tokens he wishes to withdraw
-    **/
-    function withdraw(uint256 _amount) public {
+    function withdrawCollateral(uint256 _amount) public {
         uint256 amount;
 
-        uint256 maxAmount = control.getMaxWithdrawAllowed(
-            msg.sender,
-            address(collateralAsset)
+        uint256 maxAmount = getMaxWithdrawAllowed(
+            msg.sender
         );
 
         if (_amount == 0) {
@@ -634,12 +629,9 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
 
     function valueOfAccountCollateral(address _account)
         external
-        view
         returns (uint256)
     {
-        uint256 collateralPrice = control.viewPriceOfCollateral(
-            address(collateralAsset)
-        );
+        uint256 collateralPrice = getPriceOfCollateral();
         uint256 collateralValue = collateralBalance[_account] * collateralPrice;
         return collateralValue;
     }
@@ -712,15 +704,10 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
         return accountAssetsValue;
     }
 
+    function getPriceOfCollateral() public returns (uint256) {
+        return oracle.getPriceInUSD(address(collateralAsset));
+    }
 
-    // /**
-    // @notice getPriceOfCollateral returns the price of an lpToken
-    // @param lpToken is the address of the lp token
-    // @dev this function does not run calculations amd returns the previously calculated price
-    // **/
-    // function getPriceOfCollateral(address lpToken) public returns (uint256) {
-    //     return Oracle.getUnderlyingPrice(lpToken);
-    // }
     function getPriceOfToken(address token, uint256 amount)
         public
         view
