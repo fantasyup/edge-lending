@@ -1,20 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-// helper methods to get data out of a pair
-
 contract BSPairHelper {
-        
+    
+    function viewPriceOfToken(address token, uint256 amount)
+    public
+    view
+    returns (uint256)
+    {
+        return oracle.getCurrentPriceInUSD(token) * amount;
+    }
+
+
 }
-
-// function viewPriceOfToken(address token, uint256 amount)
-// public
-// view
-// returns (uint256)
-// {
-//     return oracle.getCurrentPriceInUSD(token) * amount;
-// }
-
 
 // /**
 // @notice viewPriceOfCollateral returns the price of an lpToken
@@ -143,4 +141,12 @@ contract BSPairHelper {
 //     uint256 leftoverCollateral = collateralValue - requiredCollateral;
 //     uint256 currentCollateralValueInUSD = oracle.getPriceInUSD(address(pairCollateralAsset()), leftoverCollateral);
 //     return leftoverCollateral * 1e18 / currentCollateralValueInUSD;
+// }
+
+
+// /**
+// @notice getAssetAdd allows for easy retrieval of a EdgeVaults LP token Adress
+// **/
+// function getCollateralAddress() public view returns (address) {
+//     return address(collateralAsset);
 // }

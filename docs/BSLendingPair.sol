@@ -66,11 +66,9 @@ contract BSLendingPair is IBSLendingPair, Exponential {
         string memory assetSymbol = string(symbol);
 
         // @TODO intialize it
-        wrappedAsset = new BSWrapperToken(
-            // address(stablecoin),
-            // assetName,
-            // assetSymbol
-        );
+        wrappedAsset = new BSWrapperToken();
+        wrappedAsset.initialize(address(_asset), assetName, assetSymbol);
+        
     }
 
     /**

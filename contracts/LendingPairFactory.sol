@@ -7,6 +7,7 @@ import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSCollateralPair.sol";
 import "./LendingPair.sol";
 import "./PairConfigurationBase.sol";
+import "./interfaces/IBSWrapperToken.sol";
 
 
 contract LendingPairFactory is PairConfigurationBase {
@@ -19,7 +20,8 @@ contract LendingPairFactory is PairConfigurationBase {
         IERC20 _collateralAsset,
         uint256 _initialExchangeRateMantissa,
         uint256 _reserveFactorMantissa,
-        NewLendingVaultIRLocalVars calldata _interestRateVars
+        NewLendingVaultIRLocalVars calldata _interestRateVars,
+        IBSWrapperToken _wrappedBorrowAsset
     ) public returns (address newPairAddr){
 
         // create the interest rate model
@@ -41,7 +43,8 @@ contract LendingPairFactory is PairConfigurationBase {
           _collateralAsset,
             InterestRateModel(ir),
          _initialExchangeRateMantissa,
-         _reserveFactorMantissa
+         _reserveFactorMantissa,
+         _wrappedBorrowAsset
         );
 
         newPairAddr = address(pair);

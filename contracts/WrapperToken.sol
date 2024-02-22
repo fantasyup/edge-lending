@@ -29,7 +29,7 @@ contract BSWrapperToken is ERC20Permit, Ownable {
     @param _to is the address that will receive the new tokens
     @param _amount is the amount of token they will receive
     **/
-    function mint(address _to, uint256 _amount) public onlyOwner {
+    function mint(address _to, uint256 _amount) external onlyOwner {
         _mint(_to, _amount);
     }
 
@@ -38,7 +38,7 @@ contract BSWrapperToken is ERC20Permit, Ownable {
     * @param _from is the address where the tokens will be burnt
     * @param _amount is the amount of token to be burnt
     **/
-    function burn(address _from, uint256 _amount) public onlyOwner {
+    function burn(address _from, uint256 _amount) external onlyOwner {
         _burn(_from, _amount);
     }
 

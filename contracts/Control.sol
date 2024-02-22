@@ -12,8 +12,9 @@ import "./compound/InterestRateModel.sol";
 import "./LendingPair.sol";
 import "./LendingPairFactory.sol";
 import "./PairConfigurationBase.sol";
+import "./interfaces/IBSWrapperToken.sol";
 
-contract BSControl is IBSControl, Ownable, Exponential, PairConfigurationBase {
+contract Control is IBSControl, Ownable, Exponential, PairConfigurationBase {
 
     address public blackSmithteam;
     address public newBSControl;
@@ -56,7 +57,8 @@ contract BSControl is IBSControl, Ownable, Exponential, PairConfigurationBase {
         IERC20 _collateralAsset,
         uint256 _initialExchangeRateMantissa,
         uint256 _reserveFactorMantissa,
-        NewLendingVaultIRLocalVars memory _interestRateVars
+        NewLendingVaultIRLocalVars memory _interestRateVars,
+        IBSWrapperToken _wrappedBorrowAsset
     ) public returns (address newPairAddr){
         newPairAddr = lendingPairFactory.createPair(
             IBSControl(address(this)),
@@ -66,7 +68,8 @@ contract BSControl is IBSControl, Ownable, Exponential, PairConfigurationBase {
             _collateralAsset,
             _initialExchangeRateMantissa,
             _reserveFactorMantissa,
-            _interestRateVars
+            _interestRateVars,
+            _wrappedBorrowAsset
         );
 
         allPairs.push(newPairAddr);

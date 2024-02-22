@@ -107,12 +107,10 @@ interface IBSLendingPair {
 
     function asset() external view returns (IERC20);
 
-    // function _deposit(
-    //     IBSPair _pair,
-    //     address _depositor,
-    //     address _tokenReceipeint,
-    //     uint256 _amount
-    // ) external;
+    function deposit(
+        address _tokenReceipeint,
+        uint256 _amount
+    ) external; 
 
     // function depositWithPermit() external returns (uint256);
 
