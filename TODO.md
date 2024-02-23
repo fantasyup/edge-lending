@@ -1,7 +1,26 @@
 # TODOs:
 
-- [x]
-- [x] Harvest-DAI strategy
+- [x] Vault
+
+- [x] LendingPair
+
+- [x] LendingPairFactory
+
+- [x] Upgradability 
+
+- [x] Deployments
+
+- []
+
+
+
+
+
+
+
+
+
+
 - [x] Force Stable coins strategy (USDC, USDT, DAI)
 - [x] Force SLP strategy
 - [x] Harvest-DAI strategy
