@@ -20,8 +20,10 @@ interface IBSLendingPair {
         uint256 amount
     );
 
+    event Borrow(address indexed borrower, uint256 amount);
+
     /**
-     * Emitted on withdraw
+     * Emitted on Reedem
      *
      * @param pair The pair being interacted with
      * @param asset The asset withdraw in the pair
@@ -29,7 +31,7 @@ interface IBSLendingPair {
      * @param to The user the receives the withdrawn tokens
      * @param amount The amount being withdrawn
      **/
-    event Withdraw(
+    event Reedem(
         address indexed pair,
         address indexed asset,
         address indexed user,
@@ -107,10 +109,11 @@ interface IBSLendingPair {
 
     function asset() external view returns (IERC20);
 
-    function deposit(
-        address _tokenReceipeint,
-        uint256 _amount
-    ) external; 
+    // function deposit(
+    //     address _tokenReceipeint,
+    //     uint256 _amount
+    // ) external; 
+    function deposit(address _token, address _tokenReceipeint, uint256 _amount) external;
 
     // function depositWithPermit() external returns (uint256);
 

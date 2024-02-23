@@ -21,7 +21,7 @@ This contract implements the EIP3156 IERC3156FlashBorrower for flash loans.
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-contract Vault is VaultBase, IBSVault {
+contract Vault is VaultBase, IBSVault, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     /// @notice ERC3156 constant for flashloan callback success
@@ -95,7 +95,7 @@ contract Vault is VaultBase, IBSVault {
         _token.safeTransferFrom(_from, address(this), _amount);
         // calculate shares
         amountOut = toShare(_token, _amount);
-        balanceOf[_token][_to] = amountOut;
+        balanceOf[_token][_to] = balanceOf[_token][_to] + amountOut;
         totals[_token] = totals[_token] + amountOut;
 
         emit Deposit(_token, _from, _to, _amount, amountOut);
@@ -120,7 +120,7 @@ contract Vault is VaultBase, IBSVault {
         balanceOf[_token][_from] = balanceOf[_token][_from] - _shares;
         totals[_token] = totals[_token] - _shares;
 
-        _token.safeTransfer(_to, _shares);
+        _token.safeTransfer(_to, amountOut);
 
         emit Withdraw(_token, _from, _to, _shares, amountOut);
     }
@@ -141,9 +141,9 @@ contract Vault is VaultBase, IBSVault {
         IERC20 _token,
         address _to,
         uint256 _shares
-    ) external override {
+    ) external override nonReentrant {
         _transfer(_token, msg.sender, _to, _shares);
-        IBSLendingPair(_to).deposit(msg.sender, _shares);
+        IBSLendingPair(_to).deposit(address(_token), msg.sender, _shares);
     }
 
     function _transfer(

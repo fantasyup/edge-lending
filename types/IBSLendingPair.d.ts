@@ -22,33 +22,35 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface IBSLendingPairInterface extends ethers.utils.Interface {
   functions: {
     "asset()": FunctionFragment;
-    "deposit(address,uint256)": FunctionFragment;
+    "deposit(address,address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "deposit",
-    values: [string, BigNumberish]
+    values: [string, string, BigNumberish]
   ): string;
 
   decodeFunctionResult(functionFragment: "asset", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
 
   events: {
+    "Borrow(address,uint256)": EventFragment;
     "Deposit(address,address,address,address,uint256)": EventFragment;
     "FlashLoan(address,address,address,uint256,uint256)": EventFragment;
     "InterestAccrued(address,uint256,uint256,uint256,uint256)": EventFragment;
     "Liquidate(address,address,address,uint256,uint256,address)": EventFragment;
+    "Reedem(address,address,address,address,uint256,uint256)": EventFragment;
     "Repay(address,address,address,address,uint256)": EventFragment;
-    "Withdraw(address,address,address,address,uint256,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "Borrow"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InterestAccrued"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Liquidate"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Reedem"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Repay"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
 
 export class IBSLendingPair extends Contract {
@@ -100,12 +102,14 @@ export class IBSLendingPair extends Contract {
     "asset()"(overrides?: CallOverrides): Promise<[string]>;
 
     deposit(
+      _token: string,
       _tokenReceipeint: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "deposit(address,uint256)"(
+    "deposit(address,address,uint256)"(
+      _token: string,
       _tokenReceipeint: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -117,12 +121,14 @@ export class IBSLendingPair extends Contract {
   "asset()"(overrides?: CallOverrides): Promise<string>;
 
   deposit(
+    _token: string,
     _tokenReceipeint: string,
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "deposit(address,uint256)"(
+  "deposit(address,address,uint256)"(
+    _token: string,
     _tokenReceipeint: string,
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -134,12 +140,14 @@ export class IBSLendingPair extends Contract {
     "asset()"(overrides?: CallOverrides): Promise<string>;
 
     deposit(
+      _token: string,
       _tokenReceipeint: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "deposit(address,uint256)"(
+    "deposit(address,address,uint256)"(
+      _token: string,
       _tokenReceipeint: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
@@ -147,6 +155,14 @@ export class IBSLendingPair extends Contract {
   };
 
   filters: {
+    Borrow(
+      borrower: string | null,
+      amount: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { borrower: string; amount: BigNumber }
+    >;
+
     Deposit(
       pair: string | null,
       asset: string | null,
@@ -217,24 +233,7 @@ export class IBSLendingPair extends Contract {
       }
     >;
 
-    Repay(
-      pair: string | null,
-      asset: string | null,
-      beneficiary: string | null,
-      repayer: null,
-      amount: null
-    ): TypedEventFilter<
-      [string, string, string, string, BigNumber],
-      {
-        pair: string;
-        asset: string;
-        beneficiary: string;
-        repayer: string;
-        amount: BigNumber;
-      }
-    >;
-
-    Withdraw(
+    Reedem(
       pair: string | null,
       asset: string | null,
       user: string | null,
@@ -252,6 +251,23 @@ export class IBSLendingPair extends Contract {
         amountofWrappedBurned: BigNumber;
       }
     >;
+
+    Repay(
+      pair: string | null,
+      asset: string | null,
+      beneficiary: string | null,
+      repayer: null,
+      amount: null
+    ): TypedEventFilter<
+      [string, string, string, string, BigNumber],
+      {
+        pair: string;
+        asset: string;
+        beneficiary: string;
+        repayer: string;
+        amount: BigNumber;
+      }
+    >;
   };
 
   estimateGas: {
@@ -260,12 +276,14 @@ export class IBSLendingPair extends Contract {
     "asset()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     deposit(
+      _token: string,
       _tokenReceipeint: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "deposit(address,uint256)"(
+    "deposit(address,address,uint256)"(
+      _token: string,
       _tokenReceipeint: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -278,12 +296,14 @@ export class IBSLendingPair extends Contract {
     "asset()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     deposit(
+      _token: string,
       _tokenReceipeint: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "deposit(address,uint256)"(
+    "deposit(address,address,uint256)"(
+      _token: string,
       _tokenReceipeint: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }

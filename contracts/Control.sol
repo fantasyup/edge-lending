@@ -14,15 +14,24 @@ import "./LendingPairFactory.sol";
 import "./PairConfigurationBase.sol";
 import "./interfaces/IBSWrapperToken.sol";
 
-contract Control is IBSControl, Ownable, Exponential, PairConfigurationBase {
+contract Control is IBSControl, Ownable, PairConfigurationBase {
 
+    /// @notice address of blacksmith team
     address public blackSmithteam;
+    /// @notice 
     address public newBSControl;
+    /// @notice
     uint256 public graceSpace;
     
+    /// @notice vault used to store assets
     IBSVault public vault;
+
+    /// @notice Factory used to create lending pairs
     LendingPairFactory public lendingPairFactory;
+
+    /// @notice address of all lending pairs created
     address[] public allPairs;
+
     // pairId => pair
     mapping(address => bool) public pairs;
     
@@ -79,13 +88,12 @@ contract Control is IBSControl, Ownable, Exponential, PairConfigurationBase {
     }
 
     function startUpgradeTimer(address _newControl) public onlyOwner {
-        _newControl = _newControl;
+        newBSControl = _newControl;
         graceSpace =  block.timestamp + 172800;
     }
 
-
-    function upgradeControl() public onlyOwner {
-
+    function upgradeControl(address newBSControl) public onlyOwner {
+    
     }
 
     function transferControl(IBSControl _newControl, address[] calldata pairAddr) public onlyOwner {

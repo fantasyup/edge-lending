@@ -2,14 +2,14 @@
 pragma solidity 0.8.1;
 
 contract BSPairHelper {
-    
-    function viewPriceOfToken(address token, uint256 amount)
-    public
-    view
-    returns (uint256)
-    {
-        return oracle.getCurrentPriceInUSD(token) * amount;
-    }
+
+    // function viewPriceOfToken(address token, uint256 amount)
+    // public
+    // view
+    // returns (uint256)
+    // {
+    //     // return oracle.getCurrentPriceInUSD(token) * amount;
+    // }
 
 
 }

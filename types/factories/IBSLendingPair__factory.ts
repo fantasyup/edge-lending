@@ -23,6 +23,25 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
+        name: "borrower",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "Borrow",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
         name: "pair",
         type: "address",
       },
@@ -189,43 +208,6 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "beneficiary",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "repayer",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "Repay",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "pair",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "asset",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
         name: "user",
         type: "address",
       },
@@ -248,7 +230,44 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "Withdraw",
+    name: "Reedem",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "pair",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "asset",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "beneficiary",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "repayer",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "Repay",
     type: "event",
   },
   {
@@ -266,6 +285,11 @@ const _abi = [
   },
   {
     inputs: [
+      {
+        internalType: "address",
+        name: "_token",
+        type: "address",
+      },
       {
         internalType: "address",
         name: "_tokenReceipeint",

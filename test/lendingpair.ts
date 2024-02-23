@@ -27,8 +27,27 @@ describe("LendingPair", async function () {
   let anotherUserAcc: string;
   let thirdUser: string;
 
+  // fake users used in testing
+  let alice: string
+  let bob: string
+  let frank: string
+
   const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
   const BASE = ethers.utils.parseUnits("1", 18);
+
+
+  async function depositLendingPair(account: string, asset: MockToken, amountToDeposit: number) {
+    await asset.setBalanceTo(account, amountToDeposit)
+    await asset.approve(Vault.address, amountToDeposit)
+    await Vault.deposit(asset.address, account, account, amountToDeposit)
+    
+    // deposit borrow asset
+    await Vault.lendingPairTransfer(
+        asset.address,
+        LendingPair.address,
+        amountToDeposit
+    )
+  }
 
   before(async function () {
     // initialize
@@ -63,10 +82,10 @@ describe("LendingPair", async function () {
       "70",
       "1000000000000000000",
       Control.address
-    )) as JumpRateModelV2;
+    )) as JumpRateModelV2
 
-    LendingPair = (await LendingPairFactory.deploy()) as BLendingPair;
     MockPriceOracle = (await MockPriceOracleFactory.deploy()) as IOracle;
+    LendingPair = (await LendingPairFactory.deploy()) as BLendingPair;
   });
 
   it("initialize", async function () {
@@ -84,26 +103,62 @@ describe("LendingPair", async function () {
   });
 
   describe("- actions", async function() {
-    const amountToDeposit = 100
+    const amountToDeposit = 1000
+
     it("deposit", async function() {
         // we have to deposit into the lending pair
         // via the vault
-        await borrowAsset.setBalanceTo(userAcc, 1000)
-        await borrowAsset.approve(Vault.address, 100)
-        await Vault.deposit(borrowAsset.address, userAcc, userAcc, amountToDeposit)
-        
-        // deposit borrow asset
-        await Vault.lendingPairTransfer(
-            borrowAsset.address,
-            LendingPair.address,
-            amountToDeposit
-        )
+        // borrow asset
+        await depositLendingPair(userAcc, borrowAsset, amountToDeposit)
+        /// collateral asset
+        await depositLendingPair(userAcc, collateralAsset, amountToDeposit)
 
-        // check the deposit
+
+        // console.log(
+        //     (await LendingPair.borrowBalancePrior(userAcc)).toNumber()
+        // )
+
+        // // borrow $10
+        await LendingPair["borrow(uint256)"](10);
+
+
+        // console.log(
+        //     (await LendingPair.accountBorrows(userAcc)).principal.toNumber()
+        // )
+
+        // move time to increase interest rate
+        // await 
+        // repay
+
+        // await borrowAsset.approve()
+        await LendingPair["repay(uint256)"](0);
+
+        // withdraw
+
+        await LendingPair.redeem(userAcc, userAcc, 5)
+
+        
+
+        // await borrowAsset.setBalanceTo(userAcc, amountToDeposit)
+        // await borrowAsset.approve(Vault.address, amountToDeposit)
+        // await Vault.deposit(borrowAsset.address, userAcc, userAcc, amountToDeposit)
+        
+        // // deposit borrow asset
+        // await Vault.lendingPairTransfer(
+        //     borrowAsset.address,
+        //     LendingPair.address,
+        //     amountToDeposit
+        // )
+
+        // // deposit collateral
+        // await collateralAsset.setBalanceTo(userAcc, amountToDeposit)
+        // await collateralAsset.approve(Vault.address, amountToDeposit)
+        // await Vault.deposit(collateralAsset.address, userAcc, userAcc, amountToDeposit)
+
     })
 
     it("borrow", async function() {
-        
+
     })
 
 
