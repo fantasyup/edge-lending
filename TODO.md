@@ -23,7 +23,7 @@
 
 - [x] Oracle
     - [x] Price Oracle
-    - [] Uniquote Adapter (In progress)
+    - [] UniQuote Adapter (In progress)
     - [] Tests
  
 - [] Create more actual Tests
