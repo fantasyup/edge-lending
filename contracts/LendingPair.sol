@@ -15,7 +15,7 @@ import "./interfaces/IBSCollateralPair.sol";
 import "hardhat/console.sol";
 import "./token/Initializable.sol";
 
-contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Intializable {
+contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initializable {
     using SafeERC20 for IERC20;
 
     /// @dev initialExchangeRateMantissa Initial exchange rate used when minting the first CTokens (used when totalSupply = 0)

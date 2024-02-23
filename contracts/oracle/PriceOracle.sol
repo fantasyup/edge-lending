@@ -6,7 +6,6 @@ import "../interfaces/IOracle.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @notice aggregator of price oracle for assets in LendingPairs
-
 contract PriceOracle is IPriceOracle {
 
     /// @dev control allowed to update price oracle

@@ -26,4 +26,5 @@
     - [] UniQuote Adapter (In progress)
     - [] Tests
  
+- [x] Blacksmith Governance Token
 - [] Create more actual Tests
