@@ -5,11 +5,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./token/ERC20Permit.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-/// @title BSWrapperToken
+/// @title WrapperToken
 /// @author @samparsky
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-contract BSWrapperToken is ERC20Permit, Ownable {
+contract WrapperToken is ERC20Permit, Ownable {
     // underlying wrapper token
     address public underlying;
 

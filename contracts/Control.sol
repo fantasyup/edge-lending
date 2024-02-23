@@ -13,6 +13,7 @@ import "./LendingPair.sol";
 import "./LendingPairFactory.sol";
 import "./PairConfigurationBase.sol";
 import "./interfaces/IBSWrapperToken.sol";
+import "./interfaces/IPriceOracle.sol";
 
 contract Control is IBSControl, Ownable, PairConfigurationBase {
 
@@ -61,7 +62,7 @@ contract Control is IBSControl, Ownable, PairConfigurationBase {
     }
     
     function createPair(
-        IOracle _oracle,
+        IPriceOracle _oracle,
         IERC20 _asset, 
         IERC20 _collateralAsset,
         uint256 _initialExchangeRateMantissa,

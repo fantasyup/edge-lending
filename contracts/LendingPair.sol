@@ -10,7 +10,7 @@ import "./interfaces/IBSControl.sol";
 import "./interfaces/IBSVault.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
-import "./interfaces/IOracle.sol";
+import "./interfaces/IPriceOracle.sol";
 import "./interfaces/IBSCollateralPair.sol";
 import "hardhat/console.sol";
 
@@ -43,7 +43,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
     IBSControl public control;
 
     /// @notice The price oracle for the assets
-    IOracle public oracle;
+    IPriceOracle public oracle;
 
     /// @notice The pair borrow asset
     IERC20 public override asset;
@@ -94,7 +94,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
     /// @param _wrappedBorrowAsset wrapped token minted when depositing borrow asset
     function initialize(
         IBSControl _control,
-        IOracle _oracle,
+        IPriceOracle _oracle,
         IBSVault _vault,
         IERC20 _asset, 
         IERC20 _collateralAsset,
@@ -736,10 +736,10 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
     }
 
     function getPriceOfCollateral() public view returns (uint256) {
-        return oracle.getPriceInUSD(address(collateralAsset));
+        return oracle.getPriceInUSD(collateralAsset);
     }
 
-    function getPriceOfToken(address token, uint256 amount)
+    function getPriceOfToken(IERC20 token, uint256 amount)
         public
         view
         returns (uint256)
@@ -810,7 +810,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
         uint256 borrowedAmount = borrowBalanceCurrent(_borrower);
 
         uint256 borrowedAmountInUSD = getPriceOfToken(
-            address(collateralAsset),
+            collateralAsset,
             borrowedAmount
         );
 

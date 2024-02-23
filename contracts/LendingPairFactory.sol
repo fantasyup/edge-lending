@@ -14,7 +14,7 @@ contract LendingPairFactory is PairConfigurationBase {
 
     function createPair(
         IBSControl _control,
-        IOracle _oracle,
+        IPriceOracle _oracle,
         IBSVault _vault,
         IERC20 _asset, 
         IERC20 _collateralAsset,

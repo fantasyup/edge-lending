@@ -34,7 +34,7 @@ interface ControlInterface extends ethers.utils.Interface {
     "startUpgradeTimer(address)": FunctionFragment;
     "transferControl(address,address[])": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "upgradeControl()": FunctionFragment;
+    "upgradeControl(address)": FunctionFragment;
     "vault()": FunctionFragment;
     "viewNumOfPairs()": FunctionFragment;
   };
@@ -100,7 +100,7 @@ interface ControlInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "upgradeControl",
-    values?: undefined
+    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "vault", values?: undefined): string;
   encodeFunctionData(
@@ -324,10 +324,12 @@ export class Control extends Contract {
     ): Promise<ContractTransaction>;
 
     upgradeControl(
+      newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "upgradeControl()"(
+    "upgradeControl(address)"(
+      newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -456,10 +458,12 @@ export class Control extends Contract {
   ): Promise<ContractTransaction>;
 
   upgradeControl(
+    newBSControl: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "upgradeControl()"(
+  "upgradeControl(address)"(
+    newBSControl: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -583,9 +587,15 @@ export class Control extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    upgradeControl(overrides?: CallOverrides): Promise<void>;
+    upgradeControl(
+      newBSControl: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    "upgradeControl()"(overrides?: CallOverrides): Promise<void>;
+    "upgradeControl(address)"(
+      newBSControl: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     vault(overrides?: CallOverrides): Promise<string>;
 
@@ -734,10 +744,12 @@ export class Control extends Contract {
     ): Promise<BigNumber>;
 
     upgradeControl(
+      newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "upgradeControl()"(
+    "upgradeControl(address)"(
+      newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -882,10 +894,12 @@ export class Control extends Contract {
     ): Promise<PopulatedTransaction>;
 
     upgradeControl(
+      newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "upgradeControl()"(
+    "upgradeControl(address)"(
+      newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
