@@ -5,14 +5,14 @@
 import { Contract, Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 
-import type { IPriceOracle } from "../IPriceOracle";
+import type { IKeeperOracle } from "../IKeeperOracle";
 
-export class IPriceOracle__factory {
+export class IKeeperOracle__factory {
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IPriceOracle {
-    return new Contract(address, _abi, signerOrProvider) as IPriceOracle;
+  ): IKeeperOracle {
+    return new Contract(address, _abi, signerOrProvider) as IKeeperOracle;
   }
 }
 
@@ -20,50 +20,22 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IERC20",
-        name: "_token",
+        internalType: "address",
+        name: "",
         type: "address",
       },
-    ],
-    name: "getPriceInETH",
-    outputs: [
       {
         internalType: "uint256",
         name: "",
         type: "uint256",
       },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
       {
-        internalType: "contract IERC20",
-        name: "_token",
-        type: "address",
-      },
-    ],
-    name: "getPriceInUSD",
-    outputs: [
-      {
-        internalType: "uint256",
+        internalType: "address",
         name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IERC20",
-        name: "_token",
         type: "address",
       },
     ],
-    name: "viewPriceInETH",
+    name: "current",
     outputs: [
       {
         internalType: "uint256",
@@ -77,17 +49,41 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IERC20",
-        name: "_token",
+        internalType: "address",
+        name: "",
         type: "address",
       },
     ],
-    name: "viewPriceInUSD",
+    name: "observationLength",
     outputs: [
       {
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "pairFor",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",

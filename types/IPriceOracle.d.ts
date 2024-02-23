@@ -21,25 +21,43 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IPriceOracleInterface extends ethers.utils.Interface {
   functions: {
-    "getPriceETH()": FunctionFragment;
-    "getPriceUSD()": FunctionFragment;
+    "getPriceInETH(address)": FunctionFragment;
+    "getPriceInUSD(address)": FunctionFragment;
+    "viewPriceInETH(address)": FunctionFragment;
+    "viewPriceInUSD(address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getPriceETH",
-    values?: undefined
+    functionFragment: "getPriceInETH",
+    values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "getPriceUSD",
-    values?: undefined
+    functionFragment: "getPriceInUSD",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "viewPriceInETH",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "viewPriceInUSD",
+    values: [string]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getPriceETH",
+    functionFragment: "getPriceInETH",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getPriceUSD",
+    functionFragment: "getPriceInUSD",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "viewPriceInETH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "viewPriceInUSD",
     data: BytesLike
   ): Result;
 
@@ -90,84 +108,206 @@ export class IPriceOracle extends Contract {
   interface: IPriceOracleInterface;
 
   functions: {
-    getPriceETH(
+    getPriceInETH(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "getPriceETH()"(
+    "getPriceInETH(address)"(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getPriceUSD(
+    getPriceInUSD(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "getPriceUSD()"(
+    "getPriceInUSD(address)"(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    viewPriceInETH(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "viewPriceInETH(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    viewPriceInUSD(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "viewPriceInUSD(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
   };
 
-  getPriceETH(
+  getPriceInETH(
+    _token: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "getPriceETH()"(
+  "getPriceInETH(address)"(
+    _token: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getPriceUSD(
+  getPriceInUSD(
+    _token: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "getPriceUSD()"(
+  "getPriceInUSD(address)"(
+    _token: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  viewPriceInETH(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  "viewPriceInETH(address)"(
+    _token: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  viewPriceInUSD(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  "viewPriceInUSD(address)"(
+    _token: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   callStatic: {
-    getPriceETH(overrides?: CallOverrides): Promise<BigNumber>;
+    getPriceInETH(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    "getPriceETH()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "getPriceInETH(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    getPriceUSD(overrides?: CallOverrides): Promise<BigNumber>;
+    getPriceInUSD(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    "getPriceUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "getPriceInUSD(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    viewPriceInETH(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "viewPriceInETH(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    viewPriceInUSD(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "viewPriceInUSD(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {};
 
   estimateGas: {
-    getPriceETH(
+    getPriceInETH(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "getPriceETH()"(
+    "getPriceInETH(address)"(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getPriceUSD(
+    getPriceInUSD(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "getPriceUSD()"(
+    "getPriceInUSD(address)"(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    viewPriceInETH(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "viewPriceInETH(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    viewPriceInUSD(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "viewPriceInUSD(address)"(
+      _token: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getPriceETH(
+    getPriceInETH(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "getPriceETH()"(
+    "getPriceInETH(address)"(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getPriceUSD(
+    getPriceInUSD(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "getPriceUSD()"(
+    "getPriceInUSD(address)"(
+      _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    viewPriceInETH(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "viewPriceInETH(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    viewPriceInUSD(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "viewPriceInUSD(address)"(
+      _token: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
 }

@@ -2,14 +2,14 @@
 
 - [x] Vault
     - [x] FlashLoans
-    - [] Tests
-    
+    - [] Tests (WIP)
+
 - [x] LendingPair
     - [x] Borrow
     - [x] Repay
     - [x] Liquidate
     - [x] Redeem 
-    - [] Tests
+    - [] Tests (WIP)
 
 - [x] LendingPairFactory
     - [x] createPair

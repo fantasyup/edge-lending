@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract PriceOracle is IPriceOracle {
 
-    /// @notice control allowed to update price oracle
+    /// @dev control allowed to update price oracle
     address control;
 
     /// @notice token to the oracle address
@@ -32,7 +32,7 @@ contract PriceOracle is IPriceOracle {
     /// @notice adds oracle for an asset e.g. ETH
     /// @param _asset the oracle for the asset
     /// @param _oracle the oracle address
-    function updateOracleForAsset(IERC20 _asset, IOracle _oracle) onlyControl {
+    function updateOracleForAsset(IERC20 _asset, IOracle _oracle) external onlyControl {
         require(address(_oracle) != address(0), "INVALID_ORACLE");
         assetToOracle[_asset] = _oracle;
         emit UpdateOracle(_asset, _oracle);
@@ -40,28 +40,28 @@ contract PriceOracle is IPriceOracle {
 
     /// @notice returns price of token in USD
     /// @param _token token to fetch price
-    function getPriceInUSD(IERC20 _token) external returns(uint256) {
+    function getPriceInUSD(IERC20 _token) external override returns(uint256) {
         require(address(assetToOracle[_token]) != address(0), "INVALID_ORACLE");
         return assetToOracle[_token].getPriceInUSD();
     }
 
     /// @notice returns price of token in ETH
     /// @param _token token to fetch price
-    function getPriceInETH(IERC20 _token) external returns(uint256) {
+    function getPriceInETH(IERC20 _token) external override returns(uint256) {
         require(address(assetToOracle[_token]) != address(0), "INVALID_ORACLE");
         return assetToOracle[_token].getPriceInETH();
     }
 
     /// @notice returns price of token in USD
     /// @param _token view price of token
-    function viewPriceInUSD(IERC20 _token) external view returns(uint256) {
+    function viewPriceInUSD(IERC20 _token) external view override returns(uint256) {
         require(address(assetToOracle[_token]) != address(0), "INVALID_ORACLE");
         return assetToOracle[_token].viewPriceInUSD();
     }
 
     /// @notice returns price of token in USD
     /// @param _token view price of token
-    function viewPriceInETH(IERC20 _token) external view returns(uint256) {
+    function viewPriceInETH(IERC20 _token) external view override returns(uint256) {
         require(address(assetToOracle[_token]) != address(0), "INVALID_ORACLE");
         return assetToOracle[_token].viewPriceInETH();
     }

@@ -11,7 +11,6 @@ import {
   PopulatedTransaction,
   Contract,
   ContractTransaction,
-  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -19,52 +18,37 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface MockPriceOracleInterface extends ethers.utils.Interface {
+interface IKeeperOracleInterface extends ethers.utils.Interface {
   functions: {
-    "getPriceInETH(address)": FunctionFragment;
-    "getPriceInUSD(address)": FunctionFragment;
-    "viewPriceInETH(address)": FunctionFragment;
-    "viewPriceInUSD(address)": FunctionFragment;
+    "current(address,uint256,address)": FunctionFragment;
+    "observationLength(address)": FunctionFragment;
+    "pairFor(address,address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getPriceInETH",
+    functionFragment: "current",
+    values: [string, BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "observationLength",
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "getPriceInUSD",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "viewPriceInETH",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "viewPriceInUSD",
-    values: [string]
+    functionFragment: "pairFor",
+    values: [string, string]
   ): string;
 
+  decodeFunctionResult(functionFragment: "current", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getPriceInETH",
+    functionFragment: "observationLength",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "getPriceInUSD",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "viewPriceInETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "viewPriceInUSD",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "pairFor", data: BytesLike): Result;
 
   events: {};
 }
 
-export class MockPriceOracle extends Contract {
+export class IKeeperOracle extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -105,190 +89,194 @@ export class MockPriceOracle extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: MockPriceOracleInterface;
+  interface: IKeeperOracleInterface;
 
   functions: {
-    getPriceInETH(
+    current(
       arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      arg1: BigNumberish,
+      arg2: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
-    "getPriceInETH(address)"(
+    "current(address,uint256,address)"(
       arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      arg1: BigNumberish,
+      arg2: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
-    getPriceInUSD(
-      arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "getPriceInUSD(address)"(
-      arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    viewPriceInETH(
+    observationLength(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "viewPriceInETH(address)"(
+    "observationLength(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    viewPriceInUSD(
+    pairFor(
       arg0: string,
+      arg1: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[string]>;
 
-    "viewPriceInUSD(address)"(
+    "pairFor(address,address)"(
       arg0: string,
+      arg1: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[string]>;
   };
 
-  getPriceInETH(
+  current(
     arg0: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+    arg1: BigNumberish,
+    arg2: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
-  "getPriceInETH(address)"(
+  "current(address,uint256,address)"(
     arg0: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+    arg1: BigNumberish,
+    arg2: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
-  getPriceInUSD(
-    arg0: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "getPriceInUSD(address)"(
-    arg0: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  viewPriceInETH(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  "viewPriceInETH(address)"(
+  observationLength(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  viewPriceInUSD(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  "viewPriceInUSD(address)"(
+  "observationLength(address)"(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  pairFor(
+    arg0: string,
+    arg1: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "pairFor(address,address)"(
+    arg0: string,
+    arg1: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   callStatic: {
-    getPriceInETH(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    current(
+      arg0: string,
+      arg1: BigNumberish,
+      arg2: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    "getPriceInETH(address)"(
+    "current(address,uint256,address)"(
+      arg0: string,
+      arg1: BigNumberish,
+      arg2: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    observationLength(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getPriceInUSD(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getPriceInUSD(address)"(
+    "observationLength(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    viewPriceInETH(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInETH(address)"(
+    pairFor(
       arg0: string,
+      arg1: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<string>;
 
-    viewPriceInUSD(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD(address)"(
+    "pairFor(address,address)"(
       arg0: string,
+      arg1: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
-    getPriceInETH(
+    current(
       arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      arg1: BigNumberish,
+      arg2: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPriceInETH(address)"(
+    "current(address,uint256,address)"(
       arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      arg1: BigNumberish,
+      arg2: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getPriceInUSD(
-      arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "getPriceInUSD(address)"(
-      arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    viewPriceInETH(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInETH(address)"(
+    observationLength(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    viewPriceInUSD(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD(address)"(
+    "observationLength(address)"(
       arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    pairFor(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "pairFor(address,address)"(
+      arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getPriceInETH(
+    current(
       arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      arg1: BigNumberish,
+      arg2: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getPriceInETH(address)"(
+    "current(address,uint256,address)"(
       arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      arg1: BigNumberish,
+      arg2: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getPriceInUSD(
-      arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "getPriceInUSD(address)"(
-      arg0: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    viewPriceInETH(
+    observationLength(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "viewPriceInETH(address)"(
+    "observationLength(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    viewPriceInUSD(
+    pairFor(
       arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "viewPriceInUSD(address)"(
+    "pairFor(address,address)"(
       arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

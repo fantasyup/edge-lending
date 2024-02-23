@@ -18,14 +18,34 @@ export class IOracle__factory {
 
 const _abi = [
   {
-    inputs: [
+    inputs: [],
+    name: "getPriceInETH",
+    outputs: [
       {
-        internalType: "address",
-        name: "_token",
-        type: "address",
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
-    name: "getPriceInETH",
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getPriceInUSD",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "viewPriceInETH",
     outputs: [
       {
         internalType: "uint256",
@@ -37,14 +57,8 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_token",
-        type: "address",
-      },
-    ],
-    name: "getPriceInUSD",
+    inputs: [],
+    name: "viewPriceInUSD",
     outputs: [
       {
         internalType: "uint256",

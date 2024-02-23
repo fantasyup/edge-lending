@@ -13,8 +13,9 @@ import "./interfaces/IBSWrapperToken.sol";
 import "./interfaces/IPriceOracle.sol";
 import "./interfaces/IBSCollateralPair.sol";
 import "hardhat/console.sol";
+import "./token/Initializable.sol";
 
-contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
+contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Intializable {
     using SafeERC20 for IERC20;
 
     /// @dev initialExchangeRateMantissa Initial exchange rate used when minting the first CTokens (used when totalSupply = 0)
@@ -102,7 +103,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
         uint256 _initialExchangeRateMantissa,
         uint256 _reserveFactorMantissa,
         IBSWrapperToken _wrappedBorrowAsset
-    ) public {
+    ) public initializer {
         control = _control;
         vault = _vault;
         asset = _asset;
@@ -232,7 +233,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
         uint256 borrowAmountAllowedInUSD = borrowLimitInUSD - borrowedTotalInUSD;
         console.logUint(borrowAmountAllowedInUSD);
 
-        uint256 borrowAmountInUSD = getPriceOfToken(address(asset), _amount);
+        uint256 borrowAmountInUSD = getPriceOfToken(asset, _amount);
 
         //require the amount being borrowed is less than or equal to the amount they are aloud to borrow
         require(
@@ -711,7 +712,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
             return 0;
         }
         uint256 leftoverCollateral = collateralValue - requiredCollateral;
-        uint256 currentCollateralValueInUSD = getPriceOfToken(address(collateralAsset), leftoverCollateral);
+        uint256 currentCollateralValueInUSD = getPriceOfToken(collateralAsset, leftoverCollateral);
         return leftoverCollateral * 1e18 / currentCollateralValueInUSD;
     }
 
@@ -722,7 +723,6 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
     **/
     function getTotalAvailableCollateralValue(address _account)
         public
-        view
         returns (uint256)
     {
         uint256 accountCollateral = collateralOfAccount(_account);
@@ -730,18 +730,17 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
         uint256 accountVaultUnderlyingBalance = vault.toUnderlying(collateralAsset, accountCollateral);
         // emit DebugValues(accountCollateral, assetPrice);
         // multiply the amount of collateral by the asset price and return it
-        uint256 accountAssetsValue =  getPriceOfToken(address(collateralAsset), accountVaultUnderlyingBalance);
+        uint256 accountAssetsValue =  getPriceOfToken(collateralAsset, accountVaultUnderlyingBalance);
 
         return accountAssetsValue;
     }
 
-    function getPriceOfCollateral() public view returns (uint256) {
+    function getPriceOfCollateral() public returns (uint256) {
         return oracle.getPriceInUSD(collateralAsset);
     }
 
     function getPriceOfToken(IERC20 token, uint256 amount)
         public
-        view
         returns (uint256)
     {
         return oracle.getPriceInUSD(token) * amount;
@@ -756,7 +755,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential {
 
         uint256 currentBorrowBalance = borrowBalanceCurrent(_account);
         return getPriceOfToken(
-            address(asset),
+            asset,
             currentBorrowBalance
         );
     }

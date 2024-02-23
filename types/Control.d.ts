@@ -324,12 +324,12 @@ export class Control extends Contract {
     ): Promise<ContractTransaction>;
 
     upgradeControl(
-      newBSControl: string,
+      _newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "upgradeControl(address)"(
-      newBSControl: string,
+      _newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -458,12 +458,12 @@ export class Control extends Contract {
   ): Promise<ContractTransaction>;
 
   upgradeControl(
-    newBSControl: string,
+    _newBSControl: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "upgradeControl(address)"(
-    newBSControl: string,
+    _newBSControl: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -588,12 +588,12 @@ export class Control extends Contract {
     ): Promise<void>;
 
     upgradeControl(
-      newBSControl: string,
+      _newBSControl: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "upgradeControl(address)"(
-      newBSControl: string,
+      _newBSControl: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -744,12 +744,12 @@ export class Control extends Contract {
     ): Promise<BigNumber>;
 
     upgradeControl(
-      newBSControl: string,
+      _newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "upgradeControl(address)"(
-      newBSControl: string,
+      _newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -894,12 +894,12 @@ export class Control extends Contract {
     ): Promise<PopulatedTransaction>;
 
     upgradeControl(
-      newBSControl: string,
+      _newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "upgradeControl(address)"(
-      newBSControl: string,
+      _newBSControl: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

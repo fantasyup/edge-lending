@@ -24,7 +24,7 @@ contract UniQuote is IOracle {
         sushiswapKeeperOracle = _sushiswapKeeperOracle;
     }
 
-    function getPriceInETH() public override view returns (uint256 priceInETH) {
+    function getPriceInETH() public override returns (uint256 priceInETH) {
         uint8 decimals = ERC20(asset).decimals();
         // If token has SushiSwap Keeper oracle
         address sushiPair = sushiswapKeeperOracle.pairFor(asset, WETH);
@@ -44,7 +44,7 @@ contract UniQuote is IOracle {
     }
 
     // @TODO compelete implementataion
-    function getPriceInUSD() external override view returns(uint256 priceInUSD) {
+    function getPriceInUSD() external override returns(uint256 priceInUSD) {
         uint256 priceInETH = getPriceInETH();
         return priceInETH / 1e18;
     }

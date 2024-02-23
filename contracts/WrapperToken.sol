@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./token/Ownable.sol";
 import "./token/ERC20Permit.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,6 +19,7 @@ contract WrapperToken is ERC20Permit, Ownable {
         string memory _tokenName,
         string memory _tokenSymbol
     ) external {
+        initializeOwner();
         initializeERC20(_tokenName, _tokenSymbol, 18);
         initializeERC20Permit(_tokenName);
         underlying = _underlying;

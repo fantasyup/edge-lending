@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
+import "./token/Ownable.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSCollateralPair.sol";
 import "./interfaces/IBSControl.sol";
 import "./interfaces/IBSVault.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./compound/JumpRateModelV2.sol";
 import "./compound/Exponential.sol";
 import "./compound/InterestRateModel.sol";
@@ -49,7 +49,8 @@ contract Control is IBSControl, Ownable, PairConfigurationBase {
     function initialize(
         IBSVault _vault,
         LendingPairFactory _lendingPairFactory
-    ) public {
+    ) public initializer {
+        initializeOwner();
         vault = _vault;
         lendingPairFactory = _lendingPairFactory;
     }
@@ -93,11 +94,11 @@ contract Control is IBSControl, Ownable, PairConfigurationBase {
         graceSpace =  block.timestamp + 172800;
     }
 
-    function upgradeControl(address newBSControl) public onlyOwner {
+    function upgradeControl(address _newBSControl) public onlyOwner {
     
     }
 
-    function transferControl(IBSControl _newControl, address[] calldata pairAddr) public onlyOwner {
+    function transferControl(IBSControl _newControl, address[] calldata pairAddr) external onlyOwner {
         for (uint256 i = 0; i < pairAddr.length; ++i) {
             // transfer control to another pair
         }
