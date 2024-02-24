@@ -10,15 +10,14 @@ import "./interfaces/IBSVault.sol";
 import "./interfaces/IBSLendingPair.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
+/// 
 /// @title Blacksmith
-/// @author samparsk
-
-/***
-@notice Vault contract stores assets deposited into the Lending pairs.
-It enables deposit, withdrawal, flash loans and transfer of tokens. It represents the deposited token amount in form of shares
-This contract implements the EIP3156 IERC3156FlashBorrower for flash loans.
-*/
-
+/// @author samparsky
+/// @notice Vault contract stores assets deposited into the Lending pairs.
+/// It enables deposit, withdrawal, flashloans and transfer of tokens.
+/// It represents the deposited token amount in form of shares
+/// This contract implements the EIP3156 IERC3156FlashBorrower for flashloans.
+///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract Vault is VaultBase, IBSVault, ReentrancyGuard {

@@ -25,6 +25,7 @@ interface IBSWrapperTokenInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
+    "initialize(address,string,string)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -43,6 +44,10 @@ interface IBSWrapperTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "burn",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -65,6 +70,7 @@ interface IBSWrapperTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -172,6 +178,20 @@ export class IBSWrapperToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    initialize(
+      _underlying: string,
+      _tokenName: string,
+      _tokenSymbol: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "initialize(address,string,string)"(
+      _underlying: string,
+      _tokenName: string,
+      _tokenSymbol: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     mint(
       _to: string,
       _amount: BigNumberish,
@@ -258,6 +278,20 @@ export class IBSWrapperToken extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  initialize(
+    _underlying: string,
+    _tokenName: string,
+    _tokenSymbol: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "initialize(address,string,string)"(
+    _underlying: string,
+    _tokenName: string,
+    _tokenSymbol: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   mint(
     _to: string,
     _amount: BigNumberish,
@@ -341,6 +375,20 @@ export class IBSWrapperToken extends Contract {
     "burn(address,uint256)"(
       _from: string,
       _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    initialize(
+      _underlying: string,
+      _tokenName: string,
+      _tokenSymbol: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "initialize(address,string,string)"(
+      _underlying: string,
+      _tokenName: string,
+      _tokenSymbol: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -451,6 +499,20 @@ export class IBSWrapperToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    initialize(
+      _underlying: string,
+      _tokenName: string,
+      _tokenSymbol: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "initialize(address,string,string)"(
+      _underlying: string,
+      _tokenName: string,
+      _tokenSymbol: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     mint(
       _to: string,
       _amount: BigNumberish,
@@ -538,6 +600,20 @@ export class IBSWrapperToken extends Contract {
     "burn(address,uint256)"(
       _from: string,
       _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    initialize(
+      _underlying: string,
+      _tokenName: string,
+      _tokenSymbol: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "initialize(address,string,string)"(
+      _underlying: string,
+      _tokenName: string,
+      _tokenSymbol: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

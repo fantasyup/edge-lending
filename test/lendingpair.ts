@@ -66,6 +66,7 @@ describe("LendingPair", async function () {
     const InterestRateFactory = await ethers.getContractFactory(
       "JumpRateModelV2"
     );
+    const WrapperToken = await ethers.getContractFactory("WrapperToken")
     const token = await ethers.getContractFactory("MockToken");
 
     Vault = (await VaultFactory.deploy()) as BVault;
@@ -73,9 +74,9 @@ describe("LendingPair", async function () {
 
     borrowAsset = (await token.deploy()) as MockToken;
     collateralAsset = (await token.deploy()) as MockToken;
-    wrappedToken = (await token.deploy()) as MockToken
+    wrappedToken = (await WrapperToken.deploy()) as MockToken
     Control = (await ControlFactory.deploy()) as BSControl;
-
+    
     interestRateModel = (await InterestRateFactory.deploy(
       "30000000000000000",
       "52222222222200000",

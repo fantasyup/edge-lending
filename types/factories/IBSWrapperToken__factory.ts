@@ -156,6 +156,29 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
+        name: "_underlying",
+        type: "address",
+      },
+      {
+        internalType: "string",
+        name: "_tokenName",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_tokenSymbol",
+        type: "string",
+      },
+    ],
+    name: "initialize",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "_to",
         type: "address",
       },

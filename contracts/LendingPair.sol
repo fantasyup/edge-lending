@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./compound/InterestRateModel.sol";
 import "./compound/Exponential.sol";
-import "./WrapperToken.sol";
 import "./interfaces/IBSControl.sol";
 import "./interfaces/IBSVault.sol";
 import "./interfaces/IBSLendingPair.sol";
@@ -13,8 +13,10 @@ import "./interfaces/IBSWrapperToken.sol";
 import "./interfaces/IPriceOracle.sol";
 import "./interfaces/IBSCollateralPair.sol";
 import "hardhat/console.sol";
-import "./token/Initializable.sol";
+import "./util/Initializable.sol";
+import "./token/IERC20Details.sol";
 
+/// @notice LendingPair  
 contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initializable {
     using SafeERC20 for IERC20;
 
@@ -93,6 +95,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initiali
     /// @param _initialExchangeRateMantissa initial exchange rate mantissa
     /// @param _reserveFactorMantissa reserve factor for borrow
     /// @param _wrappedBorrowAsset wrapped token minted when depositing borrow asset
+
     function initialize(
         IBSControl _control,
         IPriceOracle _oracle,
@@ -103,7 +106,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initiali
         uint256 _initialExchangeRateMantissa,
         uint256 _reserveFactorMantissa,
         IBSWrapperToken _wrappedBorrowAsset
-    ) public initializer {
+    ) external initializer {
         control = _control;
         vault = _vault;
         asset = _asset;
@@ -113,6 +116,14 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initiali
         interestRate = _interestRate;
         initialExchangeRateMantissa = _initialExchangeRateMantissa;
         reserveFactorMantissa = _reserveFactorMantissa;
+        // // abi encode and concat strings
+        // bytes memory name = abi.encodePacked("BlackSmith-");
+        // name = abi.encodePacked(name, _asset.name(), _collateralAsset.name());
+        // bytes memory symbol = abi.encodePacked("BS-");
+        // symbol = abi.encodePacked(symbol, _asset.symbol(), _collateralAsset.symbol());
+
+        // initialize wrapped borrow asset
+        IBSWrapperToken(_wrappedBorrowAsset).initialize(address(_asset), "BlackSmith-", "BS");
         wrappedAsset = _wrappedBorrowAsset;
     }
 
@@ -143,7 +154,6 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initiali
     function depositCollateral(address _tokenReceipeint, uint256 _amount) internal {
         // require(vault.balanceOf(collateralAsset, _tokenReceipeint) >= _amount, "Not enough balance");
         // vault.transfer(collateralAsset, address(this), _amount);
-
         collateralBalance[_tokenReceipeint] = collateralBalance[_tokenReceipeint] + _amount;
         emit Deposit(_tokenReceipeint, _amount);
     }
@@ -605,7 +615,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initiali
     @return The calculated balance
     **/
     function borrowBalanceCurrent(address _account) public returns (uint256) {
-        // accrueInterest();
+        accrueInterest();
         return borrowBalancePrior(_account);
     }
 
@@ -806,6 +816,7 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initiali
     function liquidateAccount(address _borrower) public {
         // require the liquidator is not also the borrower
         require(msg.sender != _borrower, "you cant liquidate yourself");
+
         uint256 borrowedAmount = borrowBalanceCurrent(_borrower);
 
         uint256 borrowedAmountInUSD = getPriceOfToken(

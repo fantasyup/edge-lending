@@ -8,7 +8,7 @@ import "./Initializable.sol";
  * @dev Contract module which provides a basic access control mechanism, where
  * there is an account (an owner) that can be granted exclusive access to
  * specific functions.
- * @author crypto-pumpkin
+ * @author samparsky
  *
  * By initialization, the owner account will be the one that called initializeOwner. This
  * can later be changed with {transferOwnership}.
@@ -17,6 +17,7 @@ import "./Initializable.sol";
  * `onlyOwner`, which can be applied to your functions to restrict their use to
  * the owner.
  */
+
 contract Ownable is Initializable {
     address private _owner;
 

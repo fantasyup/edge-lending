@@ -28,7 +28,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  * 
- * !!! crypto-pumpkin modified: use initializeERC20 to replace constructor for proxy
+ * !!! samparsky modified: use initializeERC20 to replace constructor for proxy
  */
 contract ERC20 is IERC20 {
 

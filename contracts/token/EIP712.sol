@@ -24,7 +24,7 @@ abstract contract EIP712 {
     /* solhint-disable var-name-mixedcase */
     // Cache the domain separator as an immutable value, but also store the chain id that it corresponds to, in order to
     // invalidate the cached domain separator if the chain id changes.
-    // crypto-pumpkin@: remove immutable to be initiated, it should only be set once in initialize
+    // samparsky: remove immutable to be initiated, it should only be set once in initialize
     bytes32 private _CACHED_DOMAIN_SEPARATOR;
     uint256 private _CACHED_CHAIN_ID;
 
