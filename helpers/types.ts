@@ -4,5 +4,10 @@ export enum ContractId {
     LendingPair = 'LendingPair',
     LendingPairFactory = 'LendingPairFactory',
     Control = 'Control',
-    WrapperToken = 'WrapperToken'
+    WrapperToken = 'WrapperToken',
+    UUPSProxy = 'UUPSProxy',
+    MockFlashBorrower = 'MockFlashBorrower',
+    MockLendingPair = 'MockLendingPair'
 }
+
+export type EthereumAddress = string;

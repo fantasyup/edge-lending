@@ -21,9 +21,19 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface LendingPairFactoryInterface extends ethers.utils.Interface {
   functions: {
+    "c_0x594cc606(bytes32)": FunctionFragment;
+    "c_0x724efe76(bytes32)": FunctionFragment;
     "createPair(address,address,address,address,address,uint256,uint256,tuple,address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "c_0x594cc606",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x724efe76",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "createPair",
     values: [
@@ -44,6 +54,14 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     ]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "c_0x594cc606",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x724efe76",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "createPair", data: BytesLike): Result;
 
   events: {};
@@ -93,6 +111,26 @@ export class LendingPairFactory extends Contract {
   interface: LendingPairFactoryInterface;
 
   functions: {
+    c_0x594cc606(
+      c__0x594cc606: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x594cc606(bytes32)"(
+      c__0x594cc606: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0x724efe76(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x724efe76(bytes32)"(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     createPair(
       _control: string,
       _oracle: string,
@@ -129,6 +167,26 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  c_0x594cc606(
+    c__0x594cc606: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x594cc606(bytes32)"(
+    c__0x594cc606: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0x724efe76(
+    c__0x724efe76: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x724efe76(bytes32)"(
+    c__0x724efe76: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
 
   createPair(
     _control: string,
@@ -167,6 +225,26 @@ export class LendingPairFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    c_0x594cc606(
+      c__0x594cc606: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x594cc606(bytes32)"(
+      c__0x594cc606: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0x724efe76(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x724efe76(bytes32)"(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     createPair(
       _control: string,
       _oracle: string,
@@ -207,6 +285,26 @@ export class LendingPairFactory extends Contract {
   filters: {};
 
   estimateGas: {
+    c_0x594cc606(
+      c__0x594cc606: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x594cc606(bytes32)"(
+      c__0x594cc606: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0x724efe76(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x724efe76(bytes32)"(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     createPair(
       _control: string,
       _oracle: string,
@@ -245,6 +343,26 @@ export class LendingPairFactory extends Contract {
   };
 
   populateTransaction: {
+    c_0x594cc606(
+      c__0x594cc606: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x594cc606(bytes32)"(
+      c__0x594cc606: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0x724efe76(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x724efe76(bytes32)"(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     createPair(
       _control: string,
       _oracle: string,

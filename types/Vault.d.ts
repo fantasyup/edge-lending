@@ -24,16 +24,20 @@ interface VaultInterface extends ethers.utils.Interface {
     "FLASHLOAN_CALLBACK_SUCCESS()": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "blackSmithTeam()": FunctionFragment;
+    "c_0x630f40d2(bytes32)": FunctionFragment;
+    "c_0xd117f7be(bytes32)": FunctionFragment;
+    "c_0xeca1878e(bytes32)": FunctionFragment;
+    "c_0xff8e4d68(bytes32)": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
     "flashFee(address,uint256)": FunctionFragment;
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
     "flashLoanRate()": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
     "initialize(uint256,address)": FunctionFragment;
-    "lendingPairTransfer(address,address,uint256)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
+    "send(address,address,uint256)": FunctionFragment;
     "toShare(address,uint256)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
@@ -55,6 +59,22 @@ interface VaultInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "blackSmithTeam",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x630f40d2",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xd117f7be",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xeca1878e",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xff8e4d68",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
@@ -81,10 +101,6 @@ interface VaultInterface extends ethers.utils.Interface {
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "lendingPairTransfer",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "maxFlashLoan",
     values: [string]
   ): string;
@@ -92,6 +108,10 @@ interface VaultInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "proxiableUUID",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "send",
+    values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "toShare",
@@ -129,6 +149,22 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "blackSmithTeam",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x630f40d2",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xd117f7be",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xeca1878e",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xff8e4d68",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashFee", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashLoan", data: BytesLike): Result;
@@ -142,10 +178,6 @@ interface VaultInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "lendingPairTransfer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "maxFlashLoan",
     data: BytesLike
   ): Result;
@@ -154,6 +186,7 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "proxiableUUID",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "send", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "toUnderlying",
@@ -263,6 +296,46 @@ export class Vault extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<[string]>;
 
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xeca1878e(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xeca1878e(bytes32)"(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     deposit(
       _token: string,
       _from: string,
@@ -331,20 +404,6 @@ export class Vault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    lendingPairTransfer(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "lendingPairTransfer(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     maxFlashLoan(
       _token: string,
       overrides?: CallOverrides
@@ -362,6 +421,20 @@ export class Vault extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
+
+    send(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "send(address,address,uint256)"(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     toShare(
       _token: string,
@@ -475,6 +548,46 @@ export class Vault extends Contract {
 
   "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
+  c_0x630f40d2(
+    c__0x630f40d2: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x630f40d2(bytes32)"(
+    c__0x630f40d2: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xd117f7be(
+    c__0xd117f7be: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xd117f7be(bytes32)"(
+    c__0xd117f7be: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xeca1878e(
+    c__0xeca1878e: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xeca1878e(bytes32)"(
+    c__0xeca1878e: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xff8e4d68(
+    c__0xff8e4d68: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xff8e4d68(bytes32)"(
+    c__0xff8e4d68: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
   deposit(
     _token: string,
     _from: string,
@@ -539,20 +652,6 @@ export class Vault extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  lendingPairTransfer(
-    _token: string,
-    _to: string,
-    _shares: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "lendingPairTransfer(address,address,uint256)"(
-    _token: string,
-    _to: string,
-    _shares: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   maxFlashLoan(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "maxFlashLoan(address)"(
@@ -567,6 +666,20 @@ export class Vault extends Contract {
   proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
+
+  send(
+    _token: string,
+    _to: string,
+    _shares: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "send(address,address,uint256)"(
+    _token: string,
+    _to: string,
+    _shares: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   toShare(
     _token: string,
@@ -680,6 +793,46 @@ export class Vault extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xeca1878e(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xeca1878e(bytes32)"(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     deposit(
       _token: string,
       _from: string,
@@ -744,20 +897,6 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    lendingPairTransfer(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "lendingPairTransfer(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     maxFlashLoan(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxFlashLoan(address)"(
@@ -772,6 +911,20 @@ export class Vault extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
+
+    send(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "send(address,address,uint256)"(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     toShare(
       _token: string,
@@ -977,6 +1130,46 @@ export class Vault extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xeca1878e(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xeca1878e(bytes32)"(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     deposit(
       _token: string,
       _from: string,
@@ -1041,20 +1234,6 @@ export class Vault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    lendingPairTransfer(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "lendingPairTransfer(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     maxFlashLoan(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxFlashLoan(address)"(
@@ -1069,6 +1248,20 @@ export class Vault extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    send(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "send(address,address,uint256)"(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     toShare(
       _token: string,
@@ -1189,6 +1382,46 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xeca1878e(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xeca1878e(bytes32)"(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     deposit(
       _token: string,
       _from: string,
@@ -1255,20 +1488,6 @@ export class Vault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    lendingPairTransfer(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "lendingPairTransfer(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     maxFlashLoan(
       _token: string,
       overrides?: CallOverrides
@@ -1286,6 +1505,20 @@ export class Vault extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    send(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "send(address,address,uint256)"(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     toShare(
       _token: string,

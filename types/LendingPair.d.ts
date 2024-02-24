@@ -31,6 +31,9 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "borrowBalanceCurrent(address)": FunctionFragment;
     "borrowBalancePrior(address)": FunctionFragment;
     "borrowIndex()": FunctionFragment;
+    "c_0x17e3ec3b(bytes32)": FunctionFragment;
+    "c_0x4a27d295(bytes32)": FunctionFragment;
+    "c_0x7c557157(bytes32)": FunctionFragment;
     "calcBorrowLimit(uint256)": FunctionFragment;
     "calcCollateralRequired(uint256)": FunctionFragment;
     "calculateFee(uint256)": FunctionFragment;
@@ -99,6 +102,18 @@ interface LendingPairInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "borrowIndex",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x17e3ec3b",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x4a27d295",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x7c557157",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "calcBorrowLimit",
@@ -242,6 +257,18 @@ interface LendingPairInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "borrowIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x17e3ec3b",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x4a27d295",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x7c557157",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -500,6 +527,36 @@ export class LendingPair extends Contract {
     borrowIndex(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "borrowIndex()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    c_0x17e3ec3b(
+      c__0x17e3ec3b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x17e3ec3b(bytes32)"(
+      c__0x17e3ec3b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0x4a27d295(
+      c__0x4a27d295: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x4a27d295(bytes32)"(
+      c__0x4a27d295: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0x7c557157(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x7c557157(bytes32)"(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
 
     calcBorrowLimit(
       _collateralValue: BigNumberish,
@@ -848,6 +905,36 @@ export class LendingPair extends Contract {
 
   "borrowIndex()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  c_0x17e3ec3b(
+    c__0x17e3ec3b: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x17e3ec3b(bytes32)"(
+    c__0x17e3ec3b: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0x4a27d295(
+    c__0x4a27d295: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x4a27d295(bytes32)"(
+    c__0x4a27d295: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0x7c557157(
+    c__0x7c557157: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x7c557157(bytes32)"(
+    c__0x7c557157: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
   calcBorrowLimit(
     _collateralValue: BigNumberish,
     overrides?: CallOverrides
@@ -1193,6 +1280,36 @@ export class LendingPair extends Contract {
     borrowIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
     "borrowIndex()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    c_0x17e3ec3b(
+      c__0x17e3ec3b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x17e3ec3b(bytes32)"(
+      c__0x17e3ec3b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0x4a27d295(
+      c__0x4a27d295: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x4a27d295(bytes32)"(
+      c__0x4a27d295: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0x7c557157(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x7c557157(bytes32)"(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     calcBorrowLimit(
       _collateralValue: BigNumberish,
@@ -1633,6 +1750,36 @@ export class LendingPair extends Contract {
 
     "borrowIndex()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    c_0x17e3ec3b(
+      c__0x17e3ec3b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x17e3ec3b(bytes32)"(
+      c__0x17e3ec3b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0x4a27d295(
+      c__0x4a27d295: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x4a27d295(bytes32)"(
+      c__0x4a27d295: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0x7c557157(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x7c557157(bytes32)"(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     calcBorrowLimit(
       _collateralValue: BigNumberish,
       overrides?: CallOverrides
@@ -1980,6 +2127,36 @@ export class LendingPair extends Contract {
     borrowIndex(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "borrowIndex()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    c_0x17e3ec3b(
+      c__0x17e3ec3b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x17e3ec3b(bytes32)"(
+      c__0x17e3ec3b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0x4a27d295(
+      c__0x4a27d295: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x4a27d295(bytes32)"(
+      c__0x4a27d295: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0x7c557157(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x7c557157(bytes32)"(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     calcBorrowLimit(
       _collateralValue: BigNumberish,

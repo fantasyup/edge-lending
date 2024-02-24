@@ -92,7 +92,7 @@ interface IBSVault is IERC3156FlashLender {
         uint256 _shares
     ) external;
 
-    function lendingPairTransfer(
+    function send(
         IERC20 _token,
         address _to,
         uint256 _shares

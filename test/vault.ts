@@ -1,40 +1,56 @@
 import { ethers, waffle } from "hardhat";
 import { Signer } from "ethers";
 import { expect, assert } from "chai";
-import { MockToken, Vault as BVault } from "../types";
+import { MockLendingPair as BMockLendingPair, MockToken as BMockToken, Vault as BVault } from "../types";
+import { ContractId } from "../helpers/types";
+import {
+  deployVault,
+  deployMockToken,
+  deployMockFlashBorrower,
+} from "../helpers/contracts";
+import { FlashBorrower as BFlashBorrower } from "../types/FlashBorrower";
 
-describe("Vault", async function () {
-  let accounts: Signer[];
-  let Vault: BVault;
-  let MockToken: MockToken;
+let accounts: Signer[];
+let Vault: BVault;
+let MockToken: BMockToken;
+let FlashBorrower: BFlashBorrower;
+let MockLendingPair: BMockLendingPair
+// users
+let admin: string; // account used in deploying
+let bob: string;
+let alice: string;
 
-  // users
-  let admin: string; // account used in deploying
-  let bob: string;
-  let alice: string;
-  
-  const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
-  const BASE = ethers.utils.parseUnits("1", 18);
+const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
+const BASE = ethers.utils.parseUnits("1", 18);
 
+describe("Vault", function () {
   before(async function () {
     accounts = await ethers.getSigners();
 
     admin = await accounts[0].getAddress();
     bob = await accounts[1].getAddress();
-    alice = await accounts[3].getAddress();
+    alice = await accounts[2].getAddress();
 
-    const VaultFactory = await ethers.getContractFactory("Vault");
-    const token = await ethers.getContractFactory("MockToken");
+    Vault = await deployVault();
+    MockToken = await deployMockToken();
+    FlashBorrower = await deployMockFlashBorrower();
 
-    Vault = (await VaultFactory.deploy()) as BVault;
-    MockToken = (await token.deploy()) as MockToken;
+    await MockToken.setBalanceTo(admin, 1000000);
   });
 
-  it("initialize", async function () {
-    await Vault.initialize(flashLoanRate, admin);
+  describe("initialize", function () {
+    it("initialize fails with 0 team", async function () {
+      await expect(
+        Vault.initialize(flashLoanRate, ethers.constants.AddressZero)
+      ).to.be.revertedWith("INVALID_TEAM");
+    });
 
-    expect(await Vault.flashLoanRate()).to.eq(flashLoanRate);
-    expect(await Vault.blackSmithTeam()).to.eq(admin);
+    it("initialize - correctly", async function () {
+      await Vault.initialize(flashLoanRate, admin);
+
+      expect(await Vault.flashLoanRate()).to.eq(flashLoanRate);
+      expect(await Vault.blackSmithTeam()).to.eq(admin);
+    });
   });
 
   it("proxiableUUID", async function () {
@@ -45,103 +61,200 @@ describe("Vault", async function () {
     expect((await Vault.proxiableUUID()).toString()).to.eq(hash.toString());
   });
 
-  describe("\t - vault actions", function () {
+  describe("vault actions", function () {
     const amountToDeposit = 100;
+    describe("deposit", function () {
+      it("deposit fails with invalid `to` address", async function () {
+        await expect(
+          Vault.deposit(
+            MockToken.address,
+            admin,
+            ethers.constants.AddressZero,
+            amountToDeposit
+          )
+        ).to.be.revertedWith("VAULT: INVALID_TO_ADDRESS");
+      });
 
-    it("deposit", async function () {
-      await MockToken.setBalanceTo(admin, 1000);
-      await MockToken.approve(Vault.address, 100);
-      expect(
-        await Vault.deposit(MockToken.address, admin, admin, amountToDeposit)
-      )
-        .to.emit(Vault, "Deposit")
-        .withArgs(
-          MockToken.address,
-          admin,
-          admin,
-          amountToDeposit,
+      it("deposit - correctly with correct user balance", async function () {
+        // approve Vault to take 100
+        await MockToken.approve(Vault.address, amountToDeposit);
+
+        expect(
+          await Vault.deposit(MockToken.address, admin, admin, amountToDeposit)
+        )
+          .to.emit(Vault, "Deposit")
+          .withArgs(
+            MockToken.address,
+            admin,
+            admin,
+            amountToDeposit,
+            amountToDeposit
+          );
+
+        expect(
+          await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
+        ).eq(amountToDeposit);
+
+        expect((await Vault.totals(MockToken.address)).toNumber()).eq(
           amountToDeposit
         );
+      });
 
-      expect(
-        await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
-      ).eq(amountToDeposit);
-
-      expect((await Vault.totals(MockToken.address)).toNumber()).eq(
-        amountToDeposit
-      );
+      it("deposit fails with incorrect approve deposit", async function () {
+        // await MockToken.decreaseAllowance(Vault.address, 10);
+        await expect(
+          Vault.deposit(MockToken.address, admin, admin, amountToDeposit)
+        ).to.be.reverted;
+      });
     });
 
-    it("transfer", async function () {
-      const currentBalance = (
-        await Vault.balanceOf(MockToken.address, admin)
-      ).toNumber();
+    describe("transfer", function () {
       const sharesToTransfer = 5;
-      const remainingShareBalance = currentBalance - sharesToTransfer;
-      const currentTotal = (await Vault.totals(MockToken.address)).toNumber();
-      expect(await Vault.transfer(MockToken.address, bob, sharesToTransfer))
-        .to.emit(Vault, "Transfer")
-        .withArgs(MockToken.address, admin, bob, sharesToTransfer);
 
-      expect(
-        await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
-      ).eq(remainingShareBalance);
+      it("transfer fails with invalid `to` address", async function () {
+        await expect(
+          Vault.transfer(
+            MockToken.address,
+            ethers.constants.AddressZero,
+            sharesToTransfer
+          )
+        ).to.be.revertedWith("VAULT: INVALID_TO_ADDRESS");
+      });
 
-      expect(
-        await (await Vault.balanceOf(MockToken.address, bob)).toNumber()
-      ).eq(sharesToTransfer);
+      it("transfer - correctly", async function () {
+        const currentBalance = (
+          await Vault.balanceOf(MockToken.address, admin)
+        ).toNumber();
+        const remainingShareBalance = currentBalance - sharesToTransfer;
+        const currentTotal = (await Vault.totals(MockToken.address)).toNumber();
 
-      expect((await Vault.totals(MockToken.address)).toNumber()).eq(
-        currentTotal
-      );
-    });
+        expect(await Vault.transfer(MockToken.address, bob, sharesToTransfer))
+          .to.emit(Vault, "Transfer")
+          .withArgs(MockToken.address, admin, bob, sharesToTransfer);
 
-    it("withdraw", async function () {
-      const currentTotals = (await Vault.totals(MockToken.address)).toNumber();
-      const currentBalance = (
-        await Vault.balanceOf(MockToken.address, admin)
-      ).toNumber();
-      expect(
-        await Vault.withdraw(MockToken.address, admin, admin, currentBalance)
-      )
-        .to.emit(Vault, "Withdraw")
-        .withArgs(
-          MockToken.address,
-          admin,
-          admin,
-          currentBalance,
-          currentBalance
+        expect(
+          await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
+        ).eq(remainingShareBalance);
+
+        expect(
+          await (await Vault.balanceOf(MockToken.address, bob)).toNumber()
+        ).eq(sharesToTransfer);
+
+        expect((await Vault.totals(MockToken.address)).toNumber()).eq(
+          currentTotal
         );
-
-      expect(
-        await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
-      ).eq(0);
-
-      expect((await Vault.totals(MockToken.address)).toNumber()).eq(
-        currentTotals - currentBalance
-      );
+      });
     });
 
-    it("maxFlashLoan", async function () {
-      const currentTotals = (await Vault.totals(MockToken.address)).toNumber();
-      expect(await (await Vault.maxFlashLoan(MockToken.address)).toNumber()).eq(
-        currentTotals
-      );
+    describe("send", function () {
+        it("send fails with non-contract address", async function() {
+            expect(
+                await (await Vault.send(MockToken.address, bob, 1))
+            ).to.be.revertedWith('ONLY_TO_CONTRACT')
+        })
+
+        it("send - correctly", async function() {
+            const currentBalance = (
+                await Vault.balanceOf(MockToken.address, admin)
+              ).toNumber();
+            const sharesToSend = 1
+            expect(
+                await (await Vault.send(MockToken.address, MockLendingPair.address, sharesToSend))
+            )
+        })
+    })
+
+
+    describe("flashLoan", function () {
+      it("maxFlashLoan", async function () {
+        const currentTotals = (
+          await Vault.totals(MockToken.address)
+        ).toNumber();
+        expect(
+          await (await Vault.maxFlashLoan(MockToken.address)).toNumber()
+        ).eq(currentTotals);
+      });
+
+      it("flashFee", async function () {
+        const amountToFlashLoan = await Vault.totals(MockToken.address);
+        const expectedFlashFee = flashLoanRate.mul(amountToFlashLoan).div(BASE);
+
+        expect(
+          await (
+            await Vault.flashFee(MockToken.address, amountToFlashLoan)
+          ).toNumber()
+        ).eq(expectedFlashFee.toNumber());
+      });
+
+      it("flashLoan - correctly", async function () {
+        // deposit money to FlashBorrwer
+        await MockToken.setBalanceTo(FlashBorrower.address, 1000)
+        // call borrow on flashBorrower
+        // approve balance
+        const amountToFlashLoan = amountToDeposit
+        const expectedFlashFee = flashLoanRate.mul(amountToFlashLoan).div(BASE);
+
+        await MockToken.approve(Vault.address, amountToDeposit + expectedFlashFee.toNumber());
+
+        expect(await Vault.flashLoan(FlashBorrower.address, MockToken.address, amountToFlashLoan, "0x"))
+          .to.emit(Vault, "FlashLoan")
+          .withArgs(admin, MockToken.address, amountToFlashLoan, expectedFlashFee, FlashBorrower.address);
+      });
     });
 
-    it("flashFee", async function () {
-      const amountToFlashLoan = await Vault.totals(MockToken.address);
-      const expectedFlashFee = flashLoanRate.mul(amountToFlashLoan).div(BASE);
+    describe("withdraw", function () {
+      it("withdraw fails with invalid `to` address", async function () {
+        await expect(
+          Vault.withdraw(
+            MockToken.address,
+            admin,
+            ethers.constants.AddressZero,
+            amountToDeposit
+          )
+        ).to.be.revertedWith("VAULT: INVALID_TO_ADDRESS");
+      });
 
-      expect(
-        await (
-          await Vault.flashFee(MockToken.address, amountToFlashLoan)
-        ).toNumber()
-      ).eq(expectedFlashFee.toNumber());
+      it("user cannot withdraw more than balance", async function () {
+        await expect(
+          Vault.withdraw(
+            MockToken.address,
+            admin,
+            admin,
+            amountToDeposit * 7
+          )
+        ).to.be.reverted;
+      });
+
+      it("withdraw - correctly", async function () {
+        const currentTotals = (
+          await Vault.totals(MockToken.address)
+        ).toNumber();
+        const currentBalance = (
+          await Vault.balanceOf(MockToken.address, admin)
+        ).toNumber();
+        const expectedAmountOut = await Vault.toUnderlying(MockToken.address, currentBalance)
+        expect(
+          await Vault.withdraw(MockToken.address, admin, admin, currentBalance)
+        )
+          .to.emit(Vault, "Withdraw")
+          .withArgs(
+            MockToken.address,
+            admin,
+            admin,
+            currentBalance,
+            expectedAmountOut
+          );
+
+        expect(
+          await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
+        ).eq(0);
+
+        expect((await Vault.totals(MockToken.address)).toNumber()).eq(
+          currentTotals - currentBalance
+        );
+      });
     });
   });
-
-  //   describe()
 
   describe("\t - math", function () {
     it("calculates the shares correctly", async function () {});

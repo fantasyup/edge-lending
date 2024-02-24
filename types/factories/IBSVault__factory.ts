@@ -329,6 +329,25 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+    ],
+    name: "maxFlashLoan",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "contract IERC20",
         name: "_token",
         type: "address",
@@ -344,28 +363,9 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "lendingPairTransfer",
+    name: "send",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "token",
-        type: "address",
-      },
-    ],
-    name: "maxFlashLoan",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {

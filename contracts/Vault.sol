@@ -3,11 +3,14 @@ pragma solidity 0.8.1;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+
 // import "./upgradability/UUPSProxiableAndPausable.sol";
 import "./interfaces/IERC3156FlashBorrower.sol";
 import "./VaultBase.sol";
 import "./interfaces/IBSVault.sol";
 import "./interfaces/IBSLendingPair.sol";
+import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// 
@@ -53,6 +56,7 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
         external
         initializer
     {
+        require(_blackSmithTeam != address(0), "INVALID_TEAM");
         flashLoanRate = _flashLoanRate;
         blackSmithTeam = _blackSmithTeam;
     }
@@ -87,7 +91,7 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
         address _from,
         address _to,
         uint256 _amount
-    ) public override returns (uint256 amountOut) {
+    ) external override returns (uint256 amountOut) {
         // Checks
         require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
         // transfer appropriate amount of underlying from _from to vault
@@ -111,7 +115,7 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
         address _from,
         address _to,
         uint256 _shares
-    ) public override returns (uint256 amountOut) {
+    ) external override returns (uint256 amountOut) {
         // Checks
         require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
 
@@ -136,11 +140,16 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
         _transfer(_token, msg.sender, _to, _shares);
     }
 
-    function lendingPairTransfer(
+    /// @notice Send share of `token` to a contract that implements IBSLendingPair interface
+    /// @param _token The ERC-20 token to transfer.
+    /// @param _to which user to push the tokens.
+    /// @param _shares of shares to transfer
+    function send(
         IERC20 _token,
         address _to,
         uint256 _shares
     ) external override nonReentrant {
+        require(Address.isContract(_to), "ONLY_TO_CONTRACT");
         _transfer(_token, msg.sender, _to, _shares);
         IBSLendingPair(_to).deposit(address(_token), msg.sender, _shares);
     }
@@ -151,6 +160,7 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
         address _to,
         uint256 _shares
     ) internal {
+        require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
         // Effects
         balanceOf[_token][_from] = balanceOf[_token][_from] - _shares;
         balanceOf[_token][_to] = balanceOf[_token][_to] + _shares;

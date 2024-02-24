@@ -23,6 +23,7 @@ interface UniQuoteInterface extends ethers.utils.Interface {
   functions: {
     "WETH()": FunctionFragment;
     "asset()": FunctionFragment;
+    "c_0xb8cd9a08(bytes32)": FunctionFragment;
     "getPriceInETH()": FunctionFragment;
     "getPriceInUSD()": FunctionFragment;
     "sushiswapKeeperOracle()": FunctionFragment;
@@ -32,6 +33,10 @@ interface UniQuoteInterface extends ethers.utils.Interface {
 
   encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "c_0xb8cd9a08",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "getPriceInETH",
     values?: undefined
@@ -55,6 +60,10 @@ interface UniQuoteInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "asset", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xb8cd9a08",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getPriceInETH",
     data: BytesLike
@@ -131,6 +140,16 @@ export class UniQuote extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<[string]>;
 
+    c_0xb8cd9a08(
+      c__0xb8cd9a08: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xb8cd9a08(bytes32)"(
+      c__0xb8cd9a08: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     getPriceInETH(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -167,6 +186,16 @@ export class UniQuote extends Contract {
   asset(overrides?: CallOverrides): Promise<string>;
 
   "asset()"(overrides?: CallOverrides): Promise<string>;
+
+  c_0xb8cd9a08(
+    c__0xb8cd9a08: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xb8cd9a08(bytes32)"(
+    c__0xb8cd9a08: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
 
   getPriceInETH(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -205,6 +234,16 @@ export class UniQuote extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<string>;
 
+    c_0xb8cd9a08(
+      c__0xb8cd9a08: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xb8cd9a08(bytes32)"(
+      c__0xb8cd9a08: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     getPriceInETH(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getPriceInETH()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -236,6 +275,16 @@ export class UniQuote extends Contract {
     asset(overrides?: CallOverrides): Promise<BigNumber>;
 
     "asset()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    c_0xb8cd9a08(
+      c__0xb8cd9a08: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xb8cd9a08(bytes32)"(
+      c__0xb8cd9a08: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getPriceInETH(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -274,6 +323,16 @@ export class UniQuote extends Contract {
     asset(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "asset()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    c_0xb8cd9a08(
+      c__0xb8cd9a08: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xb8cd9a08(bytes32)"(
+      c__0xb8cd9a08: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getPriceInETH(
       overrides?: Overrides & { from?: string | Promise<string> }

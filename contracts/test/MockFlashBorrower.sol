@@ -6,7 +6,7 @@ import "../interfaces/IERC3156FlashBorrower.sol";
 import "../interfaces/IERC3156FlashLender.sol";
 
 /// Dummy contract to test FlashLoan
-contract FlashBorrower is IERC3156FlashBorrower {
+contract MockFlashBorrower is IERC3156FlashBorrower {
 
   function onFlashLoan(
     address _initiator,

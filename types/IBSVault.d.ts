@@ -25,8 +25,8 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     "deposit(address,address,address,uint256)": FunctionFragment;
     "flashFee(address,uint256)": FunctionFragment;
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
-    "lendingPairTransfer(address,address,uint256)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
+    "send(address,address,uint256)": FunctionFragment;
     "toShare(address,uint256)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "transfer(address,address,uint256)": FunctionFragment;
@@ -50,12 +50,12 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "lendingPairTransfer",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "maxFlashLoan",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "send",
+    values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "toShare",
@@ -79,13 +79,10 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "flashFee", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashLoan", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "lendingPairTransfer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "maxFlashLoan",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "send", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "toUnderlying",
@@ -213,20 +210,6 @@ export class IBSVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    lendingPairTransfer(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "lendingPairTransfer(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     maxFlashLoan(
       token: string,
       overrides?: CallOverrides
@@ -236,6 +219,20 @@ export class IBSVault extends Contract {
       token: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    send(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "send(address,address,uint256)"(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     toShare(
       token: string,
@@ -348,26 +345,26 @@ export class IBSVault extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  lendingPairTransfer(
-    _token: string,
-    _to: string,
-    _shares: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "lendingPairTransfer(address,address,uint256)"(
-    _token: string,
-    _to: string,
-    _shares: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   maxFlashLoan(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "maxFlashLoan(address)"(
     token: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  send(
+    _token: string,
+    _to: string,
+    _shares: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "send(address,address,uint256)"(
+    _token: string,
+    _to: string,
+    _shares: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   toShare(
     token: string,
@@ -480,26 +477,26 @@ export class IBSVault extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    lendingPairTransfer(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "lendingPairTransfer(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     maxFlashLoan(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxFlashLoan(address)"(
       token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    send(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "send(address,address,uint256)"(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     toShare(
       token: string,
@@ -693,25 +690,25 @@ export class IBSVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    lendingPairTransfer(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "lendingPairTransfer(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     maxFlashLoan(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxFlashLoan(address)"(
       token: string,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    send(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "send(address,address,uint256)"(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     toShare(
@@ -826,20 +823,6 @@ export class IBSVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    lendingPairTransfer(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "lendingPairTransfer(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     maxFlashLoan(
       token: string,
       overrides?: CallOverrides
@@ -848,6 +831,20 @@ export class IBSVault extends Contract {
     "maxFlashLoan(address)"(
       token: string,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    send(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "send(address,address,uint256)"(
+      _token: string,
+      _to: string,
+      _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     toShare(

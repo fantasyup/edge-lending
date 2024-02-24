@@ -63,6 +63,45 @@ const _abi = [
     type: "event",
   },
   {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "c__0x630f40d2",
+        type: "bytes32",
+      },
+    ],
+    name: "c_0x630f40d2",
+    outputs: [],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "c__0xd117f7be",
+        type: "bytes32",
+      },
+    ],
+    name: "c_0xd117f7be",
+    outputs: [],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "c__0xff8e4d68",
+        type: "bytes32",
+      },
+    ],
+    name: "c_0xff8e4d68",
+    outputs: [],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "getCodeAddress",
     outputs: [
