@@ -9,4 +9,8 @@ contract MockLendingPair {
     ) external pure returns(uint256) {
         return 1;
     }
+
+    function proxiableUUID() external pure returns(bytes32) {
+        return keccak256("1");
+    }
 }

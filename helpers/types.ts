@@ -7,7 +7,8 @@ export enum ContractId {
     WrapperToken = 'WrapperToken',
     UUPSProxy = 'UUPSProxy',
     MockFlashBorrower = 'MockFlashBorrower',
-    MockLendingPair = 'MockLendingPair'
+    MockLendingPair = 'MockLendingPair',
+    UUPSProxiable = 'UUPSProxiable'
 }
 
 export type EthereumAddress = string;

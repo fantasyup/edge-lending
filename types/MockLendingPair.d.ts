@@ -22,6 +22,7 @@ interface MockLendingPairInterface extends ethers.utils.Interface {
   functions: {
     "c_0xded68028(bytes32)": FunctionFragment;
     "deposit(address,address,uint256)": FunctionFragment;
+    "proxiableUUID()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -32,12 +33,20 @@ interface MockLendingPairInterface extends ethers.utils.Interface {
     functionFragment: "deposit",
     values: [string, string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "proxiableUUID",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "c_0xded68028",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "proxiableUUID",
+    data: BytesLike
+  ): Result;
 
   events: {};
 }
@@ -109,6 +118,10 @@ export class MockLendingPair extends Contract {
       arg2: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   c_0xded68028(
@@ -135,6 +148,10 @@ export class MockLendingPair extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+  "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
+
   callStatic: {
     c_0xded68028(
       c__0xded68028: BytesLike,
@@ -159,6 +176,10 @@ export class MockLendingPair extends Contract {
       arg2: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
@@ -187,6 +208,10 @@ export class MockLendingPair extends Contract {
       arg2: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -213,5 +238,9 @@ export class MockLendingPair extends Contract {
       arg2: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

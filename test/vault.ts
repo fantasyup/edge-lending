@@ -1,12 +1,20 @@
 import { ethers, waffle } from "hardhat";
 import { Signer } from "ethers";
 import { expect, assert } from "chai";
-import { MockLendingPair as BMockLendingPair, MockToken as BMockToken, Vault as BVault } from "../types";
+import {
+  MockLendingPair as BMockLendingPair,
+  MockToken as BMockToken,
+  UUPSProxy as BUUPSProxy,
+  Vault as BVault,
+  UUPSProxiable as BUUPSProxiable
+} from "../types";
 import { ContractId } from "../helpers/types";
 import {
   deployVault,
   deployMockToken,
   deployMockFlashBorrower,
+  deployMockLendingPair,
+  deployProxiedVault,
 } from "../helpers/contracts";
 import { FlashBorrower as BFlashBorrower } from "../types/FlashBorrower";
 
@@ -14,7 +22,7 @@ let accounts: Signer[];
 let Vault: BVault;
 let MockToken: BMockToken;
 let FlashBorrower: BFlashBorrower;
-let MockLendingPair: BMockLendingPair
+let MockLendingPair: BMockLendingPair;
 // users
 let admin: string; // account used in deploying
 let bob: string;
@@ -34,6 +42,7 @@ describe("Vault", function () {
     Vault = await deployVault();
     MockToken = await deployMockToken();
     FlashBorrower = await deployMockFlashBorrower();
+    MockLendingPair = await deployMockLendingPair();
 
     await MockToken.setBalanceTo(admin, 1000000);
   });
@@ -147,23 +156,28 @@ describe("Vault", function () {
     });
 
     describe("send", function () {
-        it("send fails with non-contract address", async function() {
-            expect(
-                await (await Vault.send(MockToken.address, bob, 1))
-            ).to.be.revertedWith('ONLY_TO_CONTRACT')
-        })
+      it("send fails with non-contract address", async function () {
+        await expect(Vault.send(MockToken.address, bob, 1)).to.be.revertedWith(
+          "ONLY_TO_CONTRACT"
+        );
+      });
 
-        it("send - correctly", async function() {
-            const currentBalance = (
-                await Vault.balanceOf(MockToken.address, admin)
-              ).toNumber();
-            const sharesToSend = 1
-            expect(
-                await (await Vault.send(MockToken.address, MockLendingPair.address, sharesToSend))
-            )
-        })
-    })
-
+      it("send - correctly", async function () {
+        const sharesToSend = 1;
+        expect(
+          await await Vault.send(
+            MockToken.address,
+            MockLendingPair.address,
+            sharesToSend
+          )
+        );
+        expect(
+          await (
+            await Vault.balanceOf(MockToken.address, MockLendingPair.address)
+          ).toNumber()
+        ).eq(sharesToSend);
+      });
+    });
 
     describe("flashLoan", function () {
       it("maxFlashLoan", async function () {
@@ -188,17 +202,33 @@ describe("Vault", function () {
 
       it("flashLoan - correctly", async function () {
         // deposit money to FlashBorrwer
-        await MockToken.setBalanceTo(FlashBorrower.address, 1000)
+        await MockToken.setBalanceTo(FlashBorrower.address, 1000);
         // call borrow on flashBorrower
         // approve balance
-        const amountToFlashLoan = amountToDeposit
+        const amountToFlashLoan = amountToDeposit;
         const expectedFlashFee = flashLoanRate.mul(amountToFlashLoan).div(BASE);
 
-        await MockToken.approve(Vault.address, amountToDeposit + expectedFlashFee.toNumber());
+        await MockToken.approve(
+          Vault.address,
+          amountToDeposit + expectedFlashFee.toNumber()
+        );
 
-        expect(await Vault.flashLoan(FlashBorrower.address, MockToken.address, amountToFlashLoan, "0x"))
+        expect(
+          await Vault.flashLoan(
+            FlashBorrower.address,
+            MockToken.address,
+            amountToFlashLoan,
+            "0x"
+          )
+        )
           .to.emit(Vault, "FlashLoan")
-          .withArgs(admin, MockToken.address, amountToFlashLoan, expectedFlashFee, FlashBorrower.address);
+          .withArgs(
+            admin,
+            MockToken.address,
+            amountToFlashLoan,
+            expectedFlashFee,
+            FlashBorrower.address
+          );
       });
     });
 
@@ -216,12 +246,7 @@ describe("Vault", function () {
 
       it("user cannot withdraw more than balance", async function () {
         await expect(
-          Vault.withdraw(
-            MockToken.address,
-            admin,
-            admin,
-            amountToDeposit * 7
-          )
+          Vault.withdraw(MockToken.address, admin, admin, amountToDeposit * 7)
         ).to.be.reverted;
       });
 
@@ -232,8 +257,11 @@ describe("Vault", function () {
         const currentBalance = (
           await Vault.balanceOf(MockToken.address, admin)
         ).toNumber();
-        const expectedAmountOut = await Vault.toUnderlying(MockToken.address, currentBalance)
-        expect(
+        const expectedAmountOut = await Vault.toUnderlying(
+          MockToken.address,
+          currentBalance
+        );
+        await expect(
           await Vault.withdraw(MockToken.address, admin, admin, currentBalance)
         )
           .to.emit(Vault, "Withdraw")
@@ -256,11 +284,16 @@ describe("Vault", function () {
     });
   });
 
-  describe("\t - math", function () {
-    it("calculates the shares correctly", async function () {});
-  });
+  describe("toShare", async function() {
+    const share = 1000
+    it("toShare - when total is 0", async function () {
+        const output = (await Vault.toShare(bob, share)).toNumber();
+        expect(output).to.eq(share)
+    });
+  })
 
-  describe("\t - admin functions", function () {
+
+  describe("admin functions", function () {
     it("updateFlashloanRate", async function () {
       const newFlashLoanRate = ethers.utils.parseUnits("0.05", 18);
 
@@ -287,4 +320,36 @@ describe("Vault", function () {
       expect(await Vault.blackSmithTeam()).to.eq(alice);
     });
   });
+
+
+  describe("Upgradable Deployment", function() {
+    it("updateCode", async function() {
+        const newVault = await deployVault()
+        const proxiedVault = await deployProxiedVault(Vault.address)
+        
+        // initialize proxiedVault
+        await proxiedVault.initialize(flashLoanRate, admin);
+
+        const currentImplAddress = await proxiedVault.getCodeAddress();
+        expect(currentImplAddress).to.eq(Vault.address)
+
+        const uuid = (await Vault.proxiableUUID()).toString()
+
+        const receipt =  await (await proxiedVault.updateCode(newVault.address)).wait()
+
+        assert.ok(receipt.events?.find(x => x.event === 'CodeUpdated'), 'should emit CodeUpdated event')
+
+        // @TODO introduce grace period
+        const newImplAddress = await proxiedVault.getCodeAddress()
+        expect(newImplAddress).to.eq(newVault.address)        
+    })
+
+    // @TODO 
+    it("test storage layout", async function() {
+
+    })
+  })
+
+
+
 });

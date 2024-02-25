@@ -38,3 +38,11 @@ export const deployMockFlashBorrower = async () => {
 export const deployMockLendingPair = async () => {
     return await deployContract<MockLendingPair>(ContractId.MockLendingPair, [])
 }
+
+export const deployProxiedVault = async(vaultAddress ?: EthereumAddress) => {
+    const UUPSProxy = await deployUUPSProxy();
+    const pVaultAddress = vaultAddress || (await deployVault()).address
+    // initialize proxy
+    await UUPSProxy.initializeProxy(pVaultAddress)
+    return (await ethers.getContractAt(ContractId.Vault, UUPSProxy.address)) as Vault
+}
