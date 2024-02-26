@@ -25,7 +25,6 @@ interface MockTokenInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
-    "c_0xd89f1ece(bytes32)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
@@ -50,10 +49,6 @@ interface MockTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "burn",
     values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xd89f1ece",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
@@ -91,10 +86,6 @@ interface MockTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xd89f1ece",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
@@ -216,16 +207,6 @@ export class MockToken extends Contract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    c_0xd89f1ece(
-      c__0xd89f1ece: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xd89f1ece(bytes32)"(
-      c__0xd89f1ece: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
 
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
@@ -361,16 +342,6 @@ export class MockToken extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  c_0xd89f1ece(
-    c__0xd89f1ece: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xd89f1ece(bytes32)"(
-    c__0xd89f1ece: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   decimals(overrides?: CallOverrides): Promise<number>;
 
   "decimals()"(overrides?: CallOverrides): Promise<number>;
@@ -502,16 +473,6 @@ export class MockToken extends Contract {
     "burn(address,uint256)"(
       _from: string,
       _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0xd89f1ece(
-      c__0xd89f1ece: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xd89f1ece(bytes32)"(
-      c__0xd89f1ece: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -670,16 +631,6 @@ export class MockToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    c_0xd89f1ece(
-      c__0xd89f1ece: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xd89f1ece(bytes32)"(
-      c__0xd89f1ece: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -816,16 +767,6 @@ export class MockToken extends Contract {
       _from: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    c_0xd89f1ece(
-      c__0xd89f1ece: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xd89f1ece(bytes32)"(
-      c__0xd89f1ece: BytesLike,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;

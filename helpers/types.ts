@@ -8,7 +8,10 @@ export enum ContractId {
     UUPSProxy = 'UUPSProxy',
     MockFlashBorrower = 'MockFlashBorrower',
     MockLendingPair = 'MockLendingPair',
-    UUPSProxiable = 'UUPSProxiable'
+    UUPSProxiable = 'UUPSProxiable',
+    MockPriceOracle  = 'MockPriceOracle',
+    JumpRateModelV2 = 'JumpRateModelV2',
+    
 }
 
 export type EthereumAddress = string;

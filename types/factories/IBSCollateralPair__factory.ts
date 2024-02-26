@@ -23,25 +23,6 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "_account",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256",
-      },
-    ],
-    name: "Deposit",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
         name: "pair",
         type: "address",
       },
@@ -71,25 +52,6 @@ const _abi = [
       },
     ],
     name: "Liquidate",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "_account",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256",
-      },
-    ],
-    name: "Withdraw",
     type: "event",
   },
   {

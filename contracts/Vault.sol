@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
@@ -14,7 +13,7 @@ import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// 
-/// @title Blacksmith
+/// @title Vault
 /// @author samparsky
 /// @notice Vault contract stores assets deposited into the Lending pairs.
 /// It enables deposit, withdrawal, flashloans and transfer of tokens.
@@ -23,7 +22,7 @@ import "hardhat/console.sol";
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-contract Vault is VaultBase, IBSVault, ReentrancyGuard {
+contract Vault is VaultBase, IBSVault {
     using SafeERC20 for IERC20;
 
     /// @notice ERC3156 constant for flashloan callback success
@@ -42,12 +41,19 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
     /// @notice mapping of token asset to total deposit
     mapping(IERC20 => uint256) public totals;
 
+    /// @notice mapping of contract to user to approval status
+    mapping(address => mapping(address => bool)) public userApprovedContracts;
+
     /// @notice modifier to allow only blacksmith team to call a function
     modifier onlyBlacksmithTeam {
         require(msg.sender == blackSmithTeam, "ONLY_BLACK_SMITH_TEAM");
         _;
     }
 
+    modifier allowed(address _from) {
+        require(msg.sender == _from || userApprovedContracts[_from][msg.sender] == true, "ONLY_ALLOWED");
+        _;
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // UUPSProxiable
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +82,13 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
         _updateCodeAddress(newAddress);
     }
 
+    //// @notice approve a contract to 
+    function approveContract(address _contract, bool _status) external  {
+        require(_contract != address(0), "Vault: Cannot approve 0"); 
+        userApprovedContracts[msg.sender][_contract] = _status;
+        emit Approval(msg.sender, _contract, _status);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Vault Actions
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,13 +104,14 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
         address _from,
         address _to,
         uint256 _amount
-    ) external override returns (uint256 amountOut) {
+    ) external override allowed(_from) returns (uint256 amountOut) {
         // Checks
         require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
+
+        amountOut = toShare(_token, _amount);
         // transfer appropriate amount of underlying from _from to vault
         _token.safeTransferFrom(_from, address(this), _amount);
         // calculate shares
-        amountOut = toShare(_token, _amount);
         balanceOf[_token][_to] = balanceOf[_token][_to] + amountOut;
         totals[_token] = totals[_token] + amountOut;
 
@@ -115,7 +129,7 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
         address _from,
         address _to,
         uint256 _shares
-    ) external override returns (uint256 amountOut) {
+    ) external override allowed(_from) returns (uint256 amountOut) {
         // Checks
         require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
 
@@ -130,28 +144,16 @@ contract Vault is VaultBase, IBSVault, ReentrancyGuard {
 
     /// @notice Transfer share of `token` to another account
     /// @param _token The ERC-20 token to transfer.
+    /// @param _from which user to pull the tokens.
     /// @param _to which user to push the tokens.
     /// @param _shares of shares to transfer
     function transfer(
         IERC20 _token,
+        address _from,
         address _to,
         uint256 _shares
-    ) external override {
-        _transfer(_token, msg.sender, _to, _shares);
-    }
-
-    /// @notice Send share of `token` to a contract that implements IBSLendingPair interface
-    /// @param _token The ERC-20 token to transfer.
-    /// @param _to which user to push the tokens.
-    /// @param _shares of shares to transfer
-    function send(
-        IERC20 _token,
-        address _to,
-        uint256 _shares
-    ) external override nonReentrant {
-        require(Address.isContract(_to), "ONLY_TO_CONTRACT");
-        _transfer(_token, msg.sender, _to, _shares);
-        IBSLendingPair(_to).deposit(address(_token), msg.sender, _shares);
+    ) external override allowed(_from) {
+        _transfer(_token, _from, _to, _shares);
     }
 
     function _transfer(

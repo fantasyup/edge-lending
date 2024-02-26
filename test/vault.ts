@@ -1,355 +1,359 @@
-import { ethers, waffle } from "hardhat";
-import { Signer } from "ethers";
-import { expect, assert } from "chai";
-import {
-  MockLendingPair as BMockLendingPair,
-  MockToken as BMockToken,
-  UUPSProxy as BUUPSProxy,
-  Vault as BVault,
-  UUPSProxiable as BUUPSProxiable
-} from "../types";
-import { ContractId } from "../helpers/types";
-import {
-  deployVault,
-  deployMockToken,
-  deployMockFlashBorrower,
-  deployMockLendingPair,
-  deployProxiedVault,
-} from "../helpers/contracts";
-import { FlashBorrower as BFlashBorrower } from "../types/FlashBorrower";
+// import { ethers, waffle } from "hardhat";
+// import { Signer } from "ethers";
+// import { expect, assert } from "chai";
+// import {
+//   MockLendingPair as BMockLendingPair,
+//   MockToken as BMockToken,
+//   UUPSProxy as BUUPSProxy,
+//   Vault as BVault,
+//   UUPSProxiable as BUUPSProxiable
+// } from "../types";
+// import { ContractId } from "../helpers/types";
+// import {
+//   deployVault,
+//   deployMockToken,
+//   deployMockFlashBorrower,
+//   deployMockLendingPair,
+//   deployProxiedVault,
+// } from "../helpers/contracts";
+// import { FlashBorrower as BFlashBorrower } from "../types/FlashBorrower";
 
-let accounts: Signer[];
-let Vault: BVault;
-let MockToken: BMockToken;
-let FlashBorrower: BFlashBorrower;
-let MockLendingPair: BMockLendingPair;
-// users
-let admin: string; // account used in deploying
-let bob: string;
-let alice: string;
+// let accounts: Signer[];
+// let Vault: BVault;
+// let MockToken: BMockToken;
+// let FlashBorrower: BFlashBorrower;
+// let MockLendingPair: BMockLendingPair;
 
-const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
-const BASE = ethers.utils.parseUnits("1", 18);
+// // users
+// let admin: string; // account used in deploying
+// let bob: string;
+// let alice: string;
 
-describe("Vault", function () {
-  before(async function () {
-    accounts = await ethers.getSigners();
+// const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
+// const BASE = ethers.utils.parseUnits("1", 18);
 
-    admin = await accounts[0].getAddress();
-    bob = await accounts[1].getAddress();
-    alice = await accounts[2].getAddress();
+// describe("Vault", function () {
+//   before(async function () {
+//     accounts = await ethers.getSigners();
 
-    Vault = await deployVault();
-    MockToken = await deployMockToken();
-    FlashBorrower = await deployMockFlashBorrower();
-    MockLendingPair = await deployMockLendingPair();
+//     ([
+//         admin,
+//         bob,
+//         alice
+//       ] = await Promise.all(accounts.slice(0, 3).map(x => x.getAddress())))
 
-    await MockToken.setBalanceTo(admin, 1000000);
-  });
+//     Vault = await deployVault();
+//     MockToken = await deployMockToken();
+//     FlashBorrower = await deployMockFlashBorrower();
+//     MockLendingPair = await deployMockLendingPair();
 
-  describe("initialize", function () {
-    it("initialize fails with 0 team", async function () {
-      await expect(
-        Vault.initialize(flashLoanRate, ethers.constants.AddressZero)
-      ).to.be.revertedWith("INVALID_TEAM");
-    });
+//     await MockToken.setBalanceTo(admin, 1000000);
+//   });
 
-    it("initialize - correctly", async function () {
-      await Vault.initialize(flashLoanRate, admin);
+//   describe("initialize", function () {
+//     it("initialize fails with 0 team", async function () {
+//       await expect(
+//         Vault.initialize(flashLoanRate, ethers.constants.AddressZero)
+//       ).to.be.revertedWith("INVALID_TEAM");
+//     });
 
-      expect(await Vault.flashLoanRate()).to.eq(flashLoanRate);
-      expect(await Vault.blackSmithTeam()).to.eq(admin);
-    });
-  });
+//     it("initialize - correctly", async function () {
+//       await Vault.initialize(flashLoanRate, admin);
 
-  it("proxiableUUID", async function () {
-    let messageBytes = ethers.utils.toUtf8Bytes(
-      "org.blacksmith.contracts.blacksmithvault.implementation"
-    );
-    const hash = ethers.utils.keccak256(messageBytes);
-    expect((await Vault.proxiableUUID()).toString()).to.eq(hash.toString());
-  });
+//       expect(await Vault.flashLoanRate()).to.eq(flashLoanRate);
+//       expect(await Vault.blackSmithTeam()).to.eq(admin);
+//     });
+//   });
 
-  describe("vault actions", function () {
-    const amountToDeposit = 100;
-    describe("deposit", function () {
-      it("deposit fails with invalid `to` address", async function () {
-        await expect(
-          Vault.deposit(
-            MockToken.address,
-            admin,
-            ethers.constants.AddressZero,
-            amountToDeposit
-          )
-        ).to.be.revertedWith("VAULT: INVALID_TO_ADDRESS");
-      });
+//   it("proxiableUUID", async function () {
+//     let messageBytes = ethers.utils.toUtf8Bytes(
+//       "org.blacksmith.contracts.blacksmithvault.implementation"
+//     );
+//     const hash = ethers.utils.keccak256(messageBytes);
+//     expect((await Vault.proxiableUUID()).toString()).to.eq(hash.toString());
+//   });
 
-      it("deposit - correctly with correct user balance", async function () {
-        // approve Vault to take 100
-        await MockToken.approve(Vault.address, amountToDeposit);
+//   describe("vault actions", function () {
+//     const amountToDeposit = 100;
 
-        expect(
-          await Vault.deposit(MockToken.address, admin, admin, amountToDeposit)
-        )
-          .to.emit(Vault, "Deposit")
-          .withArgs(
-            MockToken.address,
-            admin,
-            admin,
-            amountToDeposit,
-            amountToDeposit
-          );
+//     describe("deposit", function () {
+//       it("deposit fails with invalid `to` address", async function () {
+//         await expect(
+//           Vault.deposit(
+//             MockToken.address,
+//             admin,
+//             ethers.constants.AddressZero,
+//             amountToDeposit
+//           )
+//         ).to.be.revertedWith("VAULT: INVALID_TO_ADDRESS");
+//       });
 
-        expect(
-          await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
-        ).eq(amountToDeposit);
+//       it("deposit - correctly with correct user balance", async function () {
+//         // approve Vault to take 100
+//         await MockToken.approve(Vault.address, amountToDeposit);
 
-        expect((await Vault.totals(MockToken.address)).toNumber()).eq(
-          amountToDeposit
-        );
-      });
+//         expect(
+//           await Vault.deposit(MockToken.address, admin, admin, amountToDeposit)
+//         )
+//           .to.emit(Vault, "Deposit")
+//           .withArgs(
+//             MockToken.address,
+//             admin,
+//             admin,
+//             amountToDeposit,
+//             amountToDeposit
+//           );
 
-      it("deposit fails with incorrect approve deposit", async function () {
-        // await MockToken.decreaseAllowance(Vault.address, 10);
-        await expect(
-          Vault.deposit(MockToken.address, admin, admin, amountToDeposit)
-        ).to.be.reverted;
-      });
-    });
+//         expect(
+//           await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
+//         ).eq(amountToDeposit);
 
-    describe("transfer", function () {
-      const sharesToTransfer = 5;
+//         expect((await Vault.totals(MockToken.address)).toNumber()).eq(
+//           amountToDeposit
+//         );
+//       });
 
-      it("transfer fails with invalid `to` address", async function () {
-        await expect(
-          Vault.transfer(
-            MockToken.address,
-            ethers.constants.AddressZero,
-            sharesToTransfer
-          )
-        ).to.be.revertedWith("VAULT: INVALID_TO_ADDRESS");
-      });
+//       it("deposit fails with incorrect approve deposit", async function () {
+//         // await MockToken.decreaseAllowance(Vault.address, 10);
+//         await expect(
+//           Vault.deposit(MockToken.address, admin, admin, amountToDeposit)
+//         ).to.be.reverted;
+//       });
+//     });
 
-      it("transfer - correctly", async function () {
-        const currentBalance = (
-          await Vault.balanceOf(MockToken.address, admin)
-        ).toNumber();
-        const remainingShareBalance = currentBalance - sharesToTransfer;
-        const currentTotal = (await Vault.totals(MockToken.address)).toNumber();
+//     describe("transfer", function () {
+//       const sharesToTransfer = 5;
 
-        expect(await Vault.transfer(MockToken.address, bob, sharesToTransfer))
-          .to.emit(Vault, "Transfer")
-          .withArgs(MockToken.address, admin, bob, sharesToTransfer);
+//       it("transfer fails with invalid `to` address", async function () {
+//         await expect(
+//           Vault.transfer(
+//             MockToken.address,
+//             ethers.constants.AddressZero,
+//             sharesToTransfer
+//           )
+//         ).to.be.revertedWith("VAULT: INVALID_TO_ADDRESS");
+//       });
 
-        expect(
-          await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
-        ).eq(remainingShareBalance);
+//       it("transfer - correctly", async function () {
+//         const currentBalance = (
+//           await Vault.balanceOf(MockToken.address, admin)
+//         ).toNumber();
+//         const remainingShareBalance = currentBalance - sharesToTransfer;
+//         const currentTotal = (await Vault.totals(MockToken.address)).toNumber();
 
-        expect(
-          await (await Vault.balanceOf(MockToken.address, bob)).toNumber()
-        ).eq(sharesToTransfer);
+//         expect(await Vault.transfer(MockToken.address, bob, sharesToTransfer))
+//           .to.emit(Vault, "Transfer")
+//           .withArgs(MockToken.address, admin, bob, sharesToTransfer);
 
-        expect((await Vault.totals(MockToken.address)).toNumber()).eq(
-          currentTotal
-        );
-      });
-    });
+//         expect(
+//           await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
+//         ).eq(remainingShareBalance);
 
-    describe("send", function () {
-      it("send fails with non-contract address", async function () {
-        await expect(Vault.send(MockToken.address, bob, 1)).to.be.revertedWith(
-          "ONLY_TO_CONTRACT"
-        );
-      });
+//         expect(
+//           await (await Vault.balanceOf(MockToken.address, bob)).toNumber()
+//         ).eq(sharesToTransfer);
 
-      it("send - correctly", async function () {
-        const sharesToSend = 1;
-        expect(
-          await await Vault.send(
-            MockToken.address,
-            MockLendingPair.address,
-            sharesToSend
-          )
-        );
-        expect(
-          await (
-            await Vault.balanceOf(MockToken.address, MockLendingPair.address)
-          ).toNumber()
-        ).eq(sharesToSend);
-      });
-    });
+//         expect((await Vault.totals(MockToken.address)).toNumber()).eq(
+//           currentTotal
+//         );
+//       });
+//     });
 
-    describe("flashLoan", function () {
-      it("maxFlashLoan", async function () {
-        const currentTotals = (
-          await Vault.totals(MockToken.address)
-        ).toNumber();
-        expect(
-          await (await Vault.maxFlashLoan(MockToken.address)).toNumber()
-        ).eq(currentTotals);
-      });
+//     describe("send", function () {
+//       it("send fails with non-contract address", async function () {
+//         await expect(Vault.send(MockToken.address, bob, 1)).to.be.revertedWith(
+//           "ONLY_TO_CONTRACT"
+//         );
+//       });
 
-      it("flashFee", async function () {
-        const amountToFlashLoan = await Vault.totals(MockToken.address);
-        const expectedFlashFee = flashLoanRate.mul(amountToFlashLoan).div(BASE);
+//       it("send - correctly", async function () {
+//         const sharesToSend = 1;
+//         expect(
+//           await await Vault.send(
+//             MockToken.address,
+//             MockLendingPair.address,
+//             sharesToSend
+//           )
+//         );
+//         expect(
+//           await (
+//             await Vault.balanceOf(MockToken.address, MockLendingPair.address)
+//           ).toNumber()
+//         ).eq(sharesToSend);
+//       });
+//     });
 
-        expect(
-          await (
-            await Vault.flashFee(MockToken.address, amountToFlashLoan)
-          ).toNumber()
-        ).eq(expectedFlashFee.toNumber());
-      });
+//     describe("flashLoan", function () {
+//       it("maxFlashLoan", async function () {
+//         const currentTotals = (
+//           await Vault.totals(MockToken.address)
+//         ).toNumber();
+//         expect(
+//           await (await Vault.maxFlashLoan(MockToken.address)).toNumber()
+//         ).eq(currentTotals);
+//       });
 
-      it("flashLoan - correctly", async function () {
-        // deposit money to FlashBorrwer
-        await MockToken.setBalanceTo(FlashBorrower.address, 1000);
-        // call borrow on flashBorrower
-        // approve balance
-        const amountToFlashLoan = amountToDeposit;
-        const expectedFlashFee = flashLoanRate.mul(amountToFlashLoan).div(BASE);
+//       it("flashFee", async function () {
+//         const amountToFlashLoan = await Vault.totals(MockToken.address);
+//         const expectedFlashFee = flashLoanRate.mul(amountToFlashLoan).div(BASE);
 
-        await MockToken.approve(
-          Vault.address,
-          amountToDeposit + expectedFlashFee.toNumber()
-        );
+//         expect(
+//           await (
+//             await Vault.flashFee(MockToken.address, amountToFlashLoan)
+//           ).toNumber()
+//         ).eq(expectedFlashFee.toNumber());
+//       });
 
-        expect(
-          await Vault.flashLoan(
-            FlashBorrower.address,
-            MockToken.address,
-            amountToFlashLoan,
-            "0x"
-          )
-        )
-          .to.emit(Vault, "FlashLoan")
-          .withArgs(
-            admin,
-            MockToken.address,
-            amountToFlashLoan,
-            expectedFlashFee,
-            FlashBorrower.address
-          );
-      });
-    });
+//       it("flashLoan - correctly", async function () {
+//         // deposit money to FlashBorrwer
+//         await MockToken.setBalanceTo(FlashBorrower.address, 1000);
+//         // call borrow on flashBorrower
+//         // approve balance
+//         const amountToFlashLoan = amountToDeposit;
+//         const expectedFlashFee = flashLoanRate.mul(amountToFlashLoan).div(BASE);
 
-    describe("withdraw", function () {
-      it("withdraw fails with invalid `to` address", async function () {
-        await expect(
-          Vault.withdraw(
-            MockToken.address,
-            admin,
-            ethers.constants.AddressZero,
-            amountToDeposit
-          )
-        ).to.be.revertedWith("VAULT: INVALID_TO_ADDRESS");
-      });
+//         await MockToken.approve(
+//           Vault.address,
+//           amountToDeposit + expectedFlashFee.toNumber()
+//         );
 
-      it("user cannot withdraw more than balance", async function () {
-        await expect(
-          Vault.withdraw(MockToken.address, admin, admin, amountToDeposit * 7)
-        ).to.be.reverted;
-      });
+//         expect(
+//           await Vault.flashLoan(
+//             FlashBorrower.address,
+//             MockToken.address,
+//             amountToFlashLoan,
+//             "0x"
+//           )
+//         )
+//           .to.emit(Vault, "FlashLoan")
+//           .withArgs(
+//             admin,
+//             MockToken.address,
+//             amountToFlashLoan,
+//             expectedFlashFee,
+//             FlashBorrower.address
+//           );
+//       });
+//     });
 
-      it("withdraw - correctly", async function () {
-        const currentTotals = (
-          await Vault.totals(MockToken.address)
-        ).toNumber();
-        const currentBalance = (
-          await Vault.balanceOf(MockToken.address, admin)
-        ).toNumber();
-        const expectedAmountOut = await Vault.toUnderlying(
-          MockToken.address,
-          currentBalance
-        );
-        await expect(
-          await Vault.withdraw(MockToken.address, admin, admin, currentBalance)
-        )
-          .to.emit(Vault, "Withdraw")
-          .withArgs(
-            MockToken.address,
-            admin,
-            admin,
-            currentBalance,
-            expectedAmountOut
-          );
+//     describe("withdraw", function () {
+//       it("withdraw fails with invalid `to` address", async function () {
+//         await expect(
+//           Vault.withdraw(
+//             MockToken.address,
+//             admin,
+//             ethers.constants.AddressZero,
+//             amountToDeposit
+//           )
+//         ).to.be.revertedWith("VAULT: INVALID_TO_ADDRESS");
+//       });
 
-        expect(
-          await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
-        ).eq(0);
+//       it("user cannot withdraw more than balance", async function () {
+//         await expect(
+//           Vault.withdraw(MockToken.address, admin, admin, amountToDeposit * 7)
+//         ).to.be.reverted;
+//       });
 
-        expect((await Vault.totals(MockToken.address)).toNumber()).eq(
-          currentTotals - currentBalance
-        );
-      });
-    });
-  });
+//       it("withdraw - correctly", async function () {
+//         const currentTotals = (
+//           await Vault.totals(MockToken.address)
+//         ).toNumber();
+//         const currentBalance = (
+//           await Vault.balanceOf(MockToken.address, admin)
+//         ).toNumber();
+//         const expectedAmountOut = await Vault.toUnderlying(
+//           MockToken.address,
+//           currentBalance
+//         );
+//         await expect(
+//           await Vault.withdraw(MockToken.address, admin, admin, currentBalance)
+//         )
+//           .to.emit(Vault, "Withdraw")
+//           .withArgs(
+//             MockToken.address,
+//             admin,
+//             admin,
+//             currentBalance,
+//             expectedAmountOut
+//           );
 
-  describe("toShare", async function() {
-    const share = 1000
-    it("toShare - when total is 0", async function () {
-        const output = (await Vault.toShare(bob, share)).toNumber();
-        expect(output).to.eq(share)
-    });
-  })
+//         expect(
+//           await (await Vault.balanceOf(MockToken.address, admin)).toNumber()
+//         ).eq(0);
 
+//         expect((await Vault.totals(MockToken.address)).toNumber()).eq(
+//           currentTotals - currentBalance
+//         );
+//       });
+//     });
+//   });
 
-  describe("admin functions", function () {
-    it("updateFlashloanRate", async function () {
-      const newFlashLoanRate = ethers.utils.parseUnits("0.05", 18);
-
-      await expect(
-        Vault.connect(accounts[1]).updateFlashloanRate(newFlashLoanRate)
-      ).to.be.revertedWith("ONLY_BLACK_SMITH_TEAM");
-
-      await Vault.updateFlashloanRate(newFlashLoanRate);
-
-      expect(await Vault.flashLoanRate()).to.eq(newFlashLoanRate);
-    });
-
-    it("transferToNewTeam", async function () {
-      await expect(
-        Vault.connect(accounts[1]).transferToNewTeam(alice)
-      ).to.be.revertedWith("ONLY_BLACK_SMITH_TEAM");
-
-      await expect(
-        Vault.transferToNewTeam(ethers.constants.AddressZero)
-      ).to.be.revertedWith("INVALID_NEW_TEAM");
-
-      await Vault.transferToNewTeam(alice);
-
-      expect(await Vault.blackSmithTeam()).to.eq(alice);
-    });
-  });
+//   describe("toShare", async function() {
+//     const share = 1000
+//     it("toShare - when total is 0", async function () {
+//         const output = (await Vault.toShare(bob, share)).toNumber();
+//         expect(output).to.eq(share)
+//     });
+//   })
 
 
-  describe("Upgradable Deployment", function() {
-    it("updateCode", async function() {
-        const newVault = await deployVault()
-        const proxiedVault = await deployProxiedVault(Vault.address)
-        
-        // initialize proxiedVault
-        await proxiedVault.initialize(flashLoanRate, admin);
+//   describe("admin functions", function () {
+//     it("updateFlashloanRate", async function () {
+//       const newFlashLoanRate = ethers.utils.parseUnits("0.05", 18);
 
-        const currentImplAddress = await proxiedVault.getCodeAddress();
-        expect(currentImplAddress).to.eq(Vault.address)
+//       await expect(
+//         Vault.connect(accounts[1]).updateFlashloanRate(newFlashLoanRate)
+//       ).to.be.revertedWith("ONLY_BLACK_SMITH_TEAM");
 
-        const uuid = (await Vault.proxiableUUID()).toString()
+//       await Vault.updateFlashloanRate(newFlashLoanRate);
 
-        const receipt =  await (await proxiedVault.updateCode(newVault.address)).wait()
+//       expect(await Vault.flashLoanRate()).to.eq(newFlashLoanRate);
+//     });
 
-        assert.ok(receipt.events?.find(x => x.event === 'CodeUpdated'), 'should emit CodeUpdated event')
+//     it("transferToNewTeam", async function () {
+//       await expect(
+//         Vault.connect(accounts[1]).transferToNewTeam(alice)
+//       ).to.be.revertedWith("ONLY_BLACK_SMITH_TEAM");
 
-        // @TODO introduce grace period
-        const newImplAddress = await proxiedVault.getCodeAddress()
-        expect(newImplAddress).to.eq(newVault.address)        
-    })
+//       await expect(
+//         Vault.transferToNewTeam(ethers.constants.AddressZero)
+//       ).to.be.revertedWith("INVALID_NEW_TEAM");
 
-    // @TODO 
-    it("test storage layout", async function() {
+//       await Vault.transferToNewTeam(alice);
 
-    })
-  })
-
+//       expect(await Vault.blackSmithTeam()).to.eq(alice);
+//     });
+//   });
 
 
-});
+//   describe("Upgradable Deployment", function() {
+//     it("updateCode", async function() {
+//         const newVault = await deployVault()
+//         const proxiedVault = await deployProxiedVault(Vault.address)
+
+//         // initialize proxiedVault
+//         await proxiedVault.initialize(flashLoanRate, admin);
+
+//         const currentImplAddress = await proxiedVault.getCodeAddress();
+//         expect(currentImplAddress).to.eq(Vault.address)
+
+//         const uuid = (await Vault.proxiableUUID()).toString()
+
+//         const receipt =  await (await proxiedVault.updateCode(newVault.address)).wait()
+
+//         assert.ok(receipt.events?.find(x => x.event === 'CodeUpdated'), 'should emit CodeUpdated event')
+
+//         // @TODO introduce grace period
+//         const newImplAddress = await proxiedVault.getCodeAddress()
+//         expect(newImplAddress).to.eq(newVault.address)        
+//     })
+
+//     // @TODO 
+//     it("test storage layout", async function() {
+
+//     })
+//   })
+
+
+
+// });

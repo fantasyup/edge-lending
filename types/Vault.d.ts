@@ -22,12 +22,9 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface VaultInterface extends ethers.utils.Interface {
   functions: {
     "FLASHLOAN_CALLBACK_SUCCESS()": FunctionFragment;
+    "approveContract(address,bool)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "blackSmithTeam()": FunctionFragment;
-    "c_0x630f40d2(bytes32)": FunctionFragment;
-    "c_0xd117f7be(bytes32)": FunctionFragment;
-    "c_0xeca1878e(bytes32)": FunctionFragment;
-    "c_0xff8e4d68(bytes32)": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
     "flashFee(address,uint256)": FunctionFragment;
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
@@ -37,14 +34,14 @@ interface VaultInterface extends ethers.utils.Interface {
     "maxFlashLoan(address)": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
-    "send(address,address,uint256)": FunctionFragment;
     "toShare(address,uint256)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
-    "transfer(address,address,uint256)": FunctionFragment;
+    "transfer(address,address,address,uint256)": FunctionFragment;
     "transferToNewTeam(address)": FunctionFragment;
     "updateCode(address)": FunctionFragment;
     "updateFlashloanRate(uint256)": FunctionFragment;
+    "userApprovedContracts(address,address)": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
@@ -53,28 +50,16 @@ interface VaultInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "approveContract",
+    values: [string, boolean]
+  ): string;
+  encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "blackSmithTeam",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x630f40d2",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xd117f7be",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xeca1878e",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xff8e4d68",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
@@ -110,10 +95,6 @@ interface VaultInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "send",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "toShare",
     values: [string, BigNumberish]
   ): string;
@@ -124,7 +105,7 @@ interface VaultInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "totals", values: [string]): string;
   encodeFunctionData(
     functionFragment: "transfer",
-    values: [string, string, BigNumberish]
+    values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "transferToNewTeam",
@@ -136,6 +117,10 @@ interface VaultInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "userApprovedContracts",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "withdraw",
     values: [string, string, string, BigNumberish]
   ): string;
@@ -144,25 +129,13 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "FLASHLOAN_CALLBACK_SUCCESS",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "approveContract",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "blackSmithTeam",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x630f40d2",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xd117f7be",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xeca1878e",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xff8e4d68",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
@@ -186,7 +159,6 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "proxiableUUID",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "send", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "toUnderlying",
@@ -203,10 +175,14 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "updateFlashloanRate",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "userApprovedContracts",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "Approval(address,address,uint256)": EventFragment;
+    "Approval(address,address,bool)": EventFragment;
     "CodeUpdated(bytes32,address)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
@@ -280,6 +256,18 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    approveContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "approveContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -295,46 +283,6 @@ export class Vault extends Contract {
     blackSmithTeam(overrides?: CallOverrides): Promise<[string]>;
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<[string]>;
-
-    c_0x630f40d2(
-      c__0x630f40d2: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x630f40d2(bytes32)"(
-      c__0x630f40d2: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0xd117f7be(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xd117f7be(bytes32)"(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0xeca1878e(
-      c__0xeca1878e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xeca1878e(bytes32)"(
-      c__0xeca1878e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0xff8e4d68(
-      c__0xff8e4d68: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xff8e4d68(bytes32)"(
-      c__0xff8e4d68: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
 
     deposit(
       _token: string,
@@ -422,20 +370,6 @@ export class Vault extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
 
-    send(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "send(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -469,13 +403,15 @@ export class Vault extends Contract {
 
     transfer(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transfer(address,address,uint256)"(
+    "transfer(address,address,address,uint256)"(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -511,6 +447,18 @@ export class Vault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    userApprovedContracts(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "userApprovedContracts(address,address)"(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     withdraw(
       _token: string,
       _from: string,
@@ -532,6 +480,18 @@ export class Vault extends Contract {
 
   "FLASHLOAN_CALLBACK_SUCCESS()"(overrides?: CallOverrides): Promise<string>;
 
+  approveContract(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "approveContract(address,bool)"(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   balanceOf(
     arg0: string,
     arg1: string,
@@ -547,46 +507,6 @@ export class Vault extends Contract {
   blackSmithTeam(overrides?: CallOverrides): Promise<string>;
 
   "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
-
-  c_0x630f40d2(
-    c__0x630f40d2: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x630f40d2(bytes32)"(
-    c__0x630f40d2: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0xd117f7be(
-    c__0xd117f7be: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xd117f7be(bytes32)"(
-    c__0xd117f7be: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0xeca1878e(
-    c__0xeca1878e: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xeca1878e(bytes32)"(
-    c__0xeca1878e: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0xff8e4d68(
-    c__0xff8e4d68: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xff8e4d68(bytes32)"(
-    c__0xff8e4d68: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
 
   deposit(
     _token: string,
@@ -667,20 +587,6 @@ export class Vault extends Contract {
 
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
-  send(
-    _token: string,
-    _to: string,
-    _shares: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "send(address,address,uint256)"(
-    _token: string,
-    _to: string,
-    _shares: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   toShare(
     _token: string,
     _amount: BigNumberish,
@@ -714,13 +620,15 @@ export class Vault extends Contract {
 
   transfer(
     _token: string,
+    _from: string,
     _to: string,
     _shares: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transfer(address,address,uint256)"(
+  "transfer(address,address,address,uint256)"(
     _token: string,
+    _from: string,
     _to: string,
     _shares: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -756,6 +664,18 @@ export class Vault extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  userApprovedContracts(
+    arg0: string,
+    arg1: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "userApprovedContracts(address,address)"(
+    arg0: string,
+    arg1: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   withdraw(
     _token: string,
     _from: string,
@@ -777,6 +697,18 @@ export class Vault extends Contract {
 
     "FLASHLOAN_CALLBACK_SUCCESS()"(overrides?: CallOverrides): Promise<string>;
 
+    approveContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "approveContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -792,46 +724,6 @@ export class Vault extends Contract {
     blackSmithTeam(overrides?: CallOverrides): Promise<string>;
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
-
-    c_0x630f40d2(
-      c__0x630f40d2: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x630f40d2(bytes32)"(
-      c__0x630f40d2: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0xd117f7be(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xd117f7be(bytes32)"(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0xeca1878e(
-      c__0xeca1878e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xeca1878e(bytes32)"(
-      c__0xeca1878e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0xff8e4d68(
-      c__0xff8e4d68: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xff8e4d68(bytes32)"(
-      c__0xff8e4d68: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     deposit(
       _token: string,
@@ -912,20 +804,6 @@ export class Vault extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
-    send(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "send(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -959,13 +837,15 @@ export class Vault extends Contract {
 
     transfer(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "transfer(address,address,uint256)"(
+    "transfer(address,address,address,uint256)"(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: CallOverrides
@@ -998,6 +878,18 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    userApprovedContracts(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "userApprovedContracts(address,address)"(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     withdraw(
       _token: string,
       _from: string,
@@ -1017,12 +909,12 @@ export class Vault extends Contract {
 
   filters: {
     Approval(
-      owner: string | null,
-      spender: string | null,
-      value: null
+      user: string | null,
+      allowed: string | null,
+      status: null
     ): TypedEventFilter<
-      [string, string, BigNumber],
-      { owner: string; spender: string; value: BigNumber }
+      [string, string, boolean],
+      { user: string; allowed: string; status: boolean }
     >;
 
     CodeUpdated(
@@ -1114,6 +1006,18 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    approveContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "approveContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -1129,46 +1033,6 @@ export class Vault extends Contract {
     blackSmithTeam(overrides?: CallOverrides): Promise<BigNumber>;
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    c_0x630f40d2(
-      c__0x630f40d2: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x630f40d2(bytes32)"(
-      c__0x630f40d2: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0xd117f7be(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xd117f7be(bytes32)"(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0xeca1878e(
-      c__0xeca1878e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xeca1878e(bytes32)"(
-      c__0xeca1878e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0xff8e4d68(
-      c__0xff8e4d68: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xff8e4d68(bytes32)"(
-      c__0xff8e4d68: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     deposit(
       _token: string,
@@ -1249,20 +1113,6 @@ export class Vault extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    send(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "send(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1296,13 +1146,15 @@ export class Vault extends Contract {
 
     transfer(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transfer(address,address,uint256)"(
+    "transfer(address,address,address,uint256)"(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1338,6 +1190,18 @@ export class Vault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    userApprovedContracts(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "userApprovedContracts(address,address)"(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     withdraw(
       _token: string,
       _from: string,
@@ -1364,6 +1228,18 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    approveContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "approveContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -1379,46 +1255,6 @@ export class Vault extends Contract {
     blackSmithTeam(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "blackSmithTeam()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x630f40d2(
-      c__0x630f40d2: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x630f40d2(bytes32)"(
-      c__0x630f40d2: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0xd117f7be(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xd117f7be(bytes32)"(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0xeca1878e(
-      c__0xeca1878e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xeca1878e(bytes32)"(
-      c__0xeca1878e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0xff8e4d68(
-      c__0xff8e4d68: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xff8e4d68(bytes32)"(
-      c__0xff8e4d68: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1506,20 +1342,6 @@ export class Vault extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    send(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "send(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1556,13 +1378,15 @@ export class Vault extends Contract {
 
     transfer(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transfer(address,address,uint256)"(
+    "transfer(address,address,address,uint256)"(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1596,6 +1420,18 @@ export class Vault extends Contract {
     "updateFlashloanRate(uint256)"(
       _newRate: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    userApprovedContracts(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "userApprovedContracts(address,address)"(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     withdraw(

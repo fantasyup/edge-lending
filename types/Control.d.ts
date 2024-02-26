@@ -23,10 +23,6 @@ interface ControlInterface extends ethers.utils.Interface {
   functions: {
     "allPairs(uint256)": FunctionFragment;
     "blackSmithteam()": FunctionFragment;
-    "c_0x0b7e3e94(bytes32)": FunctionFragment;
-    "c_0x594cc606(bytes32)": FunctionFragment;
-    "c_0x7c557157(bytes32)": FunctionFragment;
-    "c_0x9e1c91b0(bytes32)": FunctionFragment;
     "createPair(address,address,address,uint256,uint256,tuple,address)": FunctionFragment;
     "graceSpace()": FunctionFragment;
     "initialize(address,address)": FunctionFragment;
@@ -50,22 +46,6 @@ interface ControlInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "blackSmithteam",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x0b7e3e94",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x594cc606",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x7c557157",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x9e1c91b0",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "createPair",
@@ -131,22 +111,6 @@ interface ControlInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "allPairs", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "blackSmithteam",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x0b7e3e94",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x594cc606",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x7c557157",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x9e1c91b0",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "createPair", data: BytesLike): Result;
@@ -251,46 +215,6 @@ export class Control extends Contract {
     blackSmithteam(overrides?: CallOverrides): Promise<[string]>;
 
     "blackSmithteam()"(overrides?: CallOverrides): Promise<[string]>;
-
-    c_0x0b7e3e94(
-      c__0x0b7e3e94: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x0b7e3e94(bytes32)"(
-      c__0x0b7e3e94: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0x594cc606(
-      c__0x594cc606: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x594cc606(bytes32)"(
-      c__0x594cc606: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
 
     createPair(
       _oracle: string,
@@ -429,46 +353,6 @@ export class Control extends Contract {
 
   "blackSmithteam()"(overrides?: CallOverrides): Promise<string>;
 
-  c_0x0b7e3e94(
-    c__0x0b7e3e94: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x0b7e3e94(bytes32)"(
-    c__0x0b7e3e94: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0x594cc606(
-    c__0x594cc606: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x594cc606(bytes32)"(
-    c__0x594cc606: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0x7c557157(
-    c__0x7c557157: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x7c557157(bytes32)"(
-    c__0x7c557157: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0x9e1c91b0(
-    c__0x9e1c91b0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x9e1c91b0(bytes32)"(
-    c__0x9e1c91b0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   createPair(
     _oracle: string,
     _asset: string,
@@ -602,46 +486,6 @@ export class Control extends Contract {
     blackSmithteam(overrides?: CallOverrides): Promise<string>;
 
     "blackSmithteam()"(overrides?: CallOverrides): Promise<string>;
-
-    c_0x0b7e3e94(
-      c__0x0b7e3e94: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x0b7e3e94(bytes32)"(
-      c__0x0b7e3e94: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0x594cc606(
-      c__0x594cc606: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x594cc606(bytes32)"(
-      c__0x594cc606: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     createPair(
       _oracle: string,
@@ -792,46 +636,6 @@ export class Control extends Contract {
 
     "blackSmithteam()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    c_0x0b7e3e94(
-      c__0x0b7e3e94: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x0b7e3e94(bytes32)"(
-      c__0x0b7e3e94: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0x594cc606(
-      c__0x594cc606: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x594cc606(bytes32)"(
-      c__0x594cc606: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     createPair(
       _oracle: string,
       _asset: string,
@@ -972,46 +776,6 @@ export class Control extends Contract {
     blackSmithteam(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "blackSmithteam()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x0b7e3e94(
-      c__0x0b7e3e94: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x0b7e3e94(bytes32)"(
-      c__0x0b7e3e94: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x594cc606(
-      c__0x594cc606: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x594cc606(bytes32)"(
-      c__0x594cc606: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

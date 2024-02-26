@@ -21,32 +21,14 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface BSTokenUpgradeableProxyBaseInterface extends ethers.utils.Interface {
   functions: {
-    "c_0x2424f9ce(bytes32)": FunctionFragment;
-    "c_0xc63f9b66(bytes32)": FunctionFragment;
     "initializeProxy(address)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "c_0x2424f9ce",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xc63f9b66",
-    values: [BytesLike]
-  ): string;
   encodeFunctionData(
     functionFragment: "initializeProxy",
     values: [string]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "c_0x2424f9ce",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xc63f9b66",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "initializeProxy",
     data: BytesLike
@@ -99,26 +81,6 @@ export class BSTokenUpgradeableProxyBase extends Contract {
   interface: BSTokenUpgradeableProxyBaseInterface;
 
   functions: {
-    c_0x2424f9ce(
-      c__0x2424f9ce: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x2424f9ce(bytes32)"(
-      c__0x2424f9ce: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0xc63f9b66(
-      c__0xc63f9b66: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xc63f9b66(bytes32)"(
-      c__0xc63f9b66: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     initializeProxy(
       initialAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -129,26 +91,6 @@ export class BSTokenUpgradeableProxyBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
-
-  c_0x2424f9ce(
-    c__0x2424f9ce: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x2424f9ce(bytes32)"(
-    c__0x2424f9ce: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0xc63f9b66(
-    c__0xc63f9b66: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xc63f9b66(bytes32)"(
-    c__0xc63f9b66: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
 
   initializeProxy(
     initialAddress: string,
@@ -161,26 +103,6 @@ export class BSTokenUpgradeableProxyBase extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    c_0x2424f9ce(
-      c__0x2424f9ce: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x2424f9ce(bytes32)"(
-      c__0x2424f9ce: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0xc63f9b66(
-      c__0xc63f9b66: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xc63f9b66(bytes32)"(
-      c__0xc63f9b66: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     initializeProxy(
       initialAddress: string,
       overrides?: CallOverrides
@@ -195,26 +117,6 @@ export class BSTokenUpgradeableProxyBase extends Contract {
   filters: {};
 
   estimateGas: {
-    c_0x2424f9ce(
-      c__0x2424f9ce: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x2424f9ce(bytes32)"(
-      c__0x2424f9ce: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0xc63f9b66(
-      c__0xc63f9b66: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xc63f9b66(bytes32)"(
-      c__0xc63f9b66: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     initializeProxy(
       initialAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -227,26 +129,6 @@ export class BSTokenUpgradeableProxyBase extends Contract {
   };
 
   populateTransaction: {
-    c_0x2424f9ce(
-      c__0x2424f9ce: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x2424f9ce(bytes32)"(
-      c__0x2424f9ce: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0xc63f9b66(
-      c__0xc63f9b66: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xc63f9b66(bytes32)"(
-      c__0xc63f9b66: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     initializeProxy(
       initialAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }

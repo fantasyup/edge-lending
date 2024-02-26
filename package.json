@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "coverage": "npx hardhat coverage",
+    "test": "npx hardhat test"
   },
   "repository": {
     "type": "git",

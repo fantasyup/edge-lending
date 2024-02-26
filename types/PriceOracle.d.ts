@@ -22,7 +22,6 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface PriceOracleInterface extends ethers.utils.Interface {
   functions: {
     "assetToOracle(address)": FunctionFragment;
-    "c_0xc7c29d54(bytes32)": FunctionFragment;
     "getPriceInETH(address)": FunctionFragment;
     "getPriceInUSD(address)": FunctionFragment;
     "updateOracleForAsset(address,address)": FunctionFragment;
@@ -33,10 +32,6 @@ interface PriceOracleInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "assetToOracle",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xc7c29d54",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getPriceInETH",
@@ -61,10 +56,6 @@ interface PriceOracleInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "assetToOracle",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xc7c29d54",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -146,16 +137,6 @@ export class PriceOracle extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    c_0xc7c29d54(
-      c__0xc7c29d54: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xc7c29d54(bytes32)"(
-      c__0xc7c29d54: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     getPriceInETH(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -216,16 +197,6 @@ export class PriceOracle extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  c_0xc7c29d54(
-    c__0xc7c29d54: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xc7c29d54(bytes32)"(
-    c__0xc7c29d54: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   getPriceInETH(
     _token: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -279,16 +250,6 @@ export class PriceOracle extends Contract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    c_0xc7c29d54(
-      c__0xc7c29d54: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xc7c29d54(bytes32)"(
-      c__0xc7c29d54: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     getPriceInETH(
       _token: string,
@@ -358,16 +319,6 @@ export class PriceOracle extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    c_0xc7c29d54(
-      c__0xc7c29d54: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xc7c29d54(bytes32)"(
-      c__0xc7c29d54: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getPriceInETH(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -429,16 +380,6 @@ export class PriceOracle extends Contract {
 
     "assetToOracle(address)"(
       arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0xc7c29d54(
-      c__0xc7c29d54: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xc7c29d54(bytes32)"(
-      c__0xc7c29d54: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

@@ -271,6 +271,25 @@ const _abi = [
     type: "event",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_account",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "WithdrawCollateral",
+    type: "event",
+  },
+  {
     inputs: [],
     name: "asset",
     outputs: [
@@ -287,11 +306,6 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_token",
-        type: "address",
-      },
-      {
-        internalType: "address",
         name: "_tokenReceipeint",
         type: "address",
       },
@@ -301,7 +315,25 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "deposit",
+    name: "depositBorrowAsset",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_tokenReceipeint",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_vaultShareAmount",
+        type: "uint256",
+      },
+    ],
+    name: "depositCollateral",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

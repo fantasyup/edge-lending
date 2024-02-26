@@ -26,10 +26,9 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     "flashFee(address,uint256)": FunctionFragment;
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
-    "send(address,address,uint256)": FunctionFragment;
     "toShare(address,uint256)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
-    "transfer(address,address,uint256)": FunctionFragment;
+    "transfer(address,address,address,uint256)": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
@@ -54,10 +53,6 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "send",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "toShare",
     values: [string, BigNumberish]
   ): string;
@@ -67,7 +62,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "transfer",
-    values: [string, string, BigNumberish]
+    values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "withdraw",
@@ -82,7 +77,6 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     functionFragment: "maxFlashLoan",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "send", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "toUnderlying",
@@ -92,7 +86,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "Approval(address,address,uint256)": EventFragment;
+    "Approval(address,address,bool)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
@@ -157,14 +151,14 @@ export class IBSVault extends Contract {
     balanceOf(
       arg0: string,
       arg1: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     "balanceOf(address,address)"(
       arg0: string,
       arg1: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     deposit(
       _token: string,
@@ -220,20 +214,6 @@ export class IBSVault extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    send(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "send(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     toShare(
       token: string,
       amount: BigNumberish,
@@ -260,13 +240,15 @@ export class IBSVault extends Contract {
 
     transfer(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transfer(address,address,uint256)"(
+    "transfer(address,address,address,uint256)"(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -292,14 +274,14 @@ export class IBSVault extends Contract {
   balanceOf(
     arg0: string,
     arg1: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   "balanceOf(address,address)"(
     arg0: string,
     arg1: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   deposit(
     _token: string,
@@ -352,20 +334,6 @@ export class IBSVault extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  send(
-    _token: string,
-    _to: string,
-    _shares: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "send(address,address,uint256)"(
-    _token: string,
-    _to: string,
-    _shares: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   toShare(
     token: string,
     amount: BigNumberish,
@@ -392,13 +360,15 @@ export class IBSVault extends Contract {
 
   transfer(
     _token: string,
+    _from: string,
     _to: string,
     _shares: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transfer(address,address,uint256)"(
+  "transfer(address,address,address,uint256)"(
     _token: string,
+    _from: string,
     _to: string,
     _shares: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -484,20 +454,6 @@ export class IBSVault extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    send(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "send(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     toShare(
       token: string,
       amount: BigNumberish,
@@ -524,13 +480,15 @@ export class IBSVault extends Contract {
 
     transfer(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "transfer(address,address,uint256)"(
+    "transfer(address,address,address,uint256)"(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: CallOverrides
@@ -555,12 +513,12 @@ export class IBSVault extends Contract {
 
   filters: {
     Approval(
-      owner: string | null,
-      spender: string | null,
-      value: null
+      user: string | null,
+      allowed: string | null,
+      status: null
     ): TypedEventFilter<
-      [string, string, BigNumber],
-      { owner: string; spender: string; value: BigNumber }
+      [string, string, boolean],
+      { user: string; allowed: string; status: boolean }
     >;
 
     Deposit(
@@ -637,13 +595,13 @@ export class IBSVault extends Contract {
     balanceOf(
       arg0: string,
       arg1: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "balanceOf(address,address)"(
       arg0: string,
       arg1: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     deposit(
@@ -697,20 +655,6 @@ export class IBSVault extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    send(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "send(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     toShare(
       token: string,
       amount: BigNumberish,
@@ -737,13 +681,15 @@ export class IBSVault extends Contract {
 
     transfer(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transfer(address,address,uint256)"(
+    "transfer(address,address,address,uint256)"(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -770,13 +716,13 @@ export class IBSVault extends Contract {
     balanceOf(
       arg0: string,
       arg1: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "balanceOf(address,address)"(
       arg0: string,
       arg1: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     deposit(
@@ -833,20 +779,6 @@ export class IBSVault extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    send(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "send(address,address,uint256)"(
-      _token: string,
-      _to: string,
-      _shares: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     toShare(
       token: string,
       amount: BigNumberish,
@@ -873,13 +805,15 @@ export class IBSVault extends Contract {
 
     transfer(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transfer(address,address,uint256)"(
+    "transfer(address,address,address,uint256)"(
       _token: string,
+      _from: string,
       _to: string,
       _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }

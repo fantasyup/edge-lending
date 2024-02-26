@@ -11,7 +11,7 @@ import "./interfaces/IBSWrapperToken.sol";
 
 
 contract LendingPairFactory is PairConfigurationBase {
-
+    
     function createPair(
         IBSControl _control,
         IPriceOracle _oracle,

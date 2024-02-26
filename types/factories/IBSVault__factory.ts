@@ -23,20 +23,20 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "owner",
+        name: "user",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "spender",
+        name: "allowed",
         type: "address",
       },
       {
         indexed: false,
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
+        internalType: "bool",
+        name: "status",
+        type: "bool",
       },
     ],
     name: "Approval",
@@ -231,7 +231,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -349,29 +349,6 @@ const _abi = [
     inputs: [
       {
         internalType: "contract IERC20",
-        name: "_token",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_to",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_shares",
-        type: "uint256",
-      },
-    ],
-    name: "send",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IERC20",
         name: "token",
         type: "address",
       },
@@ -421,6 +398,11 @@ const _abi = [
       {
         internalType: "contract IERC20",
         name: "_token",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_from",
         type: "address",
       },
       {

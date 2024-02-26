@@ -34,14 +34,10 @@ interface IBSCollateralPairInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "Deposit(address,uint256)": EventFragment;
     "Liquidate(address,address,address,uint256,address)": EventFragment;
-    "Withdraw(address,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Liquidate"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
 
 export class IBSCollateralPair extends Contract {
@@ -122,14 +118,6 @@ export class IBSCollateralPair extends Contract {
   };
 
   filters: {
-    Deposit(
-      _account: string | null,
-      _amount: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { _account: string; _amount: BigNumber }
-    >;
-
     Liquidate(
       pair: string | null,
       asset: string | null,
@@ -145,14 +133,6 @@ export class IBSCollateralPair extends Contract {
         liquidatedCollateralAmount: BigNumber;
         liquidator: string;
       }
-    >;
-
-    Withdraw(
-      _account: null,
-      _amount: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { _account: string; _amount: BigNumber }
     >;
   };
 

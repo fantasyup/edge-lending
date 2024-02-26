@@ -2,7 +2,7 @@ import { ethers, waffle } from "hardhat";
 import { Signer, Contract } from "ethers"
 import { ContractId, EthereumAddress } from "../helpers/types"
 import { Vault } from '../types/Vault'
-import { LendingPair, MockFlashBorrower, MockLendingPair, MockToken, UUPSProxy } from "../types";
+import { Control, JumpRateModelV2, LendingPair, MockFlashBorrower, MockLendingPair, MockPriceOracle, MockToken, UUPSProxy, WrapperToken } from "../types";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
@@ -45,4 +45,44 @@ export const deployProxiedVault = async(vaultAddress ?: EthereumAddress) => {
     // initialize proxy
     await UUPSProxy.initializeProxy(pVaultAddress)
     return (await ethers.getContractAt(ContractId.Vault, UUPSProxy.address)) as Vault
+}
+
+export const deployWrappedToken = async() => {
+    return await deployContract<WrapperToken>(
+        ContractId.WrapperToken,
+        []
+    )
+}
+
+export const deployMockPriceOracle = async() => {
+    return await deployContract<MockPriceOracle>(
+        ContractId.MockPriceOracle,
+        []
+    )
+}
+
+export const deployInterestRateModel = async (
+    baseRatePerYear: string,
+    multiplierPerYear: string,
+    jumpMultiplierPerYear: string,
+    kink: string,
+    owner: EthereumAddress
+) => {
+    return await deployContract<JumpRateModelV2>(
+        ContractId.JumpRateModelV2,
+        [
+            baseRatePerYear,
+            multiplierPerYear,
+            jumpMultiplierPerYear,
+            kink,
+            owner
+        ]
+    )
+}
+
+export const deployControl = async() => {
+    return await deployContract<Control>(
+        ContractId.Control,
+        []
+    )
 }

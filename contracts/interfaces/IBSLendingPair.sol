@@ -40,6 +40,12 @@ interface IBSLendingPair {
         uint256 amountofWrappedBurned
     );
 
+    event WithdrawCollateral(
+        address _account,
+        uint256 _amount
+    );
+
+
     /**
      * Emitted on repay
      *
@@ -113,8 +119,8 @@ interface IBSLendingPair {
     //     address _tokenReceipeint,
     //     uint256 _amount
     // ) external; 
-    function deposit(address _token, address _tokenReceipeint, uint256 _amount) external;
-
+    function depositBorrowAsset(address _tokenReceipeint, uint256 _amount) external;
+    function depositCollateral(address _tokenReceipeint, uint256 _vaultShareAmount) external;
     // function depositWithPermit() external returns (uint256);
 
     // function withdraw() external;

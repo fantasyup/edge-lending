@@ -61,7 +61,7 @@ interface IBSVault is IERC3156FlashLender {
         uint256 newRate
     );
 
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Approval(address indexed user, address indexed allowed, bool status);
 
     // ************** //
     // *** FUNCTIONS *** //
@@ -84,19 +84,20 @@ interface IBSVault is IERC3156FlashLender {
     function balanceOf(
         IERC20,
         address
-    ) external returns(uint256);
+    ) external view returns(uint256);
 
     function transfer(
         IERC20 _token,
+        address _from,
         address _to,
         uint256 _shares
     ) external;
 
-    function send(
-        IERC20 _token,
-        address _to,
-        uint256 _shares
-    ) external;
+    // function send(
+    //     IERC20 _token,
+    //     address _to,
+    //     uint256 _shares
+    // ) external;
 
     function toShare(
         IERC20 token,

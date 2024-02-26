@@ -21,17 +21,12 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockPriceOracleInterface extends ethers.utils.Interface {
   functions: {
-    "c_0xe557ede9(bytes32)": FunctionFragment;
     "getPriceInETH(address)": FunctionFragment;
     "getPriceInUSD(address)": FunctionFragment;
     "viewPriceInETH(address)": FunctionFragment;
     "viewPriceInUSD(address)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "c_0xe557ede9",
-    values: [BytesLike]
-  ): string;
   encodeFunctionData(
     functionFragment: "getPriceInETH",
     values: [string]
@@ -49,10 +44,6 @@ interface MockPriceOracleInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "c_0xe557ede9",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "getPriceInETH",
     data: BytesLike
@@ -117,16 +108,6 @@ export class MockPriceOracle extends Contract {
   interface: MockPriceOracleInterface;
 
   functions: {
-    c_0xe557ede9(
-      c__0xe557ede9: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xe557ede9(bytes32)"(
-      c__0xe557ede9: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     getPriceInETH(
       arg0: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -168,16 +149,6 @@ export class MockPriceOracle extends Contract {
     ): Promise<[BigNumber]>;
   };
 
-  c_0xe557ede9(
-    c__0xe557ede9: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xe557ede9(bytes32)"(
-    c__0xe557ede9: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   getPriceInETH(
     arg0: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -213,16 +184,6 @@ export class MockPriceOracle extends Contract {
   ): Promise<BigNumber>;
 
   callStatic: {
-    c_0xe557ede9(
-      c__0xe557ede9: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xe557ede9(bytes32)"(
-      c__0xe557ede9: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     getPriceInETH(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "getPriceInETH(address)"(
@@ -255,16 +216,6 @@ export class MockPriceOracle extends Contract {
   filters: {};
 
   estimateGas: {
-    c_0xe557ede9(
-      c__0xe557ede9: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xe557ede9(bytes32)"(
-      c__0xe557ede9: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getPriceInETH(
       arg0: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -301,16 +252,6 @@ export class MockPriceOracle extends Contract {
   };
 
   populateTransaction: {
-    c_0xe557ede9(
-      c__0xe557ede9: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xe557ede9(bytes32)"(
-      c__0xe557ede9: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     getPriceInETH(
       arg0: string,
       overrides?: Overrides & { from?: string | Promise<string> }
