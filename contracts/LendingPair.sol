@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-// import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./compound/Exponential.sol";
 import "./interfaces/IInterestRateModel.sol";
-import "./interfaces/IBSControl.sol";
 import "./interfaces/IBSVault.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./interfaces/IPriceOracle.sol";
-import "./interfaces/IBSCollateralPair.sol";
 import "hardhat/console.sol";
 import "./util/Initializable.sol";
 import "./token/IERC20Details.sol";
@@ -24,7 +21,7 @@ import "./token/IERC20Details.sol";
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initializable {
+contract LendingPair is IBSLendingPair, Exponential, Initializable {
     using SafeERC20 for IERC20;
 
     /// @dev initialExchangeRateMantissa Initial exchange rate used when minting the first CTokens (used when totalSupply = 0)
@@ -741,14 +738,15 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initiali
         );
 
         uint256 borrowLimit = getBorrowLimitInUSD(_borrower);
-        //check if the borrow is less than the borrowed amount
+
+        // check if the borrow is less than the borrowed amount
         if (borrowLimit <= borrowedAmountInUSD) {
             _repayLiquidatingLoan(
                 _borrower,
                 msg.sender,
                 borrowedAmount
             );
-            _liquidate(_borrower, msg.sender, borrowedAmount);
+            _liquidate(_borrower, msg.sender);
         }
     }
 
@@ -773,26 +771,27 @@ contract LendingPair is IBSLendingPair, IBSCollateralPair, Exponential, Initiali
         accountBorrows[_borrower].principal = 0;
         accountBorrows[_borrower].interestIndex = 0;
         totalBorrows = totalBorrows - _amount;
-        // transfer the owed amount of stablecoin from the borrower to this contract
     }
 
     /// @dev _liquidate is a function to liquidate a user
     /// @param _account is the address of the account being liquidated
     /// @param _liquidator is the address of the account doing the liquidating who receives the collateral
-    function _liquidate(address _account, address _liquidator, uint256 _amount)
+    function _liquidate(address _account, address _liquidator)
         internal
     {
-        require(collateralBalance[_account] >= _amount, "invalid amount to liquidate");
+        uint256 balance = collateralBalance[_account];
+
         // transfer the collateral tokens to the liquidator
-        vault.transfer(collateralAsset, address(this), _liquidator, _amount);
+        vault.transfer(collateralAsset, address(this), _liquidator, balance);
+
         // reset the borrowers collateral tracker
-        collateralBalance[_account] = collateralBalance[_account] - _amount;
+        collateralBalance[_account] = 0;
 
         emit Liquidate(
             address(this),
             address(collateralAsset),
             address(_account),
-            _amount,
+            balance,
             _liquidator
         );
     }

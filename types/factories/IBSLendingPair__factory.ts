@@ -171,12 +171,6 @@ const _abi = [
       {
         indexed: false,
         internalType: "uint256",
-        name: "amountOfDebtToCover",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
         name: "liquidatedCollateralAmount",
         type: "uint256",
       },
@@ -316,6 +310,25 @@ const _abi = [
         internalType: "contract IERC20",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_account",
+        type: "address",
+      },
+    ],
+    name: "collateralOfAccount",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

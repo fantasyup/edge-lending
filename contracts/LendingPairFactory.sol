@@ -3,7 +3,6 @@ pragma solidity 0.8.1;
 import "./compound/JumpRateModelV2.sol";
 import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
-import "./interfaces/IBSCollateralPair.sol";
 import "./LendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 

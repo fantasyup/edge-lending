@@ -70,7 +70,6 @@ interface IBSLendingPair {
      * @param pair The pair being interacted with
      * @param asset The asset that getting liquidated
      * @param user The user that's getting liquidated
-     * @param amountOfDebtToCover The amount of debt the liquidator is repay
      * @param liquidatedCollateralAmount The of collateral transferred to the liquidator
      * @param liquidator The liquidator
      **/
@@ -78,7 +77,6 @@ interface IBSLendingPair {
         address indexed pair,
         address indexed asset,
         address indexed user,
-        uint256 amountOfDebtToCover,
         uint256 liquidatedCollateralAmount,
         address liquidator
     );
@@ -122,4 +120,9 @@ interface IBSLendingPair {
         address _to,
         uint256 _amount
     ) external;
+    
+    function collateralOfAccount(address _account)
+        external
+        view
+        returns (uint256);
 }

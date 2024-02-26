@@ -22,12 +22,17 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface IBSLendingPairInterface extends ethers.utils.Interface {
   functions: {
     "asset()": FunctionFragment;
+    "collateralOfAccount(address)": FunctionFragment;
     "depositBorrowAsset(address,uint256)": FunctionFragment;
     "depositCollateral(address,uint256)": FunctionFragment;
     "redeem(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "collateralOfAccount",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "depositBorrowAsset",
     values: [string, BigNumberish]
@@ -43,6 +48,10 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "asset", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "collateralOfAccount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "depositBorrowAsset",
     data: BytesLike
   ): Result;
@@ -57,7 +66,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     "Deposit(address,address,address,address,uint256)": EventFragment;
     "FlashLoan(address,address,address,uint256,uint256)": EventFragment;
     "InterestAccrued(address,uint256,uint256,uint256,uint256)": EventFragment;
-    "Liquidate(address,address,address,uint256,uint256,address)": EventFragment;
+    "Liquidate(address,address,address,uint256,address)": EventFragment;
     "Redeem(address,address,address,address,uint256,uint256)": EventFragment;
     "Repay(address,address,address,address,uint256)": EventFragment;
     "ReserveWithdraw(address,uint256)": EventFragment;
@@ -123,6 +132,16 @@ export class IBSLendingPair extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<[string]>;
 
+    collateralOfAccount(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "collateralOfAccount(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     depositBorrowAsset(
       _tokenReceipeint: string,
       _amount: BigNumberish,
@@ -164,6 +183,16 @@ export class IBSLendingPair extends Contract {
 
   "asset()"(overrides?: CallOverrides): Promise<string>;
 
+  collateralOfAccount(
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "collateralOfAccount(address)"(
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   depositBorrowAsset(
     _tokenReceipeint: string,
     _amount: BigNumberish,
@@ -204,6 +233,16 @@ export class IBSLendingPair extends Contract {
     asset(overrides?: CallOverrides): Promise<string>;
 
     "asset()"(overrides?: CallOverrides): Promise<string>;
+
+    collateralOfAccount(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "collateralOfAccount(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     depositBorrowAsset(
       _tokenReceipeint: string,
@@ -306,16 +345,14 @@ export class IBSLendingPair extends Contract {
       pair: string | null,
       asset: string | null,
       user: string | null,
-      amountOfDebtToCover: null,
       liquidatedCollateralAmount: null,
       liquidator: null
     ): TypedEventFilter<
-      [string, string, string, BigNumber, BigNumber, string],
+      [string, string, string, BigNumber, string],
       {
         pair: string;
         asset: string;
         user: string;
-        amountOfDebtToCover: BigNumber;
         liquidatedCollateralAmount: BigNumber;
         liquidator: string;
       }
@@ -379,6 +416,16 @@ export class IBSLendingPair extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    collateralOfAccount(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "collateralOfAccount(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     depositBorrowAsset(
       _tokenReceipeint: string,
       _amount: BigNumberish,
@@ -420,6 +467,16 @@ export class IBSLendingPair extends Contract {
     asset(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "asset()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    collateralOfAccount(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "collateralOfAccount(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     depositBorrowAsset(
       _tokenReceipeint: string,
