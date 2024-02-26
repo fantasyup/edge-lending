@@ -579,9 +579,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         } else {
             amount = _amount;
         }
-        console.logString("colalteral");
-        console.logUint(amount);
-        console.logUint(maxAmount);
+        // console.logString("colalteral");
+        // console.logUint(amount);
+        // console.logUint(maxAmount);
 
         // require the availible value of the collateral locked in this contract the user has
         // is greater than or equal to the amount being withdrawn
@@ -713,7 +713,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         returns (uint256)
     {
         // 150% collateralFactor
-        return _borrowAmount * 3 / 2 ;
+        return (_borrowAmount * 3) / 2;
     }
 
     /// @notice getBorrowLimit returns the borrow limit for an account
