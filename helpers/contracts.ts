@@ -2,7 +2,7 @@ import { ethers, waffle } from "hardhat";
 import { Signer, Contract, BigNumber } from "ethers"
 import { ContractId, EthereumAddress } from "../helpers/types"
 import { Vault } from '../types/Vault'
-import { Control, JumpRateModelV2, LendingPair, MockFlashBorrower, MockLendingPair, MockPriceOracle, MockToken, UUPSProxy, WrapperToken } from "../types";
+import { JumpRateModelV2, LendingPair, MockFlashBorrower, MockLendingPair, MockPriceOracle, MockToken, UUPSProxy, WrapperToken } from "../types";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
@@ -77,13 +77,6 @@ export const deployInterestRateModel = async (
             kink,
             owner
         ]
-    )
-}
-
-export const deployControl = async() => {
-    return await deployContract<Control>(
-        ContractId.Control,
-        []
     )
 }
 

@@ -21,9 +21,14 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface LendingPairFactoryInterface extends ethers.utils.Interface {
   functions: {
+    "allPairs(uint256)": FunctionFragment;
     "createPair(address,address,address,address,address,uint256,uint256,tuple,address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "allPairs",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "createPair",
     values: [
@@ -44,9 +49,14 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     ]
   ): string;
 
+  decodeFunctionResult(functionFragment: "allPairs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "createPair", data: BytesLike): Result;
 
-  events: {};
+  events: {
+    "NewLendingPair(address,uint256)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "NewLendingPair"): EventFragment;
 }
 
 export class LendingPairFactory extends Contract {
@@ -93,8 +103,15 @@ export class LendingPairFactory extends Contract {
   interface: LendingPairFactoryInterface;
 
   functions: {
+    allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+
+    "allPairs(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     createPair(
-      _control: string,
+      _team: string,
       _oracle: string,
       _vault: string,
       _asset: string,
@@ -112,7 +129,7 @@ export class LendingPairFactory extends Contract {
     ): Promise<ContractTransaction>;
 
     "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
-      _control: string,
+      _team: string,
       _oracle: string,
       _vault: string,
       _asset: string,
@@ -130,8 +147,15 @@ export class LendingPairFactory extends Contract {
     ): Promise<ContractTransaction>;
   };
 
+  allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  "allPairs(uint256)"(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   createPair(
-    _control: string,
+    _team: string,
     _oracle: string,
     _vault: string,
     _asset: string,
@@ -149,7 +173,7 @@ export class LendingPairFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
-    _control: string,
+    _team: string,
     _oracle: string,
     _vault: string,
     _asset: string,
@@ -167,8 +191,15 @@ export class LendingPairFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    "allPairs(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     createPair(
-      _control: string,
+      _team: string,
       _oracle: string,
       _vault: string,
       _asset: string,
@@ -186,7 +217,7 @@ export class LendingPairFactory extends Contract {
     ): Promise<string>;
 
     "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
-      _control: string,
+      _team: string,
       _oracle: string,
       _vault: string,
       _asset: string,
@@ -204,11 +235,26 @@ export class LendingPairFactory extends Contract {
     ): Promise<string>;
   };
 
-  filters: {};
+  filters: {
+    NewLendingPair(
+      pair: null,
+      created: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { pair: string; created: BigNumber }
+    >;
+  };
 
   estimateGas: {
+    allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "allPairs(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     createPair(
-      _control: string,
+      _team: string,
       _oracle: string,
       _vault: string,
       _asset: string,
@@ -226,7 +272,7 @@ export class LendingPairFactory extends Contract {
     ): Promise<BigNumber>;
 
     "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
-      _control: string,
+      _team: string,
       _oracle: string,
       _vault: string,
       _asset: string,
@@ -245,8 +291,18 @@ export class LendingPairFactory extends Contract {
   };
 
   populateTransaction: {
+    allPairs(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "allPairs(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     createPair(
-      _control: string,
+      _team: string,
       _oracle: string,
       _vault: string,
       _asset: string,
@@ -264,7 +320,7 @@ export class LendingPairFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
-      _control: string,
+      _team: string,
       _oracle: string,
       _vault: string,
       _asset: string,

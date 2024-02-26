@@ -22,6 +22,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface PriceOracleInterface extends ethers.utils.Interface {
   functions: {
     "assetToOracle(address)": FunctionFragment;
+    "blackSmithTeam()": FunctionFragment;
     "getPriceInETH(address)": FunctionFragment;
     "getPriceInUSD(address)": FunctionFragment;
     "updateOracleForAsset(address,address)": FunctionFragment;
@@ -32,6 +33,10 @@ interface PriceOracleInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "assetToOracle",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "blackSmithTeam",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getPriceInETH",
@@ -56,6 +61,10 @@ interface PriceOracleInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "assetToOracle",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "blackSmithTeam",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -137,6 +146,10 @@ export class PriceOracle extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    blackSmithTeam(overrides?: CallOverrides): Promise<[string]>;
+
+    "blackSmithTeam()"(overrides?: CallOverrides): Promise<[string]>;
+
     getPriceInETH(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -197,6 +210,10 @@ export class PriceOracle extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  blackSmithTeam(overrides?: CallOverrides): Promise<string>;
+
+  "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
+
   getPriceInETH(
     _token: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -250,6 +267,10 @@ export class PriceOracle extends Contract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    blackSmithTeam(overrides?: CallOverrides): Promise<string>;
+
+    "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
     getPriceInETH(
       _token: string,
@@ -319,6 +340,10 @@ export class PriceOracle extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    blackSmithTeam(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "blackSmithTeam()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getPriceInETH(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -380,6 +405,12 @@ export class PriceOracle extends Contract {
 
     "assetToOracle(address)"(
       arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    blackSmithTeam(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "blackSmithTeam()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

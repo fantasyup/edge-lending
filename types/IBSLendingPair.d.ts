@@ -60,6 +60,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     "Liquidate(address,address,address,uint256,uint256,address)": EventFragment;
     "Redeem(address,address,address,address,uint256,uint256)": EventFragment;
     "Repay(address,address,address,address,uint256)": EventFragment;
+    "ReserveWithdraw(address,uint256)": EventFragment;
     "WithdrawCollateral(address,uint256)": EventFragment;
   };
 
@@ -70,6 +71,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Liquidate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Redeem"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Repay"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ReserveWithdraw"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "WithdrawCollateral"): EventFragment;
 }
 
@@ -355,12 +357,20 @@ export class IBSLendingPair extends Contract {
       }
     >;
 
-    WithdrawCollateral(
-      _account: null,
-      _amount: null
+    ReserveWithdraw(
+      user: null,
+      shares: null
     ): TypedEventFilter<
       [string, BigNumber],
-      { _account: string; _amount: BigNumber }
+      { user: string; shares: BigNumber }
+    >;
+
+    WithdrawCollateral(
+      account: null,
+      amount: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { account: string; amount: BigNumber }
     >;
   };
 

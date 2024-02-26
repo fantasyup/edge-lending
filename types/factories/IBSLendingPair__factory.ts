@@ -276,13 +276,32 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
-        name: "_account",
+        name: "user",
         type: "address",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "_amount",
+        name: "shares",
+        type: "uint256",
+      },
+    ],
+    name: "ReserveWithdraw",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
         type: "uint256",
       },
     ],

@@ -2,7 +2,6 @@ import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
 import {
-  Control as BSControl,
   IPriceOracle,
   JumpRateModelV2,
   LendingPair as BLendingPair,
@@ -10,14 +9,13 @@ import {
   Vault as BVault,
   WrapperToken,
 } from "../types";
-import { deployControl, deployInterestRateModel, deployLendingPair, deployMockPriceOracle, deployMockToken, deployVault, deployWrappedToken } from "../helpers/contracts";
+import { deployInterestRateModel, deployLendingPair, deployMockPriceOracle, deployMockToken, deployVault, deployWrappedToken } from "../helpers/contracts";
 
 // list of accounts
 let accounts: Signer[];
 
 let Vault: BVault;
 let LendingPair: BLendingPair;
-let Control: BSControl;
 let MockPriceOracle: IPriceOracle;
 let BorrowAsset: MockToken;
 let CollateralAsset: MockToken;
@@ -90,7 +88,6 @@ describe("LendingPair", async function () {
       james
     ] = await Promise.all(accounts.slice(0, 5).map(x => x.getAddress())))
 
-    Control = await deployControl()
     Vault = await deployVault()
     LendingPair = await deployLendingPair()
     MockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(18))
@@ -114,7 +111,7 @@ describe("LendingPair", async function () {
     const reserveFactorMantissa = "500000000000000000"
 
     await LendingPair.initialize(
-      Control.address,
+      admin,
       MockPriceOracle.address,
       Vault.address,
       BorrowAsset.address,
