@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract PriceOracle is IPriceOracle {
 
     /// @dev control allowed to update price oracle
-    address control;
+    address public blackSmithTeam;
 
     /// @notice token to the oracle address
     mapping(IERC20 => IOracle) public assetToOracle;
@@ -19,19 +19,19 @@ contract PriceOracle is IPriceOracle {
         IOracle oracle
     );
 
-    modifier onlyControl() {
-        require(msg.sender == control);
+    modifier onlyBlackSmithTeam() {
+        require(msg.sender == blackSmithTeam);
         _;
     }
 
-    constructor(address _control) {
-        control = _control;
+    constructor(address _blackSmithTeam) {
+        blackSmithTeam = _blackSmithTeam;
     }
 
     /// @notice adds oracle for an asset e.g. ETH
     /// @param _asset the oracle for the asset
     /// @param _oracle the oracle address
-    function updateOracleForAsset(IERC20 _asset, IOracle _oracle) external onlyControl {
+    function updateOracleForAsset(IERC20 _asset, IOracle _oracle) external onlyBlackSmithTeam {
         require(address(_oracle) != address(0), "INVALID_ORACLE");
         assetToOracle[_asset] = _oracle;
         emit UpdateOracle(_asset, _oracle);
@@ -64,4 +64,5 @@ contract PriceOracle is IPriceOracle {
         require(address(assetToOracle[_token]) != address(0), "INVALID_ORACLE");
         return assetToOracle[_token].viewPriceInETH();
     }
+
 }

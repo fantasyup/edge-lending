@@ -23,6 +23,7 @@ interface MockPriceOracleInterface extends ethers.utils.Interface {
   functions: {
     "getPriceInETH(address)": FunctionFragment;
     "getPriceInUSD(address)": FunctionFragment;
+    "setPrice(uint256)": FunctionFragment;
     "viewPriceInETH(address)": FunctionFragment;
     "viewPriceInUSD(address)": FunctionFragment;
   };
@@ -34,6 +35,10 @@ interface MockPriceOracleInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getPriceInUSD",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setPrice",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "viewPriceInETH",
@@ -52,6 +57,7 @@ interface MockPriceOracleInterface extends ethers.utils.Interface {
     functionFragment: "getPriceInUSD",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "viewPriceInETH",
     data: BytesLike
@@ -128,6 +134,16 @@ export class MockPriceOracle extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setPrice(
+      _newPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setPrice(uint256)"(
+      _newPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     viewPriceInETH(
       arg0: string,
       overrides?: CallOverrides
@@ -169,6 +185,16 @@ export class MockPriceOracle extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setPrice(
+    _newPrice: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setPrice(uint256)"(
+    _newPrice: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   viewPriceInETH(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "viewPriceInETH(address)"(
@@ -197,6 +223,13 @@ export class MockPriceOracle extends Contract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    setPrice(_newPrice: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    "setPrice(uint256)"(
+      _newPrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     viewPriceInETH(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -236,6 +269,16 @@ export class MockPriceOracle extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    setPrice(
+      _newPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setPrice(uint256)"(
+      _newPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     viewPriceInETH(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "viewPriceInETH(address)"(
@@ -269,6 +312,16 @@ export class MockPriceOracle extends Contract {
 
     "getPriceInUSD(address)"(
       arg0: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setPrice(
+      _newPrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setPrice(uint256)"(
+      _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

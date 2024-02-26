@@ -230,7 +230,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "Reedem",
+    name: "Redeem",
     type: "event",
   },
   {
@@ -334,6 +334,24 @@ const _abi = [
       },
     ],
     name: "depositCollateral",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_to",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "redeem",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

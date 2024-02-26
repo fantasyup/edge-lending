@@ -1,5 +1,5 @@
 import { ethers, waffle } from "hardhat";
-import { Signer } from "ethers";
+import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
 import {
   Control as BSControl,
@@ -27,8 +27,10 @@ let InterestRateModel: JumpRateModelV2;
 let admin: string; // account used in deploying
 let bob: string;
 let frank: string;
-let frankSigner: Signer;
 let alice: string;
+let james: string;
+
+let frankSigner: Signer;
 
 // flash loan rate
 const flashLoanRate = ethers.utils.parseUnits("0.05", 18)
@@ -84,13 +86,14 @@ describe("LendingPair", async function () {
       admin,
       bob,
       frank,
-      alice
-    ] = await Promise.all(accounts.slice(0, 4).map(x => x.getAddress())))
+      alice,
+      james
+    ] = await Promise.all(accounts.slice(0, 5).map(x => x.getAddress())))
 
     Control = await deployControl()
     Vault = await deployVault()
     LendingPair = await deployLendingPair()
-    MockPriceOracle = await deployMockPriceOracle()
+    MockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(18))
     BorrowAsset = await deployMockToken()
     CollateralAsset = await deployMockToken()
     BorrowAssetDepositWrapperToken = await deployWrappedToken()
@@ -248,26 +251,99 @@ describe("LendingPair", async function () {
       await depositInVault(BorrowAsset, frankSigner, 10000)
 
       // pay part of it 
-      const partRepayAmount = await (await LendingPair.accountBorrows(frank)).principal.toNumber() /  2
+      const currentRepayAmount = await (await LendingPair.accountBorrows(frank)).principal.toNumber()
+      const partRepayAmount =  currentRepayAmount /  2
 
       // repay part 
       await expect(
         await LendingPair.connect(frankSigner).repay(partRepayAmount)
       ).to.emit(LendingPair, 'Repay').withArgs(LendingPair.address,BorrowAsset.address, frank, frank, partRepayAmount)
 
-      // check 
-
+      // check current borrow balance
+      const newBorrowBalance = await (await LendingPair.accountBorrows(frank)).principal.toNumber()
+      expect(newBorrowBalance).to.be.eq(partRepayAmount)
       // repay everything
       await expect(
         await LendingPair.connect(frankSigner).repay(0)
       ).to.emit(LendingPair, 'Repay')
-      
 
+      const updatedBorrowBalance = await (await LendingPair.accountBorrows(frank)).principal.toNumber()
+      expect(updatedBorrowBalance).to.be.eq(0)
+    })
+
+    it("redeem", async function() {
+      // admin wants to redeem deposit wrapper token for underlying share
+      const currentWrapperTokenBalance = await (await BorrowAssetDepositWrapperToken.balanceOf(admin)).toNumber();
+      const partRedeem = currentWrapperTokenBalance / 2
+
+      // part redeem
+      // @TODO add withargs
+      await expect(
+        await LendingPair.redeem(admin, partRedeem)
+      ).to.emit(LendingPair, 'Redeem')
+      
+      const newWrapperTokenBalance = await (await BorrowAssetDepositWrapperToken.balanceOf(admin)).toNumber();
+      // expect(currentWrapperTokenBalance - newWrapperTokenBalance).to.be.eq(partRedeem)
+
+      // full redeem
+      await expect(
+        await LendingPair.redeem(admin, 0)
+      ).to.emit(LendingPair, 'Redeem')
+
+      const updatedWrapperTokenBalance = await (await BorrowAssetDepositWrapperToken.balanceOf(admin)).toNumber();
+      // expect(updatedWrapperTokenBalance).to.be.eq(0)
+
+      // LendingPair principal balance should be 0
+      // expect(await (await LendingPair.principalBalance(admin)).toNumber()).to.be.eq(0)
+      
+      //@TODO check the underlying vault balance
+    })
+
+    it('withdrawCollateral', async function() {
+      const currentCollateral = await (await LendingPair.collateralOfAccount(admin)).toNumber()
+      const partWithdraw = currentCollateral / 2
+      console.log({ currentCollateral })
+
+      // part withdraw
+      await expect(
+        await LendingPair.withdrawCollateral(partWithdraw)
+      ).to.emit(LendingPair, 'WithdrawCollateral')
+
+      // full withdraw
+      // await expect(
+      //   await LendingPair.withdrawCollateral(0)
+      // ).to.emit(LendingPair, 'WithdrawCollateral')
+      
+      // @Todo check balances
 
     })
 
+    describe("liquidate", async function() {
+      it("liquidate - fail", async function() {
+        await expect(
+          LendingPair.liquidate(admin)
+        ).to.revertedWith("NOT_LIQUIDATE_YOURSELF") 
+      })
 
+      it("liquidate - correctly", async function() {
+        // deposit collateral
+        await depositCollateralAsset(LendingPair, james, amountToDeposit)
+        // borrow
+        await LendingPair.connect(await ethers.getSigner(james)).borrow(500)
+        // change price 
+        // set oracle price to half
+        await MockPriceOracle.setPrice(BigNumber.from(5).pow(18))
 
+        // liquidate
+        await depositInVault(BorrowAsset, await ethers.getSigner(admin), 800)
+
+        await LendingPair.liquidate(james)
+
+        // @TODO confirm proper checks
+
+      })
+
+    })
   })  
 
 });

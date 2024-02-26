@@ -34,21 +34,21 @@ contract Exponential {
         return Exp({mantissa: rational});
     }
 
-    /**
-     * @dev Adds two exponentials, returning a new exponential.
-     */
-    function addExp(Exp memory a, Exp memory b) pure internal returns (Exp memory) {
-        uint result = a.mantissa + b.mantissa;
-        return Exp({mantissa: result});
-    }
+    // /**
+    //  * @dev Adds two exponentials, returning a new exponential.
+    //  */
+    // function addExp(Exp memory a, Exp memory b) pure internal returns (Exp memory) {
+    //     uint result = a.mantissa + b.mantissa;
+    //     return Exp({mantissa: result});
+    // }
 
-    /**
-     * @dev Subtracts two exponentials, returning a new exponential.
-     */
-    function subExp(Exp memory a, Exp memory b) pure internal returns (Exp memory) {
-       uint result = a.mantissa - b.mantissa;
-        return Exp({mantissa: result});
-    }
+    // /**
+    //  * @dev Subtracts two exponentials, returning a new exponential.
+    //  */
+    // function subExp(Exp memory a, Exp memory b) pure internal returns (Exp memory) {
+    //    uint result = a.mantissa - b.mantissa;
+    //     return Exp({mantissa: result});
+    // }
 
     /**
      * @dev Multiply an Exp by a scalar, returning a new Exp.

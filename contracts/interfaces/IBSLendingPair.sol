@@ -23,7 +23,7 @@ interface IBSLendingPair {
     event Borrow(address indexed borrower, uint256 amount);
 
     /**
-     * Emitted on Reedem
+     * Emitted on Redeem
      *
      * @param pair The pair being interacted with
      * @param asset The asset withdraw in the pair
@@ -31,7 +31,7 @@ interface IBSLendingPair {
      * @param to The user the receives the withdrawn tokens
      * @param amount The amount being withdrawn
      **/
-    event Reedem(
+    event Redeem(
         address indexed pair,
         address indexed asset,
         address indexed user,
@@ -41,10 +41,11 @@ interface IBSLendingPair {
     );
 
     event WithdrawCollateral(
-        address _account,
-        uint256 _amount
+        address account,
+        uint256 amount
     );
 
+    event ReserveWithdraw(address user, uint256 shares);
 
     /**
      * Emitted on repay
@@ -115,21 +116,10 @@ interface IBSLendingPair {
 
     function asset() external view returns (IERC20);
 
-    // function deposit(
-    //     address _tokenReceipeint,
-    //     uint256 _amount
-    // ) external; 
     function depositBorrowAsset(address _tokenReceipeint, uint256 _amount) external;
     function depositCollateral(address _tokenReceipeint, uint256 _vaultShareAmount) external;
-    // function depositWithPermit() external returns (uint256);
-
-    // function withdraw() external;
-
-    // function withdrawWithPermit() external;
-
-    // function borrow() external returns (uint256);
-
-    // function liquidate() external;
-
-    // function updatePriceOracle() external returns (address);
+    function redeem(
+        address _to,
+        uint256 _amount
+    ) external;
 }

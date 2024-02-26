@@ -1,5 +1,5 @@
 import { ethers, waffle } from "hardhat";
-import { Signer, Contract } from "ethers"
+import { Signer, Contract, BigNumber } from "ethers"
 import { ContractId, EthereumAddress } from "../helpers/types"
 import { Vault } from '../types/Vault'
 import { Control, JumpRateModelV2, LendingPair, MockFlashBorrower, MockLendingPair, MockPriceOracle, MockToken, UUPSProxy, WrapperToken } from "../types";
@@ -54,10 +54,10 @@ export const deployWrappedToken = async() => {
     )
 }
 
-export const deployMockPriceOracle = async() => {
+export const deployMockPriceOracle = async(price: BigNumber) => {
     return await deployContract<MockPriceOracle>(
         ContractId.MockPriceOracle,
-        []
+        [price.toString()]
     )
 }
 
@@ -85,4 +85,9 @@ export const deployControl = async() => {
         ContractId.Control,
         []
     )
+}
+
+// minimal proxy contract
+export const deployERC1167LendingPair = async() => {
+
 }

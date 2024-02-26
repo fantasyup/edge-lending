@@ -2,6 +2,8 @@ import { task } from "hardhat/config";
 import "hardhat-typechain";
 import "@nomiclabs/hardhat-waffle";
 import "solidity-coverage"
+// import "hardhat-contract-sizer"
+import "hardhat-tracer"
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -25,4 +27,9 @@ export default {
     outDir: "types/",
     target: "ethers-v5",
   },
+  contractSizer: {
+    alphaSort: true,
+    runOnCompile: true,
+    disambiguatePaths: false,
+  }
 };

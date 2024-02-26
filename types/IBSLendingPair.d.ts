@@ -24,6 +24,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     "asset()": FunctionFragment;
     "depositBorrowAsset(address,uint256)": FunctionFragment;
     "depositCollateral(address,uint256)": FunctionFragment;
+    "redeem(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
@@ -33,6 +34,10 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "depositCollateral",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "redeem",
     values: [string, BigNumberish]
   ): string;
 
@@ -45,6 +50,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     functionFragment: "depositCollateral",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
 
   events: {
     "Borrow(address,uint256)": EventFragment;
@@ -52,7 +58,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     "FlashLoan(address,address,address,uint256,uint256)": EventFragment;
     "InterestAccrued(address,uint256,uint256,uint256,uint256)": EventFragment;
     "Liquidate(address,address,address,uint256,uint256,address)": EventFragment;
-    "Reedem(address,address,address,address,uint256,uint256)": EventFragment;
+    "Redeem(address,address,address,address,uint256,uint256)": EventFragment;
     "Repay(address,address,address,address,uint256)": EventFragment;
     "WithdrawCollateral(address,uint256)": EventFragment;
   };
@@ -62,7 +68,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InterestAccrued"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Liquidate"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Reedem"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Redeem"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Repay"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "WithdrawCollateral"): EventFragment;
 }
@@ -138,6 +144,18 @@ export class IBSLendingPair extends Contract {
       _vaultShareAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    redeem(
+      _to: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "redeem(address,uint256)"(
+      _to: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   asset(overrides?: CallOverrides): Promise<string>;
@@ -168,6 +186,18 @@ export class IBSLendingPair extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  redeem(
+    _to: string,
+    _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "redeem(address,uint256)"(
+    _to: string,
+    _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     asset(overrides?: CallOverrides): Promise<string>;
 
@@ -194,6 +224,18 @@ export class IBSLendingPair extends Contract {
     "depositCollateral(address,uint256)"(
       _tokenReceipeint: string,
       _vaultShareAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    redeem(
+      _to: string,
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "redeem(address,uint256)"(
+      _to: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -277,7 +319,7 @@ export class IBSLendingPair extends Contract {
       }
     >;
 
-    Reedem(
+    Redeem(
       pair: string | null,
       asset: string | null,
       user: string | null,
@@ -350,6 +392,18 @@ export class IBSLendingPair extends Contract {
       _vaultShareAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    redeem(
+      _to: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "redeem(address,uint256)"(
+      _to: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -378,6 +432,18 @@ export class IBSLendingPair extends Contract {
     "depositCollateral(address,uint256)"(
       _tokenReceipeint: string,
       _vaultShareAmount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    redeem(
+      _to: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "redeem(address,uint256)"(
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

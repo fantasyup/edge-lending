@@ -21,8 +21,6 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface LendingPairInterface extends ethers.utils.Interface {
   functions: {
-    "_liquidate(address,address,uint256)": FunctionFragment;
-    "_repayLiquidatingLoan(address,address,uint256)": FunctionFragment;
     "accountBorrows(address)": FunctionFragment;
     "accrualBlockNumber()": FunctionFragment;
     "accrueInterest()": FunctionFragment;
@@ -51,11 +49,11 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "historicalReward(address)": FunctionFragment;
     "initialize(address,address,address,address,address,address,uint256,uint256,address)": FunctionFragment;
     "interestRate()": FunctionFragment;
-    "liquidateAccount(address)": FunctionFragment;
+    "liquidate(address)": FunctionFragment;
     "oracle()": FunctionFragment;
     "percent()": FunctionFragment;
     "principalBalance(address)": FunctionFragment;
-    "redeem(address,address,uint256)": FunctionFragment;
+    "redeem(address,uint256)": FunctionFragment;
     "repay(uint256)": FunctionFragment;
     "reserveFactorMantissa()": FunctionFragment;
     "totalBorrows()": FunctionFragment;
@@ -66,14 +64,6 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "wrappedAsset()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "_liquidate",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "_repayLiquidatingLoan",
-    values: [string, string, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "accountBorrows",
     values: [string]
@@ -187,10 +177,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     functionFragment: "interestRate",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "liquidateAccount",
-    values: [string]
-  ): string;
+  encodeFunctionData(functionFragment: "liquidate", values: [string]): string;
   encodeFunctionData(functionFragment: "oracle", values?: undefined): string;
   encodeFunctionData(functionFragment: "percent", values?: undefined): string;
   encodeFunctionData(
@@ -199,7 +186,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "redeem",
-    values: [string, string, BigNumberish]
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "repay", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -228,11 +215,6 @@ interface LendingPairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
-  decodeFunctionResult(functionFragment: "_liquidate", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "_repayLiquidatingLoan",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "accountBorrows",
     data: BytesLike
@@ -330,10 +312,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     functionFragment: "interestRate",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "liquidateAccount",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "liquidate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "percent", data: BytesLike): Result;
   decodeFunctionResult(
@@ -374,7 +353,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "FlashLoan(address,address,address,uint256,uint256)": EventFragment;
     "InterestAccrued(address,uint256,uint256,uint256,uint256)": EventFragment;
     "Liquidate(address,address,address,uint256,address)": EventFragment;
-    "Reedem(address,address,address,address,uint256,uint256)": EventFragment;
+    "Redeem(address,address,address,address,uint256,uint256)": EventFragment;
     "Repay(address,address,address,address,uint256)": EventFragment;
     "WithdrawCollateral(address,uint256)": EventFragment;
   };
@@ -384,7 +363,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InterestAccrued"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Liquidate"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Reedem"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Redeem"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Repay"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "WithdrawCollateral"): EventFragment;
 }
@@ -433,34 +412,6 @@ export class LendingPair extends Contract {
   interface: LendingPairInterface;
 
   functions: {
-    _liquidate(
-      _account: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "_liquidate(address,address,uint256)"(
-      _account: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    _repayLiquidatingLoan(
-      _borrower: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "_repayLiquidatingLoan(address,address,uint256)"(
-      _borrower: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     accountBorrows(
       arg0: string,
       overrides?: CallOverrides
@@ -719,12 +670,12 @@ export class LendingPair extends Contract {
 
     "interestRate()"(overrides?: CallOverrides): Promise<[string]>;
 
-    liquidateAccount(
+    liquidate(
       _borrower: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "liquidateAccount(address)"(
+    "liquidate(address)"(
       _borrower: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -748,14 +699,12 @@ export class LendingPair extends Contract {
     ): Promise<[BigNumber]>;
 
     redeem(
-      _user: string,
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "redeem(address,address,uint256)"(
-      _user: string,
+    "redeem(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -811,34 +760,6 @@ export class LendingPair extends Contract {
 
     "wrappedAsset()"(overrides?: CallOverrides): Promise<[string]>;
   };
-
-  _liquidate(
-    _account: string,
-    _liquidator: string,
-    _amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "_liquidate(address,address,uint256)"(
-    _account: string,
-    _liquidator: string,
-    _amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  _repayLiquidatingLoan(
-    _borrower: string,
-    _liquidator: string,
-    _amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "_repayLiquidatingLoan(address,address,uint256)"(
-    _borrower: string,
-    _liquidator: string,
-    _amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   accountBorrows(
     arg0: string,
@@ -1089,12 +1010,12 @@ export class LendingPair extends Contract {
 
   "interestRate()"(overrides?: CallOverrides): Promise<string>;
 
-  liquidateAccount(
+  liquidate(
     _borrower: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "liquidateAccount(address)"(
+  "liquidate(address)"(
     _borrower: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1115,14 +1036,12 @@ export class LendingPair extends Contract {
   ): Promise<BigNumber>;
 
   redeem(
-    _user: string,
     _to: string,
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "redeem(address,address,uint256)"(
-    _user: string,
+  "redeem(address,uint256)"(
     _to: string,
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1179,34 +1098,6 @@ export class LendingPair extends Contract {
   "wrappedAsset()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    _liquidate(
-      _account: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "_liquidate(address,address,uint256)"(
-      _account: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    _repayLiquidatingLoan(
-      _borrower: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "_repayLiquidatingLoan(address,address,uint256)"(
-      _borrower: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     accountBorrows(
       arg0: string,
       overrides?: CallOverrides
@@ -1453,12 +1344,9 @@ export class LendingPair extends Contract {
 
     "interestRate()"(overrides?: CallOverrides): Promise<string>;
 
-    liquidateAccount(
-      _borrower: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    liquidate(_borrower: string, overrides?: CallOverrides): Promise<void>;
 
-    "liquidateAccount(address)"(
+    "liquidate(address)"(
       _borrower: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1482,14 +1370,12 @@ export class LendingPair extends Contract {
     ): Promise<BigNumber>;
 
     redeem(
-      _user: string,
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "redeem(address,address,uint256)"(
-      _user: string,
+    "redeem(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
@@ -1623,7 +1509,7 @@ export class LendingPair extends Contract {
       }
     >;
 
-    Reedem(
+    Redeem(
       pair: string | null,
       asset: string | null,
       user: string | null,
@@ -1669,34 +1555,6 @@ export class LendingPair extends Contract {
   };
 
   estimateGas: {
-    _liquidate(
-      _account: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "_liquidate(address,address,uint256)"(
-      _account: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    _repayLiquidatingLoan(
-      _borrower: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "_repayLiquidatingLoan(address,address,uint256)"(
-      _borrower: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     accountBorrows(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "accountBorrows(address)"(
@@ -1942,12 +1800,12 @@ export class LendingPair extends Contract {
 
     "interestRate()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    liquidateAccount(
+    liquidate(
       _borrower: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "liquidateAccount(address)"(
+    "liquidate(address)"(
       _borrower: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1971,14 +1829,12 @@ export class LendingPair extends Contract {
     ): Promise<BigNumber>;
 
     redeem(
-      _user: string,
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "redeem(address,address,uint256)"(
-      _user: string,
+    "redeem(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -2036,34 +1892,6 @@ export class LendingPair extends Contract {
   };
 
   populateTransaction: {
-    _liquidate(
-      _account: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "_liquidate(address,address,uint256)"(
-      _account: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    _repayLiquidatingLoan(
-      _borrower: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "_repayLiquidatingLoan(address,address,uint256)"(
-      _borrower: string,
-      _liquidator: string,
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     accountBorrows(
       arg0: string,
       overrides?: CallOverrides
@@ -2318,12 +2146,12 @@ export class LendingPair extends Contract {
 
     "interestRate()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    liquidateAccount(
+    liquidate(
       _borrower: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "liquidateAccount(address)"(
+    "liquidate(address)"(
       _borrower: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2347,14 +2175,12 @@ export class LendingPair extends Contract {
     ): Promise<PopulatedTransaction>;
 
     redeem(
-      _user: string,
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "redeem(address,address,uint256)"(
-      _user: string,
+    "redeem(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }

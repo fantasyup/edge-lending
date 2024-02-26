@@ -5,15 +5,23 @@ import "../interfaces/IPriceOracle.sol";
 
 contract MockPriceOracle is IPriceOracle {
   
-  uint lastestAnswer = 1e18; 
+  uint lastestAnswer;
+
+  constructor(uint _price) {
+    lastestAnswer = _price;
+  }
+
+  function setPrice(uint _newPrice) external {
+    lastestAnswer = _newPrice;
+  }
 
   function getPriceInUSD(IERC20 /*_token*/) external override returns(uint256) {
-    lastestAnswer = 1e18; // to remove solidity compiler warnings
+    lastestAnswer = lastestAnswer; // to remove solidity compiler warnings
     return lastestAnswer;
   }
   
   function getPriceInETH(IERC20 /*_token*/) external override returns(uint256) {
-    lastestAnswer = 1e18; // to remove solidity compiler warnings
+    lastestAnswer = lastestAnswer; // to remove solidity compiler warnings
     return lastestAnswer;
   }
 
