@@ -8,3 +8,5 @@ docs/Demo.sol
 docs/Demo12.sol
 coverage/
 coverage.json
+
+deployments/localhost
