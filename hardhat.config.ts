@@ -1,9 +1,13 @@
+import {HardhatUserConfig} from 'hardhat/types';
 import { task } from "hardhat/config";
 import "hardhat-typechain";
 import "@nomiclabs/hardhat-waffle";
 import "solidity-coverage"
 // import "hardhat-contract-sizer"
 import "hardhat-tracer"
+import "hardhat-deploy"
+import 'hardhat-deploy-ethers'
+
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -31,5 +35,9 @@ export default {
     alphaSort: true,
     runOnCompile: true,
     disambiguatePaths: false,
-  }
+  },
+  namedAccounts: {
+    deployer: 0,
+    blackSmithTeam: '0x5B9d721f482E60efA99e555Cb59c7DBF4Df15Dc7',
+  },
 };

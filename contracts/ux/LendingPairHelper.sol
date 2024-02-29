@@ -3,16 +3,16 @@ pragma solidity 0.8.1;
 
 contract BSPairHelper {
 
-    // function viewPriceOfToken(address token, uint256 amount)
-    // public
-    // view
-    // returns (uint256)
-    // {
-    //     // return oracle.getCurrentPriceInUSD(token) * amount;
-    // }
-
-
 }
+
+ // function viewPriceOfToken(address token, uint256 amount)
+// public
+// view
+// returns (uint256)
+// {
+//     // return oracle.getCurrentPriceInUSD(token) * amount;
+// }
+
 
 // /**
 // @notice viewPriceOfCollateral returns the price of an lpToken
@@ -28,7 +28,7 @@ contract BSPairHelper {
 // }
 
 
-    // /**
+// /**
 // @notice viewTotalLentValue returns the total lent value for an account in USDC
 // @param _account is the account whos lent value we are calculating
 // **/

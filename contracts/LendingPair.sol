@@ -64,7 +64,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice The interest rate model for the borrow asset
     IInterestRateModel public interestRate;
     
-    /// @dev mapping of address to borrow asset deposited
+    /// @dev Mapping of address to borrow asset deposited
     mapping(address => uint256) public principalBalance;
     
     /// @notice Mapping of account addresses to outstanding borrow balances
@@ -119,14 +119,17 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         interestRate = _interestRate;
         initialExchangeRateMantissa = _initialExchangeRateMantissa;
         reserveFactorMantissa = _reserveFactorMantissa;
-        // // abi encode and concat strings
-        // bytes memory name = abi.encodePacked("BlackSmith-");
-        // name = abi.encodePacked(name, _asset.name(), _collateralAsset.name());
-        // bytes memory symbol = abi.encodePacked("BS-");
-        // symbol = abi.encodePacked(symbol, _asset.symbol(), _collateralAsset.symbol());
+        // abi encode and concat strings
+        IERC20Details assetDetails = IERC20Details(address(_asset));
+        IERC20Details collateralAssetDetails = IERC20Details(address(_collateralAsset));
+
+        bytes memory name = abi.encodePacked("BlackSmith-");
+        name = abi.encodePacked(name, assetDetails.name(), collateralAssetDetails.name());
+        bytes memory symbol = abi.encodePacked("BS-");
+        symbol = abi.encodePacked(symbol, assetDetails.symbol(), collateralAssetDetails.symbol());
 
         // initialize wrapped borrow asset
-        IBSWrapperToken(_wrappedBorrowAsset).initialize(address(_asset), "BlackSmith-", "BS");
+        IBSWrapperToken(_wrappedBorrowAsset).initialize(address(_asset), string(name), string(symbol));
         wrappedAsset = _wrappedBorrowAsset;
     }
 
@@ -374,7 +377,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             principalBalance[msg.sender] = principalBalance[msg.sender] - vars.principalRedeemed;
             
         } else {
-            historicalReward[msg.sender] = historicalReward[msg.sender] - vars.amount;
+            historicalReward[msg.sender] = historicalReward[msg.sender] + vars.amount;
         }
 
         wrappedAsset.burn(msg.sender, vars.burnTokens);

@@ -11,7 +11,7 @@ export enum ContractId {
     UUPSProxiable = 'UUPSProxiable',
     MockPriceOracle  = 'MockPriceOracle',
     JumpRateModelV2 = 'JumpRateModelV2',
-    
+    PriceOracle = 'PriceOracle',
 }
 
 export type EthereumAddress = string;

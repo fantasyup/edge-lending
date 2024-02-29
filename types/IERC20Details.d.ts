@@ -77,31 +77,31 @@ export class IERC20Details extends Contract {
   interface: IERC20DetailsInterface;
 
   functions: {
-    name(overrides?: CallOverrides): Promise<[void]>;
+    name(overrides?: CallOverrides): Promise<[string]>;
 
-    "name()"(overrides?: CallOverrides): Promise<[void]>;
+    "name()"(overrides?: CallOverrides): Promise<[string]>;
 
-    symbol(overrides?: CallOverrides): Promise<[void]>;
+    symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<[void]>;
+    "symbol()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  name(overrides?: CallOverrides): Promise<void>;
+  name(overrides?: CallOverrides): Promise<string>;
 
-  "name()"(overrides?: CallOverrides): Promise<void>;
+  "name()"(overrides?: CallOverrides): Promise<string>;
 
-  symbol(overrides?: CallOverrides): Promise<void>;
+  symbol(overrides?: CallOverrides): Promise<string>;
 
-  "symbol()"(overrides?: CallOverrides): Promise<void>;
+  "symbol()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    name(overrides?: CallOverrides): Promise<void>;
+    name(overrides?: CallOverrides): Promise<string>;
 
-    "name()"(overrides?: CallOverrides): Promise<void>;
+    "name()"(overrides?: CallOverrides): Promise<string>;
 
-    symbol(overrides?: CallOverrides): Promise<void>;
+    symbol(overrides?: CallOverrides): Promise<string>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<void>;
+    "symbol()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
