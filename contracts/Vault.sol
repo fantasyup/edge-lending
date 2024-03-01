@@ -83,16 +83,17 @@ contract Vault is VaultBase, IBSVault {
         _updateCodeAddress(newAddress);
     }
 
-    //// @notice approve a contract to 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Vault Actions
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //// @notice approve a contract to enable the contract to withdraw
     function approveContract(address _contract, bool _status) external  {
         require(_contract != address(0), "Vault: Cannot approve 0"); 
         userApprovedContracts[msg.sender][_contract] = _status;
         emit Approval(msg.sender, _contract, _status);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Vault Actions
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /// @notice Deposit an amount of `token`
     /// @param _token The ERC-20 token to deposit.
@@ -273,7 +274,7 @@ contract Vault is VaultBase, IBSVault {
     }
 
     /// @notice Transfer control from current team address to another
-    /// @param _newTeam The ERC-20 token.
+    /// @param _newTeam The new team
     function transferToNewTeam(address _newTeam) external onlyBlacksmithTeam {
         require(_newTeam != address(0), "INVALID_NEW_TEAM");
         blackSmithTeam = _newTeam;

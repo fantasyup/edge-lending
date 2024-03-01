@@ -13,6 +13,8 @@ contract WrapperToken is ERC20Permit, Ownable {
     
     // underlying wrapper token
     address public underlying;
+    // lending pair owner
+    address public pair;
 
     /// @notice
     function initialize(
@@ -24,6 +26,7 @@ contract WrapperToken is ERC20Permit, Ownable {
         initializeERC20(_tokenName, _tokenSymbol, 18);
         initializeERC20Permit(_tokenName);
         underlying = _underlying;
+        pair = msg.sender;
     }
 
     /**

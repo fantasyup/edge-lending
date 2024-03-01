@@ -36,6 +36,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     uint256 public totalBorrows;
     /// @notice Total amount of reserves of the underlying held in this market
     uint256 public totalReserves;
+    /// @notice The amount of collateral required for a borrow position scaled by divisor (100000)
+    uint256 public collateralFactor;
     /// @dev Maximum borrow rate that can ever be applied (.0005% / block)
     uint256 internal constant borrowRateMaxMantissa = 0.0005e16;
     /// @notice percent
@@ -60,6 +62,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @notice The wrapper token for the borrow asset
     IBSWrapperToken public wrappedAsset;
+
+    /// @notice The wrapper token for the borrow asset
+    IBSWrapperToken public wrappedCollateralAsset;
 
     /// @notice The interest rate model for the borrow asset
     IInterestRateModel public interestRate;
@@ -99,6 +104,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _initialExchangeRateMantissa initial exchange rate mantissa
     /// @param _reserveFactorMantissa reserve factor for borrow
     /// @param _wrappedBorrowAsset wrapped token minted when depositing borrow asset
+    /// @param _wrappedCollateralAsset wrapped token minted when depositing collateral asset
     function initialize(
         address _blackSmithTeam,
         IPriceOracle _oracle,
@@ -108,7 +114,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         IInterestRateModel _interestRate,
         uint256 _initialExchangeRateMantissa,
         uint256 _reserveFactorMantissa,
-        IBSWrapperToken _wrappedBorrowAsset
+        uint256 _collateralFactor,
+        IBSWrapperToken _wrappedBorrowAsset,
+        IBSWrapperToken _wrappedCollateralAsset
     ) external initializer {
         blackSmithTeam = _blackSmithTeam;
         vault = _vault;
@@ -119,18 +127,37 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         interestRate = _interestRate;
         initialExchangeRateMantissa = _initialExchangeRateMantissa;
         reserveFactorMantissa = _reserveFactorMantissa;
+        collateralFactor = _collateralFactor;
+
         // abi encode and concat strings
         IERC20Details assetDetails = IERC20Details(address(_asset));
         IERC20Details collateralAssetDetails = IERC20Details(address(_collateralAsset));
 
-        bytes memory name = abi.encodePacked("BlackSmith-");
-        name = abi.encodePacked(name, assetDetails.name(), collateralAssetDetails.name());
+        bytes memory name = abi.encodePacked("BS-Borrow-");
+        name = abi.encodePacked(name, assetDetails.name());
         bytes memory symbol = abi.encodePacked("BS-");
-        symbol = abi.encodePacked(symbol, assetDetails.symbol(), collateralAssetDetails.symbol());
+        symbol = abi.encodePacked(symbol, assetDetails.symbol());
+
+        bytes memory collateralName = abi.encodePacked("BS-Lend-");
+        collateralName = abi.encodePacked(name, collateralAssetDetails.name());
+        bytes memory collateralSymbol = abi.encodePacked("BS-");
+        collateralSymbol = abi.encodePacked(symbol, collateralAssetDetails.symbol());
 
         // initialize wrapped borrow asset
-        IBSWrapperToken(_wrappedBorrowAsset).initialize(address(_asset), string(name), string(symbol));
+        IBSWrapperToken(_wrappedBorrowAsset).initialize(
+            address(_asset),
+            string(name),
+            string(symbol)
+        );
+
+        IBSWrapperToken(_wrappedCollateralAsset).initialize(
+            address(_asset),
+            string(collateralName),
+            string(collateralSymbol)
+        );
+
         wrappedAsset = _wrappedBorrowAsset;
+        wrappedCollateralAsset = _wrappedCollateralAsset;
     }
 
     /// @notice getBlockNumber allows for easy retrieval of block number
@@ -712,11 +739,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _borrowAmount is the input borrow amount
     function calcCollateralRequired(uint256 _borrowAmount)
         public
-        pure
+        view
         returns (uint256)
     {
-        // 150% collateralFactor
-        return (_borrowAmount * 3) / 2;
+        return (_borrowAmount * collateralFactor) / divisor;
     }
 
     /// @notice getBorrowLimit returns the borrow limit for an account
