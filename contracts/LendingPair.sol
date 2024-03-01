@@ -36,10 +36,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     uint256 public totalBorrows;
     /// @notice Total amount of reserves of the underlying held in this market
     uint256 public totalReserves;
-    /// @notice The amount of collateral required for a borrow position scaled by divisor (100000)
+    /// @notice The amount of collateral required for a borrow position scaled by divisor (10000)
     uint256 public collateralFactor;
-    /// @dev Maximum borrow rate that can ever be applied (.0005% / block)
-    uint256 internal constant borrowRateMaxMantissa = 0.0005e16;
+    /// @dev Maximum borrow rate that can ever be applied'
+    uint256 internal borrowRateMaxMantissa;
     /// @notice percent
     uint256 public percent = 1500;
     /// @notice divisor
@@ -102,7 +102,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _collateralAsset pair collateral
     /// @param _interestRate for borrow asset
     /// @param _initialExchangeRateMantissa initial exchange rate mantissa
+    /// @param _borrowRateMaxMantissa borrow rate maximum
     /// @param _reserveFactorMantissa reserve factor for borrow
+    /// @param _collateralFactor the borrow pair collateral factor
     /// @param _wrappedBorrowAsset wrapped token minted when depositing borrow asset
     /// @param _wrappedCollateralAsset wrapped token minted when depositing collateral asset
     function initialize(
@@ -113,6 +115,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         IERC20 _collateralAsset,
         IInterestRateModel _interestRate,
         uint256 _initialExchangeRateMantissa,
+        uint256 _borrowRateMaxMantissa,
         uint256 _reserveFactorMantissa,
         uint256 _collateralFactor,
         IBSWrapperToken _wrappedBorrowAsset,
@@ -127,6 +130,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         interestRate = _interestRate;
         initialExchangeRateMantissa = _initialExchangeRateMantissa;
         reserveFactorMantissa = _reserveFactorMantissa;
+        borrowRateMaxMantissa = _borrowRateMaxMantissa;
         collateralFactor = _collateralFactor;
 
         // abi encode and concat strings
@@ -149,7 +153,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             string(name),
             string(symbol)
         );
-
+        // initialize wrapped collateralAsset
         IBSWrapperToken(_wrappedCollateralAsset).initialize(
             address(_asset),
             string(collateralName),

@@ -125,4 +125,8 @@ interface IBSLendingPair {
         external
         view
         returns (uint256);
+
+    function getMaxWithdrawAllowed(address account)
+        external
+        returns(uint256);
 }

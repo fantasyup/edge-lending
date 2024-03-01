@@ -3,6 +3,7 @@ pragma solidity 0.8.1;
 
 import "./util/Ownable.sol";
 import "./token/ERC20Permit.sol";
+import "./interfaces/IBSLendingPair.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title WrapperToken
@@ -14,7 +15,7 @@ contract WrapperToken is ERC20Permit, Ownable {
     // underlying wrapper token
     address public underlying;
     // lending pair owner
-    address public pair;
+    IBSLendingPair public pair;
 
     /// @notice
     function initialize(
@@ -26,7 +27,7 @@ contract WrapperToken is ERC20Permit, Ownable {
         initializeERC20(_tokenName, _tokenSymbol, 18);
         initializeERC20Permit(_tokenName);
         underlying = _underlying;
-        pair = msg.sender;
+        pair = IBSLendingPair(msg.sender);
     }
 
     /**
@@ -46,5 +47,4 @@ contract WrapperToken is ERC20Permit, Ownable {
     function burn(address _from, uint256 _amount) external onlyOwner {
         _burn(_from, _amount);
     }
-
 }

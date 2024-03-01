@@ -6,6 +6,7 @@ import "../../interfaces/IOracle.sol";
 import "../../interfaces/IKeeperOracle.sol";
 
 contract UniQuote is IOracle {
+   
     /// @notice the asset with the price oracle
     address immutable public asset;
     
@@ -14,8 +15,11 @@ contract UniQuote is IOracle {
 
     /// @notice oracle being used
     IKeeperOracle immutable public sushiswapKeeperOracle;
-
+    
+    /// @dev last fetched price in eth
     uint256 private latestPriceInETH;
+
+    /// @dev last fetched price in usd
     uint256 private latestPriceInUSD;
 
     constructor (address _asset, address _weth, IKeeperOracle _sushiswapKeeperOracle) {
