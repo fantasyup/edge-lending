@@ -26,7 +26,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     "flashFee(address,uint256)": FunctionFragment;
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
-    "toShare(address,uint256)": FunctionFragment;
+    "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "transfer(address,address,address,uint256)": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
@@ -54,7 +54,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "toShare",
-    values: [string, BigNumberish]
+    values: [string, BigNumberish, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "toUnderlying",
@@ -217,12 +217,14 @@ export class IBSVault extends Contract {
     toShare(
       token: string,
       amount: BigNumberish,
+      roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "toShare(address,uint256)"(
+    "toShare(address,uint256,bool)"(
       token: string,
       amount: BigNumberish,
+      roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -337,12 +339,14 @@ export class IBSVault extends Contract {
   toShare(
     token: string,
     amount: BigNumberish,
+    roundUp: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "toShare(address,uint256)"(
+  "toShare(address,uint256,bool)"(
     token: string,
     amount: BigNumberish,
+    roundUp: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -457,12 +461,14 @@ export class IBSVault extends Contract {
     toShare(
       token: string,
       amount: BigNumberish,
+      roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "toShare(address,uint256)"(
+    "toShare(address,uint256,bool)"(
       token: string,
       amount: BigNumberish,
+      roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -658,12 +664,14 @@ export class IBSVault extends Contract {
     toShare(
       token: string,
       amount: BigNumberish,
+      roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "toShare(address,uint256)"(
+    "toShare(address,uint256,bool)"(
       token: string,
       amount: BigNumberish,
+      roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -782,12 +790,14 @@ export class IBSVault extends Contract {
     toShare(
       token: string,
       amount: BigNumberish,
+      roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "toShare(address,uint256)"(
+    "toShare(address,uint256,bool)"(
       token: string,
       amount: BigNumberish,
+      roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

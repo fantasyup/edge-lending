@@ -23,6 +23,7 @@ interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
   functions: {
     "aggregator()": FunctionFragment;
     "asset()": FunctionFragment;
+    "c_0xf5d79186(bytes32)": FunctionFragment;
     "getPriceInUSD()": FunctionFragment;
     "viewPriceInUSD()": FunctionFragment;
   };
@@ -32,6 +33,10 @@ interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "c_0xf5d79186",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "getPriceInUSD",
     values?: undefined
@@ -43,6 +48,10 @@ interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "aggregator", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "asset", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xf5d79186",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getPriceInUSD",
     data: BytesLike
@@ -111,6 +120,16 @@ export class ChainlinkUSDAdapter extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<[string]>;
 
+    c_0xf5d79186(
+      c__0xf5d79186: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xf5d79186(bytes32)"(
+      c__0xf5d79186: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     getPriceInUSD(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -132,6 +151,16 @@ export class ChainlinkUSDAdapter extends Contract {
 
   "asset()"(overrides?: CallOverrides): Promise<string>;
 
+  c_0xf5d79186(
+    c__0xf5d79186: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xf5d79186(bytes32)"(
+    c__0xf5d79186: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
   getPriceInUSD(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -152,6 +181,16 @@ export class ChainlinkUSDAdapter extends Contract {
     asset(overrides?: CallOverrides): Promise<string>;
 
     "asset()"(overrides?: CallOverrides): Promise<string>;
+
+    c_0xf5d79186(
+      c__0xf5d79186: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xf5d79186(bytes32)"(
+      c__0xf5d79186: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -181,6 +220,16 @@ export class ChainlinkUSDAdapter extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    c_0xf5d79186(
+      c__0xf5d79186: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xf5d79186(bytes32)"(
+      c__0xf5d79186: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getPriceInUSD(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -202,6 +251,16 @@ export class ChainlinkUSDAdapter extends Contract {
     asset(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "asset()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    c_0xf5d79186(
+      c__0xf5d79186: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xf5d79186(bytes32)"(
+      c__0xf5d79186: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getPriceInUSD(
       overrides?: Overrides & { from?: string | Promise<string> }

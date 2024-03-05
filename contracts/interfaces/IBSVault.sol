@@ -101,7 +101,8 @@ interface IBSVault is IERC3156FlashLender {
 
     function toShare(
         IERC20 token,
-        uint256 amount
+        uint256 amount,
+        bool roundUp
     ) external view returns (uint256);
 
     function toUnderlying(

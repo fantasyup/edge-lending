@@ -26,6 +26,13 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
+    "c_0x0338f4c5(bytes32)": FunctionFragment;
+    "c_0x2b559a63(bytes32)": FunctionFragment;
+    "c_0x7c557157(bytes32)": FunctionFragment;
+    "c_0x9e1c91b0(bytes32)": FunctionFragment;
+    "c_0xb56825dd(bytes32)": FunctionFragment;
+    "c_0xc30e7a37(bytes32)": FunctionFragment;
+    "c_0xff7d61fd(bytes32)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
@@ -61,6 +68,34 @@ interface DebtTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "burn",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x0338f4c5",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x2b559a63",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x7c557157",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x9e1c91b0",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xb56825dd",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xc30e7a37",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xff7d61fd",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
@@ -129,6 +164,34 @@ interface DebtTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x0338f4c5",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x2b559a63",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x7c557157",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x9e1c91b0",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xb56825dd",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xc30e7a37",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xff7d61fd",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
@@ -266,6 +329,76 @@ export class DebtToken extends Contract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    c_0x0338f4c5(
+      c__0x0338f4c5: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x0338f4c5(bytes32)"(
+      c__0x0338f4c5: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0x2b559a63(
+      c__0x2b559a63: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x2b559a63(bytes32)"(
+      c__0x2b559a63: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0x7c557157(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x7c557157(bytes32)"(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0x9e1c91b0(
+      c__0x9e1c91b0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x9e1c91b0(bytes32)"(
+      c__0x9e1c91b0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xb56825dd(
+      c__0xb56825dd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xb56825dd(bytes32)"(
+      c__0xb56825dd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xc30e7a37(
+      c__0xc30e7a37: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xc30e7a37(bytes32)"(
+      c__0xc30e7a37: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xff7d61fd(
+      c__0xff7d61fd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xff7d61fd(bytes32)"(
+      c__0xff7d61fd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
 
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
@@ -466,6 +599,76 @@ export class DebtToken extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  c_0x0338f4c5(
+    c__0x0338f4c5: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x0338f4c5(bytes32)"(
+    c__0x0338f4c5: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0x2b559a63(
+    c__0x2b559a63: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x2b559a63(bytes32)"(
+    c__0x2b559a63: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0x7c557157(
+    c__0x7c557157: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x7c557157(bytes32)"(
+    c__0x7c557157: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0x9e1c91b0(
+    c__0x9e1c91b0: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x9e1c91b0(bytes32)"(
+    c__0x9e1c91b0: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xb56825dd(
+    c__0xb56825dd: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xb56825dd(bytes32)"(
+    c__0xb56825dd: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xc30e7a37(
+    c__0xc30e7a37: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xc30e7a37(bytes32)"(
+    c__0xc30e7a37: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xff7d61fd(
+    c__0xff7d61fd: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xff7d61fd(bytes32)"(
+    c__0xff7d61fd: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
   decimals(overrides?: CallOverrides): Promise<number>;
 
   "decimals()"(overrides?: CallOverrides): Promise<number>;
@@ -662,6 +865,76 @@ export class DebtToken extends Contract {
     "burn(address,uint256)"(
       _from: string,
       _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0x0338f4c5(
+      c__0x0338f4c5: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x0338f4c5(bytes32)"(
+      c__0x0338f4c5: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0x2b559a63(
+      c__0x2b559a63: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x2b559a63(bytes32)"(
+      c__0x2b559a63: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0x7c557157(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x7c557157(bytes32)"(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0x9e1c91b0(
+      c__0x9e1c91b0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x9e1c91b0(bytes32)"(
+      c__0x9e1c91b0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xb56825dd(
+      c__0xb56825dd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xb56825dd(bytes32)"(
+      c__0xb56825dd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xc30e7a37(
+      c__0xc30e7a37: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xc30e7a37(bytes32)"(
+      c__0xc30e7a37: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xff7d61fd(
+      c__0xff7d61fd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xff7d61fd(bytes32)"(
+      c__0xff7d61fd: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -889,6 +1162,76 @@ export class DebtToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    c_0x0338f4c5(
+      c__0x0338f4c5: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x0338f4c5(bytes32)"(
+      c__0x0338f4c5: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0x2b559a63(
+      c__0x2b559a63: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x2b559a63(bytes32)"(
+      c__0x2b559a63: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0x7c557157(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x7c557157(bytes32)"(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0x9e1c91b0(
+      c__0x9e1c91b0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x9e1c91b0(bytes32)"(
+      c__0x9e1c91b0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xb56825dd(
+      c__0xb56825dd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xb56825dd(bytes32)"(
+      c__0xb56825dd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xc30e7a37(
+      c__0xc30e7a37: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xc30e7a37(bytes32)"(
+      c__0xc30e7a37: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xff7d61fd(
+      c__0xff7d61fd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xff7d61fd(bytes32)"(
+      c__0xff7d61fd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1092,6 +1435,76 @@ export class DebtToken extends Contract {
       _from: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    c_0x0338f4c5(
+      c__0x0338f4c5: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x0338f4c5(bytes32)"(
+      c__0x0338f4c5: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0x2b559a63(
+      c__0x2b559a63: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x2b559a63(bytes32)"(
+      c__0x2b559a63: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0x7c557157(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x7c557157(bytes32)"(
+      c__0x7c557157: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0x9e1c91b0(
+      c__0x9e1c91b0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x9e1c91b0(bytes32)"(
+      c__0x9e1c91b0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xb56825dd(
+      c__0xb56825dd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xb56825dd(bytes32)"(
+      c__0xb56825dd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xc30e7a37(
+      c__0xc30e7a37: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xc30e7a37(bytes32)"(
+      c__0xc30e7a37: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xff7d61fd(
+      c__0xff7d61fd: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xff7d61fd(bytes32)"(
+      c__0xff7d61fd: BytesLike,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;

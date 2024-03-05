@@ -357,6 +357,11 @@ const _abi = [
         name: "amount",
         type: "uint256",
       },
+      {
+        internalType: "bool",
+        name: "roundUp",
+        type: "bool",
+      },
     ],
     name: "toShare",
     outputs: [

@@ -20,11 +20,16 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface InterestRateModelInterface extends ethers.utils.Interface {
   functions: {
+    "c_0x8a09ea5b(bytes32)": FunctionFragment;
     "getBorrowRate(uint256,uint256,uint256)": FunctionFragment;
     "getSupplyRate(uint256,uint256,uint256,uint256)": FunctionFragment;
     "isInterestRateModel()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "c_0x8a09ea5b",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "getBorrowRate",
     values: [BigNumberish, BigNumberish, BigNumberish]
@@ -38,6 +43,10 @@ interface InterestRateModelInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "c_0x8a09ea5b",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getBorrowRate",
     data: BytesLike
@@ -98,6 +107,16 @@ export class InterestRateModel extends Contract {
   interface: InterestRateModelInterface;
 
   functions: {
+    c_0x8a09ea5b(
+      c__0x8a09ea5b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x8a09ea5b(bytes32)"(
+      c__0x8a09ea5b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     getBorrowRate(
       cash: BigNumberish,
       borrows: BigNumberish,
@@ -132,6 +151,16 @@ export class InterestRateModel extends Contract {
 
     "isInterestRateModel()"(overrides?: CallOverrides): Promise<[boolean]>;
   };
+
+  c_0x8a09ea5b(
+    c__0x8a09ea5b: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x8a09ea5b(bytes32)"(
+    c__0x8a09ea5b: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
 
   getBorrowRate(
     cash: BigNumberish,
@@ -168,6 +197,16 @@ export class InterestRateModel extends Contract {
   "isInterestRateModel()"(overrides?: CallOverrides): Promise<boolean>;
 
   callStatic: {
+    c_0x8a09ea5b(
+      c__0x8a09ea5b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x8a09ea5b(bytes32)"(
+      c__0x8a09ea5b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     getBorrowRate(
       cash: BigNumberish,
       borrows: BigNumberish,
@@ -206,6 +245,16 @@ export class InterestRateModel extends Contract {
   filters: {};
 
   estimateGas: {
+    c_0x8a09ea5b(
+      c__0x8a09ea5b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x8a09ea5b(bytes32)"(
+      c__0x8a09ea5b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getBorrowRate(
       cash: BigNumberish,
       borrows: BigNumberish,
@@ -242,6 +291,16 @@ export class InterestRateModel extends Contract {
   };
 
   populateTransaction: {
+    c_0x8a09ea5b(
+      c__0x8a09ea5b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x8a09ea5b(bytes32)"(
+      c__0x8a09ea5b: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getBorrowRate(
       cash: BigNumberish,
       borrows: BigNumberish,

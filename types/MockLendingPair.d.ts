@@ -20,10 +20,15 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockLendingPairInterface extends ethers.utils.Interface {
   functions: {
+    "c_0xded68028(bytes32)": FunctionFragment;
     "deposit(address,address,uint256)": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "c_0xded68028",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "deposit",
     values: [string, string, BigNumberish]
@@ -33,6 +38,10 @@ interface MockLendingPairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "c_0xded68028",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "proxiableUUID",
@@ -86,6 +95,16 @@ export class MockLendingPair extends Contract {
   interface: MockLendingPairInterface;
 
   functions: {
+    c_0xded68028(
+      c__0xded68028: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xded68028(bytes32)"(
+      c__0xded68028: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     deposit(
       arg0: string,
       arg1: string,
@@ -104,6 +123,16 @@ export class MockLendingPair extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
   };
+
+  c_0xded68028(
+    c__0xded68028: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xded68028(bytes32)"(
+    c__0xded68028: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
 
   deposit(
     arg0: string,
@@ -124,6 +153,16 @@ export class MockLendingPair extends Contract {
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    c_0xded68028(
+      c__0xded68028: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xded68028(bytes32)"(
+      c__0xded68028: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     deposit(
       arg0: string,
       arg1: string,
@@ -146,6 +185,16 @@ export class MockLendingPair extends Contract {
   filters: {};
 
   estimateGas: {
+    c_0xded68028(
+      c__0xded68028: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xded68028(bytes32)"(
+      c__0xded68028: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     deposit(
       arg0: string,
       arg1: string,
@@ -166,6 +215,16 @@ export class MockLendingPair extends Contract {
   };
 
   populateTransaction: {
+    c_0xded68028(
+      c__0xded68028: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xded68028(bytes32)"(
+      c__0xded68028: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     deposit(
       arg0: string,
       arg1: string,

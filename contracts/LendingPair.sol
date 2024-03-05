@@ -252,7 +252,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         BorrowLocalVars memory vars;
 
         // convert amount to borrow to share representation
-        uint256 amountOfSharesToBorrow = vault.toShare(asset, _amountToBorrow);
+        uint256 amountOfSharesToBorrow = vault.toShare(asset, _amountToBorrow, false);
 
         // Fail if protocol has insufficient underlying cash
         require(getCashPrior() > amountOfSharesToBorrow, "NOT_ENOUGH_TOKEN");
@@ -340,7 +340,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         );
 
         // convert repayAmount to share
-        uint256 repayAmountInShares = vault.toShare(asset, _repayAmount);
+        uint256 repayAmountInShares = vault.toShare(asset, _repayAmount, true);
 
         // transfer the borrow asset from the borrower to LendingPair
         vault.transfer(
@@ -815,7 +815,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         address _liquidator,
         uint256 _amount
     ) internal {
-        vault.transfer(asset, _liquidator, address(this), _amount);
+        uint256 borrowedAmountInShares = vault.toShare(asset, _amount, true);
+
+        vault.transfer(asset, _liquidator, address(this), borrowedAmountInShares);
+        
         // calculate the fee on the principle received
         uint256 fee = calculateFee(_amount);
         // transfer fee amount to Edge team

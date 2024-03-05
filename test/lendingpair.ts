@@ -1,80 +1,84 @@
-// import { ethers, waffle } from "hardhat";
-// import { BigNumber, Signer } from "ethers";
-// import { expect, assert } from "chai";
-// import {
-//   IPriceOracle,
-//   JumpRateModelV2,
-//   LendingPair as BLendingPair,
-//   MockToken,
-//   Vault as BVault,
-//   WrapperToken,
-// } from "../types";
-// import { deployInterestRateModel, deployLendingPair, deployMockPriceOracle, deployMockToken, deployVault, deployWrappedToken } from "../helpers/contracts";
+import { ethers, waffle } from "hardhat";
+import { BigNumber, Signer } from "ethers";
+import { expect, assert } from "chai";
+import {
+  IPriceOracle,
+  JumpRateModelV2,
+  LendingPair as BLendingPair,
+  MockToken,
+  Vault as BVault,
+  WrapperToken,
+} from "../types";
+import { 
+  deployInterestRateModel,
+  deployLendingPair,
+  deployMockPriceOracle,
+  deployMockToken,
+  deployVault,
+  deployWrappedToken
+} from "../helpers/contracts";
 
-// // list of accounts
-// let accounts: Signer[];
+// list of accounts
+let accounts: Signer[];
 
-// let Vault: BVault;
-// let LendingPair: BLendingPair;
-// let MockPriceOracle: IPriceOracle;
-// let BorrowAsset: MockToken;
-// let CollateralAsset: MockToken;
-// let BorrowAssetDepositWrapperToken: WrapperToken;
-// let InterestRateModel: JumpRateModelV2;
+let Vault: BVault;
+let LendingPair: BLendingPair;
+let MockPriceOracle: IPriceOracle;
+let BorrowAsset: MockToken;
+let CollateralAsset: MockToken;
+let BorrowAssetDepositWrapperToken: WrapperToken;
+let InterestRateModel: JumpRateModelV2;
 
-// let admin: string; // account used in deploying
-// let bob: string;
-// let frank: string;
-// let alice: string;
-// let james: string;
+let admin: string; // account used in deploying
+let bob: string;
+let frank: string;
+let alice: string;
+let james: string;
 
-// let frankSigner: Signer;
+let frankSigner: Signer;
 
-// // flash loan rate
-// const flashLoanRate = ethers.utils.parseUnits("0.05", 18)
-// const BASE = ethers.utils.parseUnits("1", 18)
+// flash loan rate
+const flashLoanRate = ethers.utils.parseUnits("0.05", 18)
+const BASE = ethers.utils.parseUnits("1", 18)
 
-// async function depositInVault(
-//   asset: MockToken,
-//   account: Signer,
-//   amountToDeposit: number
-// ) {
-//   const addr = await account.getAddress()
-//   await asset.connect(account).setBalanceTo(addr, amountToDeposit)
-//   await asset.connect(account).approve(Vault.address, amountToDeposit)
-//   await (await Vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
-// }
+async function depositInVault(
+  asset: MockToken,
+  account: Signer,
+  amountToDeposit: number
+) {
+  const addr = await account.getAddress()
+  await asset.connect(account).setBalanceTo(addr, amountToDeposit)
+  await asset.connect(account).approve(Vault.address, amountToDeposit)
+  await (await Vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
+}
 
-// async function depositBorrowAsset(
-//   lendingPair: BLendingPair,
-//   account: string,
-//   amountToDeposit: number
-// ) {
-//   const signer = await ethers.getSigner(account)
+async function depositBorrowAsset(
+  lendingPair: BLendingPair,
+  account: string,
+  amountToDeposit: number
+) {
+  const signer = await ethers.getSigner(account)
 
-//   await depositInVault(BorrowAsset, signer, amountToDeposit)
-//   // approve 
-//   await Vault.connect(signer).approveContract(lendingPair.address, true);
-//   const userShareBalance = await (await Vault.balanceOf(BorrowAsset.address, account)).toNumber()
+  await depositInVault(BorrowAsset, signer, amountToDeposit)
+  // approve 
+  await Vault.connect(signer).approveContract(lendingPair.address, true);
+  const userShareBalance = await (await Vault.balanceOf(BorrowAsset.address, account)).toNumber()
 
-//   return await LendingPair.connect(signer).depositBorrowAsset(account, userShareBalance)
-// }
+  return await LendingPair.connect(signer).depositBorrowAsset(account, userShareBalance)
+}
 
-// async function depositCollateralAsset(
-//   lendingPair: BLendingPair,
-//   account: string,
-//   amountToDeposit: number
-// ) {
-//   const signer = await ethers.getSigner(account)
+async function depositCollateralAsset(
+  lendingPair: BLendingPair,
+  account: string,
+  amountToDeposit: number
+) {
+  const signer = await ethers.getSigner(account)
 
-//   await depositInVault(CollateralAsset, signer, amountToDeposit)
-//   // approve 
-//   await Vault.connect(signer).approveContract(lendingPair.address, true);
-//   return await LendingPair.connect(signer).depositCollateral(account, amountToDeposit)
-// }
-
-// // let depositBorrowAsset: any
-// // let depositCollateralAsset: any
+  await depositInVault(CollateralAsset, signer, amountToDeposit)
+  // approve 
+  await Vault.connect(signer).approveContract(lendingPair.address, true);
+  return await LendingPair.connect(signer).depositCollateral(account, amountToDeposit)
+}
 
 // describe("LendingPair", async function () {
 //   before(async function () {

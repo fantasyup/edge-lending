@@ -26,6 +26,11 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "approveContract(address,bool)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "blackSmithTeam()": FunctionFragment;
+    "c_0x560f5c7c(bytes32)": FunctionFragment;
+    "c_0x630f40d2(bytes32)": FunctionFragment;
+    "c_0xd117f7be(bytes32)": FunctionFragment;
+    "c_0xeca1878e(bytes32)": FunctionFragment;
+    "c_0xff8e4d68(bytes32)": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
     "flashFee(address,uint256)": FunctionFragment;
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
@@ -36,7 +41,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
-    "toShare(address,uint256)": FunctionFragment;
+    "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
     "transfer(address,address,address,uint256)": FunctionFragment;
@@ -67,6 +72,26 @@ interface MockVaultInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "blackSmithTeam",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x560f5c7c",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x630f40d2",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xd117f7be",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xeca1878e",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xff8e4d68",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
@@ -104,7 +129,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "toShare",
-    values: [string, BigNumberish]
+    values: [string, BigNumberish, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "toUnderlying",
@@ -146,6 +171,26 @@ interface MockVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "blackSmithTeam",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x560f5c7c",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x630f40d2",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xd117f7be",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xeca1878e",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xff8e4d68",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
@@ -308,6 +353,56 @@ export class MockVault extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<[string]>;
 
+    c_0x560f5c7c(
+      c__0x560f5c7c: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x560f5c7c(bytes32)"(
+      c__0x560f5c7c: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xeca1878e(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xeca1878e(bytes32)"(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     deposit(
       _token: string,
       _from: string,
@@ -405,12 +500,14 @@ export class MockVault extends Contract {
     toShare(
       _token: string,
       _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { share: BigNumber }>;
 
-    "toShare(address,uint256)"(
+    "toShare(address,uint256,bool)"(
       _token: string,
       _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { share: BigNumber }>;
 
@@ -560,6 +657,56 @@ export class MockVault extends Contract {
 
   "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
+  c_0x560f5c7c(
+    c__0x560f5c7c: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x560f5c7c(bytes32)"(
+    c__0x560f5c7c: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0x630f40d2(
+    c__0x630f40d2: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x630f40d2(bytes32)"(
+    c__0x630f40d2: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xd117f7be(
+    c__0xd117f7be: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xd117f7be(bytes32)"(
+    c__0xd117f7be: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xeca1878e(
+    c__0xeca1878e: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xeca1878e(bytes32)"(
+    c__0xeca1878e: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xff8e4d68(
+    c__0xff8e4d68: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xff8e4d68(bytes32)"(
+    c__0xff8e4d68: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
   deposit(
     _token: string,
     _from: string,
@@ -650,12 +797,14 @@ export class MockVault extends Contract {
   toShare(
     _token: string,
     _amount: BigNumberish,
+    _roundUp: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "toShare(address,uint256)"(
+  "toShare(address,uint256,bool)"(
     _token: string,
     _amount: BigNumberish,
+    _roundUp: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -805,6 +954,56 @@ export class MockVault extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
+    c_0x560f5c7c(
+      c__0x560f5c7c: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x560f5c7c(bytes32)"(
+      c__0x560f5c7c: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xeca1878e(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xeca1878e(bytes32)"(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     deposit(
       _token: string,
       _from: string,
@@ -891,12 +1090,14 @@ export class MockVault extends Contract {
     toShare(
       _token: string,
       _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "toShare(address,uint256)"(
+    "toShare(address,uint256,bool)"(
       _token: string,
       _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1134,6 +1335,56 @@ export class MockVault extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    c_0x560f5c7c(
+      c__0x560f5c7c: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x560f5c7c(bytes32)"(
+      c__0x560f5c7c: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xeca1878e(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xeca1878e(bytes32)"(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     deposit(
       _token: string,
       _from: string,
@@ -1224,12 +1475,14 @@ export class MockVault extends Contract {
     toShare(
       _token: string,
       _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "toShare(address,uint256)"(
+    "toShare(address,uint256,bool)"(
       _token: string,
       _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1386,6 +1639,56 @@ export class MockVault extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    c_0x560f5c7c(
+      c__0x560f5c7c: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x560f5c7c(bytes32)"(
+      c__0x560f5c7c: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xeca1878e(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xeca1878e(bytes32)"(
+      c__0xeca1878e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     deposit(
       _token: string,
       _from: string,
@@ -1481,12 +1784,14 @@ export class MockVault extends Contract {
     toShare(
       _token: string,
       _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "toShare(address,uint256)"(
+    "toShare(address,uint256,bool)"(
       _token: string,
       _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

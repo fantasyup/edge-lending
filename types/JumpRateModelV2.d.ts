@@ -23,6 +23,8 @@ interface JumpRateModelV2Interface extends ethers.utils.Interface {
   functions: {
     "baseRatePerBlock()": FunctionFragment;
     "blocksPerYear()": FunctionFragment;
+    "c_0x9d1ab90d(bytes32)": FunctionFragment;
+    "c_0xbd9cfc2e(bytes32)": FunctionFragment;
     "getBorrowRate(uint256,uint256,uint256)": FunctionFragment;
     "getSupplyRate(uint256,uint256,uint256,uint256)": FunctionFragment;
     "jumpMultiplierPerBlock()": FunctionFragment;
@@ -40,6 +42,14 @@ interface JumpRateModelV2Interface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "blocksPerYear",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x9d1ab90d",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xbd9cfc2e",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getBorrowRate",
@@ -74,6 +84,14 @@ interface JumpRateModelV2Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "blocksPerYear",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x9d1ab90d",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xbd9cfc2e",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -162,6 +180,26 @@ export class JumpRateModelV2 extends Contract {
 
     "blocksPerYear()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    c_0x9d1ab90d(
+      c__0x9d1ab90d: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x9d1ab90d(bytes32)"(
+      c__0x9d1ab90d: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xbd9cfc2e(
+      c__0xbd9cfc2e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xbd9cfc2e(bytes32)"(
+      c__0xbd9cfc2e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     getBorrowRate(
       cash: BigNumberish,
       borrows: BigNumberish,
@@ -247,6 +285,26 @@ export class JumpRateModelV2 extends Contract {
 
   "blocksPerYear()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  c_0x9d1ab90d(
+    c__0x9d1ab90d: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x9d1ab90d(bytes32)"(
+    c__0x9d1ab90d: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xbd9cfc2e(
+    c__0xbd9cfc2e: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xbd9cfc2e(bytes32)"(
+    c__0xbd9cfc2e: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
   getBorrowRate(
     cash: BigNumberish,
     borrows: BigNumberish,
@@ -331,6 +389,26 @@ export class JumpRateModelV2 extends Contract {
     blocksPerYear(overrides?: CallOverrides): Promise<BigNumber>;
 
     "blocksPerYear()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    c_0x9d1ab90d(
+      c__0x9d1ab90d: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x9d1ab90d(bytes32)"(
+      c__0x9d1ab90d: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xbd9cfc2e(
+      c__0xbd9cfc2e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xbd9cfc2e(bytes32)"(
+      c__0xbd9cfc2e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     getBorrowRate(
       cash: BigNumberish,
@@ -435,6 +513,26 @@ export class JumpRateModelV2 extends Contract {
 
     "blocksPerYear()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    c_0x9d1ab90d(
+      c__0x9d1ab90d: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x9d1ab90d(bytes32)"(
+      c__0x9d1ab90d: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xbd9cfc2e(
+      c__0xbd9cfc2e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xbd9cfc2e(bytes32)"(
+      c__0xbd9cfc2e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getBorrowRate(
       cash: BigNumberish,
       borrows: BigNumberish,
@@ -522,6 +620,26 @@ export class JumpRateModelV2 extends Contract {
     blocksPerYear(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "blocksPerYear()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    c_0x9d1ab90d(
+      c__0x9d1ab90d: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x9d1ab90d(bytes32)"(
+      c__0x9d1ab90d: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xbd9cfc2e(
+      c__0xbd9cfc2e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xbd9cfc2e(bytes32)"(
+      c__0xbd9cfc2e: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getBorrowRate(
       cash: BigNumberish,

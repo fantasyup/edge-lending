@@ -117,7 +117,7 @@ contract Vault is VaultBase, IBSVault {
         // Checks
         require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
 
-        amountOut = toShare(_token, _amount);
+        amountOut = toShare(_token, _amount, false);
         // transfer appropriate amount of underlying from _from to vault
         _token.safeTransferFrom(_from, address(this), _amount);
 
@@ -252,17 +252,23 @@ contract Vault is VaultBase, IBSVault {
     /// @dev Helper function to represent an `amount` of `token` in shares.
     /// @param _token The ERC-20 token.
     /// @param _amount The `token` amount.
+    /// @param _roundUp If to round up the amount or not
     /// @return share The token amount represented in shares.
-    function toShare(IERC20 _token, uint256 _amount)
+    function toShare(IERC20 _token, uint256 _amount, bool _roundUp)
         public
         view
         override
         returns (uint256 share)
     {
         if (totals[_token] > 0) {
-            share =
-                (_amount * totals[_token]) /
-                _token.balanceOf(address(this));
+            uint256 currentUnderlyingBalance = _token.balanceOf(address(this));
+            uint256 currentTotal = totals[_token];
+            share = (_amount * currentTotal) / currentUnderlyingBalance;
+            
+            if(_roundUp && ((share * currentUnderlyingBalance) / currentTotal) < _amount) {
+                share = share + 1;
+            }
+
         } else {
             share = _amount;
         }

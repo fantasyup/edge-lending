@@ -5,19 +5,21 @@ import {
   MockToken as BMockToken,
   UUPSProxy as BUUPSProxy,
   Vault as BVault,
+  MockVault as BMockVault,
   UUPSProxiable as BUUPSProxiable
 } from "../types";
-import { ContractId } from "../helpers/types";
 import {
   deployVault,
   deployMockToken,
   deployMockFlashBorrower,
   deployProxiedVault,
+  deployMockVault,
 } from "../helpers/contracts";
 import { FlashBorrower as BFlashBorrower } from "../types/FlashBorrower";
 
 let accounts: Signer[];
 let Vault: BVault;
+let MockVault: BMockVault;
 let MockToken: BMockToken;
 let FlashBorrower: BFlashBorrower;
 
@@ -41,6 +43,7 @@ describe("Vault", function () {
 
     Vault = await deployVault();
     MockToken = await deployMockToken();
+    MockVault = await deployMockVault();
     FlashBorrower = await deployMockFlashBorrower();
 
     await MockToken.setBalanceTo(admin, 1000000);
@@ -369,7 +372,7 @@ describe("Vault", function () {
   describe("toShare", async function() {
     const share = 1000
     it("toShare - when total is 0", async function () {
-        const output = (await Vault.toShare(bob, share)).toNumber();
+        const output = (await Vault.toShare(bob, share, false)).toNumber();
         expect(output).to.eq(share)
     });
   })
@@ -432,16 +435,51 @@ describe("Vault", function () {
     })
   })
 
+  async function vaultDeposit(Vault: BMockVault, user: string, amount: number) {
+    await MockToken.connect(await ethers.getSigner(user)).setBalanceTo(user, amount)
+    await MockToken.connect(await ethers.getSigner(user)).approve(MockVault.address, amount);
+    await MockVault.connect(await ethers.getSigner(user)).deposit(MockToken.address, user, user, amount);
+  }
 
   describe("Ratio - Conversion", function() {
-    it("toShare - convert to appropriate shares", async function() {
+    it("toShare/toUnderlying - convert to appropriate shares & underlying", async function() {
+      const adminAmountToDeposit = 1000
+      await vaultDeposit(MockVault, admin, adminAmountToDeposit)
+      const adminShare = (await MockVault.balanceOf(MockToken.address, admin)).toNumber()
+      expect(adminShare).to.eq(adminAmountToDeposit)
+
+      // increase the amount of Vault underlying to 5000
+      const amountToIncrease = 4000
+      await MockToken.setBalanceTo(MockVault.address, amountToIncrease)
+
+      // check the underlying value for the shares minted it should be
+      // equal to amountToIncrease + increase in underlying balance
+      const newValue = await (await MockVault.toUnderlying(MockToken.address, adminAmountToDeposit)).toNumber()
+      expect(newValue).to.eq(amountToIncrease + adminAmountToDeposit)
       
+      // a new user bob deposits
+      const bobAmountToDeposit = 1000
+      await vaultDeposit(MockVault, bob, bobAmountToDeposit)
+
+      // 1000 * 1000 / 5000 = 200 
+      const bobShare = (await MockVault.balanceOf(MockToken.address, bob)).toNumber()
+      expect(bobShare).to.eq(200)
+      
+      // increase underlying of vault
+      await MockToken.setBalanceTo(MockVault.address, 11)
+
+      /// a new user alice deposits
+      const aliceAmountToDeposit = 300
+      await vaultDeposit(MockVault, alice, aliceAmountToDeposit)
+      
+      // 300 * 1200 / 6011 = 59.89
+      const aliceShare = (await MockVault.balanceOf(MockToken.address, alice)).toNumber()
+      expect(aliceShare).to.eq(59)
     })
 
-    it("toUnderlying - convert to appropriate underlying", async function() {
-
-    })
+    // const computationalLimit = ethers.BigNumber.from(2).pow(256).sub(1)
+    // it("extreme limits", async function() {
+    // })
   })
-
 
 });

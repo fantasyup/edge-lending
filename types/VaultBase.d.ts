@@ -21,12 +21,27 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface VaultBaseInterface extends ethers.utils.Interface {
   functions: {
+    "c_0x630f40d2(bytes32)": FunctionFragment;
+    "c_0xd117f7be(bytes32)": FunctionFragment;
+    "c_0xff8e4d68(bytes32)": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "updateCode(address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "c_0x630f40d2",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xd117f7be",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0xff8e4d68",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "getCodeAddress",
     values?: undefined
@@ -38,6 +53,18 @@ interface VaultBaseInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
 
+  decodeFunctionResult(
+    functionFragment: "c_0x630f40d2",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xd117f7be",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0xff8e4d68",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getCodeAddress",
     data: BytesLike
@@ -104,6 +131,36 @@ export class VaultBase extends Contract {
   interface: VaultBaseInterface;
 
   functions: {
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     getCodeAddress(
       overrides?: CallOverrides
     ): Promise<[string] & { codeAddress: string }>;
@@ -131,6 +188,36 @@ export class VaultBase extends Contract {
     ): Promise<ContractTransaction>;
   };
 
+  c_0x630f40d2(
+    c__0x630f40d2: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x630f40d2(bytes32)"(
+    c__0x630f40d2: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xd117f7be(
+    c__0xd117f7be: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xd117f7be(bytes32)"(
+    c__0xd117f7be: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  c_0xff8e4d68(
+    c__0xff8e4d68: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xff8e4d68(bytes32)"(
+    c__0xff8e4d68: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
   getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
   "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
@@ -154,6 +241,36 @@ export class VaultBase extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
@@ -189,6 +306,36 @@ export class VaultBase extends Contract {
   };
 
   estimateGas: {
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -213,6 +360,36 @@ export class VaultBase extends Contract {
   };
 
   populateTransaction: {
+    c_0x630f40d2(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x630f40d2(bytes32)"(
+      c__0x630f40d2: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xd117f7be(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xd117f7be(bytes32)"(
+      c__0xd117f7be: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    c_0xff8e4d68(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xff8e4d68(bytes32)"(
+      c__0xff8e4d68: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getCodeAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "getCodeAddress()"(
