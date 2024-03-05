@@ -23,7 +23,6 @@ contract LendingPairFactory {
     struct BorrowLocalVars {
         IERC20 borrowAsset;
         uint256 initialExchangeRateMantissa;
-        uint256 borrowRateMaxMantissa;
         uint256 reserveFactorMantissa;
         uint256 collateralFactor;
         IBSWrapperToken wrappedBorrowAsset;
@@ -56,7 +55,6 @@ contract LendingPairFactory {
         DataTypes.BorrowAssetConfig memory borrowConfig = DataTypes.BorrowAssetConfig(
             IInterestRateModel(ir),
             _borrowVars.initialExchangeRateMantissa,
-            _borrowVars.borrowRateMaxMantissa,
             _borrowVars.reserveFactorMantissa,
             _borrowVars.collateralFactor,
             _borrowVars.wrappedBorrowAsset,
