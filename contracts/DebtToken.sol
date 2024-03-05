@@ -9,6 +9,7 @@ import "./WrapperToken.sol";
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract DebtToken is WrapperToken {
+    bool constant isDebtToken = true;
     
     function transfer(address recipient, uint256 amount)
         public

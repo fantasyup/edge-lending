@@ -24,6 +24,7 @@ import "./token/IERC20Details.sol";
 
 contract LendingPair is IBSLendingPair, Exponential, Initializable {
     using SafeERC20 for IERC20;
+    using DataTypes for DataTypes.BorrowAssetConfig;
 
     /// @dev initialExchangeRateMantissa Initial exchange rate used when minting
     uint256 internal initialExchangeRateMantissa;
@@ -50,7 +51,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     uint256 constant private COLLATERAL_FACTOR_PRECSIION = 1e18;
 
     /// @dev Maximum borrow rate that can ever be applied per second
-    uint256 internal borrowRateMaxMantissa;
+    uint internal constant borrowRateMaxMantissa = 0.0005e16;
 
     /// @notice liquidation fee
     uint256 public liquidationFee;
@@ -107,7 +108,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint256 interestIndex;
     }
 
-
     /// @notice Initialize function
     /// @param _blackSmithTeam admin address
     /// @param _oracle price oracle
@@ -124,6 +124,16 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         DataTypes.BorrowAssetConfig calldata borrowConfig,
         IBSWrapperToken _wrappedCollateralAsset
     ) external override initializer {
+        // invalid team
+        require(_blackSmithTeam != address(0), "IT");
+        // invalid vault or oracle
+        require(address(_vault) != address(0) && address(_oracle) != address(0), "IV0");
+        // invalid asset or collateral asset
+        require(address(_asset) != address(0) && address(_collateralAsset) != address(0), "IAC");
+        // validate borrow config
+        borrowConfig.validBorrowAssetConfig();
+
+        // invalid
         blackSmithTeam = _blackSmithTeam;
         vault = _vault;
         asset = _asset;
@@ -134,7 +144,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         interestRate = borrowConfig.interestRate;
         initialExchangeRateMantissa = borrowConfig.initialExchangeRateMantissa;
         reserveFactorMantissa = borrowConfig.reserveFactorMantissa;
-        borrowRateMaxMantissa = borrowConfig.borrowRateMaxMantissa;
         collateralFactor = borrowConfig.collateralFactor;
         liquidationFee = borrowConfig.liquidationFee;
 

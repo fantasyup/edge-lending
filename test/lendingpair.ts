@@ -25,8 +25,10 @@ let Vault: BVault;
 let LendingPair: BLendingPair;
 let MockPriceOracle: IPriceOracle;
 let BorrowAsset: MockToken;
-let CollateralAsset: MockToken;
-let BorrowAssetDepositWrapperToken: WrapperToken;
+let CollateralAsset: MockToken
+let BorrowAssetDepositWrapperToken: WrapperToken
+let DebtWrapperToken: WrapperToken
+let CollateralWrapperToken: WrapperToken
 let InterestRateModel: JumpRateModelV2;
 
 let admin: string; // account used in deploying
@@ -80,53 +82,57 @@ async function depositCollateralAsset(
   return await LendingPair.connect(signer).depositCollateral(account, amountToDeposit)
 }
 
-// describe("LendingPair", async function () {
-//   before(async function () {
-//     accounts = await ethers.getSigners();
-//     frankSigner = accounts[2];
-//     ([
-//       admin,
-//       bob,
-//       frank,
-//       alice,
-//       james
-//     ] = await Promise.all(accounts.slice(0, 5).map(x => x.getAddress())))
+describe("LendingPair", async function () {
+  before(async function () {
+    accounts = await ethers.getSigners();
+    frankSigner = accounts[2];
+    ([
+      admin,
+      bob,
+      frank,
+      alice,
+      james
+    ] = await Promise.all(accounts.slice(0, 5).map(x => x.getAddress())))
 
-//     Vault = await deployVault()
-//     LendingPair = await deployLendingPair()
-//     MockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(18))
-//     BorrowAsset = await deployMockToken()
-//     CollateralAsset = await deployMockToken()
-//     BorrowAssetDepositWrapperToken = await deployWrappedToken()
-//     InterestRateModel = await deployInterestRateModel(
-//       "30000000000000000",
-//       "52222222222200000",
-//       "70",
-//       "1000000000000000000",
-//       admin
-//     )
+    Vault = await deployVault()
+    LendingPair = await deployLendingPair()
+    MockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(18))
+    BorrowAsset = await deployMockToken()
+    CollateralAsset = await deployMockToken()
+    BorrowAssetDepositWrapperToken = await deployWrappedToken()
+    InterestRateModel = await deployInterestRateModel(
+      "30000000000000000",
+      "52222222222200000",
+      "70",
+      "1000000000000000000",
+      admin
+    )
 
-//     // initialize vault 
-//     await Vault.initialize(flashLoanRate, admin);
-//   });
+    // initialize vault 
+    await Vault.initialize(flashLoanRate, admin);
+  });
 
-//   it("initialize", async function () {
-//     const initialExchangeRateMantissa = "1000000000000000000"
-//     const reserveFactorMantissa = "500000000000000000"
+  it("initialize", async function () {
+    const initialExchangeRateMantissa = "1000000000000000000"
+    const reserveFactorMantissa = "500000000000000000"
 
-//     await LendingPair.initialize(
-//       admin,
-//       MockPriceOracle.address,
-//       Vault.address,
-//       BorrowAsset.address,
-//       CollateralAsset.address,
-//       InterestRateModel.address,
-//       initialExchangeRateMantissa,
-//       reserveFactorMantissa,
-//       BorrowAssetDepositWrapperToken.address
-//     );
+    await LendingPair.initialize(
+      admin,
+      MockPriceOracle.address,
+      Vault.address,
+      BorrowAsset.address,
+      CollateralAsset.address,
+      {
+        borrowRateMaxMantissa:
+        
+      }
+      // InterestRateModel.address,
+      // initialExchangeRateMantissa,
+      // reserveFactorMantissa,
+      // BorrowAssetDepositWrapperToken.address
+    );
 
-//   });
+  });
 
 //   describe("lending pair actions", async function() {
 //     const amountToDeposit = 1000
@@ -347,4 +353,4 @@ async function depositCollateralAsset(
 //     })
 //   })  
 
-// });
+});
