@@ -374,6 +374,110 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "getMaxWithdrawAllowed",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_blackSmithTeam",
+        type: "address",
+      },
+      {
+        internalType: "contract IPriceOracle",
+        name: "_oracle",
+        type: "address",
+      },
+      {
+        internalType: "contract IBSVault",
+        name: "_vault",
+        type: "address",
+      },
+      {
+        internalType: "contract IERC20",
+        name: "_asset",
+        type: "address",
+      },
+      {
+        internalType: "contract IERC20",
+        name: "_collateralAsset",
+        type: "address",
+      },
+      {
+        components: [
+          {
+            internalType: "contract IInterestRateModel",
+            name: "interestRate",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "initialExchangeRateMantissa",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "borrowRateMaxMantissa",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "reserveFactorMantissa",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "collateralFactor",
+            type: "uint256",
+          },
+          {
+            internalType: "contract IBSWrapperToken",
+            name: "wrappedBorrowAsset",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "liquidationFee",
+            type: "uint256",
+          },
+          {
+            internalType: "contract IBSWrapperToken",
+            name: "debtToken",
+            type: "address",
+          },
+        ],
+        internalType: "struct DataTypes.BorrowAssetConfig",
+        name: "borrowConfig",
+        type: "tuple",
+      },
+      {
+        internalType: "contract IBSWrapperToken",
+        name: "_wrappedCollateralAsset",
+        type: "address",
+      },
+    ],
+    name: "initialize",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "_to",
         type: "address",
       },

@@ -11,7 +11,6 @@ import {
   PopulatedTransaction,
   Contract,
   ContractTransaction,
-  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -19,38 +18,25 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface IOracleInterface extends ethers.utils.Interface {
+interface IChainlinkV3AggregatorInterface extends ethers.utils.Interface {
   functions: {
-    "getPriceInUSD()": FunctionFragment;
-    "viewPriceInUSD()": FunctionFragment;
+    "latestRoundData()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getPriceInUSD",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "latestRoundData",
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getPriceInUSD",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "latestRoundData",
     data: BytesLike
   ): Result;
 
-  events: {
-    "PriceUpdated(address,uint256)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "PriceUpdated"): EventFragment;
+  events: {};
 }
 
-export class IOracle extends Contract {
+export class IChainlinkV3Aggregator extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -91,80 +77,96 @@ export class IOracle extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: IOracleInterface;
+  interface: IChainlinkV3AggregatorInterface;
 
   functions: {
-    getPriceInUSD(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    latestRoundData(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+        roundId: BigNumber;
+        answer: BigNumber;
+        startedAt: BigNumber;
+        updatedAt: BigNumber;
+        answeredInRound: BigNumber;
+      }
+    >;
 
-    "getPriceInUSD()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-  };
-
-  getPriceInUSD(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "getPriceInUSD()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  callStatic: {
-    getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
-  };
-
-  filters: {
-    PriceUpdated(
-      asset: null,
-      newPrice: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { asset: string; newPrice: BigNumber }
+    "latestRoundData()"(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+        roundId: BigNumber;
+        answer: BigNumber;
+        startedAt: BigNumber;
+        updatedAt: BigNumber;
+        answeredInRound: BigNumber;
+      }
     >;
   };
 
+  latestRoundData(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+      roundId: BigNumber;
+      answer: BigNumber;
+      startedAt: BigNumber;
+      updatedAt: BigNumber;
+      answeredInRound: BigNumber;
+    }
+  >;
+
+  "latestRoundData()"(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+      roundId: BigNumber;
+      answer: BigNumber;
+      startedAt: BigNumber;
+      updatedAt: BigNumber;
+      answeredInRound: BigNumber;
+    }
+  >;
+
+  callStatic: {
+    latestRoundData(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+        roundId: BigNumber;
+        answer: BigNumber;
+        startedAt: BigNumber;
+        updatedAt: BigNumber;
+        answeredInRound: BigNumber;
+      }
+    >;
+
+    "latestRoundData()"(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+        roundId: BigNumber;
+        answer: BigNumber;
+        startedAt: BigNumber;
+        updatedAt: BigNumber;
+        answeredInRound: BigNumber;
+      }
+    >;
+  };
+
+  filters: {};
+
   estimateGas: {
-    getPriceInUSD(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    latestRoundData(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "latestRoundData()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getPriceInUSD(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    latestRoundData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getPriceInUSD()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "viewPriceInUSD()"(
+    "latestRoundData()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

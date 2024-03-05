@@ -5,8 +5,14 @@ import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./LendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
+import "./DataTypes.sol";
 
 contract LendingPairFactory {
+
+    address[] public allPairs;
+
+    event NewLendingPair(address pair, uint256 created);
+
     struct NewLendingVaultIRLocalVars {
         uint256 baseRatePerYear;
         uint256 multiplierPerYear;
@@ -14,21 +20,26 @@ contract LendingPairFactory {
         uint256 optimal;
     }
 
-    address[] public allPairs;
+    struct BorrowLocalVars {
+        IERC20 borrowAsset;
+        uint256 initialExchangeRateMantissa;
+        uint256 borrowRateMaxMantissa;
+        uint256 reserveFactorMantissa;
+        uint256 collateralFactor;
+        IBSWrapperToken wrappedBorrowAsset;
+        uint256 liquidationFee;
+        IBSWrapperToken debtToken;
+    }
 
-    event NewLendingPair(address pair, uint256 created);
-
-    // expensive
     function createPair(
+        IBSLendingPair pair,
         address _team,
         IPriceOracle _oracle,
         IBSVault _vault,
-        IERC20 _asset,
         IERC20 _collateralAsset,
-        uint256 _initialExchangeRateMantissa,
-        uint256 _reserveFactorMantissa,
-        NewLendingVaultIRLocalVars calldata _interestRateVars,
-        IBSWrapperToken _wrappedBorrowAsset
+        IBSWrapperToken _wrappedCollateralAsset,
+        BorrowLocalVars calldata _borrowVars,
+        NewLendingVaultIRLocalVars calldata _interestRateVars
     ) public returns (address newPairAddr) {
         // create the interest rate model
         address ir =
@@ -42,18 +53,25 @@ contract LendingPairFactory {
                 )
             );
 
-        LendingPair pair = new LendingPair();
+        DataTypes.BorrowAssetConfig memory borrowConfig = DataTypes.BorrowAssetConfig(
+            IInterestRateModel(ir),
+            _borrowVars.initialExchangeRateMantissa,
+            _borrowVars.borrowRateMaxMantissa,
+            _borrowVars.reserveFactorMantissa,
+            _borrowVars.collateralFactor,
+            _borrowVars.wrappedBorrowAsset,
+            _borrowVars.liquidationFee,
+            _borrowVars.debtToken
+        );
 
         pair.initialize(
             _team,
             _oracle,
             _vault,
-            _asset,
+            _borrowVars.borrowAsset,
             _collateralAsset,
-            IInterestRateModel(ir),
-            _initialExchangeRateMantissa,
-            _reserveFactorMantissa,
-            _wrappedBorrowAsset
+            borrowConfig,
+            _wrappedCollateralAsset
         );
 
         newPairAddr = address(pair);

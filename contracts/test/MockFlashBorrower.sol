@@ -18,7 +18,13 @@ contract MockFlashBorrower is IERC3156FlashBorrower {
   ) external override returns (bytes32) {
     require(_initiator != address(0), "sender is 0");
     require(data.length >= 0, "data < 0");
-    IERC20(_token).approve(msg.sender, _amount + _fees);
+    (bool shouldAddFees) = abi.decode(data, (bool));
+    
+    if(shouldAddFees) {
+      IERC20(_token).approve(msg.sender, _amount + _fees);
+    } else {
+      IERC20(_token).approve(msg.sender, _amount);
+    }
     // IERC20(_token).transfer(msg.sender, _amount + _fees);
     return keccak256("ERC3156FlashBorrower.onFlashLoan");
   }

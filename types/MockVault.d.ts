@@ -19,9 +19,10 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface VaultInterface extends ethers.utils.Interface {
+interface MockVaultInterface extends ethers.utils.Interface {
   functions: {
     "FLASHLOAN_CALLBACK_SUCCESS()": FunctionFragment;
+    "addProfit(address,uint256)": FunctionFragment;
     "approveContract(address,bool)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "blackSmithTeam()": FunctionFragment;
@@ -50,6 +51,10 @@ interface VaultInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "FLASHLOAN_CALLBACK_SUCCESS",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "addProfit",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "approveContract",
@@ -133,6 +138,7 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "FLASHLOAN_CALLBACK_SUCCESS",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "addProfit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "approveContract",
     data: BytesLike
@@ -212,7 +218,7 @@ interface VaultInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
 
-export class Vault extends Contract {
+export class MockVault extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -253,7 +259,7 @@ export class Vault extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: VaultInterface;
+  interface: MockVaultInterface;
 
   functions: {
     FLASHLOAN_CALLBACK_SUCCESS(overrides?: CallOverrides): Promise<[string]>;
@@ -261,6 +267,18 @@ export class Vault extends Contract {
     "FLASHLOAN_CALLBACK_SUCCESS()"(
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    addProfit(
+      _token: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "addProfit(address,uint256)"(
+      _token: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     approveContract(
       _contract: string,
@@ -502,6 +520,18 @@ export class Vault extends Contract {
 
   "FLASHLOAN_CALLBACK_SUCCESS()"(overrides?: CallOverrides): Promise<string>;
 
+  addProfit(
+    _token: string,
+    _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "addProfit(address,uint256)"(
+    _token: string,
+    _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   approveContract(
     _contract: string,
     _status: boolean,
@@ -734,6 +764,18 @@ export class Vault extends Contract {
     FLASHLOAN_CALLBACK_SUCCESS(overrides?: CallOverrides): Promise<string>;
 
     "FLASHLOAN_CALLBACK_SUCCESS()"(overrides?: CallOverrides): Promise<string>;
+
+    addProfit(
+      _token: string,
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "addProfit(address,uint256)"(
+      _token: string,
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     approveContract(
       _contract: string,
@@ -1052,6 +1094,18 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    addProfit(
+      _token: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "addProfit(address,uint256)"(
+      _token: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     approveContract(
       _contract: string,
       _status: boolean,
@@ -1288,6 +1342,18 @@ export class Vault extends Contract {
 
     "FLASHLOAN_CALLBACK_SUCCESS()"(
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    addProfit(
+      _token: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "addProfit(address,uint256)"(
+      _token: string,
+      _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     approveContract(

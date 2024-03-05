@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
+import "../interfaces/IBSLendingPair.sol";
 
-contract BSPairHelper {
+contract LendingPairHelper {
 
 }
 
- // function viewPriceOfToken(address token, uint256 amount)
-// public
-// view
-// returns (uint256)
+
+// function viewPriceOfToken(IBSLendingPair pair, address token, uint256 amount)
+//     public
+//     view
+//     returns (uint256)
 // {
-//     // return oracle.getCurrentPriceInUSD(token) * amount;
+//     return oracle.getCurrentPriceInUSD(token) * amount;
 // }
-
-
 // /**
 // @notice viewPriceOfCollateral returns the price of an lpToken
 // @param lpToken is the address of the lp token

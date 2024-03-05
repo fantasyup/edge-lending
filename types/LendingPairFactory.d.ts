@@ -22,7 +22,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface LendingPairFactoryInterface extends ethers.utils.Interface {
   functions: {
     "allPairs(uint256)": FunctionFragment;
-    "createPair(address,address,address,address,address,uint256,uint256,tuple,address)": FunctionFragment;
+    "createPair(address,address,address,address,address,address,tuple,tuple)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -37,15 +37,23 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
       string,
       string,
       string,
-      BigNumberish,
-      BigNumberish,
+      string,
+      {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
-      },
-      string
+      }
     ]
   ): string;
 
@@ -111,38 +119,54 @@ export class LendingPairFactory extends Contract {
     ): Promise<[string]>;
 
     createPair(
+      pair: string,
       _team: string,
       _oracle: string,
       _vault: string,
-      _asset: string,
       _collateralAsset: string,
-      _initialExchangeRateMantissa: BigNumberish,
-      _reserveFactorMantissa: BigNumberish,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
       },
-      _wrappedBorrowAsset: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
+    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+      pair: string,
       _team: string,
       _oracle: string,
       _vault: string,
-      _asset: string,
       _collateralAsset: string,
-      _initialExchangeRateMantissa: BigNumberish,
-      _reserveFactorMantissa: BigNumberish,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
       },
-      _wrappedBorrowAsset: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -155,38 +179,54 @@ export class LendingPairFactory extends Contract {
   ): Promise<string>;
 
   createPair(
+    pair: string,
     _team: string,
     _oracle: string,
     _vault: string,
-    _asset: string,
     _collateralAsset: string,
-    _initialExchangeRateMantissa: BigNumberish,
-    _reserveFactorMantissa: BigNumberish,
+    _wrappedCollateralAsset: string,
+    _borrowVars: {
+      borrowAsset: string;
+      initialExchangeRateMantissa: BigNumberish;
+      borrowRateMaxMantissa: BigNumberish;
+      reserveFactorMantissa: BigNumberish;
+      collateralFactor: BigNumberish;
+      wrappedBorrowAsset: string;
+      liquidationFee: BigNumberish;
+      debtToken: string;
+    },
     _interestRateVars: {
       baseRatePerYear: BigNumberish;
       multiplierPerYear: BigNumberish;
       jumpMultiplierPerYear: BigNumberish;
       optimal: BigNumberish;
     },
-    _wrappedBorrowAsset: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
+  "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+    pair: string,
     _team: string,
     _oracle: string,
     _vault: string,
-    _asset: string,
     _collateralAsset: string,
-    _initialExchangeRateMantissa: BigNumberish,
-    _reserveFactorMantissa: BigNumberish,
+    _wrappedCollateralAsset: string,
+    _borrowVars: {
+      borrowAsset: string;
+      initialExchangeRateMantissa: BigNumberish;
+      borrowRateMaxMantissa: BigNumberish;
+      reserveFactorMantissa: BigNumberish;
+      collateralFactor: BigNumberish;
+      wrappedBorrowAsset: string;
+      liquidationFee: BigNumberish;
+      debtToken: string;
+    },
     _interestRateVars: {
       baseRatePerYear: BigNumberish;
       multiplierPerYear: BigNumberish;
       jumpMultiplierPerYear: BigNumberish;
       optimal: BigNumberish;
     },
-    _wrappedBorrowAsset: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -199,38 +239,54 @@ export class LendingPairFactory extends Contract {
     ): Promise<string>;
 
     createPair(
+      pair: string,
       _team: string,
       _oracle: string,
       _vault: string,
-      _asset: string,
       _collateralAsset: string,
-      _initialExchangeRateMantissa: BigNumberish,
-      _reserveFactorMantissa: BigNumberish,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
       },
-      _wrappedBorrowAsset: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
+    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+      pair: string,
       _team: string,
       _oracle: string,
       _vault: string,
-      _asset: string,
       _collateralAsset: string,
-      _initialExchangeRateMantissa: BigNumberish,
-      _reserveFactorMantissa: BigNumberish,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
       },
-      _wrappedBorrowAsset: string,
       overrides?: CallOverrides
     ): Promise<string>;
   };
@@ -254,38 +310,54 @@ export class LendingPairFactory extends Contract {
     ): Promise<BigNumber>;
 
     createPair(
+      pair: string,
       _team: string,
       _oracle: string,
       _vault: string,
-      _asset: string,
       _collateralAsset: string,
-      _initialExchangeRateMantissa: BigNumberish,
-      _reserveFactorMantissa: BigNumberish,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
       },
-      _wrappedBorrowAsset: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
+    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+      pair: string,
       _team: string,
       _oracle: string,
       _vault: string,
-      _asset: string,
       _collateralAsset: string,
-      _initialExchangeRateMantissa: BigNumberish,
-      _reserveFactorMantissa: BigNumberish,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
       },
-      _wrappedBorrowAsset: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -302,38 +374,54 @@ export class LendingPairFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     createPair(
+      pair: string,
       _team: string,
       _oracle: string,
       _vault: string,
-      _asset: string,
       _collateralAsset: string,
-      _initialExchangeRateMantissa: BigNumberish,
-      _reserveFactorMantissa: BigNumberish,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
       },
-      _wrappedBorrowAsset: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createPair(address,address,address,address,address,uint256,uint256,(uint256,uint256,uint256,uint256),address)"(
+    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+      pair: string,
       _team: string,
       _oracle: string,
       _vault: string,
-      _asset: string,
       _collateralAsset: string,
-      _initialExchangeRateMantissa: BigNumberish,
-      _reserveFactorMantissa: BigNumberish,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
       },
-      _wrappedBorrowAsset: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

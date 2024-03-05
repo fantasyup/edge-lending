@@ -19,33 +19,21 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface UniQuoteInterface extends ethers.utils.Interface {
+interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
   functions: {
-    "WETH()": FunctionFragment;
+    "aggregator()": FunctionFragment;
     "asset()": FunctionFragment;
-    "getPriceInETH()": FunctionFragment;
     "getPriceInUSD()": FunctionFragment;
-    "sushiswapKeeperOracle()": FunctionFragment;
-    "viewPriceInETH()": FunctionFragment;
     "viewPriceInUSD()": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "aggregator",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getPriceInETH",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "getPriceInUSD",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "sushiswapKeeperOracle",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "viewPriceInETH",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -53,22 +41,10 @@ interface UniQuoteInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
-  decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "aggregator", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "asset", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getPriceInETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "getPriceInUSD",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "sushiswapKeeperOracle",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "viewPriceInETH",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -83,7 +59,7 @@ interface UniQuoteInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "PriceUpdated"): EventFragment;
 }
 
-export class UniQuote extends Contract {
+export class ChainlinkUSDAdapter extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -124,24 +100,16 @@ export class UniQuote extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: UniQuoteInterface;
+  interface: ChainlinkUSDAdapterInterface;
 
   functions: {
-    WETH(overrides?: CallOverrides): Promise<[string]>;
+    aggregator(overrides?: CallOverrides): Promise<[string]>;
 
-    "WETH()"(overrides?: CallOverrides): Promise<[string]>;
+    "aggregator()"(overrides?: CallOverrides): Promise<[string]>;
 
     asset(overrides?: CallOverrides): Promise<[string]>;
 
     "asset()"(overrides?: CallOverrides): Promise<[string]>;
-
-    getPriceInETH(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "getPriceInETH()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     getPriceInUSD(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -151,34 +119,18 @@ export class UniQuote extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    sushiswapKeeperOracle(overrides?: CallOverrides): Promise<[string]>;
-
-    "sushiswapKeeperOracle()"(overrides?: CallOverrides): Promise<[string]>;
-
-    viewPriceInETH(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "viewPriceInETH()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     viewPriceInUSD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "viewPriceInUSD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
-  WETH(overrides?: CallOverrides): Promise<string>;
+  aggregator(overrides?: CallOverrides): Promise<string>;
 
-  "WETH()"(overrides?: CallOverrides): Promise<string>;
+  "aggregator()"(overrides?: CallOverrides): Promise<string>;
 
   asset(overrides?: CallOverrides): Promise<string>;
 
   "asset()"(overrides?: CallOverrides): Promise<string>;
-
-  getPriceInETH(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "getPriceInETH()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   getPriceInUSD(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -188,42 +140,22 @@ export class UniQuote extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  sushiswapKeeperOracle(overrides?: CallOverrides): Promise<string>;
-
-  "sushiswapKeeperOracle()"(overrides?: CallOverrides): Promise<string>;
-
-  viewPriceInETH(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "viewPriceInETH()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
   "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    WETH(overrides?: CallOverrides): Promise<string>;
+    aggregator(overrides?: CallOverrides): Promise<string>;
 
-    "WETH()"(overrides?: CallOverrides): Promise<string>;
+    "aggregator()"(overrides?: CallOverrides): Promise<string>;
 
     asset(overrides?: CallOverrides): Promise<string>;
 
     "asset()"(overrides?: CallOverrides): Promise<string>;
 
-    getPriceInETH(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getPriceInETH()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    sushiswapKeeperOracle(overrides?: CallOverrides): Promise<string>;
-
-    "sushiswapKeeperOracle()"(overrides?: CallOverrides): Promise<string>;
-
-    viewPriceInETH(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInETH()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -241,21 +173,13 @@ export class UniQuote extends Contract {
   };
 
   estimateGas: {
-    WETH(overrides?: CallOverrides): Promise<BigNumber>;
+    aggregator(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "WETH()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "aggregator()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     asset(overrides?: CallOverrides): Promise<BigNumber>;
 
     "asset()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getPriceInETH(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "getPriceInETH()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     getPriceInUSD(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -264,14 +188,6 @@ export class UniQuote extends Contract {
     "getPriceInUSD()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    sushiswapKeeperOracle(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "sushiswapKeeperOracle()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    viewPriceInETH(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInETH()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -279,21 +195,13 @@ export class UniQuote extends Contract {
   };
 
   populateTransaction: {
-    WETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    aggregator(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "WETH()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "aggregator()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     asset(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "asset()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getPriceInETH(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "getPriceInETH()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     getPriceInUSD(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -301,20 +209,6 @@ export class UniQuote extends Contract {
 
     "getPriceInUSD()"(
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    sushiswapKeeperOracle(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "sushiswapKeeperOracle()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    viewPriceInETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "viewPriceInETH()"(
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     viewPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;

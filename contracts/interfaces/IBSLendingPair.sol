@@ -1,8 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.1;
+
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./IPriceOracle.sol";
+import "./IBSVault.sol";
+import "../DataTypes.sol";
+import "./IBSWrapperToken.sol";
 
 interface IBSLendingPair {
+
+    function initialize(
+        address _blackSmithTeam,
+        IPriceOracle _oracle,
+        IBSVault _vault,
+        IERC20 _asset, 
+        IERC20 _collateralAsset,
+        DataTypes.BorrowAssetConfig calldata borrowConfig,
+        IBSWrapperToken _wrappedCollateralAsset
+    ) external;
+
     /**
      * Emitted on deposit
      *

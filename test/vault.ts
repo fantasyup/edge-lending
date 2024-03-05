@@ -2,7 +2,6 @@ import { ethers, waffle } from "hardhat";
 import { Signer } from "ethers";
 import { expect, assert } from "chai";
 import {
-  MockLendingPair as BMockLendingPair,
   MockToken as BMockToken,
   UUPSProxy as BUUPSProxy,
   Vault as BVault,
@@ -13,7 +12,6 @@ import {
   deployVault,
   deployMockToken,
   deployMockFlashBorrower,
-  deployMockLendingPair,
   deployProxiedVault,
 } from "../helpers/contracts";
 import { FlashBorrower as BFlashBorrower } from "../types/FlashBorrower";
@@ -22,7 +20,6 @@ let accounts: Signer[];
 let Vault: BVault;
 let MockToken: BMockToken;
 let FlashBorrower: BFlashBorrower;
-let MockLendingPair: BMockLendingPair;
 
 // users
 let admin: string; // account used in deploying
@@ -45,7 +42,6 @@ describe("Vault", function () {
     Vault = await deployVault();
     MockToken = await deployMockToken();
     FlashBorrower = await deployMockFlashBorrower();
-    MockLendingPair = await deployMockLendingPair();
 
     await MockToken.setBalanceTo(admin, 1000000);
   });

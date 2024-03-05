@@ -3,8 +3,6 @@ pragma solidity 0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-
-// import "./upgradability/UUPSProxiableAndPausable.sol";
 import "./interfaces/IERC3156FlashBorrower.sol";
 import "./VaultBase.sol";
 import "./interfaces/IBSVault.sol";
@@ -94,6 +92,15 @@ contract Vault is VaultBase, IBSVault {
         emit Approval(msg.sender, _contract, _status);
     }
 
+    //// @notice pause vault actions
+    function pause() onlyBlacksmithTeam external {
+        _pause();
+    }
+
+    //// @notice unpause vault actions
+    function unpause() onlyBlacksmithTeam external {
+        _unpause();
+    }
 
     /// @notice Deposit an amount of `token`
     /// @param _token The ERC-20 token to deposit.
@@ -106,13 +113,14 @@ contract Vault is VaultBase, IBSVault {
         address _from,
         address _to,
         uint256 _amount
-    ) external override allowed(_from) returns (uint256 amountOut) {
+    ) external override whenNotPaused allowed(_from) returns (uint256 amountOut) {
         // Checks
         require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
 
         amountOut = toShare(_token, _amount);
         // transfer appropriate amount of underlying from _from to vault
         _token.safeTransferFrom(_from, address(this), _amount);
+
         // calculate shares
         balanceOf[_token][_to] = balanceOf[_token][_to] + amountOut;
         totals[_token] = totals[_token] + amountOut;
@@ -131,7 +139,7 @@ contract Vault is VaultBase, IBSVault {
         address _from,
         address _to,
         uint256 _shares
-    ) external override allowed(_from) returns (uint256 amountOut) {
+    ) external override whenNotPaused allowed(_from) returns (uint256 amountOut) {
         // Checks
         require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
 
@@ -154,7 +162,7 @@ contract Vault is VaultBase, IBSVault {
         address _from,
         address _to,
         uint256 _shares
-    ) external override allowed(_from) {
+    ) external override whenNotPaused allowed(_from) {
         _transfer(_token, _from, _to, _shares);
     }
 

@@ -19,15 +19,30 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface IPriceOracleInterface extends ethers.utils.Interface {
+interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
   functions: {
+    "assetToOracle(address)": FunctionFragment;
+    "blackSmithTeam()": FunctionFragment;
     "getPriceInUSD(address)": FunctionFragment;
+    "updateOracleForAsset(address,address)": FunctionFragment;
     "viewPriceInUSD(address)": FunctionFragment;
   };
 
   encodeFunctionData(
+    functionFragment: "assetToOracle",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "blackSmithTeam",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getPriceInUSD",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateOracleForAsset",
+    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "viewPriceInUSD",
@@ -35,7 +50,19 @@ interface IPriceOracleInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "assetToOracle",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "blackSmithTeam",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getPriceInUSD",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateOracleForAsset",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -43,10 +70,14 @@ interface IPriceOracleInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
 
-  events: {};
+  events: {
+    "UpdateOracle(address,address)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "UpdateOracle"): EventFragment;
 }
 
-export class IPriceOracle extends Contract {
+export class PriceOracleAggregator extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -87,9 +118,20 @@ export class IPriceOracle extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: IPriceOracleInterface;
+  interface: PriceOracleAggregatorInterface;
 
   functions: {
+    assetToOracle(arg0: string, overrides?: CallOverrides): Promise<[string]>;
+
+    "assetToOracle(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    blackSmithTeam(overrides?: CallOverrides): Promise<[string]>;
+
+    "blackSmithTeam()"(overrides?: CallOverrides): Promise<[string]>;
+
     getPriceInUSD(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -97,6 +139,18 @@ export class IPriceOracle extends Contract {
 
     "getPriceInUSD(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateOracleForAsset(
+      _asset: string,
+      _oracle: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updateOracleForAsset(address,address)"(
+      _asset: string,
+      _oracle: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -110,6 +164,17 @@ export class IPriceOracle extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
   };
+
+  assetToOracle(arg0: string, overrides?: CallOverrides): Promise<string>;
+
+  "assetToOracle(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  blackSmithTeam(overrides?: CallOverrides): Promise<string>;
+
+  "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
   getPriceInUSD(
     _token: string,
@@ -121,6 +186,18 @@ export class IPriceOracle extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  updateOracleForAsset(
+    _asset: string,
+    _oracle: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updateOracleForAsset(address,address)"(
+    _asset: string,
+    _oracle: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   viewPriceInUSD(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "viewPriceInUSD(address)"(
@@ -129,6 +206,17 @@ export class IPriceOracle extends Contract {
   ): Promise<BigNumber>;
 
   callStatic: {
+    assetToOracle(arg0: string, overrides?: CallOverrides): Promise<string>;
+
+    "assetToOracle(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    blackSmithTeam(overrides?: CallOverrides): Promise<string>;
+
+    "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
+
     getPriceInUSD(
       _token: string,
       overrides?: CallOverrides
@@ -138,6 +226,18 @@ export class IPriceOracle extends Contract {
       _token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    updateOracleForAsset(
+      _asset: string,
+      _oracle: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "updateOracleForAsset(address,address)"(
+      _asset: string,
+      _oracle: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     viewPriceInUSD(
       _token: string,
@@ -150,9 +250,25 @@ export class IPriceOracle extends Contract {
     ): Promise<BigNumber>;
   };
 
-  filters: {};
+  filters: {
+    UpdateOracle(
+      token: null,
+      oracle: null
+    ): TypedEventFilter<[string, string], { token: string; oracle: string }>;
+  };
 
   estimateGas: {
+    assetToOracle(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "assetToOracle(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    blackSmithTeam(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "blackSmithTeam()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getPriceInUSD(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -160,6 +276,18 @@ export class IPriceOracle extends Contract {
 
     "getPriceInUSD(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateOracleForAsset(
+      _asset: string,
+      _oracle: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updateOracleForAsset(address,address)"(
+      _asset: string,
+      _oracle: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -175,6 +303,22 @@ export class IPriceOracle extends Contract {
   };
 
   populateTransaction: {
+    assetToOracle(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "assetToOracle(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    blackSmithTeam(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "blackSmithTeam()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getPriceInUSD(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -182,6 +326,18 @@ export class IPriceOracle extends Contract {
 
     "getPriceInUSD(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateOracleForAsset(
+      _asset: string,
+      _oracle: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updateOracleForAsset(address,address)"(
+      _asset: string,
+      _oracle: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

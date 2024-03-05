@@ -25,25 +25,6 @@ const _abi = [
         type: "address",
       },
     ],
-    name: "getPriceInETH",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IERC20",
-        name: "_token",
-        type: "address",
-      },
-    ],
     name: "getPriceInUSD",
     outputs: [
       {
@@ -53,25 +34,6 @@ const _abi = [
       },
     ],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IERC20",
-        name: "_token",
-        type: "address",
-      },
-    ],
-    name: "viewPriceInETH",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {

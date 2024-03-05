@@ -25,6 +25,8 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     "collateralOfAccount(address)": FunctionFragment;
     "depositBorrowAsset(address,uint256)": FunctionFragment;
     "depositCollateral(address,uint256)": FunctionFragment;
+    "getMaxWithdrawAllowed(address)": FunctionFragment;
+    "initialize(address,address,address,address,address,tuple,address)": FunctionFragment;
     "redeem(address,uint256)": FunctionFragment;
   };
 
@@ -40,6 +42,31 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "depositCollateral",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMaxWithdrawAllowed",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [
+      string,
+      string,
+      string,
+      string,
+      string,
+      {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      string
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "redeem",
@@ -59,6 +86,11 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     functionFragment: "depositCollateral",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMaxWithdrawAllowed",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
 
   events: {
@@ -166,6 +198,56 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    getMaxWithdrawAllowed(
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "getMaxWithdrawAllowed(address)"(
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    initialize(
+      _blackSmithTeam: string,
+      _oracle: string,
+      _vault: string,
+      _asset: string,
+      _collateralAsset: string,
+      borrowConfig: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _wrappedCollateralAsset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+      _blackSmithTeam: string,
+      _oracle: string,
+      _vault: string,
+      _asset: string,
+      _collateralAsset: string,
+      borrowConfig: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _wrappedCollateralAsset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     redeem(
       _to: string,
       _amount: BigNumberish,
@@ -217,6 +299,56 @@ export class IBSLendingPair extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  getMaxWithdrawAllowed(
+    account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "getMaxWithdrawAllowed(address)"(
+    account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  initialize(
+    _blackSmithTeam: string,
+    _oracle: string,
+    _vault: string,
+    _asset: string,
+    _collateralAsset: string,
+    borrowConfig: {
+      interestRate: string;
+      initialExchangeRateMantissa: BigNumberish;
+      borrowRateMaxMantissa: BigNumberish;
+      reserveFactorMantissa: BigNumberish;
+      collateralFactor: BigNumberish;
+      wrappedBorrowAsset: string;
+      liquidationFee: BigNumberish;
+      debtToken: string;
+    },
+    _wrappedCollateralAsset: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+    _blackSmithTeam: string,
+    _oracle: string,
+    _vault: string,
+    _asset: string,
+    _collateralAsset: string,
+    borrowConfig: {
+      interestRate: string;
+      initialExchangeRateMantissa: BigNumberish;
+      borrowRateMaxMantissa: BigNumberish;
+      reserveFactorMantissa: BigNumberish;
+      collateralFactor: BigNumberish;
+      wrappedBorrowAsset: string;
+      liquidationFee: BigNumberish;
+      debtToken: string;
+    },
+    _wrappedCollateralAsset: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   redeem(
     _to: string,
     _amount: BigNumberish,
@@ -265,6 +397,56 @@ export class IBSLendingPair extends Contract {
     "depositCollateral(address,uint256)"(
       _tokenReceipeint: string,
       _vaultShareAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    getMaxWithdrawAllowed(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getMaxWithdrawAllowed(address)"(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    initialize(
+      _blackSmithTeam: string,
+      _oracle: string,
+      _vault: string,
+      _asset: string,
+      _collateralAsset: string,
+      borrowConfig: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _wrappedCollateralAsset: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+      _blackSmithTeam: string,
+      _oracle: string,
+      _vault: string,
+      _asset: string,
+      _collateralAsset: string,
+      borrowConfig: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _wrappedCollateralAsset: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -450,6 +632,56 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    getMaxWithdrawAllowed(
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "getMaxWithdrawAllowed(address)"(
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    initialize(
+      _blackSmithTeam: string,
+      _oracle: string,
+      _vault: string,
+      _asset: string,
+      _collateralAsset: string,
+      borrowConfig: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _wrappedCollateralAsset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+      _blackSmithTeam: string,
+      _oracle: string,
+      _vault: string,
+      _asset: string,
+      _collateralAsset: string,
+      borrowConfig: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _wrappedCollateralAsset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     redeem(
       _to: string,
       _amount: BigNumberish,
@@ -499,6 +731,56 @@ export class IBSLendingPair extends Contract {
     "depositCollateral(address,uint256)"(
       _tokenReceipeint: string,
       _vaultShareAmount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getMaxWithdrawAllowed(
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "getMaxWithdrawAllowed(address)"(
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    initialize(
+      _blackSmithTeam: string,
+      _oracle: string,
+      _vault: string,
+      _asset: string,
+      _collateralAsset: string,
+      borrowConfig: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _wrappedCollateralAsset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+      _blackSmithTeam: string,
+      _oracle: string,
+      _vault: string,
+      _asset: string,
+      _collateralAsset: string,
+      borrowConfig: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _wrappedCollateralAsset: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
