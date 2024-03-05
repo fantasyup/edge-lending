@@ -39,7 +39,7 @@ contract Vault is VaultBase, IBSVault {
     /// @notice mapping of token asset to total deposit
     mapping(IERC20 => uint256) public totals;
 
-    /// @notice mapping of contract to user to approval status
+    /// @notice mapping of user to contract to approval status
     mapping(address => mapping(address => bool)) public userApprovedContracts;
 
     /// @notice modifier to allow only blacksmith team to call a function
@@ -85,19 +85,19 @@ contract Vault is VaultBase, IBSVault {
     // Vault Actions
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    //// @notice approve a contract to enable the contract to withdraw
+    /// @notice approve a contract to enable the contract to withdraw
     function approveContract(address _contract, bool _status) external  {
         require(_contract != address(0), "Vault: Cannot approve 0"); 
         userApprovedContracts[msg.sender][_contract] = _status;
         emit Approval(msg.sender, _contract, _status);
     }
 
-    //// @notice pause vault actions
+    /// @notice pause vault actions
     function pause() onlyBlacksmithTeam external {
         _pause();
     }
 
-    //// @notice unpause vault actions
+    /// @notice unpause vault actions
     function unpause() onlyBlacksmithTeam external {
         _unpause();
     }

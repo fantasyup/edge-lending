@@ -72,6 +72,100 @@ describe("Vault", function () {
   describe("vault actions", function () {
     const amountToDeposit = 100;
 
+    describe("approveContract", function() {
+      it('approveContract', async function() {
+        expect(
+          await Vault.userApprovedContracts(bob, admin)
+        ).to.eq(false)
+        // approve contract
+        expect(
+          await Vault.approveContract(bob, true)
+        ).to.emit(Vault, "Approval")
+        .withArgs(
+          admin,
+          bob,
+          true,
+        );
+        // read the status onchain
+        expect(
+          await Vault.userApprovedContracts(admin, bob)
+        ).to.eq(true)
+
+        // reject contract
+        await expect(
+          await Vault.approveContract(bob, false)
+        ).to.emit(Vault, "Approval")
+        .withArgs(
+          admin,
+          bob,
+          false,
+        );
+        // read the status onchain
+        expect(
+          await Vault.userApprovedContracts(bob, admin)
+        ).to.eq(false)
+      })
+    })
+
+    describe("pause and unpause", function() {
+      it("pause & unpause - fails incorrect user", async function() {
+        await expect(
+          Vault.connect(await ethers.getSigner(bob)).pause()
+        ).to.be.revertedWith("ONLY_BLACK_SMITH_TEAM")
+        
+        await expect(
+          Vault.connect(await ethers.getSigner(bob)).unpause()
+        ).to.be.revertedWith("ONLY_BLACK_SMITH_TEAM")
+      })
+
+      it("pause", async function() {
+        expect(
+          await Vault.paused()
+        ).to.eq(false)
+
+        // pause the contract
+        expect(
+          await Vault.pause()
+        ).to.emit(Vault, 'Paused').withArgs(
+          admin
+        )
+
+        // cannot perform deposit, withdraw or transfer actions
+        await expect(
+          Vault.deposit(
+            MockToken.address,
+            admin,
+            ethers.constants.AddressZero,
+            amountToDeposit
+          )
+        ).to.be.revertedWith("Pausable: paused")
+
+        await expect(
+          Vault.withdraw(
+            MockToken.address,
+            admin,
+            ethers.constants.AddressZero,
+            amountToDeposit
+          )
+        ).to.be.revertedWith("Pausable: paused")
+
+        await expect(
+          Vault.transfer(
+            MockToken.address,
+            admin,
+            ethers.constants.AddressZero,
+            amountToDeposit
+          )
+        ).to.be.revertedWith("Pausable: paused")
+
+        expect(
+          await Vault.unpause()
+        ).to.emit(Vault, 'Unpaused').withArgs(
+          admin
+        )
+      })
+    })
+
     describe("deposit", function () {
       it("deposit fails with invalid `to` address", async function () {
         await expect(
@@ -190,12 +284,23 @@ describe("Vault", function () {
           amountToDeposit + expectedFlashFee.toNumber()
         );
 
+        // should revert if the user does not pay fee or correct amount
+        await expect(
+          Vault.flashLoan(
+            FlashBorrower.address,
+            MockToken.address,
+            amountToFlashLoan,
+            "0x"
+          )
+        ).to.reverted;
+        
+        const data = ethers.utils.defaultAbiCoder.encode(['bool'], [true])
         expect(
           await Vault.flashLoan(
             FlashBorrower.address,
             MockToken.address,
             amountToFlashLoan,
-            "0x"
+            data
           )
         )
           .to.emit(Vault, "FlashLoan")
@@ -327,6 +432,16 @@ describe("Vault", function () {
     })
   })
 
+
+  describe("Ratio - Conversion", function() {
+    it("toShare - convert to appropriate shares", async function() {
+      
+    })
+
+    it("toUnderlying - convert to appropriate underlying", async function() {
+
+    })
+  })
 
 
 });
