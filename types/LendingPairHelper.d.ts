@@ -20,12 +20,17 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface LendingPairHelperInterface extends ethers.utils.Interface {
   functions: {
+    "c_0x59f30742(bytes32)": FunctionFragment;
     "vault()": FunctionFragment;
     "viewBorrowLimit(address[],address)": FunctionFragment;
     "viewBorrowedValue(address[],address)": FunctionFragment;
     "viewBorrowedValueInUSD(address[],address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "c_0x59f30742",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "vault", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "viewBorrowLimit",
@@ -40,6 +45,10 @@ interface LendingPairHelperInterface extends ethers.utils.Interface {
     values: [string[], string]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "c_0x59f30742",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "viewBorrowLimit",
@@ -101,6 +110,16 @@ export class LendingPairHelper extends Contract {
   interface: LendingPairHelperInterface;
 
   functions: {
+    c_0x59f30742(
+      c__0x59f30742: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x59f30742(bytes32)"(
+      c__0x59f30742: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     vault(overrides?: CallOverrides): Promise<[string]>;
 
     "vault()"(overrides?: CallOverrides): Promise<[string]>;
@@ -141,6 +160,16 @@ export class LendingPairHelper extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
   };
+
+  c_0x59f30742(
+    c__0x59f30742: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x59f30742(bytes32)"(
+    c__0x59f30742: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
 
   vault(overrides?: CallOverrides): Promise<string>;
 
@@ -183,6 +212,16 @@ export class LendingPairHelper extends Contract {
   ): Promise<BigNumber[]>;
 
   callStatic: {
+    c_0x59f30742(
+      c__0x59f30742: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x59f30742(bytes32)"(
+      c__0x59f30742: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     vault(overrides?: CallOverrides): Promise<string>;
 
     "vault()"(overrides?: CallOverrides): Promise<string>;
@@ -227,6 +266,16 @@ export class LendingPairHelper extends Contract {
   filters: {};
 
   estimateGas: {
+    c_0x59f30742(
+      c__0x59f30742: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x59f30742(bytes32)"(
+      c__0x59f30742: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     vault(overrides?: CallOverrides): Promise<BigNumber>;
 
     "vault()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -269,6 +318,16 @@ export class LendingPairHelper extends Contract {
   };
 
   populateTransaction: {
+    c_0x59f30742(
+      c__0x59f30742: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x59f30742(bytes32)"(
+      c__0x59f30742: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     vault(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "vault()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;

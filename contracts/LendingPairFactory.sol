@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
+
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./interfaces/IPriceOracleAggregator.sol";
 import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
@@ -8,11 +10,33 @@ import "./compound/JumpRateModelV2.sol";
 import "./LendingPair.sol";
 import "./DataTypes.sol";
 
-contract LendingPairFactory {
+contract LendingPairFactory is Pausable {
+
+    address immutable public admin;
 
     address[] public allPairs;
 
     event NewLendingPair(address pair, uint256 created);
+
+    /// @notice modifier to allow only blacksmith team to call a function
+    modifier onlyAdmin {
+        require(msg.sender == admin, "ONLY_ADMIN");
+        _;
+    }
+
+    constructor(address _admin) {
+        admin = _admin;
+    }
+
+    /// @notice pause factory actions
+    function pause() onlyAdmin external {
+        _pause();
+    }
+
+    /// @notice unpause vault actions
+    function unpause() onlyAdmin external {
+        _unpause();
+    }
 
     struct NewLendingVaultIRLocalVars {
         uint256 baseRatePerYear;
@@ -40,7 +64,7 @@ contract LendingPairFactory {
         IBSWrapperToken _wrappedCollateralAsset,
         BorrowLocalVars calldata _borrowVars,
         NewLendingVaultIRLocalVars calldata _interestRateVars
-    ) public returns (address newPairAddr) {
+    ) external whenNotPaused returns (address newPairAddr) {
         // create the interest rate model
         address ir =
             address(

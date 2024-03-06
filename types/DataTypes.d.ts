@@ -20,9 +20,14 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface DataTypesInterface extends ethers.utils.Interface {
   functions: {
+    "c_0xe39ebf19(bytes32)": FunctionFragment;
     "validBorrowAssetConfig(tuple)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "c_0xe39ebf19",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "validBorrowAssetConfig",
     values: [
@@ -38,6 +43,10 @@ interface DataTypesInterface extends ethers.utils.Interface {
     ]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "c_0xe39ebf19",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "validBorrowAssetConfig",
     data: BytesLike
@@ -90,6 +99,16 @@ export class DataTypes extends Contract {
   interface: DataTypesInterface;
 
   functions: {
+    c_0xe39ebf19(
+      c__0xe39ebf19: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0xe39ebf19(bytes32)"(
+      c__0xe39ebf19: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
     validBorrowAssetConfig(
       self: {
         interestRate: string;
@@ -116,6 +135,16 @@ export class DataTypes extends Contract {
       overrides?: CallOverrides
     ): Promise<[void]>;
   };
+
+  c_0xe39ebf19(
+    c__0xe39ebf19: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0xe39ebf19(bytes32)"(
+    c__0xe39ebf19: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
 
   validBorrowAssetConfig(
     self: {
@@ -144,6 +173,16 @@ export class DataTypes extends Contract {
   ): Promise<void>;
 
   callStatic: {
+    c_0xe39ebf19(
+      c__0xe39ebf19: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0xe39ebf19(bytes32)"(
+      c__0xe39ebf19: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     validBorrowAssetConfig(
       self: {
         interestRate: string;
@@ -174,6 +213,16 @@ export class DataTypes extends Contract {
   filters: {};
 
   estimateGas: {
+    c_0xe39ebf19(
+      c__0xe39ebf19: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0xe39ebf19(bytes32)"(
+      c__0xe39ebf19: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     validBorrowAssetConfig(
       self: {
         interestRate: string;
@@ -202,6 +251,16 @@ export class DataTypes extends Contract {
   };
 
   populateTransaction: {
+    c_0xe39ebf19(
+      c__0xe39ebf19: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0xe39ebf19(bytes32)"(
+      c__0xe39ebf19: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     validBorrowAssetConfig(
       self: {
         interestRate: string;

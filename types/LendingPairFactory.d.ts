@@ -21,13 +21,23 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface LendingPairFactoryInterface extends ethers.utils.Interface {
   functions: {
+    "admin()": FunctionFragment;
     "allPairs(uint256)": FunctionFragment;
+    "c_0x724efe76(bytes32)": FunctionFragment;
     "createPair(address,address,address,address,address,address,tuple,tuple)": FunctionFragment;
+    "pause()": FunctionFragment;
+    "paused()": FunctionFragment;
+    "unpause()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "allPairs",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "c_0x724efe76",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "createPair",
@@ -55,15 +65,30 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
       }
     ]
   ): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allPairs", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "c_0x724efe76",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "createPair", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
 
   events: {
     "NewLendingPair(address,uint256)": EventFragment;
+    "Paused(address)": EventFragment;
+    "Unpaused(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "NewLendingPair"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
 export class LendingPairFactory extends Contract {
@@ -110,12 +135,26 @@ export class LendingPairFactory extends Contract {
   interface: LendingPairFactoryInterface;
 
   functions: {
+    admin(overrides?: CallOverrides): Promise<[string]>;
+
+    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+
     allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     "allPairs(uint256)"(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    c_0x724efe76(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    "c_0x724efe76(bytes32)"(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
 
     createPair(
       pair: string,
@@ -166,7 +205,31 @@ export class LendingPairFactory extends Contract {
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "pause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
+
+    "paused()"(overrides?: CallOverrides): Promise<[boolean]>;
+
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "unpause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
+
+  admin(overrides?: CallOverrides): Promise<string>;
+
+  "admin()"(overrides?: CallOverrides): Promise<string>;
 
   allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -174,6 +237,16 @@ export class LendingPairFactory extends Contract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
+
+  c_0x724efe76(
+    c__0x724efe76: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  "c_0x724efe76(bytes32)"(
+    c__0x724efe76: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<void>;
 
   createPair(
     pair: string,
@@ -225,13 +298,47 @@ export class LendingPairFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  pause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "pause()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  paused(overrides?: CallOverrides): Promise<boolean>;
+
+  "paused()"(overrides?: CallOverrides): Promise<boolean>;
+
+  unpause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "unpause()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
+    admin(overrides?: CallOverrides): Promise<string>;
+
+    "admin()"(overrides?: CallOverrides): Promise<string>;
+
     allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     "allPairs(uint256)"(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    c_0x724efe76(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "c_0x724efe76(bytes32)"(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     createPair(
       pair: string,
@@ -282,6 +389,18 @@ export class LendingPairFactory extends Contract {
       },
       overrides?: CallOverrides
     ): Promise<string>;
+
+    pause(overrides?: CallOverrides): Promise<void>;
+
+    "pause()"(overrides?: CallOverrides): Promise<void>;
+
+    paused(overrides?: CallOverrides): Promise<boolean>;
+
+    "paused()"(overrides?: CallOverrides): Promise<boolean>;
+
+    unpause(overrides?: CallOverrides): Promise<void>;
+
+    "unpause()"(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -292,13 +411,31 @@ export class LendingPairFactory extends Contract {
       [string, BigNumber],
       { pair: string; created: BigNumber }
     >;
+
+    Paused(account: null): TypedEventFilter<[string], { account: string }>;
+
+    Unpaused(account: null): TypedEventFilter<[string], { account: string }>;
   };
 
   estimateGas: {
+    admin(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     "allPairs(uint256)"(
       arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    c_0x724efe76(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "c_0x724efe76(bytes32)"(
+      c__0x724efe76: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -351,9 +488,33 @@ export class LendingPairFactory extends Contract {
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "pause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "paused()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "unpause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     allPairs(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -364,6 +525,16 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    c_0x724efe76(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "c_0x724efe76(bytes32)"(
+      c__0x724efe76: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     createPair(
       pair: string,
       _team: string,
@@ -411,6 +582,26 @@ export class LendingPairFactory extends Contract {
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
       },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "pause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "paused()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "unpause()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
