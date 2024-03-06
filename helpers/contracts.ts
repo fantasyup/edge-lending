@@ -3,6 +3,8 @@ import { Signer, Contract, BigNumber } from "ethers"
 import { ContractId, EthereumAddress } from "../helpers/types"
 import { Vault } from '../types/Vault'
 import { 
+    CollateralWrapperToken,
+    DebtToken,
     JumpRateModelV2,
     LendingPair,
     MockFlashBorrower,
@@ -74,6 +76,20 @@ export const deployProxiedVault = async(vaultAddress ?: EthereumAddress) => {
 export const deployWrappedToken = async() => {
     return await deployContract<WrapperToken>(
         ContractId.WrapperToken,
+        []
+    )
+}
+
+export const deployDebtToken = async() => {
+    return await deployContract<DebtToken>(
+        ContractId.DebtToken,
+        []
+    )
+}
+
+export const deployCollateralWrapperToken = async() => {
+    return await deployContract<CollateralWrapperToken>(
+        ContractId.CollateralWrapperToken,
         []
     )
 }

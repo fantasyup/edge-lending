@@ -406,20 +406,46 @@ describe("LendingPair", async function () {
 
     it('withdrawCollateral', async function() {
       const jamesSigner = await ethers.getSigner(james)
+      const connectedLendingPair = LendingPair.connect(jamesSigner)
       // deposit collateral
       await depositCollateralAsset(LendingPair, james, amountToDeposit)
       // borrow
-      await LendingPair.connect(jamesSigner).borrow(500)
-      // change price 
-      // set oracle price to half
-      // await MockPriceOracle.setPrice(BigNumber.from(5).pow(18))
+      await connectedLendingPair.borrow(10)
       // james tries to withdraw his entire collateral
       await expect(
-        LendingPair.connect(jamesSigner).withdrawCollateral(amountToDeposit)
+        connectedLendingPair.withdrawCollateral(amountToDeposit)
       ).to.be.revertedWith('EXCEEDS_ALLOWED')
+      // can withdraw up to half of collateral
+      const jamesVaultBalance = (await Vault.balanceOf(CollateralAsset.address, james)).toNumber()
+      console.log({ jamesVaultBalance })
+      const lendingPairVaultBalance = (await Vault.balanceOf(CollateralAsset.address, LendingPair.address)).toNumber()
+      console.log({ lendingPairVaultBalance })
 
+      await expect(
+        await connectedLendingPair.withdrawCollateral(amountToDeposit / 2)
+      ).to.emit(LendingPair, 'WithdrawCollateral').withArgs(
+        james,
+        amountToDeposit / 2
+      )
+
+      // check balances of user
+      const updatedJamesVaultBalance = (await Vault.balanceOf(CollateralAsset.address, james)).toNumber()
+      console.log({ updatedJamesVaultBalance })
+
+      const updatedLendingPairVaultBalance = (await Vault.balanceOf(CollateralAsset.address, LendingPair.address)).toNumber()
+      console.log({ updatedLendingPairVaultBalance })
+
+      // repay
+      await depositInVault(BorrowAsset, jamesSigner, 100)
+      await connectedLendingPair.repay(10)
+
+      // withdrawCollateral entire collateral
+      await expect(
+        await connectedLendingPair.withdrawCollateral(0)
+      )
       
-
+      expect((await LendingPair.collateralOfAccount(james)).toNumber()).to.eq(0)
+      expect((await CollateralWrapperToken.balanceOf(james)).toNumber()).to.eq(0)
     })
 
     //     describe("liquidate", async function() {

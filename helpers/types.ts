@@ -14,7 +14,9 @@ export enum ContractId {
     PriceOracleAggregator = 'PriceOracleAggregator',
     MockVault = 'MockVault',
     DataTypes = 'DataTypes',
-    LendingPairHelper = 'LendingPairHelper'
+    LendingPairHelper = 'LendingPairHelper',
+    DebtToken = 'DebtToken',
+    CollateralWrapperToken = 'CollateralWrapperToken'
 }
 
 export type EthereumAddress = string;
