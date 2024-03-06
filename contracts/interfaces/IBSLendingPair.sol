@@ -152,4 +152,8 @@ interface IBSLendingPair {
         returns(uint256);
     
     function oracle() external view returns(IPriceOracle);
+    function collateralAsset() external view returns(IERC20);
+    
+    function calcBorrowLimit(uint256 amount) external view returns(uint256);
+
 }

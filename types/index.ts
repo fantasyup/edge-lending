@@ -12,6 +12,7 @@ export type { InterestRateModel } from "./InterestRateModel";
 export type { JumpRateModelV2 } from "./JumpRateModelV2";
 export type { DataTypes } from "./DataTypes";
 export type { DebtToken } from "./DebtToken";
+export type { LendingPairHelper } from "./LendingPairHelper";
 export type { IBSLendingPair } from "./IBSLendingPair";
 export type { IBSVault } from "./IBSVault";
 export type { IBSWrapperToken } from "./IBSWrapperToken";
@@ -54,6 +55,7 @@ export { InterestRateModel__factory } from "./factories/InterestRateModel__facto
 export { JumpRateModelV2__factory } from "./factories/JumpRateModelV2__factory";
 export { DataTypes__factory } from "./factories/DataTypes__factory";
 export { DebtToken__factory } from "./factories/DebtToken__factory";
+export { LendingPairHelper__factory } from "./factories/LendingPairHelper__factory";
 export { IBSLendingPair__factory } from "./factories/IBSLendingPair__factory";
 export { IBSVault__factory } from "./factories/IBSVault__factory";
 export { IBSWrapperToken__factory } from "./factories/IBSWrapperToken__factory";

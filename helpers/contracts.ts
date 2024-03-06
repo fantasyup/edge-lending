@@ -12,6 +12,7 @@ import {
     MockVault, UUPSProxy, WrapperToken 
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
+import { LendingPairHelper } from "../types/LendingPairHelper";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
@@ -108,8 +109,8 @@ export const deployMockVault =  async() => {
 }
 
 
-export const deployLendingPairHelper = async() => {
-    return await deployCont
+export const deployLendingPairHelper = async(vault: Vault) => {
+    return await deployContract<LendingPairHelper>(ContractId.LendingPairHelper, [vault.address])
 }
 
 // minimal proxy contract

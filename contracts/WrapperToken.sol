@@ -8,6 +8,7 @@ import "./interfaces/IBSLendingPair.sol";
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title WrapperToken
 /// @author @samparsky
+///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract WrapperToken is ERC20Permit, Ownable {
@@ -41,6 +42,7 @@ contract WrapperToken is ERC20Permit, Ownable {
 
     /**
     * @notice burn is an only owner function that allows the owner to burn  tokens from an input account
+    * @dev IMPORTANT: it reverts if user doesn't have enough balance
     * @param _from is the address where the tokens will be burnt
     * @param _amount is the amount of token to be burnt
     **/

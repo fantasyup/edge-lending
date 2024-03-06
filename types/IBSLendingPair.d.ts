@@ -22,15 +22,31 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface IBSLendingPairInterface extends ethers.utils.Interface {
   functions: {
     "asset()": FunctionFragment;
+    "borrowBalancePrior(address)": FunctionFragment;
+    "calcBorrowLimit(uint256)": FunctionFragment;
+    "collateralAsset()": FunctionFragment;
     "collateralOfAccount(address)": FunctionFragment;
     "depositBorrowAsset(address,uint256)": FunctionFragment;
     "depositCollateral(address,uint256)": FunctionFragment;
     "getMaxWithdrawAllowed(address)": FunctionFragment;
     "initialize(address,address,address,address,address,tuple,address)": FunctionFragment;
+    "oracle()": FunctionFragment;
     "redeem(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "borrowBalancePrior",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "calcBorrowLimit",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "collateralAsset",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "collateralOfAccount",
     values: [string]
@@ -67,12 +83,25 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
       string
     ]
   ): string;
+  encodeFunctionData(functionFragment: "oracle", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "redeem",
     values: [string, BigNumberish]
   ): string;
 
   decodeFunctionResult(functionFragment: "asset", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "borrowBalancePrior",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "calcBorrowLimit",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "collateralAsset",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "collateralOfAccount",
     data: BytesLike
@@ -90,6 +119,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
 
   events: {
@@ -162,6 +192,30 @@ export class IBSLendingPair extends Contract {
     asset(overrides?: CallOverrides): Promise<[string]>;
 
     "asset()"(overrides?: CallOverrides): Promise<[string]>;
+
+    borrowBalancePrior(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "borrowBalancePrior(address)"(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    calcBorrowLimit(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "calcBorrowLimit(uint256)"(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    collateralAsset(overrides?: CallOverrides): Promise<[string]>;
+
+    "collateralAsset()"(overrides?: CallOverrides): Promise<[string]>;
 
     collateralOfAccount(
       _account: string,
@@ -245,6 +299,10 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    oracle(overrides?: CallOverrides): Promise<[string]>;
+
+    "oracle()"(overrides?: CallOverrides): Promise<[string]>;
+
     redeem(
       _to: string,
       _amount: BigNumberish,
@@ -261,6 +319,30 @@ export class IBSLendingPair extends Contract {
   asset(overrides?: CallOverrides): Promise<string>;
 
   "asset()"(overrides?: CallOverrides): Promise<string>;
+
+  borrowBalancePrior(
+    account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "borrowBalancePrior(address)"(
+    account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  calcBorrowLimit(
+    amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "calcBorrowLimit(uint256)"(
+    amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  collateralAsset(overrides?: CallOverrides): Promise<string>;
+
+  "collateralAsset()"(overrides?: CallOverrides): Promise<string>;
 
   collateralOfAccount(
     _account: string,
@@ -344,6 +426,10 @@ export class IBSLendingPair extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  oracle(overrides?: CallOverrides): Promise<string>;
+
+  "oracle()"(overrides?: CallOverrides): Promise<string>;
+
   redeem(
     _to: string,
     _amount: BigNumberish,
@@ -360,6 +446,30 @@ export class IBSLendingPair extends Contract {
     asset(overrides?: CallOverrides): Promise<string>;
 
     "asset()"(overrides?: CallOverrides): Promise<string>;
+
+    borrowBalancePrior(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "borrowBalancePrior(address)"(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    calcBorrowLimit(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "calcBorrowLimit(uint256)"(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    collateralAsset(overrides?: CallOverrides): Promise<string>;
+
+    "collateralAsset()"(overrides?: CallOverrides): Promise<string>;
 
     collateralOfAccount(
       _account: string,
@@ -442,6 +552,10 @@ export class IBSLendingPair extends Contract {
       _wrappedCollateralAsset: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    oracle(overrides?: CallOverrides): Promise<string>;
+
+    "oracle()"(overrides?: CallOverrides): Promise<string>;
 
     redeem(
       _to: string,
@@ -591,6 +705,30 @@ export class IBSLendingPair extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    borrowBalancePrior(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "borrowBalancePrior(address)"(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    calcBorrowLimit(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "calcBorrowLimit(uint256)"(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    collateralAsset(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "collateralAsset()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     collateralOfAccount(
       _account: string,
       overrides?: CallOverrides
@@ -672,6 +810,10 @@ export class IBSLendingPair extends Contract {
       _wrappedCollateralAsset: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    oracle(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "oracle()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     redeem(
       _to: string,
@@ -691,6 +833,32 @@ export class IBSLendingPair extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    borrowBalancePrior(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "borrowBalancePrior(address)"(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    calcBorrowLimit(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "calcBorrowLimit(uint256)"(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    collateralAsset(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "collateralAsset()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     collateralOfAccount(
       _account: string,
       overrides?: CallOverrides
@@ -772,6 +940,10 @@ export class IBSLendingPair extends Contract {
       _wrappedCollateralAsset: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    oracle(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "oracle()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     redeem(
       _to: string,

@@ -29,8 +29,7 @@ export async function depositInVault(
     await asset.connect(account).approve(Vault.address, amountToDeposit)
     await (await Vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
 }
-// interface IMakeTestSuiteVars {
-// }
+
 export async function makeLendingPairTestSuiteVars(price?: BigNumber) {
     return {
         Vault: await deployVault(),
@@ -44,7 +43,7 @@ export async function makeLendingPairTestSuiteVars(price?: BigNumber) {
     }
 }
 
-export class LendingPairTestHelper {
+export class LendingPairTestSuiteVars {
     Vault: BVault;
     LendingPair: BLendingPair;
     BorrowAsset: MockToken;

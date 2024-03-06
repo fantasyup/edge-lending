@@ -500,24 +500,24 @@ export class LendingPair extends Contract {
     borrowBalancePrior(
       _account: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { result: BigNumber }>;
 
     "borrowBalancePrior(address)"(
       _account: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { result: BigNumber }>;
 
     borrowIndex(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "borrowIndex()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     calcBorrowLimit(
-      _collateralValue: BigNumberish,
+      _collateralValueInUSD: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     "calcBorrowLimit(uint256)"(
-      _collateralValue: BigNumberish,
+      _collateralValueInUSD: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -871,12 +871,12 @@ export class LendingPair extends Contract {
   "borrowIndex()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   calcBorrowLimit(
-    _collateralValue: BigNumberish,
+    _collateralValueInUSD: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   "calcBorrowLimit(uint256)"(
-    _collateralValue: BigNumberish,
+    _collateralValueInUSD: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -1226,12 +1226,12 @@ export class LendingPair extends Contract {
     "borrowIndex()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     calcBorrowLimit(
-      _collateralValue: BigNumberish,
+      _collateralValueInUSD: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "calcBorrowLimit(uint256)"(
-      _collateralValue: BigNumberish,
+      _collateralValueInUSD: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1695,12 +1695,12 @@ export class LendingPair extends Contract {
     "borrowIndex()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     calcBorrowLimit(
-      _collateralValue: BigNumberish,
+      _collateralValueInUSD: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "calcBorrowLimit(uint256)"(
-      _collateralValue: BigNumberish,
+      _collateralValueInUSD: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2053,12 +2053,12 @@ export class LendingPair extends Contract {
     "borrowIndex()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     calcBorrowLimit(
-      _collateralValue: BigNumberish,
+      _collateralValueInUSD: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "calcBorrowLimit(uint256)"(
-      _collateralValue: BigNumberish,
+      _collateralValueInUSD: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

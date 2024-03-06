@@ -9,7 +9,7 @@ import "./interfaces/IBSVault.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./interfaces/IPriceOracle.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 import "./DataTypes.sol";
 import "./util/Initializable.sol";
 import "./token/IERC20Details.sol";
@@ -17,7 +17,7 @@ import "./token/IERC20Details.sol";
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// 
 /// @title LendingPair
-/// @author samparsky
+/// @author @samparsky
 /// @notice
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     IERC20 public override asset;
 
     /// @notice The pair collateral asset
-    IERC20 public collateralAsset;
+    IERC20 public override collateralAsset;
 
     /// @notice The wrapper token for the borrow asset
     IBSWrapperToken public wrapperBorrowedAsset;
@@ -170,6 +170,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         wrapperBorrowedAsset = borrowConfig.wrappedBorrowAsset;
         wrappedCollateralAsset = _wrappedCollateralAsset;
+        debtToken = borrowConfig.debtToken;
     }
 
     function initializeWrapperTokens(
@@ -285,15 +286,13 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _amountToBorrow is the amount of the borrow asset vault shares the user wants to borrow
     function borrow(uint256 _amountToBorrow) external {
         uint256 borrowedTotalInUSD = getTotalBorrowedValueInUSD(msg.sender);
-        // console.logUint(borrowedTotalInUSD);
         uint256 borrowLimitInUSD = getBorrowLimitInUSD(msg.sender);
-        // console.logUint(borrowLimitInUSD);
         uint256 borrowAmountAllowedInUSD = borrowLimitInUSD - borrowedTotalInUSD;
-        // console.logUint(borrowAmountAllowedInUSD);
 
         uint256 borrowAmountInUSD = getPriceOfToken(asset, _amountToBorrow);
 
-        // require the amount being borrowed is less than or equal to the amount they are aloud to borrow
+        // require the amount being borrowed is less than 
+        // or equal to the amount they are aloud to borrow
         require(
             borrowAmountAllowedInUSD >= borrowAmountInUSD,
             "BORROWING_MORE_THAN_ALLOWED"
@@ -328,7 +327,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // We fetch the amount the borrower owes, with accumulated interest
         vars.accountBorrows = borrowBalanceCurrent(msg.sender);
 
-        // console.logString("accountboorwos");
+        // console.logString("accountborrows");
         // console.logUint(vars.accountBorrows);
         // require the borrower cant pay more than they owe
         require(
@@ -342,14 +341,13 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             vars.repayAmount = _repayAmount;
         }
 
+        // convert repayAmount to share
+        uint256 repayAmountInShares = vault.toShare(asset, vars.repayAmount, true);
+
         require(
-            asset.balanceOf(msg.sender) >= _repayAmount,
+            vault.balanceOf(asset, msg.sender) >= repayAmountInShares,
             "NOT_ENOUGH_BALANCE_TO_REPAY"
         );
-
-        // convert repayAmount to share
-        uint256 repayAmountInShares = vault.toShare(asset, _repayAmount, true);
-
         // transfer the borrow asset from the borrower to LendingPair
         vault.transfer(
             asset,
@@ -416,8 +414,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         } else {
             vars.amount = _amount;
         }
-        // console.logString("exchangeRateMantissa");
-        // console.logUint(vars.exchangeRateMantissa);
+        
         // we get the current exchange rate and calculate the number of EdgeWrapperToken to be burned:
         // burnTokens = _amount / exchangeRate
         vars.burnTokens = divScalarByExpTruncate(
@@ -439,6 +436,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         vars.principalRedeemed = vars.amount - currentUnderlyingReward;
 
         if (vars.amount >= currentUnderlyingReward) {
+            // user is redeeming part or all of the prinicipal
             historicalReward[msg.sender] = historicalReward[msg.sender] + currentUnderlyingReward;
             
             require(
@@ -448,11 +446,12 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             principalBalance[msg.sender] = principalBalance[msg.sender] - vars.principalRedeemed;
             
         } else {
+            // user is redeeming rewards
             historicalReward[msg.sender] = historicalReward[msg.sender] + vars.amount;
         }
 
         wrapperBorrowedAsset.burn(msg.sender, vars.burnTokens);
-        // transferUnderlyingTo
+        // transfer
         vault.transfer(asset, address(this), _to, vars.amount);
 
         emit Redeem(address(this), address(asset), msg.sender, _to, vars.amount, vars.burnTokens);
@@ -599,10 +598,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @notice returns last calculated account's borrow balance using the prior borrowIndex
     /// @param _account The address whose balance should be calculated after updating borrowIndex
-    /// @return The calculated balance
-    function borrowBalancePrior(address _account) public view override returns (uint256) {
+    /// @return result The calculated balance
+    function borrowBalancePrior(address _account) public view override returns (uint256 result) {
         uint256 principalTimesIndex;
-        uint256 result;
 
         // Get borrowBalance and borrowIndex
         BorrowSnapshot memory borrowSnapshot = accountBorrows[_account];
@@ -616,16 +614,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // recentBorrowBalance = borrower.borrowBalance * market.borrowIndex / borrower.borrowIndex
         principalTimesIndex = borrowSnapshot.principal * borrowIndex;
 
-        // console.logString("principalTimesIndex");
-        // console.logUint(borrowSnapshot.principal);
-        // console.logUint(borrowIndex);
-        // console.logUint(principalTimesIndex);
-        // console.logUint(borrowSnapshot.interestIndex);
-
         result = principalTimesIndex / borrowSnapshot.interestIndex;
-        
-        // console.logUint(result);
-        return result;
     }
 
     /**
@@ -661,7 +650,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         // require the availible value of the collateral locked in this contract the user has
         // is greater than or equal to the amount being withdrawn
-        require(maxAmount >= amount, "EXCEEDS_DEPOSITED");
+        require(maxAmount >= amount, "EXCEEDS_ALLOWED");
         // require the user has locked up enough collateral to withdraw this amount
         require(
             wrappedCollateralAsset.balanceOf(msg.sender) >= amount,
@@ -759,13 +748,14 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /// @notice calcBorrowLimit is used to calculate the borrow limit for an account based on the input value of their collateral
-    /// @param _collateralValue is the USD value of the users collateral
-    function calcBorrowLimit(uint256 _collateralValue)
+    /// @param _collateralValueInUSD is the USD value of the users collateral
+    function calcBorrowLimit(uint256 _collateralValueInUSD)
         public
         view
+        override
         returns (uint256)
     {
-        return ( _collateralValue * COLLATERAL_FACTOR_PRECSIION) / collateralFactor;
+        return ( _collateralValueInUSD * COLLATERAL_FACTOR_PRECSIION) / collateralFactor;
     }
 
     /// @notice calcCollateralRequired returns the amount of collateral needed for an input borrow value

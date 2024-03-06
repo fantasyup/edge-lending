@@ -20,16 +20,37 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface LendingPairHelperInterface extends ethers.utils.Interface {
   functions: {
-    "c_0x843bd52e(bytes32)": FunctionFragment;
+    "vault()": FunctionFragment;
+    "viewBorrowLimit(address[],address)": FunctionFragment;
+    "viewBorrowedValue(address[],address)": FunctionFragment;
+    "viewBorrowedValueInUSD(address[],address)": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "vault", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "c_0x843bd52e",
-    values: [BytesLike]
+    functionFragment: "viewBorrowLimit",
+    values: [string[], string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "viewBorrowedValue",
+    values: [string[], string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "viewBorrowedValueInUSD",
+    values: [string[], string]
   ): string;
 
+  decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "c_0x843bd52e",
+    functionFragment: "viewBorrowLimit",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "viewBorrowedValue",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "viewBorrowedValueInUSD",
     data: BytesLike
   ): Result;
 
@@ -80,61 +101,211 @@ export class LendingPairHelper extends Contract {
   interface: LendingPairHelperInterface;
 
   functions: {
-    c_0x843bd52e(
-      c__0x843bd52e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
+    vault(overrides?: CallOverrides): Promise<[string]>;
 
-    "c_0x843bd52e(bytes32)"(
-      c__0x843bd52e: BytesLike,
+    "vault()"(overrides?: CallOverrides): Promise<[string]>;
+
+    viewBorrowLimit(
+      pairs: string[],
+      _account: string,
       overrides?: CallOverrides
-    ): Promise<[void]>;
+    ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
+
+    "viewBorrowLimit(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
+
+    viewBorrowedValue(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
+
+    "viewBorrowedValue(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
+
+    viewBorrowedValueInUSD(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
+
+    "viewBorrowedValueInUSD(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
   };
 
-  c_0x843bd52e(
-    c__0x843bd52e: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
+  vault(overrides?: CallOverrides): Promise<string>;
 
-  "c_0x843bd52e(bytes32)"(
-    c__0x843bd52e: BytesLike,
+  "vault()"(overrides?: CallOverrides): Promise<string>;
+
+  viewBorrowLimit(
+    pairs: string[],
+    _account: string,
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<BigNumber[]>;
+
+  "viewBorrowLimit(address[],address)"(
+    pairs: string[],
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  viewBorrowedValue(
+    pairs: string[],
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  "viewBorrowedValue(address[],address)"(
+    pairs: string[],
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  viewBorrowedValueInUSD(
+    pairs: string[],
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  "viewBorrowedValueInUSD(address[],address)"(
+    pairs: string[],
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
 
   callStatic: {
-    c_0x843bd52e(
-      c__0x843bd52e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    vault(overrides?: CallOverrides): Promise<string>;
 
-    "c_0x843bd52e(bytes32)"(
-      c__0x843bd52e: BytesLike,
+    "vault()"(overrides?: CallOverrides): Promise<string>;
+
+    viewBorrowLimit(
+      pairs: string[],
+      _account: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber[]>;
+
+    "viewBorrowLimit(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    viewBorrowedValue(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    "viewBorrowedValue(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    viewBorrowedValueInUSD(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    "viewBorrowedValueInUSD(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
   };
 
   filters: {};
 
   estimateGas: {
-    c_0x843bd52e(
-      c__0x843bd52e: BytesLike,
+    vault(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "vault()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    viewBorrowLimit(
+      pairs: string[],
+      _account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "c_0x843bd52e(bytes32)"(
-      c__0x843bd52e: BytesLike,
+    "viewBorrowLimit(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    viewBorrowedValue(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "viewBorrowedValue(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    viewBorrowedValueInUSD(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "viewBorrowedValueInUSD(address[],address)"(
+      pairs: string[],
+      _account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    c_0x843bd52e(
-      c__0x843bd52e: BytesLike,
+    vault(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "vault()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    viewBorrowLimit(
+      pairs: string[],
+      _account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "c_0x843bd52e(bytes32)"(
-      c__0x843bd52e: BytesLike,
+    "viewBorrowLimit(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    viewBorrowedValue(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "viewBorrowedValue(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    viewBorrowedValueInUSD(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "viewBorrowedValueInUSD(address[],address)"(
+      pairs: string[],
+      _account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

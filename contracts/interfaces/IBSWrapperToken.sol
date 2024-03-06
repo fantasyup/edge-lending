@@ -10,4 +10,5 @@ interface IBSWrapperToken is IERC20 {
     ) external;
     function burn(address _from, uint256 _amount) external;
     function mint(address _to, uint256 _amount) external;
+    function owner() external returns(address);
 }

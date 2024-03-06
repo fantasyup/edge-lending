@@ -1,5 +1,5 @@
 import {
-    LendingPairTestHelper,
+    LendingPairTestSuiteVars,
     depositInVault
 } from './lib'
 /// simulate different user interactions
