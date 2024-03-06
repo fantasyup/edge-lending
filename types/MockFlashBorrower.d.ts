@@ -22,7 +22,6 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface MockFlashBorrowerInterface extends ethers.utils.Interface {
   functions: {
     "borrow(address,address,uint256)": FunctionFragment;
-    "c_0x9f152e50(bytes32)": FunctionFragment;
     "onFlashLoan(address,address,uint256,uint256,bytes)": FunctionFragment;
   };
 
@@ -31,19 +30,11 @@ interface MockFlashBorrowerInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "c_0x9f152e50",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "onFlashLoan",
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
   ): string;
 
   decodeFunctionResult(functionFragment: "borrow", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x9f152e50",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "onFlashLoan",
     data: BytesLike
@@ -110,16 +101,6 @@ export class MockFlashBorrower extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    c_0x9f152e50(
-      c__0x9f152e50: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x9f152e50(bytes32)"(
-      c__0x9f152e50: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     onFlashLoan(
       _initiator: string,
       _token: string,
@@ -153,16 +134,6 @@ export class MockFlashBorrower extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  c_0x9f152e50(
-    c__0x9f152e50: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x9f152e50(bytes32)"(
-    c__0x9f152e50: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   onFlashLoan(
     _initiator: string,
     _token: string,
@@ -193,16 +164,6 @@ export class MockFlashBorrower extends Contract {
       _lender: string,
       _token: string,
       _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0x9f152e50(
-      c__0x9f152e50: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x9f152e50(bytes32)"(
-      c__0x9f152e50: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -242,16 +203,6 @@ export class MockFlashBorrower extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    c_0x9f152e50(
-      c__0x9f152e50: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x9f152e50(bytes32)"(
-      c__0x9f152e50: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     onFlashLoan(
       _initiator: string,
       _token: string,
@@ -284,16 +235,6 @@ export class MockFlashBorrower extends Contract {
       _token: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    c_0x9f152e50(
-      c__0x9f152e50: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x9f152e50(bytes32)"(
-      c__0x9f152e50: BytesLike,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     onFlashLoan(

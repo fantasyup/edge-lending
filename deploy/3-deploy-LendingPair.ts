@@ -6,10 +6,20 @@ const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnv
   const { deployments: { deploy }, getNamedAccounts } = hre;
   const { deployer } = await getNamedAccounts();
 
+  // deploy library with deterministic set to true
+  const DataTypesLib = await deploy(ContractId.DataTypes, {
+    from: deployer,
+    args: [],
+    deterministicDeployment: true
+  })
+
   await deploy(ContractId.LendingPair, {
     from: deployer,
     args: [],
     log: true,
+    libraries: {
+      [ContractId.DataTypes]: DataTypesLib.address
+    }
   });
 
 };

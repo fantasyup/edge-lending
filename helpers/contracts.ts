@@ -2,17 +2,35 @@ import { ethers, waffle } from "hardhat";
 import { Signer, Contract, BigNumber } from "ethers"
 import { ContractId, EthereumAddress } from "../helpers/types"
 import { Vault } from '../types/Vault'
-import { JumpRateModelV2, LendingPair, MockFlashBorrower, MockLendingPair, MockPriceOracle, MockToken, MockVault, UUPSProxy, WrapperToken } from "../types";
+import { 
+    JumpRateModelV2,
+    LendingPair,
+    MockFlashBorrower,
+    MockLendingPair,
+    MockPriceOracle,
+    MockToken,
+    MockVault, UUPSProxy, WrapperToken 
+} from "../types";
+import { DataTypes } from "../types/DataTypes";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
-    args: any[]
+    args: any[],
+    libraries?: {}
 ) => {
-    const contract = (await (await ethers.getContractFactory(contractName)).deploy(
+    const contract = (await (await ethers.getContractFactory(contractName, {
+        libraries: {
+            ...libraries
+        }
+    })).deploy(
         ...args
       )) as ContractType;
     
     return contract
+}
+
+export const deployDataTypesLib = async () => {
+    return await deployContract<DataTypes>('DataTypes', [])
 }
 
 export const deployVault = async() => {
@@ -24,7 +42,12 @@ export const deployMockToken = async() => {
 }
 
 export const deployLendingPair = async () => {
-    return await deployContract<LendingPair>(ContractId.LendingPair, [])
+    const dataTypesLib = await deployDataTypesLib()
+
+    return await deployContract<LendingPair>(ContractId.LendingPair, [], 
+    {
+        DataTypes: dataTypesLib.address
+    })
 }
 
 export const deployUUPSProxy = async () => {

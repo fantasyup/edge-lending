@@ -93,12 +93,6 @@ interface IBSVault is IERC3156FlashLender {
         uint256 _shares
     ) external;
 
-    // function send(
-    //     IERC20 _token,
-    //     address _to,
-    //     uint256 _shares
-    // ) external;
-
     function toShare(
         IERC20 token,
         uint256 amount,

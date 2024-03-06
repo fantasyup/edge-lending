@@ -13,6 +13,7 @@ export enum ContractId {
     JumpRateModelV2 = 'JumpRateModelV2',
     PriceOracle = 'PriceOracle',
     MockVault = 'MockVault',
+    DataTypes = 'DataTypes'
 }
 
 export type EthereumAddress = string;

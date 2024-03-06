@@ -23,7 +23,6 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
   functions: {
     "assetToOracle(address)": FunctionFragment;
     "blackSmithTeam()": FunctionFragment;
-    "c_0xb717478a(bytes32)": FunctionFragment;
     "getPriceInUSD(address)": FunctionFragment;
     "updateOracleForAsset(address,address)": FunctionFragment;
     "viewPriceInUSD(address)": FunctionFragment;
@@ -36,10 +35,6 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "blackSmithTeam",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xb717478a",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getPriceInUSD",
@@ -60,10 +55,6 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "blackSmithTeam",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xb717478a",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -141,16 +132,6 @@ export class PriceOracleAggregator extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<[string]>;
 
-    c_0xb717478a(
-      c__0xb717478a: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xb717478a(bytes32)"(
-      c__0xb717478a: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     getPriceInUSD(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -195,16 +176,6 @@ export class PriceOracleAggregator extends Contract {
 
   "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
-  c_0xb717478a(
-    c__0xb717478a: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xb717478a(bytes32)"(
-    c__0xb717478a: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   getPriceInUSD(
     _token: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -245,16 +216,6 @@ export class PriceOracleAggregator extends Contract {
     blackSmithTeam(overrides?: CallOverrides): Promise<string>;
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
-
-    c_0xb717478a(
-      c__0xb717478a: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xb717478a(bytes32)"(
-      c__0xb717478a: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     getPriceInUSD(
       _token: string,
@@ -308,16 +269,6 @@ export class PriceOracleAggregator extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    c_0xb717478a(
-      c__0xb717478a: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xb717478a(bytes32)"(
-      c__0xb717478a: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getPriceInUSD(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -365,16 +316,6 @@ export class PriceOracleAggregator extends Contract {
     blackSmithTeam(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "blackSmithTeam()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0xb717478a(
-      c__0xb717478a: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xb717478a(bytes32)"(
-      c__0xb717478a: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

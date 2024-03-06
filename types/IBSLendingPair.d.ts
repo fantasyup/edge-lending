@@ -58,7 +58,6 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
       {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -217,7 +216,6 @@ export class IBSLendingPair extends Contract {
       borrowConfig: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -228,7 +226,7 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),address)"(
       _blackSmithTeam: string,
       _oracle: string,
       _vault: string,
@@ -237,7 +235,6 @@ export class IBSLendingPair extends Contract {
       borrowConfig: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -318,7 +315,6 @@ export class IBSLendingPair extends Contract {
     borrowConfig: {
       interestRate: string;
       initialExchangeRateMantissa: BigNumberish;
-      borrowRateMaxMantissa: BigNumberish;
       reserveFactorMantissa: BigNumberish;
       collateralFactor: BigNumberish;
       wrappedBorrowAsset: string;
@@ -329,7 +325,7 @@ export class IBSLendingPair extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+  "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),address)"(
     _blackSmithTeam: string,
     _oracle: string,
     _vault: string,
@@ -338,7 +334,6 @@ export class IBSLendingPair extends Contract {
     borrowConfig: {
       interestRate: string;
       initialExchangeRateMantissa: BigNumberish;
-      borrowRateMaxMantissa: BigNumberish;
       reserveFactorMantissa: BigNumberish;
       collateralFactor: BigNumberish;
       wrappedBorrowAsset: string;
@@ -419,7 +414,6 @@ export class IBSLendingPair extends Contract {
       borrowConfig: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -430,7 +424,7 @@ export class IBSLendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),address)"(
       _blackSmithTeam: string,
       _oracle: string,
       _vault: string,
@@ -439,7 +433,6 @@ export class IBSLendingPair extends Contract {
       borrowConfig: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -651,7 +644,6 @@ export class IBSLendingPair extends Contract {
       borrowConfig: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -662,7 +654,7 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),address)"(
       _blackSmithTeam: string,
       _oracle: string,
       _vault: string,
@@ -671,7 +663,6 @@ export class IBSLendingPair extends Contract {
       borrowConfig: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -753,7 +744,6 @@ export class IBSLendingPair extends Contract {
       borrowConfig: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -764,7 +754,7 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),address)"(
+    "initialize(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),address)"(
       _blackSmithTeam: string,
       _oracle: string,
       _vault: string,
@@ -773,7 +763,6 @@ export class IBSLendingPair extends Contract {
       borrowConfig: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;

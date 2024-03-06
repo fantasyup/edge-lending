@@ -430,11 +430,6 @@ const _abi = [
           },
           {
             internalType: "uint256",
-            name: "borrowRateMaxMantissa",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
             name: "reserveFactorMantissa",
             type: "uint256",
           },

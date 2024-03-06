@@ -6,7 +6,7 @@ Rounding issue in `toShare` & `toUnderlying` a user could end up with a fraction
 
 #### Vault
 
-We ignore the problem in the `deposit` & `withdraw` function of `Vault`
+We round down in the `deposit` & `withdraw` function of `Vault` which means the user could end up with a fraction less of the value they deposited
 
 #### LendingPair
 

@@ -133,7 +133,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // validate borrow config
         borrowConfig.validBorrowAssetConfig();
 
-        // invalid
         blackSmithTeam = _blackSmithTeam;
         vault = _vault;
         asset = _asset;
@@ -202,7 +201,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     function depositCollateral(address _tokenReceipeint, uint256 _vaultShareAmount) external override {
         vault.transfer(collateralAsset, msg.sender, address(this), _vaultShareAmount);
         // mint receipient vault share amount
-        // collateralBalance[_tokenReceipeint] = collateralBalance[_tokenReceipeint] + _vaultShareAmount;
         wrappedCollateralAsset.mint(_tokenReceipeint, _vaultShareAmount);
         emit Deposit(address(this), address(collateralAsset), _tokenReceipeint, msg.sender, _vaultShareAmount);
     }
@@ -216,11 +214,12 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @dev the user should initially have deposited in the vault 
     /// transfer appropriate amount of underlying from msg.sender to the LendingPair
-    /// @param _tokenReceipeint who credit the wrapped
+    /// @param _tokenReceipeint whom to credit the wrapped tokens
     function depositBorrowAsset(
         address _tokenReceipeint,
         uint256 _vaultShareAmount
     ) external override {
+        require(_tokenReceipeint != address(0), "IDB");
         // declare struct
         MintLocalVars memory vars;
 
@@ -238,7 +237,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         vault.transfer(asset, msg.sender, address(this), _vaultShareAmount);
 
         principalBalance[_tokenReceipeint] = principalBalance[_tokenReceipeint] + _vaultShareAmount;
-        // mint appropriate Blacksmith DAI
+        // mint appropriate wrapped tokens
         wrapperBorrowedAsset.mint(_tokenReceipeint, vars.mintTokens);
         emit Deposit(address(this), address(asset), _tokenReceipeint, msg.sender, _vaultShareAmount);
     }

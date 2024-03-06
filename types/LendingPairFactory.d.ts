@@ -22,17 +22,12 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface LendingPairFactoryInterface extends ethers.utils.Interface {
   functions: {
     "allPairs(uint256)": FunctionFragment;
-    "c_0x724efe76(bytes32)": FunctionFragment;
     "createPair(address,address,address,address,address,address,tuple,tuple)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "allPairs",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x724efe76",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "createPair",
@@ -46,7 +41,6 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
       {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -63,10 +57,6 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "allPairs", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x724efe76",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "createPair", data: BytesLike): Result;
 
   events: {
@@ -127,16 +117,6 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    c_0x724efe76(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x724efe76(bytes32)"(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     createPair(
       pair: string,
       _team: string,
@@ -147,7 +127,6 @@ export class LendingPairFactory extends Contract {
       _borrowVars: {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -163,7 +142,7 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
       pair: string,
       _team: string,
       _oracle: string,
@@ -173,7 +152,6 @@ export class LendingPairFactory extends Contract {
       _borrowVars: {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -197,16 +175,6 @@ export class LendingPairFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  c_0x724efe76(
-    c__0x724efe76: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x724efe76(bytes32)"(
-    c__0x724efe76: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   createPair(
     pair: string,
     _team: string,
@@ -217,7 +185,6 @@ export class LendingPairFactory extends Contract {
     _borrowVars: {
       borrowAsset: string;
       initialExchangeRateMantissa: BigNumberish;
-      borrowRateMaxMantissa: BigNumberish;
       reserveFactorMantissa: BigNumberish;
       collateralFactor: BigNumberish;
       wrappedBorrowAsset: string;
@@ -233,7 +200,7 @@ export class LendingPairFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+  "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
     pair: string,
     _team: string,
     _oracle: string,
@@ -243,7 +210,6 @@ export class LendingPairFactory extends Contract {
     _borrowVars: {
       borrowAsset: string;
       initialExchangeRateMantissa: BigNumberish;
-      borrowRateMaxMantissa: BigNumberish;
       reserveFactorMantissa: BigNumberish;
       collateralFactor: BigNumberish;
       wrappedBorrowAsset: string;
@@ -267,16 +233,6 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    c_0x724efe76(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x724efe76(bytes32)"(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     createPair(
       pair: string,
       _team: string,
@@ -287,7 +243,6 @@ export class LendingPairFactory extends Contract {
       _borrowVars: {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -303,7 +258,7 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
       pair: string,
       _team: string,
       _oracle: string,
@@ -313,7 +268,6 @@ export class LendingPairFactory extends Contract {
       _borrowVars: {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -348,16 +302,6 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    c_0x724efe76(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x724efe76(bytes32)"(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     createPair(
       pair: string,
       _team: string,
@@ -368,7 +312,6 @@ export class LendingPairFactory extends Contract {
       _borrowVars: {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -384,7 +327,7 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
       pair: string,
       _team: string,
       _oracle: string,
@@ -394,7 +337,6 @@ export class LendingPairFactory extends Contract {
       _borrowVars: {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -422,16 +364,6 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    c_0x724efe76(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x724efe76(bytes32)"(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     createPair(
       pair: string,
       _team: string,
@@ -442,7 +374,6 @@ export class LendingPairFactory extends Contract {
       _borrowVars: {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;
@@ -458,7 +389,7 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+    "createPair(address,address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
       pair: string,
       _team: string,
       _oracle: string,
@@ -468,7 +399,6 @@ export class LendingPairFactory extends Contract {
       _borrowVars: {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
-        borrowRateMaxMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         wrappedBorrowAsset: string;

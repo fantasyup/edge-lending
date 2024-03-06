@@ -4,6 +4,17 @@ import "../interfaces/IBSLendingPair.sol";
 
 contract LendingPairHelper {
 
+    function viewTotalBorrowedValueInUSD(
+        IBSLendingPair[] calldata pairs,
+        address _account
+    ) external view returns(uint256[] memory totals) {
+        for(uint256 i = 0; i < pairs.length; i++) {
+            IBSLendingPair pair = pairs[i];
+            uint currentBorrowBalance = pair.borrowBalancePrior(_account);
+            uint priceInUSD = pair.oracle.viewPriceInUSD() * currentBorrowBalance;
+            totals[i] = priceInUSD;
+        }
+    }
 }
 
 

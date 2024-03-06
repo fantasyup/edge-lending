@@ -20,16 +20,26 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface DataTypesInterface extends ethers.utils.Interface {
   functions: {
-    "c_0xe39ebf19(bytes32)": FunctionFragment;
+    "validBorrowAssetConfig(tuple)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "c_0xe39ebf19",
-    values: [BytesLike]
+    functionFragment: "validBorrowAssetConfig",
+    values: [
+      {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      }
+    ]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "c_0xe39ebf19",
+    functionFragment: "validBorrowAssetConfig",
     data: BytesLike
   ): Result;
 
@@ -80,35 +90,83 @@ export class DataTypes extends Contract {
   interface: DataTypesInterface;
 
   functions: {
-    c_0xe39ebf19(
-      c__0xe39ebf19: BytesLike,
+    validBorrowAssetConfig(
+      self: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       overrides?: CallOverrides
     ): Promise<[void]>;
 
-    "c_0xe39ebf19(bytes32)"(
-      c__0xe39ebf19: BytesLike,
+    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IBSWrapperToken))"(
+      self: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       overrides?: CallOverrides
     ): Promise<[void]>;
   };
 
-  c_0xe39ebf19(
-    c__0xe39ebf19: BytesLike,
+  validBorrowAssetConfig(
+    self: {
+      interestRate: string;
+      initialExchangeRateMantissa: BigNumberish;
+      reserveFactorMantissa: BigNumberish;
+      collateralFactor: BigNumberish;
+      wrappedBorrowAsset: string;
+      liquidationFee: BigNumberish;
+      debtToken: string;
+    },
     overrides?: CallOverrides
   ): Promise<void>;
 
-  "c_0xe39ebf19(bytes32)"(
-    c__0xe39ebf19: BytesLike,
+  "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IBSWrapperToken))"(
+    self: {
+      interestRate: string;
+      initialExchangeRateMantissa: BigNumberish;
+      reserveFactorMantissa: BigNumberish;
+      collateralFactor: BigNumberish;
+      wrappedBorrowAsset: string;
+      liquidationFee: BigNumberish;
+      debtToken: string;
+    },
     overrides?: CallOverrides
   ): Promise<void>;
 
   callStatic: {
-    c_0xe39ebf19(
-      c__0xe39ebf19: BytesLike,
+    validBorrowAssetConfig(
+      self: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "c_0xe39ebf19(bytes32)"(
-      c__0xe39ebf19: BytesLike,
+    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IBSWrapperToken))"(
+      self: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -116,25 +174,57 @@ export class DataTypes extends Contract {
   filters: {};
 
   estimateGas: {
-    c_0xe39ebf19(
-      c__0xe39ebf19: BytesLike,
+    validBorrowAssetConfig(
+      self: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "c_0xe39ebf19(bytes32)"(
-      c__0xe39ebf19: BytesLike,
+    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IBSWrapperToken))"(
+      self: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    c_0xe39ebf19(
-      c__0xe39ebf19: BytesLike,
+    validBorrowAssetConfig(
+      self: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "c_0xe39ebf19(bytes32)"(
-      c__0xe39ebf19: BytesLike,
+    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IBSWrapperToken))"(
+      self: {
+        interestRate: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
