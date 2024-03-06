@@ -2,7 +2,7 @@
 pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./IPriceOracle.sol";
+import "./IPriceOracleAggregator.sol";
 import "./IBSVault.sol";
 import "../DataTypes.sol";
 import "./IBSWrapperToken.sol";
@@ -11,7 +11,7 @@ interface IBSLendingPair {
 
     function initialize(
         address _blackSmithTeam,
-        IPriceOracle _oracle,
+        IPriceOracleAggregator _oracle,
         IBSVault _vault,
         IERC20 _asset, 
         IERC20 _collateralAsset,
@@ -151,9 +151,9 @@ interface IBSLendingPair {
         view
         returns(uint256);
     
-    function oracle() external view returns(IPriceOracle);
+    function oracle() external view returns(IPriceOracleAggregator);
     function collateralAsset() external view returns(IERC20);
-    
+
     function calcBorrowLimit(uint256 amount) external view returns(uint256);
 
 }

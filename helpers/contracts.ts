@@ -15,6 +15,7 @@ import {
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
+import { MockChainlinkUSDAdapter } from "../types/MockChainlinkUSDAdapter";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
@@ -130,6 +131,10 @@ export const deployLendingPairHelper = async(vault: Vault) => {
 
 export const deployPriceOracleAggregator = async(admin: EthereumAddress) => {
     return await deployContract<PriceOracleAggregator>(ContractId.PriceOracleAggregator, [admin])
+}
+
+export const deployMockChainlinkUSDAdapter = async() => {
+    return await deployContract<MockChainlinkUSDAdapter>(ContractId.MockChainlinkUSDAdapter, [])
 }
 
 // minimal proxy contract

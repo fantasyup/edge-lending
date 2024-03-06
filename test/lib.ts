@@ -1,7 +1,7 @@
 import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import {
-    IPriceOracle,
+    IPriceOracleAggregator,
     JumpRateModelV2,
     LendingPair as BLendingPair,
     MockToken,

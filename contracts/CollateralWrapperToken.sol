@@ -2,6 +2,7 @@
 pragma solidity 0.8.1;
 
 import "./WrapperToken.sol";
+import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title CollateralWrapperToken
@@ -11,7 +12,7 @@ import "./WrapperToken.sol";
 contract CollateralWrapperToken is WrapperToken {
     function transfer(address _recipient, uint256 _amount) external override returns (bool) {
         uint maxWithdrawAllowed = pair.getMaxWithdrawAllowed(msg.sender);
-        require(_amount <= maxWithdrawAllowed, "EXCEEDS_ALLOWANCE");
+        require(_amount <= maxWithdrawAllowed, "EXCEEDS_ALLOWED");
         _transfer(msg.sender, _recipient, _amount);
         return true;
     }

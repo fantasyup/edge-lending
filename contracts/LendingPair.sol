@@ -117,7 +117,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _wrappedCollateralAsset wrapped token minted when depositing collateral asset
     function initialize(
         address _blackSmithTeam,
-        IPriceOracle _oracle,
+        IPriceOracleAggregator _oracle,
         IBSVault _vault,
         IERC20 _asset, 
         IERC20 _collateralAsset,

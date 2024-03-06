@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
-import "./compound/JumpRateModelV2.sol";
+import "./interfaces/IPriceOracleAggregator.sol";
 import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
-import "./LendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
+import "./compound/JumpRateModelV2.sol";
+import "./LendingPair.sol";
 import "./DataTypes.sol";
 
 contract LendingPairFactory {
@@ -33,7 +34,7 @@ contract LendingPairFactory {
     function createPair(
         IBSLendingPair pair,
         address _team,
-        IPriceOracle _oracle,
+        IPriceOracleAggregator _oracle,
         IBSVault _vault,
         IERC20 _collateralAsset,
         IBSWrapperToken _wrappedCollateralAsset,

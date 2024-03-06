@@ -2,7 +2,7 @@ import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
 import {
-  IPriceOracle,
+  IPriceOracleAggregator,
   JumpRateModelV2,
   LendingPair as BLendingPair,
   MockToken,
@@ -11,6 +11,7 @@ import {
   LendingPairHelper as BLendingPairHelper
 } from "../types";
 import { 
+  deployCollateralWrapperToken,
   deployInterestRateModel,
   deployLendingPair,
   deployLendingPairHelper,
@@ -25,7 +26,7 @@ let accounts: Signer[];
 
 let Vault: BVault;
 let LendingPair: BLendingPair;
-let MockPriceOracle: IPriceOracle;
+let MockPriceOracle: IPriceOracleAggregator;
 let BorrowAsset: MockToken;
 let CollateralAsset: MockToken
 let BorrowAssetDepositWrapperToken: WrapperToken
@@ -104,7 +105,7 @@ describe("LendingPair", async function () {
     CollateralAsset = await deployMockToken()
     BorrowAssetDepositWrapperToken = await deployWrappedToken()
     DebtWrapperToken = await deployWrappedToken()
-    CollateralWrapperToken = await deployWrappedToken()
+    CollateralWrapperToken = await deployCollateralWrapperToken()
     InterestRateModel = await deployInterestRateModel(
       "30000000000000000",
       "52222222222200000",
@@ -296,6 +297,22 @@ describe("LendingPair", async function () {
       await expect(
         await (await LendingPair.totalBorrows()).toNumber()
       ).to.eq(sharesToBorrow)
+    })
+
+    it("collateral transfer - can not transfer more than allowed", async function() {
+        const balance = await (await CollateralWrapperToken.balanceOf(frank)).toNumber()
+        console.log({ balance })
+        await expect(
+          CollateralWrapperToken.connect(frankSigner).transfer(bob, 1000)
+        ).to.revertedWith('EXCEEDS_ALLOWED')
+    })
+
+    it("collateral transfer - can transfer part of collateral", async function() {
+      const balance = await (await CollateralWrapperToken.balanceOf(frank)).toNumber()
+      console.log({ balance })
+      await expect(
+        await CollateralWrapperToken.connect(frankSigner).transfer(bob, 50)
+      ).to.emit(CollateralWrapperToken, 'Transfer')
     })
 
     it("repay - fails if you are trying to pay more than owed", async function() {

@@ -448,7 +448,7 @@ const _abi = [
         type: "address",
       },
       {
-        internalType: "contract IPriceOracle",
+        internalType: "contract IPriceOracleAggregator",
         name: "_oracle",
         type: "address",
       },
@@ -525,7 +525,7 @@ const _abi = [
     name: "oracle",
     outputs: [
       {
-        internalType: "contract IPriceOracle",
+        internalType: "contract IPriceOracleAggregator",
         name: "",
         type: "address",
       },

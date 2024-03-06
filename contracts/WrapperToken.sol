@@ -23,7 +23,7 @@ contract WrapperToken is ERC20Permit, Ownable {
         address _underlying,
         string memory _tokenName,
         string memory _tokenSymbol
-    ) external {
+    ) external initializer {
         initializeOwner();
         initializeERC20(_tokenName, _tokenSymbol, 18);
         initializeERC20Permit(_tokenName);

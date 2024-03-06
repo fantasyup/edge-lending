@@ -225,26 +225,26 @@ export class DebtToken extends Contract {
     "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<[string]>;
 
     allowance(
-      owner: string,
-      spender: string,
+      arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     "allowance(address,address)"(
-      owner: string,
-      spender: string,
+      arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     approve(
-      spender: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "approve(address,uint256)"(
-      spender: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -272,26 +272,26 @@ export class DebtToken extends Contract {
     "decimals()"(overrides?: CallOverrides): Promise<[number]>;
 
     decreaseAllowance(
-      spender: string,
-      subtractedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "decreaseAllowance(address,uint256)"(
-      spender: string,
-      subtractedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     increaseAllowance(
-      spender: string,
-      addedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "increaseAllowance(address,uint256)"(
-      spender: string,
-      addedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -379,28 +379,28 @@ export class DebtToken extends Contract {
     "totalSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transfer(
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     "transfer(address,uint256)"(
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     transferFrom(
-      sender: string,
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "transferFrom(address,address,uint256)"(
-      sender: string,
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -424,26 +424,26 @@ export class DebtToken extends Contract {
   "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<string>;
 
   allowance(
-    owner: string,
-    spender: string,
+    arg0: string,
+    arg1: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   "allowance(address,address)"(
-    owner: string,
-    spender: string,
+    arg0: string,
+    arg1: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   approve(
-    spender: string,
-    amount: BigNumberish,
+    arg0: string,
+    arg1: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "approve(address,uint256)"(
-    spender: string,
-    amount: BigNumberish,
+    arg0: string,
+    arg1: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -471,26 +471,26 @@ export class DebtToken extends Contract {
   "decimals()"(overrides?: CallOverrides): Promise<number>;
 
   decreaseAllowance(
-    spender: string,
-    subtractedValue: BigNumberish,
+    arg0: string,
+    arg1: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "decreaseAllowance(address,uint256)"(
-    spender: string,
-    subtractedValue: BigNumberish,
+    arg0: string,
+    arg1: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   increaseAllowance(
-    spender: string,
-    addedValue: BigNumberish,
+    arg0: string,
+    arg1: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "increaseAllowance(address,uint256)"(
-    spender: string,
-    addedValue: BigNumberish,
+    arg0: string,
+    arg1: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -578,28 +578,28 @@ export class DebtToken extends Contract {
   "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   transfer(
-    recipient: string,
-    amount: BigNumberish,
+    arg0: string,
+    arg1: BigNumberish,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   "transfer(address,uint256)"(
-    recipient: string,
-    amount: BigNumberish,
+    arg0: string,
+    arg1: BigNumberish,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   transferFrom(
-    sender: string,
-    recipient: string,
-    amount: BigNumberish,
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "transferFrom(address,address,uint256)"(
-    sender: string,
-    recipient: string,
-    amount: BigNumberish,
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -623,26 +623,26 @@ export class DebtToken extends Contract {
     "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<string>;
 
     allowance(
-      owner: string,
-      spender: string,
+      arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "allowance(address,address)"(
-      owner: string,
-      spender: string,
+      arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     approve(
-      spender: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     "approve(address,uint256)"(
-      spender: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -670,26 +670,26 @@ export class DebtToken extends Contract {
     "decimals()"(overrides?: CallOverrides): Promise<number>;
 
     decreaseAllowance(
-      spender: string,
-      subtractedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     "decreaseAllowance(address,uint256)"(
-      spender: string,
-      subtractedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     increaseAllowance(
-      spender: string,
-      addedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     "increaseAllowance(address,uint256)"(
-      spender: string,
-      addedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -773,28 +773,28 @@ export class DebtToken extends Contract {
     "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     "transfer(address,uint256)"(
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     transferFrom(
-      sender: string,
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     "transferFrom(address,address,uint256)"(
-      sender: string,
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -847,26 +847,26 @@ export class DebtToken extends Contract {
     "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
-      owner: string,
-      spender: string,
+      arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "allowance(address,address)"(
-      owner: string,
-      spender: string,
+      arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     approve(
-      spender: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "approve(address,uint256)"(
-      spender: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -894,26 +894,26 @@ export class DebtToken extends Contract {
     "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     decreaseAllowance(
-      spender: string,
-      subtractedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "decreaseAllowance(address,uint256)"(
-      spender: string,
-      subtractedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     increaseAllowance(
-      spender: string,
-      addedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "increaseAllowance(address,uint256)"(
-      spender: string,
-      addedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1001,28 +1001,28 @@ export class DebtToken extends Contract {
     "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "transfer(address,uint256)"(
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     transferFrom(
-      sender: string,
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "transferFrom(address,address,uint256)"(
-      sender: string,
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1049,26 +1049,26 @@ export class DebtToken extends Contract {
     ): Promise<PopulatedTransaction>;
 
     allowance(
-      owner: string,
-      spender: string,
+      arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "allowance(address,address)"(
-      owner: string,
-      spender: string,
+      arg0: string,
+      arg1: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     approve(
-      spender: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "approve(address,uint256)"(
-      spender: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1099,26 +1099,26 @@ export class DebtToken extends Contract {
     "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     decreaseAllowance(
-      spender: string,
-      subtractedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "decreaseAllowance(address,uint256)"(
-      spender: string,
-      subtractedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     increaseAllowance(
-      spender: string,
-      addedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "increaseAllowance(address,uint256)"(
-      spender: string,
-      addedValue: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1209,28 +1209,28 @@ export class DebtToken extends Contract {
     "totalSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transfer(
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "transfer(address,uint256)"(
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     transferFrom(
-      sender: string,
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "transferFrom(address,address,uint256)"(
-      sender: string,
-      recipient: string,
-      amount: BigNumberish,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
