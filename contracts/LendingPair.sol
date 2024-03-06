@@ -8,7 +8,7 @@ import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSVault.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
-import "./interfaces/IPriceOracle.sol";
+import "./interfaces/IPriceOracleAggregator.sol";
 import "hardhat/console.sol";
 import "./DataTypes.sol";
 import "./util/Initializable.sol";
@@ -66,7 +66,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     address public blackSmithTeam;
 
     /// @notice The price oracle for the assets
-    IPriceOracle public override oracle;
+    IPriceOracleAggregator public override oracle;
 
     /// @notice The pair borrow asset
     IERC20 public override asset;

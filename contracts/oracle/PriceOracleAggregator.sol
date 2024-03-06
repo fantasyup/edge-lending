@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-import "../interfaces/IPriceOracle.sol";
+import "../interfaces/IPriceOracleAggregator.sol";
 import "../interfaces/IOracle.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 /// @notice aggregator of price oracle for assets in LendingPairs
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-contract PriceOracleAggregator is IPriceOracle {
+contract PriceOracleAggregator is IPriceOracleAggregator {
 
     /// @dev control allowed to update price oracle
     address public blackSmithTeam;
@@ -25,7 +25,7 @@ contract PriceOracleAggregator is IPriceOracle {
     );
 
     modifier onlyBlackSmithTeam() {
-        require(msg.sender == blackSmithTeam);
+        require(msg.sender == blackSmithTeam, "ONLY_TEAM");
         _;
     }
 

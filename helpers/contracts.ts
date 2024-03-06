@@ -11,7 +11,7 @@ import {
     MockLendingPair,
     MockPriceOracle,
     MockToken,
-    MockVault, UUPSProxy, WrapperToken 
+    MockVault, PriceOracleAggregator, UUPSProxy, WrapperToken 
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
@@ -124,9 +124,12 @@ export const deployMockVault =  async() => {
     return await deployContract<MockVault>(ContractId.MockVault, [])
 }
 
-
 export const deployLendingPairHelper = async(vault: Vault) => {
     return await deployContract<LendingPairHelper>(ContractId.LendingPairHelper, [vault.address])
+}
+
+export const deployPriceOracleAggregator = async(admin: EthereumAddress) => {
+    return await deployContract<PriceOracleAggregator>(ContractId.PriceOracleAggregator, [admin])
 }
 
 // minimal proxy contract

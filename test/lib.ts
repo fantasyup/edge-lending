@@ -17,7 +17,6 @@ import {
   deployWrappedToken
 } from "../helpers/contracts";
 
-
 export async function depositInVault(
     Vault: BVault,
     asset: MockToken,

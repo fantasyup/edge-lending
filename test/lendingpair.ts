@@ -448,33 +448,32 @@ describe("LendingPair", async function () {
       expect((await CollateralWrapperToken.balanceOf(james)).toNumber()).to.eq(0)
     })
 
-    //     describe("liquidate", async function() {
-//       it("liquidate - fail", async function() {
-//         await expect(
-//           LendingPair.liquidate(admin)
-//         ).to.revertedWith("NOT_LIQUIDATE_YOURSELF") 
-//       })
+  // describe("liquidate", async function() {
+  //     it("liquidate - fail", async function() {
+  //       await expect(
+  //         LendingPair.liquidate(admin)
+  //       ).to.revertedWith("NOT_LIQUIDATE_YOURSELF") 
+  //     })
 
-//       it("liquidate - correctly", async function() {
-//         // deposit collateral
-//         await depositCollateralAsset(LendingPair, james, amountToDeposit)
-//         // borrow
-//         await LendingPair.connect(await ethers.getSigner(james)).borrow(500)
-//         // change price 
-//         // set oracle price to half
-//         await MockPriceOracle.setPrice(BigNumber.from(5).pow(18))
+  //     it("liquidate - correctly", async function() {
+  //       // deposit collateral
+  //       await depositCollateralAsset(LendingPair, james, amountToDeposit)
+  //       // borrow
+  //       await LendingPair.connect(await ethers.getSigner(james)).borrow(500)
+  //       // change price 
+  //       // set oracle price to half
+  //       await MockPriceOracle.setPrice(BigNumber.from(5).pow(18))
 
-//         // liquidate
-//         await depositInVault(BorrowAsset, await ethers.getSigner(admin), 800)
+  //       // liquidate
+  //       await depositInVault(BorrowAsset, await ethers.getSigner(admin), 800)
 
-//         await LendingPair.liquidate(james)
+  //       await LendingPair.liquidate(james)
 
-//         // @TODO confirm proper checks
+  //       // @TODO confirm proper checks
 
-//       })
-
-//     })
-//   })  
+  //     })
+  //   })
+  // })  
 
   })
 
