@@ -145,4 +145,11 @@ interface IBSLendingPair {
     function getMaxWithdrawAllowed(address account)
         external
         returns(uint256);
+    
+    function borrowBalancePrior(address account)
+        external
+        view
+        returns(uint256);
+    
+    function oracle() external view returns(IPriceOracle);
 }

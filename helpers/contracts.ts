@@ -107,6 +107,11 @@ export const deployMockVault =  async() => {
     return await deployContract<MockVault>(ContractId.MockVault, [])
 }
 
+
+export const deployLendingPairHelper = async() => {
+    return await deployCont
+}
+
 // minimal proxy contract
 export const deployERC1167LendingPair = async() => {
 

@@ -2,11 +2,11 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import { ContractId, EthereumAddress } from "../helpers/types"
 
-const deployPriceOracle: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+const deployPriceOracleAggregator: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments: { deploy }, getNamedAccounts } = hre;
   const { deployer, blackSmithTeam } = await getNamedAccounts();
 
-  await deploy(ContractId.PriceOracle, {
+  await deploy(ContractId.PriceOracleAggregator, {
     from: deployer,
     args: [blackSmithTeam],
     log: true,
@@ -14,5 +14,5 @@ const deployPriceOracle: DeployFunction = async function (hre: HardhatRuntimeEnv
 
 };
 
-export default deployPriceOracle
-deployPriceOracle.tags = ['PriceOracle']
+export default deployPriceOracleAggregator
+deployPriceOracleAggregator.tags = ['PriceOracle']

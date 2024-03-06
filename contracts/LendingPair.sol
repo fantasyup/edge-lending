@@ -66,7 +66,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     address public blackSmithTeam;
 
     /// @notice The price oracle for the assets
-    IPriceOracle public oracle;
+    IPriceOracle public override oracle;
 
     /// @notice The pair borrow asset
     IERC20 public override asset;
@@ -600,7 +600,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice returns last calculated account's borrow balance using the prior borrowIndex
     /// @param _account The address whose balance should be calculated after updating borrowIndex
     /// @return The calculated balance
-    function borrowBalancePrior(address _account) public view returns (uint256) {
+    function borrowBalancePrior(address _account) public view override returns (uint256) {
         uint256 principalTimesIndex;
         uint256 result;
 

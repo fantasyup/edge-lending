@@ -11,7 +11,7 @@ export enum ContractId {
     UUPSProxiable = 'UUPSProxiable',
     MockPriceOracle  = 'MockPriceOracle',
     JumpRateModelV2 = 'JumpRateModelV2',
-    PriceOracle = 'PriceOracle',
+    PriceOracleAggregator = 'PriceOracleAggregator',
     MockVault = 'MockVault',
     DataTypes = 'DataTypes'
 }
