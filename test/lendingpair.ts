@@ -150,7 +150,7 @@ describe("LendingPair", async function () {
     await initializeWrapperTokens(
       LendingPair.address,
       DebtWrapperToken,
-      ethers.constants.AddressZero
+      BorrowAsset.address
     )
 
     // initialize vault 

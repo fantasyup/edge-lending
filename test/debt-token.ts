@@ -2,7 +2,7 @@ import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
 import { DebtToken as BDebtToken } from "../types";
-import { deployDebtToken } from "../helpers/contracts";
+import { deployDebtToken, deployMockToken } from "../helpers/contracts";
 
 let accounts: Signer[];
 
@@ -19,9 +19,10 @@ describe("DebtToken", async function () {
             bob,
             frank,
           ] = await Promise.all(accounts.slice(0, 5).map(x => x.getAddress())))
+          const token = await deployMockToken()
           DebtToken = await deployDebtToken()
           // admin owner
-          await DebtToken.initialize(admin, ethers.constants.AddressZero, 'Test', 'TST')
+          await DebtToken.initialize(admin, token.address, 'Test', 'TST')
     })
 
     it("mint", async function() {
