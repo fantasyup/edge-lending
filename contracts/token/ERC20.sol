@@ -32,9 +32,9 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
  */
 contract ERC20 is IERC20 {
 
-  mapping (address => uint256) private _balances;
+  mapping (address => uint256) internal _balances;
 
-  mapping (address => mapping (address => uint256)) private _allowances;
+  mapping (address => mapping (address => uint256)) internal _allowances;
 
   uint256 internal _totalSupply;
 
@@ -48,7 +48,7 @@ contract ERC20 is IERC20 {
     decimals = decimals_;
   }
 
-  function balanceOf(address account) external view override returns (uint256) {
+  function balanceOf(address account) public virtual view override returns (uint256) {
     return _balances[account];
   }
 

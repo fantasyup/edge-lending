@@ -26,22 +26,22 @@ contract LendingPairHelper {
         totals = new uint[](pairs.length);
         for (uint256 i = 0; i < pairs.length; i++) {
             IBSLendingPair pair = pairs[i];
-            totals[i] = pair.borrowBalancePrior(_account);
+            totals[i] = pair.debtToken().balanceOf(_account);
         }
     }
 
-    function viewBorrowedValueInUSD(
-        IBSLendingPair[] calldata pairs,
-        address _account
-    ) external view returns(uint256[] memory totals) {
-        totals = new uint[](pairs.length);
-        for (uint256 i = 0; i < pairs.length; i++) {
-            IBSLendingPair pair = pairs[i];
-            uint currentBorrowBalance = pair.borrowBalancePrior(_account);
-            uint256 priceInUSD = pair.oracle().viewPriceInUSD(pair.asset()) * currentBorrowBalance;
-            totals[i] = priceInUSD;
-        }
-    }
+    // function viewBorrowedValueInUSD(
+    //     IBSLendingPair[] calldata pairs,
+    //     address _account
+    // ) external view returns(uint256[] memory totals) {
+    //     totals = new uint[](pairs.length);
+    //     for (uint256 i = 0; i < pairs.length; i++) {
+    //         IBSLendingPair pair = pairs[i];
+    //         // (uint currentBorrowBalance,) = pair.borrowBalancePrior(_account);
+    //         // uint256 priceInUSD = pair.oracle().viewPriceInUSD(pair.asset()) * currentBorrowBalance;
+    //         // totals[i] = priceInUSD;
+    //     }
+    // }
 
     function viewBorrowLimit(
         IBSLendingPair[] calldata pairs,

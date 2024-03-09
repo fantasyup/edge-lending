@@ -21,7 +21,7 @@ describe("DebtToken", async function () {
           ] = await Promise.all(accounts.slice(0, 5).map(x => x.getAddress())))
           DebtToken = await deployDebtToken()
           // admin owner
-          await DebtToken.initialize(ethers.constants.AddressZero, 'Test', 'TST')
+          await DebtToken.initialize(admin, ethers.constants.AddressZero, 'Test', 'TST')
     })
 
     it("mint", async function() {

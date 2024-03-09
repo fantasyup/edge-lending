@@ -23,8 +23,8 @@ import "hardhat/console.sol";
 contract Vault is VaultBase, IBSVault {
     using SafeERC20 for IERC20;
 
-    /// @notice ERC3156 constant for flashloan callback success
-    bytes32 public constant FLASHLOAN_CALLBACK_SUCCESS =
+    /// @dev ERC3156 constant for flashloan callback success
+    bytes32 private constant FLASHLOAN_CALLBACK_SUCCESS =
         keccak256("ERC3156FlashBorrower.onFlashLoan");
 
     /// @notice the address of the blackSmithTeam that enables `admin` functions
@@ -260,9 +260,9 @@ contract Vault is VaultBase, IBSVault {
         override
         returns (uint256 share)
     {
-        if (totals[_token] > 0) {
+        uint256 currentTotal = totals[_token];
+        if (currentTotal > 0) {
             uint256 currentUnderlyingBalance = _token.balanceOf(address(this));
-            uint256 currentTotal = totals[_token];
             share = (_amount * currentTotal) / currentUnderlyingBalance;
             
             if(_roundUp && ((share * currentUnderlyingBalance) / currentTotal) < _amount) {

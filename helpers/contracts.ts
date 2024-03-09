@@ -5,6 +5,7 @@ import { Vault } from '../types/Vault'
 import { 
     CollateralWrapperToken,
     DebtToken,
+    IPriceOracleAggregator,
     JumpRateModelV2,
     LendingPair,
     MockFlashBorrower,
@@ -96,7 +97,7 @@ export const deployCollateralWrapperToken = async() => {
 }
 
 export const deployMockPriceOracle = async(price: BigNumber) => {
-    return await deployContract<MockPriceOracle>(
+    return await deployContract<IPriceOracleAggregator>(
         ContractId.MockPriceOracle,
         [price.toString()]
     )

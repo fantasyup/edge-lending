@@ -25,7 +25,7 @@ interface IBSWrapperTokenInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
-    "initialize(address,string,string)": FunctionFragment;
+    "initialize(address,address,string,string)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -48,7 +48,7 @@ interface IBSWrapperTokenInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string]
+    values: [string, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -182,13 +182,15 @@ export class IBSWrapperToken extends Contract {
     ): Promise<ContractTransaction>;
 
     initialize(
+      _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,string,string)"(
+    "initialize(address,address,string,string)"(
+      _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
@@ -207,13 +209,9 @@ export class IBSWrapperToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    owner(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    owner(overrides?: CallOverrides): Promise<[string]>;
 
-    "owner()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -290,13 +288,15 @@ export class IBSWrapperToken extends Contract {
   ): Promise<ContractTransaction>;
 
   initialize(
+    _owner: string,
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,string,string)"(
+  "initialize(address,address,string,string)"(
+    _owner: string,
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
@@ -315,13 +315,9 @@ export class IBSWrapperToken extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  owner(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  owner(overrides?: CallOverrides): Promise<string>;
 
-  "owner()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  "owner()"(overrides?: CallOverrides): Promise<string>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -398,13 +394,15 @@ export class IBSWrapperToken extends Contract {
     ): Promise<void>;
 
     initialize(
+      _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,string,string)"(
+    "initialize(address,address,string,string)"(
+      _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
@@ -523,13 +521,15 @@ export class IBSWrapperToken extends Contract {
     ): Promise<BigNumber>;
 
     initialize(
+      _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,string,string)"(
+    "initialize(address,address,string,string)"(
+      _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
@@ -548,13 +548,9 @@ export class IBSWrapperToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    owner(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "owner()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -635,13 +631,15 @@ export class IBSWrapperToken extends Contract {
     ): Promise<PopulatedTransaction>;
 
     initialize(
+      _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,string,string)"(
+    "initialize(address,address,string,string)"(
+      _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
@@ -660,13 +658,9 @@ export class IBSWrapperToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    owner(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "owner()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

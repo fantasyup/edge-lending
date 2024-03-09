@@ -21,16 +21,11 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface UUPSProxiableInterface extends ethers.utils.Interface {
   functions: {
-    "c_0xd117f7be(bytes32)": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "updateCode(address)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "c_0xd117f7be",
-    values: [BytesLike]
-  ): string;
   encodeFunctionData(
     functionFragment: "getCodeAddress",
     values?: undefined
@@ -41,10 +36,6 @@ interface UUPSProxiableInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
 
-  decodeFunctionResult(
-    functionFragment: "c_0xd117f7be",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "getCodeAddress",
     data: BytesLike
@@ -106,16 +97,6 @@ export class UUPSProxiable extends Contract {
   interface: UUPSProxiableInterface;
 
   functions: {
-    c_0xd117f7be(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xd117f7be(bytes32)"(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     getCodeAddress(
       overrides?: CallOverrides
     ): Promise<[string] & { codeAddress: string }>;
@@ -139,16 +120,6 @@ export class UUPSProxiable extends Contract {
     ): Promise<ContractTransaction>;
   };
 
-  c_0xd117f7be(
-    c__0xd117f7be: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xd117f7be(bytes32)"(
-    c__0xd117f7be: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
   "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
@@ -168,16 +139,6 @@ export class UUPSProxiable extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    c_0xd117f7be(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xd117f7be(bytes32)"(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
@@ -205,16 +166,6 @@ export class UUPSProxiable extends Contract {
   };
 
   estimateGas: {
-    c_0xd117f7be(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xd117f7be(bytes32)"(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -235,16 +186,6 @@ export class UUPSProxiable extends Contract {
   };
 
   populateTransaction: {
-    c_0xd117f7be(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xd117f7be(bytes32)"(
-      c__0xd117f7be: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     getCodeAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "getCodeAddress()"(

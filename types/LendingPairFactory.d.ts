@@ -23,7 +23,6 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
   functions: {
     "admin()": FunctionFragment;
     "allPairs(uint256)": FunctionFragment;
-    "c_0x724efe76(bytes32)": FunctionFragment;
     "createPair(address,address,address,address,address,address,tuple,tuple)": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
@@ -34,10 +33,6 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "allPairs",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x724efe76",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "createPair",
@@ -71,10 +66,6 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allPairs", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x724efe76",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "createPair", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
@@ -145,16 +136,6 @@ export class LendingPairFactory extends Contract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    c_0x724efe76(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x724efe76(bytes32)"(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
 
     createPair(
       pair: string,
@@ -238,16 +219,6 @@ export class LendingPairFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  c_0x724efe76(
-    c__0x724efe76: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x724efe76(bytes32)"(
-    c__0x724efe76: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   createPair(
     pair: string,
     _team: string,
@@ -329,16 +300,6 @@ export class LendingPairFactory extends Contract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    c_0x724efe76(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x724efe76(bytes32)"(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     createPair(
       pair: string,
@@ -429,16 +390,6 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    c_0x724efe76(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x724efe76(bytes32)"(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     createPair(
       pair: string,
       _team: string,
@@ -522,16 +473,6 @@ export class LendingPairFactory extends Contract {
 
     "allPairs(uint256)"(
       arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x724efe76(
-      c__0x724efe76: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x724efe76(bytes32)"(
-      c__0x724efe76: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

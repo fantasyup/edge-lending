@@ -6,6 +6,7 @@ import "./IPriceOracleAggregator.sol";
 import "./IBSVault.sol";
 import "../DataTypes.sol";
 import "./IBSWrapperToken.sol";
+import "./IDebtToken.sol";
 
 interface IBSLendingPair {
 
@@ -14,8 +15,8 @@ interface IBSLendingPair {
         IPriceOracleAggregator _oracle,
         IBSVault _vault,
         IERC20 _asset, 
-        IERC20 _collateralAsset,
         DataTypes.BorrowAssetConfig calldata borrowConfig,
+        IERC20 _collateralAsset,
         IBSWrapperToken _wrappedCollateralAsset
     ) external;
 
@@ -146,14 +147,18 @@ interface IBSLendingPair {
         external
         returns(uint256);
     
-    function borrowBalancePrior(address account)
-        external
-        view
-        returns(uint256);
+    // function borrowBalancePrior(address account)
+    //     external
+    //     view
+    //     returns(uint256, uint256);
     
     function oracle() external view returns(IPriceOracleAggregator);
     function collateralAsset() external view returns(IERC20);
 
     function calcBorrowLimit(uint256 amount) external view returns(uint256);
+
+    function accountInterestIndex(address) external view returns(uint256);
+    function borrowIndex() external view returns(uint256);
+    function debtToken() external view returns(IDebtToken);
 
 }

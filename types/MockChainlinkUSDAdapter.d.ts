@@ -20,15 +20,10 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockChainlinkUSDAdapterInterface extends ethers.utils.Interface {
   functions: {
-    "c_0x53f5c99d(bytes32)": FunctionFragment;
     "getPriceInUSD()": FunctionFragment;
     "viewPriceInUSD()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "c_0x53f5c99d",
-    values: [BytesLike]
-  ): string;
   encodeFunctionData(
     functionFragment: "getPriceInUSD",
     values?: undefined
@@ -38,10 +33,6 @@ interface MockChainlinkUSDAdapterInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "c_0x53f5c99d",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "getPriceInUSD",
     data: BytesLike
@@ -102,16 +93,6 @@ export class MockChainlinkUSDAdapter extends Contract {
   interface: MockChainlinkUSDAdapterInterface;
 
   functions: {
-    c_0x53f5c99d(
-      c__0x53f5c99d: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x53f5c99d(bytes32)"(
-      c__0x53f5c99d: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     getPriceInUSD(
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { price: BigNumber }>;
@@ -129,16 +110,6 @@ export class MockChainlinkUSDAdapter extends Contract {
     ): Promise<[BigNumber] & { price: BigNumber }>;
   };
 
-  c_0x53f5c99d(
-    c__0x53f5c99d: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x53f5c99d(bytes32)"(
-    c__0x53f5c99d: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
   "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -148,16 +119,6 @@ export class MockChainlinkUSDAdapter extends Contract {
   "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    c_0x53f5c99d(
-      c__0x53f5c99d: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x53f5c99d(bytes32)"(
-      c__0x53f5c99d: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -178,16 +139,6 @@ export class MockChainlinkUSDAdapter extends Contract {
   };
 
   estimateGas: {
-    c_0x53f5c99d(
-      c__0x53f5c99d: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x53f5c99d(bytes32)"(
-      c__0x53f5c99d: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -198,16 +149,6 @@ export class MockChainlinkUSDAdapter extends Contract {
   };
 
   populateTransaction: {
-    c_0x53f5c99d(
-      c__0x53f5c99d: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x53f5c99d(bytes32)"(
-      c__0x53f5c99d: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     getPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "getPriceInUSD()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
