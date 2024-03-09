@@ -44,9 +44,9 @@ describe("LendingPairFactory", function() {
         ] = await Promise.all(accounts.slice(0, 10).map(x => x.getAddress())))
 
 
-        LendingPairFactory = await deployLendingPairFactory(
-            
-        )
+        // LendingPairFactory = await deployLendingPairFactory(
+
+        // )
     })
 
     it("createIR", async function() {
