@@ -430,11 +430,10 @@ describe("Vault", function () {
         expect(newImplAddress).to.eq(newVault.address)        
     })
 
-    // @TODO 
     it("test storage layout", async function() {
       const storageLayoutTester = await deployVaultStorageLayoutTester()
 
-      await expect(await storageLayoutTester.validateStorageLayout()).to.not.be.reverted;
+      await expect(storageLayoutTester.validateStorageLayout()).to.not.be.reverted;
     })
 
   })
