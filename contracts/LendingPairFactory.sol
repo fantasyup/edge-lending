@@ -6,6 +6,7 @@ import "./interfaces/IPriceOracleAggregator.sol";
 import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
+import "./interfaces/IDebtToken.sol";
 import "./compound/JumpRateModelV2.sol";
 import "./LendingPair.sol";
 import "./DataTypes.sol";
@@ -52,7 +53,7 @@ contract LendingPairFactory is Pausable {
         uint256 collateralFactor;
         IBSWrapperToken wrappedBorrowAsset;
         uint256 liquidationFee;
-        IBSWrapperToken debtToken;
+        IDebtToken debtToken;
     }
 
     function createPair(
@@ -87,13 +88,40 @@ contract LendingPairFactory is Pausable {
             _borrowVars.debtToken
         );
 
+        // initialize wrapper borrow asset
+        initializeWrapperTokens(
+            pair,
+            borrowConfig.wrappedBorrowAsset,
+            IERC20Details(address(_borrowVars.borrowAsset)),
+            "BOR",
+            address(_borrowVars.borrowAsset)
+        );
+        // initialize wrapper collateral asset
+        initializeWrapperTokens(
+            pair,
+            _wrappedCollateralAsset,
+            IERC20Details(address(_collateralAsset)),
+            "COL",
+            address(_collateralAsset)
+        );
+
+        // initialize debt token
+        initializeWrapperTokens(
+            pair,
+            borrowConfig.debtToken,
+            IERC20Details(address(borrowConfig.wrappedBorrowAsset)),
+            "DEB",
+            address(0)
+        );
+
+
         pair.initialize(
             _team,
             _oracle,
             _vault,
             _borrowVars.borrowAsset,
-            _collateralAsset,
             borrowConfig,
+            _collateralAsset,
             _wrappedCollateralAsset
         );
 
@@ -101,5 +129,25 @@ contract LendingPairFactory is Pausable {
         allPairs.push(newPairAddr);
 
         emit NewLendingPair(newPairAddr, block.timestamp);
+    }
+
+    function initializeWrapperTokens(
+        IBSLendingPair _pair,
+        IBSWrapperToken _wrapperToken,
+        IERC20Details _assetDetails,
+        string memory _tokenType,
+        address _underlying
+    ) internal {
+        bytes memory name = abi.encodePacked("BS-");
+        name = abi.encodePacked(name, _tokenType, _assetDetails.name());
+        bytes memory symbol = abi.encodePacked("BS-");
+        symbol = abi.encodePacked(symbol, _assetDetails.symbol());
+        // initialize wrapperToken
+        IBSWrapperToken(_wrapperToken).initialize(
+            _pair,
+            _underlying,
+            string(name),
+            string(symbol)
+        );
     }
 }

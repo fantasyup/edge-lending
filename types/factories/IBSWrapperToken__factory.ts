@@ -155,6 +155,11 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "contract IBSLendingPair",
+        name: "_owner",
+        type: "address",
+      },
+      {
         internalType: "address",
         name: "_underlying",
         type: "address",
@@ -198,12 +203,12 @@ const _abi = [
     name: "owner",
     outputs: [
       {
-        internalType: "address",
+        internalType: "contract IBSLendingPair",
         name: "",
         type: "address",
       },
     ],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {

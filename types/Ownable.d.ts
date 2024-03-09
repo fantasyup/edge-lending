@@ -21,21 +21,11 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface OwnableInterface extends ethers.utils.Interface {
   functions: {
-    "c_0x7c557157(bytes32)": FunctionFragment;
-    "c_0x9e1c91b0(bytes32)": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "c_0x7c557157",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x9e1c91b0",
-    values: [BytesLike]
-  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -46,14 +36,6 @@ interface OwnableInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "c_0x7c557157",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x9e1c91b0",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
@@ -115,26 +97,6 @@ export class Ownable extends Contract {
   interface: OwnableInterface;
 
   functions: {
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
@@ -157,26 +119,6 @@ export class Ownable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
-
-  c_0x7c557157(
-    c__0x7c557157: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x7c557157(bytes32)"(
-    c__0x7c557157: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0x9e1c91b0(
-    c__0x9e1c91b0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x9e1c91b0(bytes32)"(
-    c__0x9e1c91b0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -201,26 +143,6 @@ export class Ownable extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     owner(overrides?: CallOverrides): Promise<string>;
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
@@ -251,26 +173,6 @@ export class Ownable extends Contract {
   };
 
   estimateGas: {
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -295,26 +197,6 @@ export class Ownable extends Contract {
   };
 
   populateTransaction: {
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;

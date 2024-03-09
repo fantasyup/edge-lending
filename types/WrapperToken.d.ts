@@ -26,28 +26,19 @@ interface WrapperTokenInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
-    "c_0x0338f4c5(bytes32)": FunctionFragment;
-    "c_0x2b559a63(bytes32)": FunctionFragment;
-    "c_0x7c557157(bytes32)": FunctionFragment;
-    "c_0x9e1c91b0(bytes32)": FunctionFragment;
-    "c_0xc30e7a37(bytes32)": FunctionFragment;
-    "c_0xff7d61fd(bytes32)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
-    "initialize(address,string,string)": FunctionFragment;
+    "initialize(address,address,string,string)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "nonces(address)": FunctionFragment;
     "owner()": FunctionFragment;
-    "pair()": FunctionFragment;
     "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
     "underlying()": FunctionFragment;
   };
 
@@ -68,30 +59,6 @@ interface WrapperTokenInterface extends ethers.utils.Interface {
     functionFragment: "burn",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x0338f4c5",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x2b559a63",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x7c557157",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0x9e1c91b0",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xc30e7a37",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xff7d61fd",
-    values: [BytesLike]
-  ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "decreaseAllowance",
@@ -103,7 +70,7 @@ interface WrapperTokenInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string]
+    values: [string, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -112,7 +79,6 @@ interface WrapperTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "nonces", values: [string]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "pair", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "permit",
     values: [
@@ -124,10 +90,6 @@ interface WrapperTokenInterface extends ethers.utils.Interface {
       BytesLike,
       BytesLike
     ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
@@ -143,10 +105,6 @@ interface WrapperTokenInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "underlying",
     values?: undefined
   ): string;
@@ -159,30 +117,6 @@ interface WrapperTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x0338f4c5",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x2b559a63",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x7c557157",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0x9e1c91b0",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xc30e7a37",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xff7d61fd",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
@@ -197,12 +131,7 @@ interface WrapperTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "pair", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -213,20 +142,14 @@ interface WrapperTokenInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "underlying", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
-    "OwnershipTransferred(address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
 
@@ -321,66 +244,6 @@ export class WrapperToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    c_0x0338f4c5(
-      c__0x0338f4c5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x0338f4c5(bytes32)"(
-      c__0x0338f4c5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0x2b559a63(
-      c__0x2b559a63: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x2b559a63(bytes32)"(
-      c__0x2b559a63: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0xc30e7a37(
-      c__0xc30e7a37: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xc30e7a37(bytes32)"(
-      c__0xc30e7a37: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    c_0xff7d61fd(
-      c__0xff7d61fd: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xff7d61fd(bytes32)"(
-      c__0xff7d61fd: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
     "decimals()"(overrides?: CallOverrides): Promise<[number]>;
@@ -410,13 +273,15 @@ export class WrapperToken extends Contract {
     ): Promise<ContractTransaction>;
 
     initialize(
+      __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,string,string)"(
+    "initialize(address,address,string,string)"(
+      __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
@@ -450,10 +315,6 @@ export class WrapperToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
-    pair(overrides?: CallOverrides): Promise<[string]>;
-
-    "pair()"(overrides?: CallOverrides): Promise<[string]>;
-
     permit(
       owner: string,
       spender: string,
@@ -473,14 +334,6 @@ export class WrapperToken extends Contract {
       v: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "renounceOwnership()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -515,16 +368,6 @@ export class WrapperToken extends Contract {
       sender: string,
       recipient: string,
       amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -580,66 +423,6 @@ export class WrapperToken extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  c_0x0338f4c5(
-    c__0x0338f4c5: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x0338f4c5(bytes32)"(
-    c__0x0338f4c5: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0x2b559a63(
-    c__0x2b559a63: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x2b559a63(bytes32)"(
-    c__0x2b559a63: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0x7c557157(
-    c__0x7c557157: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x7c557157(bytes32)"(
-    c__0x7c557157: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0x9e1c91b0(
-    c__0x9e1c91b0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0x9e1c91b0(bytes32)"(
-    c__0x9e1c91b0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0xc30e7a37(
-    c__0xc30e7a37: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xc30e7a37(bytes32)"(
-    c__0xc30e7a37: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  c_0xff7d61fd(
-    c__0xff7d61fd: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xff7d61fd(bytes32)"(
-    c__0xff7d61fd: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   decimals(overrides?: CallOverrides): Promise<number>;
 
   "decimals()"(overrides?: CallOverrides): Promise<number>;
@@ -669,13 +452,15 @@ export class WrapperToken extends Contract {
   ): Promise<ContractTransaction>;
 
   initialize(
+    __owner: string,
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,string,string)"(
+  "initialize(address,address,string,string)"(
+    __owner: string,
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
@@ -709,10 +494,6 @@ export class WrapperToken extends Contract {
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
-  pair(overrides?: CallOverrides): Promise<string>;
-
-  "pair()"(overrides?: CallOverrides): Promise<string>;
-
   permit(
     owner: string,
     spender: string,
@@ -732,14 +513,6 @@ export class WrapperToken extends Contract {
     v: BigNumberish,
     r: BytesLike,
     s: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  renounceOwnership(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "renounceOwnership()"(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -774,16 +547,6 @@ export class WrapperToken extends Contract {
     sender: string,
     recipient: string,
     amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  transferOwnership(
-    newOwner: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "transferOwnership(address)"(
-    newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -839,66 +602,6 @@ export class WrapperToken extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    c_0x0338f4c5(
-      c__0x0338f4c5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x0338f4c5(bytes32)"(
-      c__0x0338f4c5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0x2b559a63(
-      c__0x2b559a63: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x2b559a63(bytes32)"(
-      c__0x2b559a63: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0xc30e7a37(
-      c__0xc30e7a37: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xc30e7a37(bytes32)"(
-      c__0xc30e7a37: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    c_0xff7d61fd(
-      c__0xff7d61fd: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xff7d61fd(bytes32)"(
-      c__0xff7d61fd: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     decimals(overrides?: CallOverrides): Promise<number>;
 
     "decimals()"(overrides?: CallOverrides): Promise<number>;
@@ -928,13 +631,15 @@ export class WrapperToken extends Contract {
     ): Promise<boolean>;
 
     initialize(
+      __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,string,string)"(
+    "initialize(address,address,string,string)"(
+      __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
@@ -968,10 +673,6 @@ export class WrapperToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
 
-    pair(overrides?: CallOverrides): Promise<string>;
-
-    "pair()"(overrides?: CallOverrides): Promise<string>;
-
     permit(
       owner: string,
       spender: string,
@@ -993,10 +694,6 @@ export class WrapperToken extends Contract {
       s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    "renounceOwnership()"(overrides?: CallOverrides): Promise<void>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -1032,16 +729,6 @@ export class WrapperToken extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    transferOwnership(
-      newOwner: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     underlying(overrides?: CallOverrides): Promise<string>;
 
     "underlying()"(overrides?: CallOverrides): Promise<string>;
@@ -1055,14 +742,6 @@ export class WrapperToken extends Contract {
     ): TypedEventFilter<
       [string, string, BigNumber],
       { owner: string; spender: string; value: BigNumber }
-    >;
-
-    OwnershipTransferred(
-      previousOwner: string | null,
-      newOwner: string | null
-    ): TypedEventFilter<
-      [string, string],
-      { previousOwner: string; newOwner: string }
     >;
 
     Transfer(
@@ -1123,66 +802,6 @@ export class WrapperToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    c_0x0338f4c5(
-      c__0x0338f4c5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x0338f4c5(bytes32)"(
-      c__0x0338f4c5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0x2b559a63(
-      c__0x2b559a63: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x2b559a63(bytes32)"(
-      c__0x2b559a63: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0xc30e7a37(
-      c__0xc30e7a37: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xc30e7a37(bytes32)"(
-      c__0xc30e7a37: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    c_0xff7d61fd(
-      c__0xff7d61fd: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xff7d61fd(bytes32)"(
-      c__0xff7d61fd: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1212,13 +831,15 @@ export class WrapperToken extends Contract {
     ): Promise<BigNumber>;
 
     initialize(
+      __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,string,string)"(
+    "initialize(address,address,string,string)"(
+      __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
@@ -1252,10 +873,6 @@ export class WrapperToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    pair(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "pair()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     permit(
       owner: string,
       spender: string,
@@ -1275,14 +892,6 @@ export class WrapperToken extends Contract {
       v: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "renounceOwnership()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1317,16 +926,6 @@ export class WrapperToken extends Contract {
       sender: string,
       recipient: string,
       amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1388,66 +987,6 @@ export class WrapperToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    c_0x0338f4c5(
-      c__0x0338f4c5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x0338f4c5(bytes32)"(
-      c__0x0338f4c5: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x2b559a63(
-      c__0x2b559a63: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x2b559a63(bytes32)"(
-      c__0x2b559a63: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x7c557157(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x7c557157(bytes32)"(
-      c__0x7c557157: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0x9e1c91b0(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0x9e1c91b0(bytes32)"(
-      c__0x9e1c91b0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0xc30e7a37(
-      c__0xc30e7a37: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xc30e7a37(bytes32)"(
-      c__0xc30e7a37: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    c_0xff7d61fd(
-      c__0xff7d61fd: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xff7d61fd(bytes32)"(
-      c__0xff7d61fd: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1477,13 +1016,15 @@ export class WrapperToken extends Contract {
     ): Promise<PopulatedTransaction>;
 
     initialize(
+      __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,string,string)"(
+    "initialize(address,address,string,string)"(
+      __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
@@ -1520,10 +1061,6 @@ export class WrapperToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    pair(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "pair()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     permit(
       owner: string,
       spender: string,
@@ -1543,14 +1080,6 @@ export class WrapperToken extends Contract {
       v: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "renounceOwnership()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1585,16 +1114,6 @@ export class WrapperToken extends Contract {
       sender: string,
       recipient: string,
       amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

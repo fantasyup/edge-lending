@@ -303,6 +303,25 @@ const _abi = [
     type: "event",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "accountInterestIndex",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "asset",
     outputs: [
@@ -316,14 +335,8 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "borrowBalancePrior",
+    inputs: [],
+    name: "borrowIndex",
     outputs: [
       {
         internalType: "uint256",
@@ -380,6 +393,19 @@ const _abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "debtToken",
+    outputs: [
+      {
+        internalType: "contract IDebtToken",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -463,11 +489,6 @@ const _abi = [
         type: "address",
       },
       {
-        internalType: "contract IERC20",
-        name: "_collateralAsset",
-        type: "address",
-      },
-      {
         components: [
           {
             internalType: "contract IInterestRateModel",
@@ -500,7 +521,7 @@ const _abi = [
             type: "uint256",
           },
           {
-            internalType: "contract IBSWrapperToken",
+            internalType: "contract IDebtToken",
             name: "debtToken",
             type: "address",
           },
@@ -508,6 +529,11 @@ const _abi = [
         internalType: "struct DataTypes.BorrowAssetConfig",
         name: "borrowConfig",
         type: "tuple",
+      },
+      {
+        internalType: "contract IERC20",
+        name: "_collateralAsset",
+        type: "address",
       },
       {
         internalType: "contract IBSWrapperToken",

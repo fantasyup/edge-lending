@@ -42,6 +42,11 @@ export async function makeLendingPairTestSuiteVars(price?: BigNumber) {
     }
 }
 
+export async function advanceNBlocks(n: number) {
+    for(let i = 0; i< n; i++) {
+        await ethers.provider.send('evm_mine', [])
+    }
+}
 export class LendingPairTestSuiteVars {
     Vault: BVault;
     LendingPair: BLendingPair;

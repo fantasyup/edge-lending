@@ -23,7 +23,6 @@ interface BaseJumpRateModelV2Interface extends ethers.utils.Interface {
   functions: {
     "baseRatePerBlock()": FunctionFragment;
     "blocksPerYear()": FunctionFragment;
-    "c_0xbd9cfc2e(bytes32)": FunctionFragment;
     "getSupplyRate(uint256,uint256,uint256,uint256)": FunctionFragment;
     "jumpMultiplierPerBlock()": FunctionFragment;
     "kink()": FunctionFragment;
@@ -40,10 +39,6 @@ interface BaseJumpRateModelV2Interface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "blocksPerYear",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "c_0xbd9cfc2e",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getSupplyRate",
@@ -74,10 +69,6 @@ interface BaseJumpRateModelV2Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "blocksPerYear",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "c_0xbd9cfc2e",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -162,16 +153,6 @@ export class BaseJumpRateModelV2 extends Contract {
 
     "blocksPerYear()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    c_0xbd9cfc2e(
-      c__0xbd9cfc2e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    "c_0xbd9cfc2e(bytes32)"(
-      c__0xbd9cfc2e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     getSupplyRate(
       cash: BigNumberish,
       borrows: BigNumberish,
@@ -243,16 +224,6 @@ export class BaseJumpRateModelV2 extends Contract {
 
   "blocksPerYear()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  c_0xbd9cfc2e(
-    c__0xbd9cfc2e: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  "c_0xbd9cfc2e(bytes32)"(
-    c__0xbd9cfc2e: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   getSupplyRate(
     cash: BigNumberish,
     borrows: BigNumberish,
@@ -323,16 +294,6 @@ export class BaseJumpRateModelV2 extends Contract {
     blocksPerYear(overrides?: CallOverrides): Promise<BigNumber>;
 
     "blocksPerYear()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    c_0xbd9cfc2e(
-      c__0xbd9cfc2e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "c_0xbd9cfc2e(bytes32)"(
-      c__0xbd9cfc2e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     getSupplyRate(
       cash: BigNumberish,
@@ -423,16 +384,6 @@ export class BaseJumpRateModelV2 extends Contract {
 
     "blocksPerYear()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    c_0xbd9cfc2e(
-      c__0xbd9cfc2e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "c_0xbd9cfc2e(bytes32)"(
-      c__0xbd9cfc2e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getSupplyRate(
       cash: BigNumberish,
       borrows: BigNumberish,
@@ -506,16 +457,6 @@ export class BaseJumpRateModelV2 extends Contract {
     blocksPerYear(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "blocksPerYear()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    c_0xbd9cfc2e(
-      c__0xbd9cfc2e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "c_0xbd9cfc2e(bytes32)"(
-      c__0xbd9cfc2e: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     getSupplyRate(
       cash: BigNumberish,

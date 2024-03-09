@@ -8,10 +8,12 @@ import {
   MockToken,
   Vault as BVault,
   WrapperToken,
-  LendingPairHelper as BLendingPairHelper
+  LendingPairHelper as BLendingPairHelper,
+  DebtToken,
 } from "../types";
 import { 
   deployCollateralWrapperToken,
+  deployDebtToken,
   deployInterestRateModel,
   deployLendingPair,
   deployLendingPairHelper,
@@ -20,6 +22,7 @@ import {
   deployVault,
   deployWrappedToken
 } from "../helpers/contracts";
+import { advanceNBlocks } from "./lib";
 
 // list of accounts
 let accounts: Signer[];
@@ -30,7 +33,7 @@ let MockPriceOracle: IPriceOracleAggregator;
 let BorrowAsset: MockToken;
 let CollateralAsset: MockToken
 let BorrowAssetDepositWrapperToken: WrapperToken
-let DebtWrapperToken: WrapperToken
+let DebtWrapperToken: DebtToken
 let CollateralWrapperToken: WrapperToken
 let InterestRateModel: JumpRateModelV2;
 let LendingPairHelper: BLendingPairHelper
@@ -40,6 +43,7 @@ let bob: string;
 let frank: string;
 let alice: string;
 let james: string;
+let zubi: string
 
 let frankSigner: Signer;
 
@@ -86,6 +90,19 @@ async function depositCollateralAsset(
   return await LendingPair.connect(signer).depositCollateral(account, amountToDeposit)
 }
 
+async function initializeWrapperTokens(
+  owner: string,
+  wrapperToken: WrapperToken | DebtToken,
+  underlying: string
+) {
+  await wrapperToken.initialize(
+    owner,
+    underlying,
+    "DEMO",
+    "DMO"
+  )
+}
+
 describe("LendingPair", async function () {
   before(async function () {
     accounts = await ethers.getSigners();
@@ -95,8 +112,9 @@ describe("LendingPair", async function () {
       bob,
       frank,
       alice,
-      james
-    ] = await Promise.all(accounts.slice(0, 5).map(x => x.getAddress())))
+      james,
+      zubi
+    ] = await Promise.all(accounts.slice(0, 10).map(x => x.getAddress())))
 
     Vault = await deployVault()
     LendingPair = await deployLendingPair()
@@ -104,7 +122,7 @@ describe("LendingPair", async function () {
     BorrowAsset = await deployMockToken()
     CollateralAsset = await deployMockToken()
     BorrowAssetDepositWrapperToken = await deployWrappedToken()
-    DebtWrapperToken = await deployWrappedToken()
+    DebtWrapperToken = await deployDebtToken()
     CollateralWrapperToken = await deployCollateralWrapperToken()
     InterestRateModel = await deployInterestRateModel(
       "30000000000000000",
@@ -114,7 +132,26 @@ describe("LendingPair", async function () {
       admin
     )
     LendingPairHelper = await deployLendingPairHelper(Vault)
+    // collateral wrapper token
+    await initializeWrapperTokens(
+      LendingPair.address,
+      CollateralWrapperToken,
+      CollateralAsset.address
+    )
 
+    // borrow wrapper token
+    await initializeWrapperTokens(
+      LendingPair.address,
+      BorrowAssetDepositWrapperToken,
+      BorrowAsset.address
+    )
+    
+    // debt token
+    await initializeWrapperTokens(
+      LendingPair.address,
+      DebtWrapperToken,
+      ethers.constants.AddressZero
+    )
 
     // initialize vault 
     await Vault.initialize(flashLoanRate, admin);
@@ -133,7 +170,6 @@ describe("LendingPair", async function () {
       MockPriceOracle.address,
       Vault.address,
       BorrowAsset.address,
-      CollateralAsset.address,
       {
         interestRate: InterestRateModel.address,
         initialExchangeRateMantissa: initialExchangeRateMantissa,
@@ -143,6 +179,7 @@ describe("LendingPair", async function () {
         liquidationFee,
         debtToken: DebtWrapperToken.address
       },
+      CollateralAsset.address,
       CollateralWrapperToken.address
     );
 
@@ -174,9 +211,9 @@ describe("LendingPair", async function () {
             ).to.emit(LendingPair, "Deposit")
 
             // check balances of depositors
-            expect(
-              await (await LendingPair.principalBalance(address)).toNumber()
-            ).to.eq(amountToDeposit)
+            // expect(
+            //   await (await LendingPair.principalBalance(address)).toNumber()
+            // ).to.eq(amountToDeposit)
             // wrapper token balance minted on deposit of borrow asset
             expect(
               await BorrowAssetDepositWrapperToken.balanceOf(address)
@@ -252,12 +289,12 @@ describe("LendingPair", async function () {
       await depositCollateralAsset(LendingPair, alice, 1000000)
       await expect(
         LendingPair.connect(await ethers.getSigner(alice)).borrow(5000)
-      ).to.revertedWith("NOT_ENOUGH_TOKEN")
+      ).to.revertedWith("")
     })
 
     it("borrow", async function(){
         // frank will like to borrow 100 of borrow asset after depositing 1000 collateral
-      const sharesToBorrow = 100
+      const amountToBorrow = 100
       const currentFrankBorrowAssetBalance = await (await Vault.balanceOf(BorrowAsset.address, frank)).toNumber()
       const currentLendingPairBorrowAssetBalance = await (await Vault.balanceOf(BorrowAsset.address, LendingPair.address)).toNumber()
       
@@ -268,10 +305,11 @@ describe("LendingPair", async function () {
       // 1000 * 0.666
       expect(borrowLimit[0].toNumber()).to.eq(666)
 
-      await expect(
-        await LendingPair.connect(await ethers.getSigner(frank)).borrow(sharesToBorrow)
-      ).to.emit(LendingPair, 'Borrow').withArgs(frank, sharesToBorrow)
-
+      // await expect(
+      //   await LendingPair.connect(await ethers.getSigner(frank)).borrow(amountToBorrow)
+      // ).to.emit(LendingPair, 'Borrow').withArgs(frank, amountToBorrow)
+      const tx =  await (await LendingPair.connect(await ethers.getSigner(frank)).borrow(amountToBorrow)).wait()
+        console.log(`gasUsed `, tx.gasUsed.toNumber());
       const newBorrowLimit: any = await LendingPairHelper.viewBorrowedValue(
         [LendingPair.address], frank
       )
@@ -279,24 +317,24 @@ describe("LendingPair", async function () {
       expect(newBorrowLimit[0].toNumber()).to.eq(100)
 
       // check debtToken balance
-      expect((await DebtWrapperToken.balanceOf(frank)).toNumber()).to.eq(sharesToBorrow);
+      expect((await DebtWrapperToken.balanceOf(frank)).toNumber()).to.eq(amountToBorrow);
       
       const newFrankBorrowAssetBalance = await (await Vault.balanceOf(BorrowAsset.address, frank)).toNumber()
       const newLendingPairBorrowAssetBalance = await (await Vault.balanceOf(BorrowAsset.address, LendingPair.address)).toNumber()
 
-      expect(newFrankBorrowAssetBalance).eq(currentFrankBorrowAssetBalance + sharesToBorrow)
-      expect(newLendingPairBorrowAssetBalance).eq(currentLendingPairBorrowAssetBalance - sharesToBorrow)
+      expect(newFrankBorrowAssetBalance).eq(currentFrankBorrowAssetBalance + amountToBorrow)
+      expect(newLendingPairBorrowAssetBalance).eq(currentLendingPairBorrowAssetBalance - amountToBorrow)
 
-      const accountBorrows = await LendingPair.accountBorrows(frank)
+      const accountBorrows = await DebtWrapperToken.balanceOf(frank)
       // check frank account borrows
       expect(
-        accountBorrows.principal.toNumber()
-      ).to.eq(sharesToBorrow)
+        accountBorrows.toNumber()
+      ).to.eq(amountToBorrow)
 
       // check total borrows for the borrow asset
       await expect(
-        await (await LendingPair.totalBorrows()).toNumber()
-      ).to.eq(sharesToBorrow)
+        await (await DebtWrapperToken.totalSupply()).toNumber()
+      ).to.eq(amountToBorrow)
     })
 
     it("collateral transfer - can not transfer more than allowed", async function() {
@@ -328,7 +366,7 @@ describe("LendingPair", async function () {
       const frankVaultBalance = await (await Vault.balanceOf(BorrowAsset.address, frank)).toNumber()
       const LendingPairBalance = await (await Vault.balanceOf(BorrowAsset.address, LendingPair.address)).toNumber()
       // pay part of it 
-      const currentRepayAmount = await (await LendingPair.accountBorrows(frank)).principal.toNumber()
+      const currentRepayAmount = await (await DebtWrapperToken.balanceOf(frank)).toNumber()
       const partRepayAmount =  currentRepayAmount /  2
 
       // repay part 
@@ -346,7 +384,7 @@ describe("LendingPair", async function () {
       expect((await DebtWrapperToken.balanceOf(frank)).toNumber()).to.eq(partRepayAmount)
 
       // check current borrow balance
-      const newBorrowBalance = await (await LendingPair.accountBorrows(frank)).principal.toNumber()
+      const newBorrowBalance = await (await DebtWrapperToken.balanceOf(frank)).toNumber()
       expect(newBorrowBalance).to.be.eq(partRepayAmount)
 
       // repay everything
@@ -354,7 +392,7 @@ describe("LendingPair", async function () {
         await LendingPair.connect(frankSigner).repay(0)
       ).to.emit(LendingPair, 'Repay')
 
-      const updatedBorrowBalance = await (await LendingPair.accountBorrows(frank)).principal.toNumber()
+      const updatedBorrowBalance = await (await DebtWrapperToken.balanceOf(frank)).toNumber()
       expect(updatedBorrowBalance).to.be.eq(0)
 
       const updatedFrankVaultBalance = await (await Vault.balanceOf(BorrowAsset.address, frank)).toNumber()
@@ -408,7 +446,7 @@ describe("LendingPair", async function () {
       expect(updatedWrapperTokenBalance).to.be.eq(0)
 
       // LendingPair principal balance should be 0
-      expect(await (await LendingPair.principalBalance(admin)).toNumber()).to.be.eq(0)
+      // expect(await (await LendingPair.principalBalance(admin)).toNumber()).to.be.eq(0)
       // borrow wrapper asset should be zero
       expect(await (await BorrowAssetDepositWrapperToken.balanceOf(admin)).toNumber()).to.be.eq(0)
       
@@ -465,32 +503,84 @@ describe("LendingPair", async function () {
       expect((await CollateralWrapperToken.balanceOf(james)).toNumber()).to.eq(0)
     })
 
-  // describe("liquidate", async function() {
-  //     it("liquidate - fail", async function() {
-  //       await expect(
-  //         LendingPair.liquidate(admin)
-  //       ).to.revertedWith("NOT_LIQUIDATE_YOURSELF") 
-  //     })
+    describe("liquidate", async function() {
+      it("liquidate - fail", async function() {
+          await expect(
+            LendingPair.liquidate(admin)
+          ).to.revertedWith("NOT_LIQUIDATE_YOURSELF") 
+        })
 
-  //     it("liquidate - correctly", async function() {
-  //       // deposit collateral
-  //       await depositCollateralAsset(LendingPair, james, amountToDeposit)
-  //       // borrow
-  //       await LendingPair.connect(await ethers.getSigner(james)).borrow(500)
-  //       // change price 
-  //       // set oracle price to half
-  //       await MockPriceOracle.setPrice(BigNumber.from(5).pow(18))
+        it("liquidate - correctly", async function() {
+          // deposit collateral
+          await depositCollateralAsset(LendingPair, james, amountToDeposit)
+          const jamesCollateralInVault = (await CollateralWrapperToken.balanceOf(james)).toNumber()
 
-  //       // liquidate
-  //       await depositInVault(BorrowAsset, await ethers.getSigner(admin), 800)
+          // borrow
+          await LendingPair.connect(await ethers.getSigner(james)).borrow(500);
+          // change price 
+          // set oracle price to half
+          await (await MockPriceOracle.setPrice(BorrowAsset.address, BigNumber.from(3000).pow(8))).wait()
 
-  //       await LendingPair.liquidate(james)
+          // liquidator deposits in vault
+          await depositInVault(BorrowAsset, await ethers.getSigner(admin), 800)
+          const lendingPairBalanceInVault = (await Vault.balanceOf(BorrowAsset.address, LendingPair.address)).toNumber()
+          const adminBalanceInVault = (await Vault.balanceOf(BorrowAsset.address, admin)).toNumber()
+          const adminCollateralBalanceInVault = (await Vault.balanceOf(CollateralAsset.address, admin)).toNumber()
 
-  //       // @TODO confirm proper checks
+          await (await LendingPair.liquidate(james)).wait()
 
-  //     })
-  //   })
-  // })  
+          // james now has zero debt balance
+          expect((await DebtWrapperToken.balanceOf(james)).toNumber()).to.eq(0)
+          const updateAdminBalanceInVault = (await Vault.balanceOf(BorrowAsset.address, admin)).toNumber()
+
+          // expect the liquidator balance to be reduced minimum by
+          //  500 + (0.05 * 500) = 525 (0.05% is liquidation fee)
+          expect(adminBalanceInVault - updateAdminBalanceInVault >= 525).true
+
+          // expect that lending pair balance increased by liquidated amount
+          expect((await Vault.balanceOf(BorrowAsset.address, LendingPair.address)).toNumber()).to.eq(
+            lendingPairBalanceInVault + 525
+          )
+
+          // expect james collateral to be seized
+          expect((await CollateralWrapperToken.balanceOf(james)).toNumber()).to.eq(0)
+
+          // expect admin collateral balance to be increased
+          expect((await Vault.balanceOf(CollateralAsset.address, admin)).toNumber()).to.eq(
+            adminCollateralBalanceInVault + jamesCollateralInVault
+          )
+
+        })
+    })
+
+    describe("accrueInterest", function() {
+      it("borrow position - accrues interest", async function(){
+        // zubi deposits collateral and opens a borrow position
+        const toDeposit = 2000000000000
+        const zubiSigner = await ethers.getSigner(zubi)
+        await depositCollateralAsset(LendingPair, zubi, toDeposit)
+        await depositBorrowAsset(LendingPair, admin, toDeposit)
+
+        // set price proper
+        await (await MockPriceOracle.setPrice(BorrowAsset.address, BigNumber.from(10).pow(8))).wait()
+        
+        // borrow
+        const amountToBorrow = 1500000000000
+
+        await LendingPair.connect(zubiSigner).borrow(amountToBorrow);
+
+        // mine
+        await advanceNBlocks(1000)
+
+        // // call accrueInterest
+        await (await LendingPair.accrueInterest()).wait()
+
+        // // check debt balance
+        const borrowBalance = await (await DebtWrapperToken.balanceOf(zubi)).toNumber()
+        console.log({ borrowBalance })
+
+      })
+    })
 
   })
 

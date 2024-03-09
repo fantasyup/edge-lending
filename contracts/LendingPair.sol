@@ -8,6 +8,7 @@ import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSVault.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
+import "./interfaces/IDebtToken.sol";
 import "./interfaces/IPriceOracleAggregator.sol";
 import "hardhat/console.sol";
 import "./DataTypes.sol";
@@ -29,22 +30,19 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @dev initialExchangeRateMantissa Initial exchange rate used when minting
     uint256 internal initialExchangeRateMantissa;
  
-    /// @notice Fraction of interest currently set aside for reserves
-    uint256 public reserveFactorMantissa;
+    /// @dev Fraction of interest currently set aside for reserves
+    uint256 private reserveFactorMantissa;
 
     /// @dev Block number that interest was last accrued at
     uint256 private accrualBlockNumber;
 
-    /// @notice Accumulator of the total earned interest rate since the opening of the market
-    uint256 public borrowIndex;
-
-    /// @notice Total amount of outstanding borrows of the asset in this market
-    uint256 public totalBorrows;
+    /// @dev Accumulator of the total earned interest rate since the opening of the market
+    uint256 public override borrowIndex;
     
     /// @notice Total amount of reserves of the underlying held in this market
     uint256 public totalReserves;
 
-    /// @notice The amount of collateral required for a borrow position
+    /// @dev The amount of collateral required for a borrow position
     uint256 public collateralFactor;
 
     /// @dev collateral factor precision
@@ -81,31 +79,18 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     IBSWrapperToken public wrappedCollateralAsset;
 
     /// @notice The wrapper token for debt
-    IBSWrapperToken public debtToken;
+    IDebtToken public override debtToken;
 
     /// @notice The interest rate model for the borrow asset
     IInterestRateModel public interestRate;
     
-    /// @dev Mapping of address to borrow asset deposited
-    mapping(address => uint256) public principalBalance;
-    
-    /// @notice Mapping of account addresses to outstanding borrow balances
-    mapping(address => BorrowSnapshot) public accountBorrows;
+    /// @notice Mapping of account addresses to their interest interest index
+    mapping( address => uint256 ) public override accountInterestIndex;
 
-    /// @dev historicalReward
-    mapping(address => uint256) public historicalReward;
 
     modifier onlyBlackSmithTeam() {
         require(msg.sender == blackSmithTeam, "ONLY_BLACK_SMITH_TEAM");
         _;
-    }
-
-    /// @notice Container for borrow balance information
-    /// principal Total balance (with accrued interest), after applying the most recent balance-changing action
-    /// interestIndex Global borrowIndex as of the most recent balance-changing action
-    struct BorrowSnapshot {
-        uint256 principal;
-        uint256 interestIndex;
     }
 
     /// @notice Initialize function
@@ -120,8 +105,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         IPriceOracleAggregator _oracle,
         IBSVault _vault,
         IERC20 _asset, 
-        IERC20 _collateralAsset,
         DataTypes.BorrowAssetConfig calldata borrowConfig,
+        IERC20 _collateralAsset,
         IBSWrapperToken _wrappedCollateralAsset
     ) external override initializer {
         // invalid team
@@ -131,64 +116,25 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // invalid asset or collateral asset
         require(address(_asset) != address(0) && address(_collateralAsset) != address(0), "IAC");
         // validate borrow config
-        borrowConfig.validBorrowAssetConfig();
+        borrowConfig.validBorrowAssetConfig(IBSLendingPair(address(this)));
+        require(address(_wrappedCollateralAsset.owner()) == address(this), "IVWC");
 
         blackSmithTeam = _blackSmithTeam;
         vault = _vault;
         asset = _asset;
         oracle = _oracle;
         collateralAsset = _collateralAsset;
-        
         borrowIndex = mantissaOne;
+
         interestRate = borrowConfig.interestRate;
         initialExchangeRateMantissa = borrowConfig.initialExchangeRateMantissa;
         reserveFactorMantissa = borrowConfig.reserveFactorMantissa;
         collateralFactor = borrowConfig.collateralFactor;
         liquidationFee = borrowConfig.liquidationFee;
-
-        // initialize wrapper borrow asset
-        initializeWrapperTokens(
-            borrowConfig.wrappedBorrowAsset,
-            IERC20Details(address(_asset)),
-            "BOR",
-            address(_asset)
-        );
-        // initialize wrapper collateral asset
-        initializeWrapperTokens(
-            _wrappedCollateralAsset,
-            IERC20Details(address(_collateralAsset)),
-            "COL",
-            address(_collateralAsset)
-        );
-        // initialize debt token
-        initializeWrapperTokens(
-            borrowConfig.debtToken,
-            IERC20Details(address(borrowConfig.wrappedBorrowAsset)),
-            "DEB",
-            address(0)
-        );
-
         wrapperBorrowedAsset = borrowConfig.wrappedBorrowAsset;
-        wrappedCollateralAsset = _wrappedCollateralAsset;
         debtToken = borrowConfig.debtToken;
-    }
 
-    function initializeWrapperTokens(
-        IBSWrapperToken _wrapperToken,
-        IERC20Details _assetDetails,
-        string memory _tokenType,
-        address _underlying
-    ) internal {
-        bytes memory name = abi.encodePacked("BS-");
-        name = abi.encodePacked(name, _tokenType, _assetDetails.name());
-        bytes memory symbol = abi.encodePacked("BS-");
-        symbol = abi.encodePacked(symbol, _assetDetails.symbol());
-        // initialize wrapperToken
-        IBSWrapperToken(_wrapperToken).initialize(
-            _underlying,
-            string(name),
-            string(symbol)
-        );
+        wrappedCollateralAsset = _wrappedCollateralAsset;
     }
 
     /// @notice getBlockNumber allows for easy retrieval of block number
@@ -206,13 +152,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         emit Deposit(address(this), address(collateralAsset), _tokenReceipeint, msg.sender, _vaultShareAmount);
     }
 
-    // struct used by mint to avoid stack too deep errors
-    struct MintLocalVars {
-        uint256 exchangeRateMantissa;
-        uint256 mintTokens;
-        bool isMember;
-    }
-
     /// @dev the user should initially have deposited in the vault 
     /// transfer appropriate amount of underlying from msg.sender to the LendingPair
     /// @param _tokenReceipeint whom to credit the wrapped tokens
@@ -221,76 +160,33 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint256 _vaultShareAmount
     ) external override {
         require(_tokenReceipeint != address(0), "IDB");
-        // declare struct
-        MintLocalVars memory vars;
-
         // retrieve exchange rate
-        vars.exchangeRateMantissa = exchangeRateCurrent();
-
-        // We get the current exchange rate and calculate the number of BSWrapperToken to be minted:
+        uint256 exchangeRateMantissa = exchangeRateCurrent();
+        // We get the current exchange rate and calculate the number of wrapper token to be minted:
         // mintTokens = _amount / exchangeRate
-        vars.mintTokens = divScalarByExpTruncate(
+        uint256 mintTokens = divScalarByExpTruncate(
             _vaultShareAmount,
-            Exp({mantissa: vars.exchangeRateMantissa})
+            Exp({mantissa: exchangeRateMantissa})
         );
 
         // transfer appropriate amount of DAI from msg.sender to the Vault
         vault.transfer(asset, msg.sender, address(this), _vaultShareAmount);
 
-        principalBalance[_tokenReceipeint] = principalBalance[_tokenReceipeint] + _vaultShareAmount;
         // mint appropriate wrapped tokens
-        wrapperBorrowedAsset.mint(_tokenReceipeint, vars.mintTokens);
-        emit Deposit(address(this), address(asset), _tokenReceipeint, msg.sender, _vaultShareAmount);
-    }
-
-    // struct used by borrow function to avoid stack too deep errors
-    struct BorrowLocalVars {
-        uint256 accountBorrows;
-        uint256 accountBorrowsNew;
-        uint256 totalBorrowsNew;
-    }
-
-    /// @notice _borrow
-    /// @param _borrower the address of the borrower
-    /// @param _amountToBorrow The amount of the borrow asset to borrow
-    function _borrow(
-        address _borrower,
-        uint256 _amountToBorrow
-    ) internal {
-        // create local vars
-        BorrowLocalVars memory vars;
-
-        // convert amount to borrow to share representation
-        uint256 amountOfSharesToBorrow = vault.toShare(asset, _amountToBorrow, false);
-
-        // Fail if protocol has insufficient underlying cash
-        require(getCashPrior() > amountOfSharesToBorrow, "NOT_ENOUGH_TOKEN");
-
-        // calculate the new borrower and total borrow balances, failing on overflow:
-        vars.accountBorrows = borrowBalancePrior(_borrower);
-        vars.accountBorrowsNew = vars.accountBorrows + _amountToBorrow;
+        wrapperBorrowedAsset.mint(_tokenReceipeint, mintTokens);
         
-        // totalBorrowsNew = totalBorrows + borrowAmount
-        vars.totalBorrowsNew = totalBorrows + _amountToBorrow;
-
-        // We write the previously calculated values into storage
-        accountBorrows[_borrower].principal = vars.accountBorrowsNew;
-        accountBorrows[_borrower].interestIndex = borrowIndex;
-        totalBorrows = vars.totalBorrowsNew;
-        // console.logUint(_amountOfSharesToBorrow);
-
-        vault.transfer(asset, address(this), _borrower, amountOfSharesToBorrow);
-    
+        emit Deposit(address(this), address(asset), _tokenReceipeint, msg.sender, _vaultShareAmount);
     }
 
     /// @param _amountToBorrow is the amount of the borrow asset vault shares the user wants to borrow
     function borrow(uint256 _amountToBorrow) external {
-        uint256 borrowedTotalInUSD = getTotalBorrowedValueInUSD(msg.sender);
+        uint256 borrowedTotalWithInterest = borrowBalanceCurrent(msg.sender);
+        uint256 currentBorrowAssetPrice = oracle.getPriceInUSD(asset);
+        uint256 borrowedTotalInUSD = borrowedTotalWithInterest * currentBorrowAssetPrice;
         uint256 borrowLimitInUSD = getBorrowLimitInUSD(msg.sender);
         uint256 borrowAmountAllowedInUSD = borrowLimitInUSD - borrowedTotalInUSD;
 
-        uint256 borrowAmountInUSD = getPriceOfToken(asset, _amountToBorrow);
-
+        uint256 borrowAmountInUSD = currentBorrowAssetPrice * _amountToBorrow;
         // require the amount being borrowed is less than 
         // or equal to the amount they are aloud to borrow
         require(
@@ -298,22 +194,24 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             "BORROWING_MORE_THAN_ALLOWED"
         );
 
-        _borrow(msg.sender, _amountToBorrow);
-
-        // mint debt tokens
+        uint256 amountOfSharesToBorrow = vault.toShare(asset, _amountToBorrow, false);
+        
+        // mint debt tokens to account
         debtToken.mint(msg.sender, _amountToBorrow);
+
+        accountInterestIndex[msg.sender] = borrowIndex;
+
+        // transfer borrow asset to borrower
+        vault.transfer(asset, address(this), msg.sender, amountOfSharesToBorrow);
 
         emit Borrow(msg.sender, _amountToBorrow);
     }
 
     struct RepayBorrowLocalVars {
         uint256 repayAmount;
-        // uint256 borrowerIndex;
         uint256 accountBorrows;
         uint256 accountBorrowsNew;
         uint256 totalBorrowsNew;
-        // uint256 borrowPrinciple;
-        // uint256 interestPayed;
     }
 
     /// @notice Sender repays their own borrow
@@ -327,8 +225,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // We fetch the amount the borrower owes, with accumulated interest
         vars.accountBorrows = borrowBalanceCurrent(msg.sender);
 
-        // console.logString("accountborrows");
-        // console.logUint(vars.accountBorrows);
         // require the borrower cant pay more than they owe
         require(
             _repayAmount <= vars.accountBorrows,
@@ -341,13 +237,14 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             vars.repayAmount = _repayAmount;
         }
 
-        // convert repayAmount to share
+        // convert repayAmount to share and round up
         uint256 repayAmountInShares = vault.toShare(asset, vars.repayAmount, true);
 
         require(
             vault.balanceOf(asset, msg.sender) >= repayAmountInShares,
             "NOT_ENOUGH_BALANCE_TO_REPAY"
         );
+
         // transfer the borrow asset from the borrower to LendingPair
         vault.transfer(
             asset,
@@ -356,19 +253,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             repayAmountInShares
         );
 
-        // We calculate the new borrower and total borrow balances
-        // accountBorrowsNew = accountBorrows - actualRepayShares
-        vars.accountBorrowsNew = vars.accountBorrows - vars.repayAmount;
-
-        // totalBorrowsNew = totalBorrows - actualRepayAmount
-        vars.totalBorrowsNew = totalBorrows - vars.repayAmount;
+        accountInterestIndex[msg.sender] = borrowIndex;
         
-        /* We write the previously calculated values into storage */
-        totalBorrows = vars.totalBorrowsNew;
-        accountBorrows[msg.sender].principal = vars.accountBorrowsNew;
-        accountBorrows[msg.sender].interestIndex = borrowIndex;
-
-        // burn debt tokens
         debtToken.burn(msg.sender, vars.repayAmount);
 
         emit Repay(
@@ -385,7 +271,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint256 burnTokens;
         uint256 currentBSBalance;
         uint256 currentUnderlyingBalance;
-        uint256 principalRedeemed;
         uint256 amount;
     }
 
@@ -428,28 +313,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             "NOT_ENOUGH_BALANCE"
         );
 
-        uint256 currentUnderlyingReward = 0;
-        if (vars.currentUnderlyingBalance > principalBalance[msg.sender]) {
-            currentUnderlyingReward = vars.currentUnderlyingBalance - principalBalance[msg.sender];
-        }
-
-        vars.principalRedeemed = vars.amount - currentUnderlyingReward;
-
-        if (vars.amount >= currentUnderlyingReward) {
-            // user is redeeming part or all of the prinicipal
-            historicalReward[msg.sender] = historicalReward[msg.sender] + currentUnderlyingReward;
-            
-            require(
-                vars.principalRedeemed <= principalBalance[msg.sender],
-                "ERROR_CALCULATING_REWARD"
-            );
-            principalBalance[msg.sender] = principalBalance[msg.sender] - vars.principalRedeemed;
-            
-        } else {
-            // user is redeeming rewards
-            historicalReward[msg.sender] = historicalReward[msg.sender] + vars.amount;
-        }
-
         wrapperBorrowedAsset.burn(msg.sender, vars.burnTokens);
         // transfer
         vault.transfer(asset, address(this), _to, vars.amount);
@@ -471,8 +334,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         accrueInterest();
 
         uint256 currentTotalSupply = wrapperBorrowedAsset.totalSupply();
-        // console.logString("currentTotalSupply");
-        // console.logUint(currentTotalSupply);
 
         if (currentTotalSupply == 0) {
             // If there are no tokens minted: exchangeRate = initialExchangeRate
@@ -483,22 +344,15 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             uint256 cashPlusBorrowsMinusReserves;
             Exp memory exchangeRate;
 
-            // console.logUint(totalCash);
-            // console.logUint(totalBorrows);
-            // console.logUint(totalReserves);
-
             // calculate total value held by contract plus owed to contract
-            cashPlusBorrowsMinusReserves = totalCash + totalBorrows - totalReserves;
+            // uint totalBorrows = totalBorrows();
+            cashPlusBorrowsMinusReserves = totalCash + totalBorrows() - totalReserves;
             
-            // console.logUint(cashPlusBorrowsMinusReserves);
-
             // calculate exchange rate
             exchangeRate = getExp(
                 cashPlusBorrowsMinusReserves,
                 currentTotalSupply
             );
-
-            // console.logUint(exchangeRate.mantissa);
 
             return (exchangeRate.mantissa);
         }
@@ -510,6 +364,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         return vault.balanceOf(asset, address(this));
     }
 
+    /// @notice Total amount of outstanding borrows of the asset in this market
+    function totalBorrows() public view returns(uint256) {
+        return debtToken.totalSupply();
+    }
     
     /// @notice Applies accrued interest to total borrows and reserves
     /// @dev This calculates interest accrued from the last checkpointed block
@@ -528,7 +386,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         // read the previous values out of storage
         uint256 cashPrior = getCashPrior();
-        uint256 borrowsPrior = totalBorrows;
+        uint256 borrowsPrior = totalBorrows();
+
         uint256 reservesPrior = totalReserves;
         uint256 borrowIndexPrior = borrowIndex;
         // calculate the current borrow interest rate
@@ -549,7 +408,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // Calculate the interest accumulated into borrows and reserves and the new index:
         Exp memory simpleInterestFactor;
         uint256 interestAccumulated;
-        uint256 totalBorrowsNew;
         uint256 totalReservesNew;
         uint256 borrowIndexNew;
 
@@ -563,9 +421,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             simpleInterestFactor,
             borrowsPrior
         );
-        // totalBorrowsNew = interestAccumulated + totalBorrows
-        totalBorrowsNew = interestAccumulated + borrowsPrior;
-
+        
         // totalReservesNew = interestAccumulated * reserveFactor + totalReserves
         totalReservesNew = mulScalarTruncateAddUInt(
             Exp({mantissa: reserveFactorMantissa}),
@@ -583,38 +439,19 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // Write the previously calculated values into storage
         accrualBlockNumber = currentBlockNumber;
         borrowIndex = borrowIndexNew;
-        totalBorrows = totalBorrowsNew;
+        // increase total borrows
+        // totalBorrowsNew = interestAccumulated + totalBorrows
+        debtToken.increaseTotalDebt(interestAccumulated);
         totalReserves = totalReservesNew;
 
         emit InterestAccrued(
             address(this),
             accrualBlockNumber,
             borrowIndex,
-            totalBorrows,
+            // total borrows
+            borrowsPrior + interestAccumulated,
             totalReserves
         );
-    }
-
-
-    /// @notice returns last calculated account's borrow balance using the prior borrowIndex
-    /// @param _account The address whose balance should be calculated after updating borrowIndex
-    /// @return result The calculated balance
-    function borrowBalancePrior(address _account) public view override returns (uint256 result) {
-        uint256 principalTimesIndex;
-
-        // Get borrowBalance and borrowIndex
-        BorrowSnapshot memory borrowSnapshot = accountBorrows[_account];
-        // If borrowBalance = 0 then borrowIndex is likely also 0.
-        // Rather than failing the calculation with a division by 0, we immediately return 0 in this case.
-        if (borrowSnapshot.principal == 0) {
-            return 0;
-        }
-
-        // Calculate new borrow balance using the interest index:
-        // recentBorrowBalance = borrower.borrowBalance * market.borrowIndex / borrower.borrowIndex
-        principalTimesIndex = borrowSnapshot.principal * borrowIndex;
-
-        result = principalTimesIndex / borrowSnapshot.interestIndex;
     }
 
     /**
@@ -624,7 +461,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     **/
     function borrowBalanceCurrent(address _account) public returns (uint256) {
         accrueInterest();
-        return borrowBalancePrior(_account);
+        return debtToken.balanceOf(_account);
     }
 
 
@@ -644,9 +481,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         } else {
             amount = _amount;
         }
-        // console.logString("colalteral");
-        // console.logUint(amount);
-        // console.logUint(maxAmount);
 
         // require the availible value of the collateral locked in this contract the user has
         // is greater than or equal to the amount being withdrawn
@@ -687,23 +521,14 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         returns (uint256)
     {
         uint256 borrowedTotal = getTotalBorrowedValueInUSD(account);
-        // console.logString("borrowedTotal");
-        // console.logUint(borrowedTotal);
         uint256 collateralValue = getTotalAvailableCollateralValueInUSD(account);
-        // console.logUint(borrowedTotal);
         uint256 requiredCollateral = calcCollateralRequired(borrowedTotal);
-        // console.logUint(requiredCollateral);
         if (collateralValue < requiredCollateral) {
             return 0;
         }
         uint256 leftoverCollateral = collateralValue - requiredCollateral;
-        // console.logUint(leftoverCollateral);
 
         uint256 currentCollateralValueInUSD = getPriceOfCollateral();
-
-        // console.logUint(currentCollateralValueInUSD);
-        // console.logUint(leftoverCollateral / currentCollateralValueInUSD);
-
         return leftoverCollateral / currentCollateralValueInUSD;
     }
 
@@ -715,10 +540,12 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         public
         returns (uint256)
     {
-        // convert the amount of collateral to underlying amount
-        uint256 underlyingAmount = vault.toUnderlying(collateralAsset, collateralOfAccount(_account));
-        return getPriceOfToken(collateralAsset, underlyingAmount);
+        return getPriceOfToken(
+            collateralAsset, 
+            vault.toUnderlying(collateralAsset, collateralOfAccount(_account))  // convert the amount of collateral to underlying amount
+        );
     }
+
     /// @dev returns price of collateral in usd
     function getPriceOfCollateral() public returns (uint256) {
         return oracle.getPriceInUSD(collateralAsset);
@@ -739,11 +566,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _account is the account whos borrowed value we are calculating
     /// @dev this function returns newly calculated values
     function getTotalBorrowedValueInUSD(address _account) public returns (uint256) {
-        uint256 currentBorrowBalance = borrowBalanceCurrent(_account);
-
         return getPriceOfToken(
             asset,
-            currentBorrowBalance
+            borrowBalanceCurrent(_account)
         );
     }
 
@@ -783,48 +608,45 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // require the liquidator is not also the borrower
         require(msg.sender != _borrower, "NOT_LIQUIDATE_YOURSELF");
 
-        uint256 borrowedAmount = borrowBalanceCurrent(_borrower);
-        uint256 borrowedAmountInUSD = getPriceOfToken(
-            collateralAsset,
-            borrowedAmount
-        );
-
-        uint256 borrowLimit = getBorrowLimitInUSD(_borrower);
+        uint256 borrowedAmountTotal = borrowBalanceCurrent(_borrower);
+        uint256 borrowedAmountInUSD = getPriceOfToken(asset, borrowedAmountTotal);
+        uint256 borrowLimitInUSD = getBorrowLimitInUSD(_borrower);
 
         // check if the borrow is less than the borrowed amount
-        if (borrowLimit <= borrowedAmountInUSD) {
+        if (borrowLimitInUSD <= borrowedAmountInUSD) {
             _repayLiquidatingLoan(
                 _borrower,
                 msg.sender,
-                borrowedAmount
+                borrowedAmountTotal
             );
+
+            // Clear the borrowers interest rate index
+            accountInterestIndex[_borrower] = 0;
+
             _liquidate(_borrower, msg.sender);
         }
     }
 
-    
     /// @dev _repayLiquidatingLoan
     /// @param _borrower is the address of the borrower who took out the loan
     /// @param _liquidator is the address of the account who is liquidating the loan
-    /// @param _amount is the amount of StableCoin being repayed
+    /// @param _borrowedAmount is the amount of StableCoin being repayed
     /// @dev
     function _repayLiquidatingLoan(
         address _borrower,
         address _liquidator,
-        uint256 _amount
+        uint256 _borrowedAmount
     ) internal {
-        uint256 borrowedAmountInShares = vault.toShare(asset, _amount, true);
-
-        vault.transfer(asset, _liquidator, address(this), borrowedAmountInShares);
-        
-        // calculate the fee on the principle received
-        uint256 fee = calculateFee(_amount);
-        // transfer fee amount to Edge team
+        // liquidation fee
+        uint256 fee = calculateFee(_borrowedAmount);
+        // borrowed amount + liquidation fee
+        uint256 amountInShares = vault.toShare(asset, _borrowedAmount + fee, true);
+        // transfer liquidated position to eldning
+        vault.transfer(asset, _liquidator, address(this), amountInShares);
+        // add fee amount to reserves
         totalReserves = totalReserves + fee;
-        // Clear the borrowers loan
-        accountBorrows[_borrower].principal = 0;
-        accountBorrows[_borrower].interestIndex = 0;
-        totalBorrows = totalBorrows - _amount;
+        // burn borrower debt
+        debtToken.burn(_borrower, _borrowedAmount);
     }
 
     /// @dev _liquidate is a function to liquidate a user
@@ -833,14 +655,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     function _liquidate(address _account, address _liquidator)
         internal
     {
-
         // uint256 balance = collateralBalance[_account];
         uint balance = wrappedCollateralAsset.balanceOf(_account);
-
         // reset the borrowers collateral tracker
-        // collateralBalance[_account] = 0;
         wrappedCollateralAsset.burn(_account, balance);
-
         // transfer the collateral tokens to the liquidator
         vault.transfer(collateralAsset, address(this), _liquidator, balance);
 
@@ -854,18 +672,17 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /// @notice withdrawFees allows the blacksmith team to withdraw the reserves earned by fees
-    /// @param _sharesToWithdraw is the amount of a reservers being withdrawn
+    /// @param _toWithdraw is the amount of a reservers being withdrawn
     /// @dev this is a protected function that can only be called by the blacksmith address
-    function withdrawFees(uint256 _sharesToWithdraw) public onlyBlackSmithTeam {
+    function withdrawFees(uint256 _toWithdraw) public onlyBlackSmithTeam {
         require(
-            totalReserves >= _sharesToWithdraw,
+            totalReserves >= _toWithdraw,
             "NOT_ENOUGH_BALANCE"
         );
 
-        totalReserves = totalReserves - _sharesToWithdraw;
-        vault.transfer(asset, address(this), blackSmithTeam, _sharesToWithdraw);
+        totalReserves = totalReserves - _toWithdraw;
+        vault.transfer(asset, address(this), blackSmithTeam, _toWithdraw);
 
-        emit ReserveWithdraw(msg.sender, _sharesToWithdraw);
+        emit ReserveWithdraw(msg.sender, _toWithdraw);
     }
-
 }

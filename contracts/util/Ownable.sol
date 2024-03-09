@@ -26,8 +26,8 @@ contract Ownable is Initializable {
     /**
      * @dev Ruler: Initializes the contract setting the deployer as the initial owner.
      */
-    function initializeOwner() internal initializer {
-        _owner = msg.sender;
+    function initializeOwner(address __owner) internal initializer {
+        _owner = __owner;
         emit OwnershipTransferred(address(0), _owner);
     }
 
@@ -35,7 +35,7 @@ contract Ownable is Initializable {
     /**
      * @dev Returns the address of the current owner.
      */
-    function owner() public view returns (address) {
+    function owner() external view returns (address) {
         return _owner;
     }
 
