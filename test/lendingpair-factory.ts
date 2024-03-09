@@ -1,5 +1,6 @@
 import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
+import { expect, assert } from "chai";
 import {
     IPriceOracleAggregator,
     JumpRateModelV2,
@@ -9,8 +10,12 @@ import {
     WrapperToken,
     LendingPairHelper as BLendingPairHelper,
     DebtToken,
-  } from "../types";
-import deployLendingPairFactory from "../deploy/7-deploy-LendingPairFactory";
+    LendingPairFactory as BLendingPairFactory,
+} from "../types";
+import { 
+    deployLendingPairFactory
+} from "../helpers/contracts"
+import { makeLendingPairTestSuiteVars } from "./lib";
 
 // list of accounts
 let accounts: Signer[];
@@ -30,7 +35,7 @@ let CollateralWrapperToken: WrapperToken
 let InterestRateModel: JumpRateModelV2;
 let LendingPairHelper: BLendingPairHelper
 
-let LendingPairFactory
+let LendingPairFactory: BLendingPairFactory
 
 describe("LendingPairFactory", function() {
 
@@ -41,20 +46,44 @@ describe("LendingPairFactory", function() {
             admin,
             bob,
             frank,
-        ] = await Promise.all(accounts.slice(0, 10).map(x => x.getAddress())))
+        ] = await Promise.all(accounts.slice(0, 10).map(x => x.getAddress())));
 
+        ({
+            Vault,
+            LendingPair,
+            MockPriceOracle,
+            BorrowAsset,
+            CollateralAsset,
+            CollateralWrapperToken,
+            BorrowAssetDepositWrapperToken,
+            DebtWrapperToken,
+        } = await makeLendingPairTestSuiteVars());
 
-        // LendingPairFactory = await deployLendingPairFactory(
-
-        // )
+        LendingPairFactory = await deployLendingPairFactory(
+            admin,
+            LendingPair.address,
+            CollateralWrapperToken.address,
+            DebtWrapperToken.address,
+            BorrowAssetDepositWrapperToken.address
+        )
     })
 
     it("createIR", async function() {
-
+        await expect(
+            LendingPairFactory.createIR(
+                {
+                    baseRatePerYear: "30000000000000000",
+                    multiplierPerYear: "52222222222200000",
+                    jumpMultiplierPerYear: "70",
+                    optimal: "1000000000000000000",
+                },
+                admin
+            )
+        ).to.not.be.reverted
     })
 
     it("createPair", async function() {
-
+        
     })
 
 })

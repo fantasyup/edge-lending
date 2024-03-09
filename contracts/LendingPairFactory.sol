@@ -75,7 +75,7 @@ contract LendingPairFactory is Pausable {
         emit LogicContractUpdated(_newLogicContract);
     }
 
-    /// @dev creates lending pair clone using EIP 1167 minimal proxy contract
+    /// @dev creates clone using EIP 1167 minimal proxy contract
     function clone(address implementation) internal returns (address instance) {
         // solhint-disable-next-line no-inline-assembly
         assembly {
@@ -174,6 +174,8 @@ contract LendingPairFactory is Pausable {
             _collateralAsset,
             wrappedCollateralAsset
         );
+
+        emit NewLendingPair(newLendingPair);
     }
 
     function initWrapperTokensWithProxy(

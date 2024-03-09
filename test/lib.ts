@@ -9,6 +9,7 @@ import {
     WrapperToken,
 } from "../types";
 import { 
+    deployDebtToken,
   deployInterestRateModel,
   deployLendingPair,
   deployMockPriceOracle,
@@ -37,7 +38,7 @@ export async function makeLendingPairTestSuiteVars(price?: BigNumber) {
         BorrowAsset: await deployMockToken(),
         CollateralAsset: await deployMockToken(),
         BorrowAssetDepositWrapperToken: await deployWrappedToken(),
-        DebtWrapperToken: await deployWrappedToken(),
+        DebtWrapperToken: await deployDebtToken(),
         CollateralWrapperToken: await deployWrappedToken()
     }
 }
