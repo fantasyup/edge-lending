@@ -120,7 +120,7 @@ contract LendingPairFactory is Pausable {
     }
 
     /// @dev create lending pair with clones
-    function createLendingPairWithClones(
+    function createLendingPairWithProxy(
         address _team,
         IPriceOracleAggregator _oracle,
         IBSVault _vault,
@@ -175,6 +175,8 @@ contract LendingPairFactory is Pausable {
             wrappedCollateralAsset
         );
 
+        allPairs.push(newLendingPair);
+        
         emit NewLendingPair(newLendingPair, block.timestamp);
     }
 

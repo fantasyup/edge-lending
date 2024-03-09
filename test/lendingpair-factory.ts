@@ -91,23 +91,39 @@ describe("LendingPairFactory", function() {
             "1000000000000000000",
             admin
           )
+        
+        const liquidationFee = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
+        const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
 
-        // await expect(
-        //     LendingPairFactory.createLendingPairWithClones(
-        //         admin,
-        //         MockPriceOracle.address,
-        //         Vault.address,
-        //         CollateralAsset.address,
-        //         {
-        //             borrowAsset: BorrowAsset.address,
-        //             initialExchangeRateMantissa: "",
-        //             reserveFactorMantissa: "",
-        //             collateralFactor: "",
-        //             liquidationFee: ""
-        //         },
-        //         interestRateModel.address
-        //     )
-        // ).to.not.be.reverted
+        await expect(
+            LendingPairFactory.createLendingPairWithProxy(
+                admin,
+                MockPriceOracle.address,
+                Vault.address,
+                CollateralAsset.address,
+                {
+                    borrowAsset: BorrowAsset.address,
+                    initialExchangeRateMantissa: "1000000000000000000",
+                    reserveFactorMantissa: "500000000000000000",
+                    collateralFactor,
+                    liquidationFee
+                },
+                interestRateModel.address
+            )
+        ).to.not.be.reverted
+
+        const pairAddress = await LendingPairFactory.allPairs(0)
+
+        const lendingPair = LendingPair.attach(pairAddress)
+
+        // confirm data provided is correct
+        await expect(await lendingPair.collateralAsset()).eq(CollateralAsset.address)
+        await expect(await lendingPair.asset()).eq(BorrowAsset.address)
+        await expect(await lendingPair.vault()).eq(Vault.address)
+        await expect(await lendingPair.interestRate()).eq(interestRateModel.address)
+
+        await expect(await (await lendingPair.liquidationFee()).toString()).eq(liquidationFee.toString())
+        await expect(await (await lendingPair.collateralFactor()).toString()).eq(collateralFactor.toString())
     })
 
 })

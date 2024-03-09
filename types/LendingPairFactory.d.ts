@@ -26,7 +26,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     "borrowAssetWrapperImplementation()": FunctionFragment;
     "collateralWrapperImplementation()": FunctionFragment;
     "createIR(tuple,address)": FunctionFragment;
-    "createLendingPairWithClones(address,address,address,address,tuple,address)": FunctionFragment;
+    "createLendingPairWithProxy(address,address,address,address,tuple,address)": FunctionFragment;
     "debtTokenImplementation()": FunctionFragment;
     "initWrapperTokensWithProxy(address,address,address,string)": FunctionFragment;
     "lendingPairImplementation()": FunctionFragment;
@@ -65,7 +65,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "createLendingPairWithClones",
+    functionFragment: "createLendingPairWithProxy",
     values: [
       string,
       string,
@@ -125,7 +125,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "createIR", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "createLendingPairWithClones",
+    functionFragment: "createLendingPairWithProxy",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -266,7 +266,7 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    createLendingPairWithClones(
+    createLendingPairWithProxy(
       _team: string,
       _oracle: string,
       _vault: string,
@@ -282,7 +282,7 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createLendingPairWithClones(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
+    "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
       _team: string,
       _oracle: string,
       _vault: string,
@@ -428,7 +428,7 @@ export class LendingPairFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  createLendingPairWithClones(
+  createLendingPairWithProxy(
     _team: string,
     _oracle: string,
     _vault: string,
@@ -444,7 +444,7 @@ export class LendingPairFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createLendingPairWithClones(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
+  "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
     _team: string,
     _oracle: string,
     _vault: string,
@@ -592,7 +592,7 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    createLendingPairWithClones(
+    createLendingPairWithProxy(
       _team: string,
       _oracle: string,
       _vault: string,
@@ -608,7 +608,7 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createLendingPairWithClones(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
+    "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
       _team: string,
       _oracle: string,
       _vault: string,
@@ -769,7 +769,7 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    createLendingPairWithClones(
+    createLendingPairWithProxy(
       _team: string,
       _oracle: string,
       _vault: string,
@@ -785,7 +785,7 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createLendingPairWithClones(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
+    "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
       _team: string,
       _oracle: string,
       _vault: string,
@@ -941,7 +941,7 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    createLendingPairWithClones(
+    createLendingPairWithProxy(
       _team: string,
       _oracle: string,
       _vault: string,
@@ -957,7 +957,7 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createLendingPairWithClones(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
+    "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
       _team: string,
       _oracle: string,
       _vault: string,
