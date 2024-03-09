@@ -13,6 +13,20 @@ import "hardhat/console.sol";
 contract DebtToken is WrapperToken, IDebtToken {
     bool constant isDebtToken = true;
 
+        /// @notice
+    function initialize(
+        IBSLendingPair __owner,
+        address _underlying,
+        string memory _tokenName,
+        string memory _tokenSymbol
+    ) external override(WrapperToken, IBSWrapperToken) initializer {
+        require(address(__owner) != address(0), "invalid owner");
+        _owner = __owner;
+        initializeERC20(_tokenName, _tokenSymbol, 18);
+        initializeERC20Permit(_tokenName);
+        underlying = _underlying;
+    }
+
     function balanceOf(address _account) public view override(ERC20, IERC20) returns(uint256 balance) {
         uint256 principalTimesIndex;
         // Get borrowBalance and borrowIndex

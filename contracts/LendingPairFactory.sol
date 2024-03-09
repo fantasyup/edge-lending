@@ -20,7 +20,6 @@ contract LendingPairFactory is Pausable {
     address public debtTokenImplementation;
     address public borrowAssetWrapperImplementation;
 
-
     address[] public allPairs;
 
     event NewLendingPair(address pair, uint256 created);

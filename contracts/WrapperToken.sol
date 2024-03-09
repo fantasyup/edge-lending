@@ -41,7 +41,7 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
         address _underlying,
         string memory _tokenName,
         string memory _tokenSymbol
-    ) external override initializer {
+    ) external virtual override initializer {
         require(address(__owner) != address(0), "invalid owner");
         _owner = __owner;
         uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
