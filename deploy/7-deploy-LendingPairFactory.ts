@@ -7,10 +7,20 @@ const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRun
     const { deployer, blackSmithTeam } = await getNamedAccounts();
 
     const dataTypesLib = await get(ContractId.DataTypes)
+    const lendingPairImplementation = await get(ContractId.LendingPair)
+    const debtTokenImplementation = await get(ContractId.DebtToken)
+    const collateralWrapperImplementation = await get(ContractId.CollateralWrapperToken)
+    const borrowWrapperImpl = await get(ContractId.WrapperToken)
 
     await deploy(ContractId.LendingPairFactory, {
       from: deployer,
-      args: [blackSmithTeam],
+      args: [
+        blackSmithTeam,
+        lendingPairImplementation.address,
+        collateralWrapperImplementation.address,
+        debtTokenImplementation.address,
+        borrowWrapperImpl.address
+      ],
       log: true,
       libraries: {
         [ContractId.DataTypes]: dataTypesLib.address

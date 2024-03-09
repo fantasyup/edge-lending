@@ -15,4 +15,4 @@ const deployPriceOracleAggregator: DeployFunction = async function (hre: Hardhat
 };
 
 export default deployPriceOracleAggregator
-deployPriceOracleAggregator.tags = ['PriceOracle']
+deployPriceOracleAggregator.tags = [`${ContractId.PriceOracleAggregator}`]

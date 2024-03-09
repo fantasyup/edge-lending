@@ -13,7 +13,7 @@ import "hardhat/console.sol";
 contract DebtToken is WrapperToken, IDebtToken {
     bool constant isDebtToken = true;
 
-        /// @notice
+    /// @notice
     function initialize(
         IBSLendingPair __owner,
         address _underlying,
@@ -27,6 +27,7 @@ contract DebtToken is WrapperToken, IDebtToken {
         underlying = _underlying;
     }
 
+    /// @dev calculates the debt balance of account
     function balanceOf(address _account) public view override(ERC20, IERC20) returns(uint256 balance) {
         uint256 principalTimesIndex;
         // Get borrowBalance and borrowIndex
@@ -56,7 +57,7 @@ contract DebtToken is WrapperToken, IDebtToken {
 
     /**
     * @notice used to increase the debt of the system
-    * @param _amount is the amount of token to increase supply
+    * @param _amount is the amount to increase
     **/
     function increaseTotalDebt(uint256 _amount) external override onlyLendingPair {
         _totalSupply = _totalSupply + _amount;

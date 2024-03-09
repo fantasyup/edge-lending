@@ -15,4 +15,4 @@ const deployWrapperToken: DeployFunction = async function (hre: HardhatRuntimeEn
 };
 
 export default deployWrapperToken
-deployWrapperToken.tags = ['WrapperToken']
+deployWrapperToken.tags = [`${ContractId.WrapperToken}`]
