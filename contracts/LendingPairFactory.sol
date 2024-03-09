@@ -13,8 +13,13 @@ import "./DataTypes.sol";
 
 contract LendingPairFactory is Pausable {
 
-    address public pairLogic;
     address immutable public admin;
+
+    address public lendingPairImplementation;
+    address public collateralWrapperImplementation;
+    address public debtTokenImplementation;
+    address public borrowAssetWrapperImplementation;
+
 
     address[] public allPairs;
 
@@ -27,9 +32,18 @@ contract LendingPairFactory is Pausable {
         _;
     }
 
-    constructor(address _admin, address _pairLogic) {
+    constructor(
+        address _admin,
+        address _pairLogic,
+        address _collateralWrapperLogic,
+        address _debtTokenLogic,
+        address _borrowAssetWrapperLogic
+    ) {
         admin = _admin;
-        pairLogic = _pairLogic;
+        lendingPairImplementation = _pairLogic;
+        collateralWrapperImplementation = _collateralWrapperLogic;
+        debtTokenImplementation = _debtTokenLogic;
+        borrowAssetWrapperImplementation = _borrowAssetWrapperLogic;
     }
 
     /// @notice pause factory actions
@@ -42,9 +56,37 @@ contract LendingPairFactory is Pausable {
         _unpause();
     }
 
-    function updatePairLogicContract(address _newLogicContract) external onlyAdmin {
-        pairLogic = _newLogicContract;
+    function updatePairImpl(address _newLogicContract) external onlyAdmin {
+        lendingPairImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
+    }
+    
+    function updateCollateralWrapperImpl(address _newLogicContract) external onlyAdmin {
+        collateralWrapperImplementation = _newLogicContract;
+        emit LogicContractUpdated(_newLogicContract);
+    }
+    
+    function updateDebtTokenImpl(address _newLogicContract) external onlyAdmin {
+        debtTokenImplementation = _newLogicContract;
+        emit LogicContractUpdated(_newLogicContract);
+    }
+    
+    function updateBorrowAssetWrapperImpl(address _newLogicContract) external onlyAdmin {
+        borrowAssetWrapperImplementation = _newLogicContract;
+        emit LogicContractUpdated(_newLogicContract);
+    }
+
+    /// @dev creates lending pair clone using EIP 1167 minimal proxy contract
+    function clone(address implementation) internal returns (address instance) {
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            let ptr := mload(0x40)
+            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
+            mstore(add(ptr, 0x14), shl(0x60, implementation))
+            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
+            instance := create(0, ptr, 0x37)
+        }
+        require(instance != address(0), "ERC1167: create failed");
     }
 
     struct NewLendingVaultIRLocalVars {
@@ -54,125 +96,106 @@ contract LendingPairFactory is Pausable {
         uint256 optimal;
     }
 
+    /// @dev create interest rate model
+    function createIR(
+        NewLendingVaultIRLocalVars calldata _interestRateVars,
+        address _team
+    ) external returns (address ir) {
+        ir = address(
+            new JumpRateModelV2(
+                _interestRateVars.baseRatePerYear,
+                _interestRateVars.multiplierPerYear,
+                _interestRateVars.jumpMultiplierPerYear,
+                _interestRateVars.optimal,
+                address(_team)
+            )
+        );
+    }
+
     struct BorrowLocalVars {
         IERC20 borrowAsset;
         uint256 initialExchangeRateMantissa;
         uint256 reserveFactorMantissa;
         uint256 collateralFactor;
-        IBSWrapperToken wrappedBorrowAsset;
         uint256 liquidationFee;
-        IDebtToken debtToken;
     }
 
-    /// @dev creates lending pair clone using EIP 1167 minimal proxy contract
-    function createLendingPairClone() internal returns (address result) {
-        bytes20 targetBytes = bytes20(pairLogic);
-        assembly {
-            let clone := mload(0x40)
-            mstore(clone, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
-            mstore(add(clone, 0x14), targetBytes)
-            mstore(add(clone, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
-            result := create(0, clone, 0x37)
-        }
-    }
-
-    /// @dev create pair with clone
-    function createPairWithClone(
+    /// @dev create lending pair with clones
+    function createLendingPairWithClones(
         address _team,
         IPriceOracleAggregator _oracle,
         IBSVault _vault,
         IERC20 _collateralAsset,
-        IBSWrapperToken _wrappedCollateralAsset,
         BorrowLocalVars calldata _borrowVars,
-        NewLendingVaultIRLocalVars calldata _interestRateVars
-    ) external whenNotPaused returns (address newPairAddr) {
-        IBSLendingPair newLendingPair = IBSLendingPair(createLendingPairClone());
-        createPair(
+        address interestRateModel
+    ) external whenNotPaused returns (address newLendingPair) {
+        newLendingPair = clone(lendingPairImplementation);
+
+        // initialize wrapper borrow asset
+        IBSWrapperToken wrappedBorrowAsset = IBSWrapperToken(initWrapperTokensWithProxy(
+            borrowAssetWrapperImplementation,
             newLendingPair,
-            _team,
-            _oracle,
-            _vault,
-            _collateralAsset,
-            _wrappedCollateralAsset,
-            _borrowVars,
-            _interestRateVars
-        );
-        newPairAddr = address(newLendingPair);
-    } 
+            address(_borrowVars.borrowAsset),
+            "BOR",
+            address(_borrowVars.borrowAsset)
+        ));
 
-    function createPair(
-        IBSLendingPair pair,
-        address _team,
-        IPriceOracleAggregator _oracle,
-        IBSVault _vault,
-        IERC20 _collateralAsset,
-        IBSWrapperToken _wrappedCollateralAsset,
-        BorrowLocalVars calldata _borrowVars,
-        NewLendingVaultIRLocalVars calldata _interestRateVars
-    ) public whenNotPaused returns (address newPairAddr) {
-        // create the interest rate model
-        address ir =
-            address(
-                new JumpRateModelV2(
-                    _interestRateVars.baseRatePerYear,
-                    _interestRateVars.multiplierPerYear,
-                    _interestRateVars.jumpMultiplierPerYear,
-                    _interestRateVars.optimal,
-                    address(_team)
-                )
-            );
+        // initialize wrapper collateral asset
+        IBSWrapperToken wrappedCollateralAsset = IBSWrapperToken(initWrapperTokensWithProxy(
+            collateralWrapperImplementation,
+            newLendingPair,
+            address(_collateralAsset),
+            "COL",
+            address(_collateralAsset)
+        ));
 
+        // initialize debt token
+        IDebtToken debtToken = IDebtToken(initWrapperTokensWithProxy(
+            debtTokenImplementation,
+            newLendingPair,
+            address(_borrowVars.borrowAsset),
+            "DEB",
+            address(0)
+        ));
+        
         DataTypes.BorrowAssetConfig memory borrowConfig = DataTypes.BorrowAssetConfig(
-            IInterestRateModel(ir),
+            IInterestRateModel(interestRateModel),
             _borrowVars.initialExchangeRateMantissa,
             _borrowVars.reserveFactorMantissa,
             _borrowVars.collateralFactor,
-            _borrowVars.wrappedBorrowAsset,
+            wrappedBorrowAsset,
             _borrowVars.liquidationFee,
-            _borrowVars.debtToken
+            debtToken
         );
 
-        // initialize wrapper borrow asset
-        initializeWrapperTokens(
-            pair,
-            borrowConfig.wrappedBorrowAsset,
-            IERC20Details(address(_borrowVars.borrowAsset)),
-            "BOR",
-            address(_borrowVars.borrowAsset)
-        );
-
-        // initialize wrapper collateral asset
-        initializeWrapperTokens(
-            pair,
-            _wrappedCollateralAsset,
-            IERC20Details(address(_collateralAsset)),
-            "COL",
-            address(_collateralAsset)
-        );
-
-        // initialize debt token
-        initializeWrapperTokens(
-            pair,
-            borrowConfig.debtToken,
-            IERC20Details(address(borrowConfig.wrappedBorrowAsset)),
-            "DEB",
-            address(0)
-        );
-
-        pair.initialize(
+        // initialize lending pair
+        IBSLendingPair(newLendingPair).initialize(
             _team,
             _oracle,
             _vault,
             _borrowVars.borrowAsset,
             borrowConfig,
             _collateralAsset,
-            _wrappedCollateralAsset
+            wrappedCollateralAsset
         );
+    }
 
-        newPairAddr = address(pair);
-        allPairs.push(newPairAddr);
+    function initWrapperTokensWithProxy(
+        address implementation,
+        address pair,
+        address assetDetails,
+        string memory symbol,
+        address underlying
+    ) public returns(address wrapper){
+        wrapper = clone(implementation);
 
-        emit NewLendingPair(newPairAddr, block.timestamp);
+        initializeWrapperTokens(
+            IBSLendingPair(pair),
+            IBSWrapperToken(wrapper),
+            IERC20Details(assetDetails),
+            symbol,
+            underlying
+        );
     }
 
     function initializeWrapperTokens(
