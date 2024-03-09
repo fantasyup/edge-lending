@@ -13,6 +13,7 @@ import {
     LendingPairFactory as BLendingPairFactory,
 } from "../types";
 import { 
+    deployInterestRateModel,
     deployLendingPairFactory
 } from "../helpers/contracts"
 import { makeLendingPairTestSuiteVars } from "./lib";
@@ -83,7 +84,30 @@ describe("LendingPairFactory", function() {
     })
 
     it("createPair", async function() {
-        
+        const interestRateModel = await deployInterestRateModel(
+            "30000000000000000",
+            "52222222222200000",
+            "70",
+            "1000000000000000000",
+            admin
+          )
+
+        // await expect(
+        //     LendingPairFactory.createLendingPairWithClones(
+        //         admin,
+        //         MockPriceOracle.address,
+        //         Vault.address,
+        //         CollateralAsset.address,
+        //         {
+        //             borrowAsset: BorrowAsset.address,
+        //             initialExchangeRateMantissa: "",
+        //             reserveFactorMantissa: "",
+        //             collateralFactor: "",
+        //             liquidationFee: ""
+        //         },
+        //         interestRateModel.address
+        //     )
+        // ).to.not.be.reverted
     })
 
 })

@@ -175,7 +175,7 @@ contract LendingPairFactory is Pausable {
             wrappedCollateralAsset
         );
 
-        emit NewLendingPair(newLendingPair);
+        emit NewLendingPair(newLendingPair, block.timestamp);
     }
 
     function initWrapperTokensWithProxy(
