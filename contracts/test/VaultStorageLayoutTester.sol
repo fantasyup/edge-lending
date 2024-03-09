@@ -9,11 +9,11 @@ contract VaultStorageLayoutTester is Vault {
         uint256 slot;
         uint256 offset;
 
-        assembly { slot:= blackSmithTeam.slot offset := blackSmithTeam.offset }
-        require (slot == 1 && offset == 0, "blacksmith team has changed location");
+        assembly { slot:= flashLoanRate.slot offset := flashLoanRate.offset }
+        require (slot == 1 && offset == 0, "flashloan rate has changed location");
 
-        assembly { slot:= flashLoanRate.slot offset := blackSmithTeam.offset }
-        require (slot == 2 && offset == 0, "flashloan rate has changed location");
+        assembly { slot:= blackSmithTeam.slot offset := blackSmithTeam.offset }
+        require (slot == 2 && offset == 0, "blacksmith team has changed location");
 
         assembly { slot:= balanceOf.slot offset := balanceOf.offset }
         require (slot == 3 && offset == 0, "balanceOf rate has changed location");
@@ -22,6 +22,6 @@ contract VaultStorageLayoutTester is Vault {
         require (slot == 4 && offset == 0, "totals has changed location");
 
         assembly { slot:= userApprovedContracts.slot offset := userApprovedContracts.offset }
-        require (slot == 5 && offset == 0, "flashloan rate has changed location");
+        require (slot == 5 && offset == 0, "userApprovedContracts rate has changed location");
     }
 }

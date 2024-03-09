@@ -433,8 +433,10 @@ describe("Vault", function () {
     // @TODO 
     it("test storage layout", async function() {
       const storageLayoutTester = await deployVaultStorageLayoutTester()
-      
+
+      await expect(await storageLayoutTester.validateStorageLayout()).to.not.be.reverted;
     })
+
   })
 
   async function vaultDeposit(Vault: BMockVault, user: string, amount: number) {

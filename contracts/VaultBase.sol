@@ -7,12 +7,12 @@ import { UUPSProxiableAndPausable } from "./upgradability/UUPSProxiableAndPausab
 import "./interfaces/IBSVault.sol";
 
 abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
-    
-    /// @notice the address of the blackSmithTeam that enables `admin` functions
-    address public blackSmithTeam;
 
     /// @notice the flashloan rate to charge for flash loans
     uint256 public flashLoanRate;
+
+    /// @notice the address of the blackSmithTeam that enables `admin` functions
+    address public blackSmithTeam;
 
     /// @notice mapping of token asset to user address and balance
     mapping(IERC20 => mapping(address => uint256)) public override balanceOf;
@@ -23,4 +23,6 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
     /// @notice mapping of user to contract to approval status
     mapping(address => mapping(address => bool)) public userApprovedContracts;
 
+    /// @dev ERC3156 constant for flashloan callback success
+    bytes32 internal constant FLASHLOAN_CALLBACK_SUCCESS = keccak256("ERC3156FlashBorrower.onFlashLoan");
 }

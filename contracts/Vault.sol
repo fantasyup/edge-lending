@@ -23,10 +23,6 @@ import "hardhat/console.sol";
 contract Vault is VaultBase {
     using SafeERC20 for IERC20;
 
-    /// @dev ERC3156 constant for flashloan callback success
-    bytes32 private constant FLASHLOAN_CALLBACK_SUCCESS =
-        keccak256("ERC3156FlashBorrower.onFlashLoan");
-
     /// @notice modifier to allow only blacksmith team to call a function
     modifier onlyBlacksmithTeam {
         require(msg.sender == blackSmithTeam, "ONLY_BLACK_SMITH_TEAM");
