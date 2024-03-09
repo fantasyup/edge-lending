@@ -13,6 +13,7 @@ import "./DataTypes.sol";
 
 contract LendingPairFactory is Pausable {
 
+    address immutable pairLogic;
     address immutable public admin;
 
     address[] public allPairs;
@@ -25,8 +26,9 @@ contract LendingPairFactory is Pausable {
         _;
     }
 
-    constructor(address _admin) {
+    constructor(address _admin, IBSLendingPair _pair) {
         admin = _admin;
+        pairLogic = _pair;
     }
 
     /// @notice pause factory actions
@@ -56,6 +58,42 @@ contract LendingPairFactory is Pausable {
         IDebtToken debtToken;
     }
 
+    /// @dev creates lending pair clone using EIP 1167 minimal proxy contract
+    function createLendingPairClone() internal returns (address result) {
+        bytes20 targetBytes = bytes20(pairLogic);
+        assembly {
+            let clone := mload(0x40)
+            mstore(clone, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
+            mstore(add(clone, 0x14), targetBytes)
+            mstore(add(clone, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
+            result := create(0, clone, 0x37)
+        }
+    }
+
+    /// @dev create pair with clone
+    function createPairWithClone(
+        address _team,
+        IPriceOracleAggregator _oracle,
+        IBSVault _vault,
+        IERC20 _collateralAsset,
+        IBSWrapperToken _wrappedCollateralAsset,
+        BorrowLocalVars calldata _borrowVars,
+        NewLendingVaultIRLocalVars calldata _interestRateVars
+    ) external whenNotPaused returns (address newPairAddr) {
+        IBSLendingPair newLendingPair = IBSLendingPair(createLendingPairClone());
+        createPair(
+            newLendingPair,
+            _team,
+            _oracle,
+            _vault,
+            _collateralAsset,
+            _wrappedCollateralAsset,
+            _borrowVars,
+            _interestRateVars
+        );
+        newPairAddr = address(newLendingPair);
+    } 
+
     function createPair(
         IBSLendingPair pair,
         address _team,
@@ -65,7 +103,7 @@ contract LendingPairFactory is Pausable {
         IBSWrapperToken _wrappedCollateralAsset,
         BorrowLocalVars calldata _borrowVars,
         NewLendingVaultIRLocalVars calldata _interestRateVars
-    ) external whenNotPaused returns (address newPairAddr) {
+    ) public whenNotPaused returns (address newPairAddr) {
         // create the interest rate model
         address ir =
             address(
@@ -96,6 +134,7 @@ contract LendingPairFactory is Pausable {
             "BOR",
             address(_borrowVars.borrowAsset)
         );
+
         // initialize wrapper collateral asset
         initializeWrapperTokens(
             pair,
@@ -113,7 +152,6 @@ contract LendingPairFactory is Pausable {
             "DEB",
             address(0)
         );
-
 
         pair.initialize(
             _team,
