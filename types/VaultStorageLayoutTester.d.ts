@@ -19,8 +19,9 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface VaultBaseInterface extends ethers.utils.Interface {
+interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
   functions: {
+    "approveContract(address,bool)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "blackSmithTeam()": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
@@ -28,18 +29,28 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
     "flashLoanRate()": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
+    "initialize(uint256,address)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
+    "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
     "transfer(address,address,address,uint256)": FunctionFragment;
+    "transferToNewTeam(address)": FunctionFragment;
+    "unpause()": FunctionFragment;
     "updateCode(address)": FunctionFragment;
+    "updateFlashloanRate(uint256)": FunctionFragment;
     "userApprovedContracts(address,address)": FunctionFragment;
+    "validateStorageLayout()": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "approveContract",
+    values: [string, boolean]
+  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
@@ -69,9 +80,14 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "initialize",
+    values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "maxFlashLoan",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "proxiableUUID",
@@ -90,16 +106,33 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     functionFragment: "transfer",
     values: [string, string, string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "transferToNewTeam",
+    values: [string]
+  ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "updateFlashloanRate",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "userApprovedContracts",
     values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "validateStorageLayout",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "withdraw",
     values: [string, string, string, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "approveContract",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "blackSmithTeam",
@@ -116,10 +149,12 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     functionFragment: "getCodeAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "maxFlashLoan",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "proxiableUUID",
@@ -132,9 +167,22 @@ interface VaultBaseInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "totals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "transferToNewTeam",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "updateFlashloanRate",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "userApprovedContracts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "validateStorageLayout",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
@@ -164,7 +212,7 @@ interface VaultBaseInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
 
-export class VaultBase extends Contract {
+export class VaultStorageLayoutTester extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -205,9 +253,21 @@ export class VaultBase extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: VaultBaseInterface;
+  interface: VaultStorageLayoutTesterInterface;
 
   functions: {
+    approveContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "approveContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -241,30 +301,30 @@ export class VaultBase extends Contract {
     ): Promise<ContractTransaction>;
 
     flashFee(
-      token: string,
-      amount: BigNumberish,
+      arg0: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     "flashFee(address,uint256)"(
-      token: string,
-      amount: BigNumberish,
+      arg0: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     flashLoan(
-      receiver: string,
-      token: string,
-      amount: BigNumberish,
-      data: BytesLike,
+      _receiver: string,
+      _token: string,
+      _amount: BigNumberish,
+      _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "flashLoan(address,address,uint256,bytes)"(
-      receiver: string,
-      token: string,
-      amount: BigNumberish,
-      data: BytesLike,
+      _receiver: string,
+      _token: string,
+      _amount: BigNumberish,
+      _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -280,15 +340,35 @@ export class VaultBase extends Contract {
       overrides?: CallOverrides
     ): Promise<[string] & { codeAddress: string }>;
 
+    initialize(
+      _flashLoanRate: BigNumberish,
+      _blackSmithTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "initialize(uint256,address)"(
+      _flashLoanRate: BigNumberish,
+      _blackSmithTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     maxFlashLoan(
-      token: string,
+      _token: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     "maxFlashLoan(address)"(
-      token: string,
+      _token: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "pause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -299,30 +379,30 @@ export class VaultBase extends Contract {
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
 
     toShare(
-      token: string,
-      amount: BigNumberish,
-      roundUp: boolean,
+      _token: string,
+      _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { share: BigNumber }>;
 
     "toShare(address,uint256,bool)"(
-      token: string,
-      amount: BigNumberish,
-      roundUp: boolean,
+      _token: string,
+      _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { share: BigNumber }>;
 
     toUnderlying(
-      token: string,
-      share: BigNumberish,
+      _token: string,
+      _share: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { amount: BigNumber }>;
 
     "toUnderlying(address,uint256)"(
-      token: string,
-      share: BigNumberish,
+      _token: string,
+      _share: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { amount: BigNumber }>;
 
     totals(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -347,6 +427,24 @@ export class VaultBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    transferToNewTeam(
+      _newTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "transferToNewTeam(address)"(
+      _newTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "unpause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     updateCode(
       newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -354,6 +452,16 @@ export class VaultBase extends Contract {
 
     "updateCode(address)"(
       newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateFlashloanRate(
+      _newRate: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updateFlashloanRate(uint256)"(
+      _newRate: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -369,11 +477,15 @@ export class VaultBase extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    validateStorageLayout(overrides?: CallOverrides): Promise<[void]>;
+
+    "validateStorageLayout()"(overrides?: CallOverrides): Promise<[void]>;
+
     withdraw(
       _token: string,
       _from: string,
       _to: string,
-      _amount: BigNumberish,
+      _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -381,10 +493,22 @@ export class VaultBase extends Contract {
       _token: string,
       _from: string,
       _to: string,
-      _amount: BigNumberish,
+      _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  approveContract(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "approveContract(address,bool)"(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   balanceOf(
     arg0: string,
@@ -419,30 +543,30 @@ export class VaultBase extends Contract {
   ): Promise<ContractTransaction>;
 
   flashFee(
-    token: string,
-    amount: BigNumberish,
+    arg0: string,
+    _amount: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   "flashFee(address,uint256)"(
-    token: string,
-    amount: BigNumberish,
+    arg0: string,
+    _amount: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   flashLoan(
-    receiver: string,
-    token: string,
-    amount: BigNumberish,
-    data: BytesLike,
+    _receiver: string,
+    _token: string,
+    _amount: BigNumberish,
+    _data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "flashLoan(address,address,uint256,bytes)"(
-    receiver: string,
-    token: string,
-    amount: BigNumberish,
-    data: BytesLike,
+    _receiver: string,
+    _token: string,
+    _amount: BigNumberish,
+    _data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -454,12 +578,32 @@ export class VaultBase extends Contract {
 
   "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
 
-  maxFlashLoan(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+  initialize(
+    _flashLoanRate: BigNumberish,
+    _blackSmithTeam: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "initialize(uint256,address)"(
+    _flashLoanRate: BigNumberish,
+    _blackSmithTeam: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  maxFlashLoan(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "maxFlashLoan(address)"(
-    token: string,
+    _token: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  pause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "pause()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   paused(overrides?: CallOverrides): Promise<boolean>;
 
@@ -470,28 +614,28 @@ export class VaultBase extends Contract {
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
   toShare(
-    token: string,
-    amount: BigNumberish,
-    roundUp: boolean,
+    _token: string,
+    _amount: BigNumberish,
+    _roundUp: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   "toShare(address,uint256,bool)"(
-    token: string,
-    amount: BigNumberish,
-    roundUp: boolean,
+    _token: string,
+    _amount: BigNumberish,
+    _roundUp: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   toUnderlying(
-    token: string,
-    share: BigNumberish,
+    _token: string,
+    _share: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   "toUnderlying(address,uint256)"(
-    token: string,
-    share: BigNumberish,
+    _token: string,
+    _share: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -518,6 +662,24 @@ export class VaultBase extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  transferToNewTeam(
+    _newTeam: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "transferToNewTeam(address)"(
+    _newTeam: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  unpause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "unpause()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   updateCode(
     newAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -525,6 +687,16 @@ export class VaultBase extends Contract {
 
   "updateCode(address)"(
     newAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateFlashloanRate(
+    _newRate: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updateFlashloanRate(uint256)"(
+    _newRate: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -540,11 +712,15 @@ export class VaultBase extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  validateStorageLayout(overrides?: CallOverrides): Promise<void>;
+
+  "validateStorageLayout()"(overrides?: CallOverrides): Promise<void>;
+
   withdraw(
     _token: string,
     _from: string,
     _to: string,
-    _amount: BigNumberish,
+    _shares: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -552,11 +728,23 @@ export class VaultBase extends Contract {
     _token: string,
     _from: string,
     _to: string,
-    _amount: BigNumberish,
+    _shares: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    approveContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "approveContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -590,30 +778,30 @@ export class VaultBase extends Contract {
     ): Promise<BigNumber>;
 
     flashFee(
-      token: string,
-      amount: BigNumberish,
+      arg0: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "flashFee(address,uint256)"(
-      token: string,
-      amount: BigNumberish,
+      arg0: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     flashLoan(
-      receiver: string,
-      token: string,
-      amount: BigNumberish,
-      data: BytesLike,
+      _receiver: string,
+      _token: string,
+      _amount: BigNumberish,
+      _data: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     "flashLoan(address,address,uint256,bytes)"(
-      receiver: string,
-      token: string,
-      amount: BigNumberish,
-      data: BytesLike,
+      _receiver: string,
+      _token: string,
+      _amount: BigNumberish,
+      _data: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -625,12 +813,28 @@ export class VaultBase extends Contract {
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
 
-    maxFlashLoan(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+    initialize(
+      _flashLoanRate: BigNumberish,
+      _blackSmithTeam: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "initialize(uint256,address)"(
+      _flashLoanRate: BigNumberish,
+      _blackSmithTeam: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    maxFlashLoan(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxFlashLoan(address)"(
-      token: string,
+      _token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    pause(overrides?: CallOverrides): Promise<void>;
+
+    "pause()"(overrides?: CallOverrides): Promise<void>;
 
     paused(overrides?: CallOverrides): Promise<boolean>;
 
@@ -641,28 +845,28 @@ export class VaultBase extends Contract {
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
     toShare(
-      token: string,
-      amount: BigNumberish,
-      roundUp: boolean,
+      _token: string,
+      _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "toShare(address,uint256,bool)"(
-      token: string,
-      amount: BigNumberish,
-      roundUp: boolean,
+      _token: string,
+      _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     toUnderlying(
-      token: string,
-      share: BigNumberish,
+      _token: string,
+      _share: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "toUnderlying(address,uint256)"(
-      token: string,
-      share: BigNumberish,
+      _token: string,
+      _share: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -689,10 +893,34 @@ export class VaultBase extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    transferToNewTeam(
+      _newTeam: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "transferToNewTeam(address)"(
+      _newTeam: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    unpause(overrides?: CallOverrides): Promise<void>;
+
+    "unpause()"(overrides?: CallOverrides): Promise<void>;
+
     updateCode(newAddress: string, overrides?: CallOverrides): Promise<void>;
 
     "updateCode(address)"(
       newAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateFlashloanRate(
+      _newRate: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "updateFlashloanRate(uint256)"(
+      _newRate: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -708,11 +936,15 @@ export class VaultBase extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    validateStorageLayout(overrides?: CallOverrides): Promise<void>;
+
+    "validateStorageLayout()"(overrides?: CallOverrides): Promise<void>;
+
     withdraw(
       _token: string,
       _from: string,
       _to: string,
-      _amount: BigNumberish,
+      _shares: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -720,7 +952,7 @@ export class VaultBase extends Contract {
       _token: string,
       _from: string,
       _to: string,
-      _amount: BigNumberish,
+      _shares: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
@@ -818,6 +1050,18 @@ export class VaultBase extends Contract {
   };
 
   estimateGas: {
+    approveContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "approveContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -851,30 +1095,30 @@ export class VaultBase extends Contract {
     ): Promise<BigNumber>;
 
     flashFee(
-      token: string,
-      amount: BigNumberish,
+      arg0: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "flashFee(address,uint256)"(
-      token: string,
-      amount: BigNumberish,
+      arg0: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     flashLoan(
-      receiver: string,
-      token: string,
-      amount: BigNumberish,
-      data: BytesLike,
+      _receiver: string,
+      _token: string,
+      _amount: BigNumberish,
+      _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "flashLoan(address,address,uint256,bytes)"(
-      receiver: string,
-      token: string,
-      amount: BigNumberish,
-      data: BytesLike,
+      _receiver: string,
+      _token: string,
+      _amount: BigNumberish,
+      _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -886,11 +1130,31 @@ export class VaultBase extends Contract {
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    maxFlashLoan(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+    initialize(
+      _flashLoanRate: BigNumberish,
+      _blackSmithTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "initialize(uint256,address)"(
+      _flashLoanRate: BigNumberish,
+      _blackSmithTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    maxFlashLoan(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxFlashLoan(address)"(
-      token: string,
+      _token: string,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "pause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
@@ -902,28 +1166,28 @@ export class VaultBase extends Contract {
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     toShare(
-      token: string,
-      amount: BigNumberish,
-      roundUp: boolean,
+      _token: string,
+      _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "toShare(address,uint256,bool)"(
-      token: string,
-      amount: BigNumberish,
-      roundUp: boolean,
+      _token: string,
+      _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     toUnderlying(
-      token: string,
-      share: BigNumberish,
+      _token: string,
+      _share: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "toUnderlying(address,uint256)"(
-      token: string,
-      share: BigNumberish,
+      _token: string,
+      _share: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -950,6 +1214,24 @@ export class VaultBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    transferToNewTeam(
+      _newTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "transferToNewTeam(address)"(
+      _newTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "unpause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     updateCode(
       newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -957,6 +1239,16 @@ export class VaultBase extends Contract {
 
     "updateCode(address)"(
       newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateFlashloanRate(
+      _newRate: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updateFlashloanRate(uint256)"(
+      _newRate: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -972,11 +1264,15 @@ export class VaultBase extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    validateStorageLayout(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "validateStorageLayout()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     withdraw(
       _token: string,
       _from: string,
       _to: string,
-      _amount: BigNumberish,
+      _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -984,12 +1280,24 @@ export class VaultBase extends Contract {
       _token: string,
       _from: string,
       _to: string,
-      _amount: BigNumberish,
+      _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    approveContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "approveContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -1025,30 +1333,30 @@ export class VaultBase extends Contract {
     ): Promise<PopulatedTransaction>;
 
     flashFee(
-      token: string,
-      amount: BigNumberish,
+      arg0: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "flashFee(address,uint256)"(
-      token: string,
-      amount: BigNumberish,
+      arg0: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     flashLoan(
-      receiver: string,
-      token: string,
-      amount: BigNumberish,
-      data: BytesLike,
+      _receiver: string,
+      _token: string,
+      _amount: BigNumberish,
+      _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "flashLoan(address,address,uint256,bytes)"(
-      receiver: string,
-      token: string,
-      amount: BigNumberish,
-      data: BytesLike,
+      _receiver: string,
+      _token: string,
+      _amount: BigNumberish,
+      _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1062,14 +1370,34 @@ export class VaultBase extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    initialize(
+      _flashLoanRate: BigNumberish,
+      _blackSmithTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "initialize(uint256,address)"(
+      _flashLoanRate: BigNumberish,
+      _blackSmithTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     maxFlashLoan(
-      token: string,
+      _token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "maxFlashLoan(address)"(
-      token: string,
+      _token: string,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "pause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1081,28 +1409,28 @@ export class VaultBase extends Contract {
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     toShare(
-      token: string,
-      amount: BigNumberish,
-      roundUp: boolean,
+      _token: string,
+      _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "toShare(address,uint256,bool)"(
-      token: string,
-      amount: BigNumberish,
-      roundUp: boolean,
+      _token: string,
+      _amount: BigNumberish,
+      _roundUp: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     toUnderlying(
-      token: string,
-      share: BigNumberish,
+      _token: string,
+      _share: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "toUnderlying(address,uint256)"(
-      token: string,
-      share: BigNumberish,
+      _token: string,
+      _share: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1132,6 +1460,24 @@ export class VaultBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    transferToNewTeam(
+      _newTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "transferToNewTeam(address)"(
+      _newTeam: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "unpause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     updateCode(
       newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1139,6 +1485,16 @@ export class VaultBase extends Contract {
 
     "updateCode(address)"(
       newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateFlashloanRate(
+      _newRate: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updateFlashloanRate(uint256)"(
+      _newRate: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1154,11 +1510,19 @@ export class VaultBase extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    validateStorageLayout(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "validateStorageLayout()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     withdraw(
       _token: string,
       _from: string,
       _to: string,
-      _amount: BigNumberish,
+      _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1166,7 +1530,7 @@ export class VaultBase extends Contract {
       _token: string,
       _from: string,
       _to: string,
-      _amount: BigNumberish,
+      _shares: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

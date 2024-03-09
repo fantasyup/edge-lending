@@ -11,6 +11,7 @@ import "./util/Initializable.sol";
 /// @title WrapperToken
 /// @author @samparsky
 /// @dev 
+/// 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
@@ -28,7 +29,7 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyLendingPair() {
-        require(address(_owner) == msg.sender, "Ownable: caller is not the owner");
+        require(address(_owner) == msg.sender, "ONLY_LENDING_PAIR");
         _;
     }
 

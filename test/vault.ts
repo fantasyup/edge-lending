@@ -14,6 +14,7 @@ import {
   deployMockFlashBorrower,
   deployProxiedVault,
   deployMockVault,
+  deployVaultStorageLayoutTester,
 } from "../helpers/contracts";
 import { FlashBorrower as BFlashBorrower } from "../types/FlashBorrower";
 
@@ -431,7 +432,8 @@ describe("Vault", function () {
 
     // @TODO 
     it("test storage layout", async function() {
-
+      const storageLayoutTester = await deployVaultStorageLayoutTester()
+      
     })
   })
 

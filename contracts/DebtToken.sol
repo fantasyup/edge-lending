@@ -15,10 +15,8 @@ contract DebtToken is WrapperToken, IDebtToken {
 
     function balanceOf(address _account) public view override(ERC20, IERC20) returns(uint256 balance) {
         uint256 principalTimesIndex;
-
         // Get borrowBalance and borrowIndex
         uint256 principal = _balances[_account];
-        
         // If borrowBalance = 0 then borrowIndex is likely also 0.
         // Rather than failing the calculation with a division by 0, we immediately return 0 in this case.
         if (principal == 0) {

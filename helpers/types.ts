@@ -17,7 +17,8 @@ export enum ContractId {
     LendingPairHelper = 'LendingPairHelper',
     DebtToken = 'DebtToken',
     CollateralWrapperToken = 'CollateralWrapperToken',
-    MockChainlinkUSDAdapter = 'MockChainlinkUSDAdapter'
+    MockChainlinkUSDAdapter = 'MockChainlinkUSDAdapter',
+    VaultStorageLayoutTester = 'VaultStorageLayoutTester',
 }
 
 export type EthereumAddress = string;

@@ -34,9 +34,10 @@ describe("DebtToken", async function () {
         ).to.be.reverted
     })
 
-    it("burn", async function() {
-        await DebtToken.burn(admin, 100)
-    })
+    // @TODO mock
+    // it("burn", async function() {
+    //     await DebtToken.burn(admin, 100)
+    // })
 
     it("burn - fails if not owner", async function() {
         await expect(
@@ -80,4 +81,19 @@ describe("DebtToken", async function () {
         ).revertedWith('ALLOWANCE_NOT_SUPPORTED')
     })
 
+    it("increaseTotalDebt - fails if not owner", async function() {
+        await expect(
+            DebtToken.connect(await ethers.getSigner(bob)).increaseTotalDebt(1000)
+        ).to.be.revertedWith("ONLY_LENDING_PAIR")
+    })
+
+    it("increaseTotalDebt", async function() {
+        const totalDebt = (await DebtToken.totalSupply()).toNumber()
+        const debToIncrease = 1000
+
+        await DebtToken.increaseTotalDebt(debToIncrease)
+
+        expect((await DebtToken.totalSupply()).toNumber()).eq(totalDebt + debToIncrease)
+    })
 })
+

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IERC3156FlashBorrower.sol";
 import "./VaultBase.sol";
-import "./interfaces/IBSVault.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "hardhat/console.sol";
 
@@ -20,27 +20,12 @@ import "hardhat/console.sol";
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-contract Vault is VaultBase, IBSVault {
+contract Vault is VaultBase {
     using SafeERC20 for IERC20;
 
     /// @dev ERC3156 constant for flashloan callback success
     bytes32 private constant FLASHLOAN_CALLBACK_SUCCESS =
         keccak256("ERC3156FlashBorrower.onFlashLoan");
-
-    /// @notice the address of the blackSmithTeam that enables `admin` functions
-    address public blackSmithTeam;
-
-    /// @notice the flashloan rate to charge for flash loans
-    uint256 public flashLoanRate;
-
-    /// @notice mapping of token asset to user address and balance
-    mapping(IERC20 => mapping(address => uint256)) public override balanceOf;
-
-    /// @notice mapping of token asset to total deposit
-    mapping(IERC20 => uint256) public totals;
-
-    /// @notice mapping of user to contract to approval status
-    mapping(address => mapping(address => bool)) public userApprovedContracts;
 
     /// @notice modifier to allow only blacksmith team to call a function
     modifier onlyBlacksmithTeam {

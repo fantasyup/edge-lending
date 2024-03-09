@@ -93,6 +93,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         _;
     }
 
+
     /// @notice Initialize function
     /// @param _blackSmithTeam admin address
     /// @param _oracle price oracle
@@ -198,9 +199,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         
         // mint debt tokens to account
         debtToken.mint(msg.sender, _amountToBorrow);
-
+        // set interest index
         accountInterestIndex[msg.sender] = borrowIndex;
-
         // transfer borrow asset to borrower
         vault.transfer(asset, address(this), msg.sender, amountOfSharesToBorrow);
 
@@ -274,7 +274,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint256 amount;
     }
 
-    /// @notice Allows a user to redeem their Wrapper Token for the appropriate amount of underlying stablecoin asset
+    /// @notice Allows a user to redeem their Wrapper Token for the appropriate amount of underlying asset
     /// @param _to Address to send the underlying tokens to
     /// @param _amount of wrapper token to redeem
     function redeem(

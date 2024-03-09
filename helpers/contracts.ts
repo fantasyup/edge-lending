@@ -12,11 +12,12 @@ import {
     MockLendingPair,
     MockPriceOracle,
     MockToken,
-    MockVault, PriceOracleAggregator, UUPSProxy, WrapperToken 
+    MockVault, PriceOracleAggregator, UUPSProxy, VaultStorageLayoutTester, WrapperToken 
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
 import { MockChainlinkUSDAdapter } from "../types/MockChainlinkUSDAdapter";
+import { VaultStorageLayout } from "../types/VaultStorageLayout";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
@@ -138,7 +139,11 @@ export const deployMockChainlinkUSDAdapter = async() => {
     return await deployContract<MockChainlinkUSDAdapter>(ContractId.MockChainlinkUSDAdapter, [])
 }
 
+export const deployVaultStorageLayoutTester = async() => {
+    return await deployContract<VaultStorageLayoutTester>(ContractId.VaultStorageLayoutTester, [])
+}
 // minimal proxy contract
 export const deployERC1167LendingPair = async() => {
 
 }
+
