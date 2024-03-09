@@ -579,6 +579,13 @@ describe("LendingPair", async function () {
         const borrowBalance = await (await DebtWrapperToken.balanceOf(zubi)).toNumber()
         console.log({ borrowBalance })
 
+        // mine
+        // await advanceNBlocks(1000)
+
+        // repay everything
+
+
+
       })
     })
 
