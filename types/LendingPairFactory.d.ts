@@ -24,9 +24,12 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     "admin()": FunctionFragment;
     "allPairs(uint256)": FunctionFragment;
     "createPair(address,address,address,address,address,address,tuple,tuple)": FunctionFragment;
+    "createPairWithClone(address,address,address,address,address,tuple,tuple)": FunctionFragment;
+    "pairLogic()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "unpause()": FunctionFragment;
+    "updatePairLogicContract(address)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "admin", values?: undefined): string;
@@ -60,23 +63,64 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
       }
     ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "createPairWithClone",
+    values: [
+      string,
+      string,
+      string,
+      string,
+      string,
+      {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      {
+        baseRatePerYear: BigNumberish;
+        multiplierPerYear: BigNumberish;
+        jumpMultiplierPerYear: BigNumberish;
+        optimal: BigNumberish;
+      }
+    ]
+  ): string;
+  encodeFunctionData(functionFragment: "pairLogic", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "updatePairLogicContract",
+    values: [string]
+  ): string;
 
   decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allPairs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "createPair", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "createPairWithClone",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "pairLogic", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "updatePairLogicContract",
+    data: BytesLike
+  ): Result;
 
   events: {
+    "LogicContractUpdated(address)": EventFragment;
     "NewLendingPair(address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "Unpaused(address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "LogicContractUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NewLendingPair"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
@@ -187,6 +231,58 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    createPairWithClone(
+      _team: string,
+      _oracle: string,
+      _vault: string,
+      _collateralAsset: string,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _interestRateVars: {
+        baseRatePerYear: BigNumberish;
+        multiplierPerYear: BigNumberish;
+        jumpMultiplierPerYear: BigNumberish;
+        optimal: BigNumberish;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "createPairWithClone(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+      _team: string,
+      _oracle: string,
+      _vault: string,
+      _collateralAsset: string,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _interestRateVars: {
+        baseRatePerYear: BigNumberish;
+        multiplierPerYear: BigNumberish;
+        jumpMultiplierPerYear: BigNumberish;
+        optimal: BigNumberish;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    pairLogic(overrides?: CallOverrides): Promise<[string]>;
+
+    "pairLogic()"(overrides?: CallOverrides): Promise<[string]>;
+
     pause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -204,6 +300,16 @@ export class LendingPairFactory extends Contract {
     ): Promise<ContractTransaction>;
 
     "unpause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updatePairLogicContract(
+      _newLogicContract: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updatePairLogicContract(address)"(
+      _newLogicContract: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -269,6 +375,58 @@ export class LendingPairFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  createPairWithClone(
+    _team: string,
+    _oracle: string,
+    _vault: string,
+    _collateralAsset: string,
+    _wrappedCollateralAsset: string,
+    _borrowVars: {
+      borrowAsset: string;
+      initialExchangeRateMantissa: BigNumberish;
+      reserveFactorMantissa: BigNumberish;
+      collateralFactor: BigNumberish;
+      wrappedBorrowAsset: string;
+      liquidationFee: BigNumberish;
+      debtToken: string;
+    },
+    _interestRateVars: {
+      baseRatePerYear: BigNumberish;
+      multiplierPerYear: BigNumberish;
+      jumpMultiplierPerYear: BigNumberish;
+      optimal: BigNumberish;
+    },
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "createPairWithClone(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+    _team: string,
+    _oracle: string,
+    _vault: string,
+    _collateralAsset: string,
+    _wrappedCollateralAsset: string,
+    _borrowVars: {
+      borrowAsset: string;
+      initialExchangeRateMantissa: BigNumberish;
+      reserveFactorMantissa: BigNumberish;
+      collateralFactor: BigNumberish;
+      wrappedBorrowAsset: string;
+      liquidationFee: BigNumberish;
+      debtToken: string;
+    },
+    _interestRateVars: {
+      baseRatePerYear: BigNumberish;
+      multiplierPerYear: BigNumberish;
+      jumpMultiplierPerYear: BigNumberish;
+      optimal: BigNumberish;
+    },
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  pairLogic(overrides?: CallOverrides): Promise<string>;
+
+  "pairLogic()"(overrides?: CallOverrides): Promise<string>;
+
   pause(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -286,6 +444,16 @@ export class LendingPairFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   "unpause()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updatePairLogicContract(
+    _newLogicContract: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updatePairLogicContract(address)"(
+    _newLogicContract: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -351,6 +519,58 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    createPairWithClone(
+      _team: string,
+      _oracle: string,
+      _vault: string,
+      _collateralAsset: string,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _interestRateVars: {
+        baseRatePerYear: BigNumberish;
+        multiplierPerYear: BigNumberish;
+        jumpMultiplierPerYear: BigNumberish;
+        optimal: BigNumberish;
+      },
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "createPairWithClone(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+      _team: string,
+      _oracle: string,
+      _vault: string,
+      _collateralAsset: string,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _interestRateVars: {
+        baseRatePerYear: BigNumberish;
+        multiplierPerYear: BigNumberish;
+        jumpMultiplierPerYear: BigNumberish;
+        optimal: BigNumberish;
+      },
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    pairLogic(overrides?: CallOverrides): Promise<string>;
+
+    "pairLogic()"(overrides?: CallOverrides): Promise<string>;
+
     pause(overrides?: CallOverrides): Promise<void>;
 
     "pause()"(overrides?: CallOverrides): Promise<void>;
@@ -362,9 +582,23 @@ export class LendingPairFactory extends Contract {
     unpause(overrides?: CallOverrides): Promise<void>;
 
     "unpause()"(overrides?: CallOverrides): Promise<void>;
+
+    updatePairLogicContract(
+      _newLogicContract: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "updatePairLogicContract(address)"(
+      _newLogicContract: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
+    LogicContractUpdated(
+      pairLogic: null
+    ): TypedEventFilter<[string], { pairLogic: string }>;
+
     NewLendingPair(
       pair: null,
       created: null
@@ -440,6 +674,58 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    createPairWithClone(
+      _team: string,
+      _oracle: string,
+      _vault: string,
+      _collateralAsset: string,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _interestRateVars: {
+        baseRatePerYear: BigNumberish;
+        multiplierPerYear: BigNumberish;
+        jumpMultiplierPerYear: BigNumberish;
+        optimal: BigNumberish;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "createPairWithClone(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+      _team: string,
+      _oracle: string,
+      _vault: string,
+      _collateralAsset: string,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _interestRateVars: {
+        baseRatePerYear: BigNumberish;
+        multiplierPerYear: BigNumberish;
+        jumpMultiplierPerYear: BigNumberish;
+        optimal: BigNumberish;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    pairLogic(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "pairLogic()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     pause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -457,6 +743,16 @@ export class LendingPairFactory extends Contract {
     ): Promise<BigNumber>;
 
     "unpause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updatePairLogicContract(
+      _newLogicContract: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updatePairLogicContract(address)"(
+      _newLogicContract: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -526,6 +822,58 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    createPairWithClone(
+      _team: string,
+      _oracle: string,
+      _vault: string,
+      _collateralAsset: string,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _interestRateVars: {
+        baseRatePerYear: BigNumberish;
+        multiplierPerYear: BigNumberish;
+        jumpMultiplierPerYear: BigNumberish;
+        optimal: BigNumberish;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "createPairWithClone(address,address,address,address,address,(address,uint256,uint256,uint256,address,uint256,address),(uint256,uint256,uint256,uint256))"(
+      _team: string,
+      _oracle: string,
+      _vault: string,
+      _collateralAsset: string,
+      _wrappedCollateralAsset: string,
+      _borrowVars: {
+        borrowAsset: string;
+        initialExchangeRateMantissa: BigNumberish;
+        reserveFactorMantissa: BigNumberish;
+        collateralFactor: BigNumberish;
+        wrappedBorrowAsset: string;
+        liquidationFee: BigNumberish;
+        debtToken: string;
+      },
+      _interestRateVars: {
+        baseRatePerYear: BigNumberish;
+        multiplierPerYear: BigNumberish;
+        jumpMultiplierPerYear: BigNumberish;
+        optimal: BigNumberish;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    pairLogic(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "pairLogic()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     pause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -543,6 +891,16 @@ export class LendingPairFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "unpause()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updatePairLogicContract(
+      _newLogicContract: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updatePairLogicContract(address)"(
+      _newLogicContract: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

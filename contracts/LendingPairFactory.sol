@@ -13,12 +13,13 @@ import "./DataTypes.sol";
 
 contract LendingPairFactory is Pausable {
 
-    address immutable pairLogic;
+    address public pairLogic;
     address immutable public admin;
 
     address[] public allPairs;
 
     event NewLendingPair(address pair, uint256 created);
+    event LogicContractUpdated(address pairLogic);
 
     /// @notice modifier to allow only blacksmith team to call a function
     modifier onlyAdmin {
@@ -26,9 +27,9 @@ contract LendingPairFactory is Pausable {
         _;
     }
 
-    constructor(address _admin, IBSLendingPair _pair) {
+    constructor(address _admin, address _pairLogic) {
         admin = _admin;
-        pairLogic = _pair;
+        pairLogic = _pairLogic;
     }
 
     /// @notice pause factory actions
@@ -39,6 +40,11 @@ contract LendingPairFactory is Pausable {
     /// @notice unpause vault actions
     function unpause() onlyAdmin external {
         _unpause();
+    }
+
+    function updatePairLogicContract(address _newLogicContract) external onlyAdmin {
+        pairLogic = _newLogicContract;
+        emit LogicContractUpdated(_newLogicContract);
     }
 
     struct NewLendingVaultIRLocalVars {
