@@ -5,6 +5,8 @@ import "./util/Ownable.sol";
 import "./token/ERC20Permit.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
+import "./token/IERC20Details.sol";
+
 import "./util/Initializable.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +44,8 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     ) external override initializer {
         require(address(__owner) != address(0), "invalid owner");
         _owner = __owner;
-        initializeERC20(_tokenName, _tokenSymbol, 18);
+        uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
+        initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
         initializeERC20Permit(_tokenName);
         underlying = _underlying;
     }

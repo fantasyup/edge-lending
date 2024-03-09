@@ -20,13 +20,16 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IERC20DetailsInterface extends ethers.utils.Interface {
   functions: {
+    "decimals()": FunctionFragment;
     "name()": FunctionFragment;
     "symbol()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
 
@@ -77,6 +80,10 @@ export class IERC20Details extends Contract {
   interface: IERC20DetailsInterface;
 
   functions: {
+    decimals(overrides?: CallOverrides): Promise<[number]>;
+
+    "decimals()"(overrides?: CallOverrides): Promise<[number]>;
+
     name(overrides?: CallOverrides): Promise<[string]>;
 
     "name()"(overrides?: CallOverrides): Promise<[string]>;
@@ -85,6 +92,10 @@ export class IERC20Details extends Contract {
 
     "symbol()"(overrides?: CallOverrides): Promise<[string]>;
   };
+
+  decimals(overrides?: CallOverrides): Promise<number>;
+
+  "decimals()"(overrides?: CallOverrides): Promise<number>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -95,6 +106,10 @@ export class IERC20Details extends Contract {
   "symbol()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    decimals(overrides?: CallOverrides): Promise<number>;
+
+    "decimals()"(overrides?: CallOverrides): Promise<number>;
+
     name(overrides?: CallOverrides): Promise<string>;
 
     "name()"(overrides?: CallOverrides): Promise<string>;
@@ -107,6 +122,10 @@ export class IERC20Details extends Contract {
   filters: {};
 
   estimateGas: {
+    decimals(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     "name()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -117,6 +136,10 @@ export class IERC20Details extends Contract {
   };
 
   populateTransaction: {
+    decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
