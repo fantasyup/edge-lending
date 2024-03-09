@@ -22,9 +22,10 @@ contract DebtToken is WrapperToken, IDebtToken {
     ) external override(WrapperToken, IBSWrapperToken) initializer {
         require(address(__owner) != address(0), "invalid owner");
         _owner = __owner;
-        initializeERC20(_tokenName, _tokenSymbol, 18);
+        uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
+        initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
         initializeERC20Permit(_tokenName);
-        underlying = _underlying;
+        underlying = address(0);
     }
 
     /// @dev calculates the debt balance of account

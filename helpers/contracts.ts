@@ -8,6 +8,7 @@ import {
     IPriceOracleAggregator,
     JumpRateModelV2,
     LendingPair,
+    LendingPairFactory,
     MockFlashBorrower,
     MockLendingPair,
     MockPriceOracle,
@@ -142,6 +143,23 @@ export const deployMockChainlinkUSDAdapter = async() => {
 export const deployVaultStorageLayoutTester = async() => {
     return await deployContract<VaultStorageLayoutTester>(ContractId.VaultStorageLayoutTester, [])
 }
+
+export const deployLendingPairFactory = async(
+    admin: EthereumAddress,
+    pairLogic: EthereumAddress,
+    collateralWrapperLogic: EthereumAddress,
+    debtTokenLogic: EthereumAddress,
+    borrowAssetWrapperLogic: EthereumAddress
+) => {
+    return await deployContract<LendingPairFactory>(ContractId.LendingPairFactory, [
+        admin,
+        pairLogic,
+        collateralWrapperLogic,
+        debtTokenLogic,
+        borrowAssetWrapperLogic
+    ])
+}
+
 // minimal proxy contract
 export const deployERC1167LendingPair = async() => {
 

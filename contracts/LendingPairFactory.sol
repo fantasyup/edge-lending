@@ -135,8 +135,7 @@ contract LendingPairFactory is Pausable {
             borrowAssetWrapperImplementation,
             newLendingPair,
             address(_borrowVars.borrowAsset),
-            "BOR",
-            address(_borrowVars.borrowAsset)
+            "BOR"
         ));
 
         // initialize wrapper collateral asset
@@ -144,8 +143,7 @@ contract LendingPairFactory is Pausable {
             collateralWrapperImplementation,
             newLendingPair,
             address(_collateralAsset),
-            "COL",
-            address(_collateralAsset)
+            "COL"
         ));
 
         // initialize debt token
@@ -153,8 +151,7 @@ contract LendingPairFactory is Pausable {
             debtTokenImplementation,
             newLendingPair,
             address(_borrowVars.borrowAsset),
-            "DEB",
-            address(0)
+            "DEB"
         ));
         
         DataTypes.BorrowAssetConfig memory borrowConfig = DataTypes.BorrowAssetConfig(
@@ -183,8 +180,7 @@ contract LendingPairFactory is Pausable {
         address implementation,
         address pair,
         address assetDetails,
-        string memory symbol,
-        address underlying
+        string memory symbol
     ) public returns(address wrapper){
         wrapper = clone(implementation);
 
@@ -192,8 +188,7 @@ contract LendingPairFactory is Pausable {
             IBSLendingPair(pair),
             IBSWrapperToken(wrapper),
             IERC20Details(assetDetails),
-            symbol,
-            underlying
+            symbol
         );
     }
 
@@ -201,8 +196,7 @@ contract LendingPairFactory is Pausable {
         IBSLendingPair _pair,
         IBSWrapperToken _wrapperToken,
         IERC20Details _assetDetails,
-        string memory _tokenType,
-        address _underlying
+        string memory _tokenType
     ) internal {
         bytes memory name = abi.encodePacked("BS-");
         name = abi.encodePacked(name, _tokenType, _assetDetails.name());
@@ -211,7 +205,7 @@ contract LendingPairFactory is Pausable {
         // initialize wrapperToken
         IBSWrapperToken(_wrapperToken).initialize(
             _pair,
-            _underlying,
+            address(_assetDetails),
             string(name),
             string(symbol)
         );

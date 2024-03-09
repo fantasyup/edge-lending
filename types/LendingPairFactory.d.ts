@@ -28,7 +28,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     "createIR(tuple,address)": FunctionFragment;
     "createLendingPairWithClones(address,address,address,address,tuple,address)": FunctionFragment;
     "debtTokenImplementation()": FunctionFragment;
-    "initWrapperTokensWithProxy(address,address,address,string,address)": FunctionFragment;
+    "initWrapperTokensWithProxy(address,address,address,string)": FunctionFragment;
     "lendingPairImplementation()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
@@ -87,7 +87,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initWrapperTokensWithProxy",
-    values: [string, string, string, string, string]
+    values: [string, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "lendingPairImplementation",
@@ -307,16 +307,14 @@ export class LendingPairFactory extends Contract {
       pair: string,
       assetDetails: string,
       symbol: string,
-      underlying: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initWrapperTokensWithProxy(address,address,address,string,address)"(
+    "initWrapperTokensWithProxy(address,address,address,string)"(
       implementation: string,
       pair: string,
       assetDetails: string,
       symbol: string,
-      underlying: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -471,16 +469,14 @@ export class LendingPairFactory extends Contract {
     pair: string,
     assetDetails: string,
     symbol: string,
-    underlying: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initWrapperTokensWithProxy(address,address,address,string,address)"(
+  "initWrapperTokensWithProxy(address,address,address,string)"(
     implementation: string,
     pair: string,
     assetDetails: string,
     symbol: string,
-    underlying: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -637,16 +633,14 @@ export class LendingPairFactory extends Contract {
       pair: string,
       assetDetails: string,
       symbol: string,
-      underlying: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "initWrapperTokensWithProxy(address,address,address,string,address)"(
+    "initWrapperTokensWithProxy(address,address,address,string)"(
       implementation: string,
       pair: string,
       assetDetails: string,
       symbol: string,
-      underlying: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -816,16 +810,14 @@ export class LendingPairFactory extends Contract {
       pair: string,
       assetDetails: string,
       symbol: string,
-      underlying: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initWrapperTokensWithProxy(address,address,address,string,address)"(
+    "initWrapperTokensWithProxy(address,address,address,string)"(
       implementation: string,
       pair: string,
       assetDetails: string,
       symbol: string,
-      underlying: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -994,16 +986,14 @@ export class LendingPairFactory extends Contract {
       pair: string,
       assetDetails: string,
       symbol: string,
-      underlying: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initWrapperTokensWithProxy(address,address,address,string,address)"(
+    "initWrapperTokensWithProxy(address,address,address,string)"(
       implementation: string,
       pair: string,
       assetDetails: string,
       symbol: string,
-      underlying: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
