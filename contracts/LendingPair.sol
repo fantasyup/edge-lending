@@ -19,7 +19,7 @@ import "./token/IERC20Details.sol";
 /// 
 /// @title LendingPair
 /// @author @samparsky
-/// @notice
+/// @notice 
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -92,6 +92,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         require(msg.sender == blackSmithTeam, "ONLY_BLACK_SMITH_TEAM");
         _;
     }
+
 
     /// @notice Initialize function
     /// @param _blackSmithTeam admin address
@@ -178,17 +179,41 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         emit Deposit(address(this), address(asset), _tokenReceipeint, msg.sender, _vaultShareAmount);
     }
 
+        /// @dev scales the input to 18 decimal places
+    function normalize(uint256 _amount, uint8 _underlyingDecimal) external view override returns(uint256) {
+        if (_underlyingDecimal >= 18) {
+            return _amount / 10 ** (_underlyingDecimal - 18);
+        } else {
+            return _amount * (10 ** (18 - _underlyingDecimal));
+        }
+    }
+
+    /// @dev scales the input to underlying decimal places
+    function denormalizeAmount(uint256 _underlyingDecimal, uint256 _amount) external view override returns(uint256) {
+        if (_underlyingDecimal >= 18) {
+            return _amount * 10 ** (_underlyingDecimal - 18);
+        } else {
+            return _amount / (10 ** (18 - _underlyingDecimal));
+        }
+    }
+
     /// @param _amountToBorrow is the amount of the borrow asset vault shares the user wants to borrow
+    /// @dev we use normalized amounts to calculate the 
     function borrow(uint256 _amountToBorrow) external {
-        (uint256 borrowedTotalWithInterestNormalized,) = getAccountCurrentBorrowsNormalized(msg.sender);
+        // used for normalizing amount
+        uint8 _borrowAssetUnderlyingDecimal = IERC20Details(asset).decimals();
+        uint8 _collateralAssetUnderlyingDecimal =  IERC20Details(collateralAsset).decimals();
+
+        uint256 borrowedTotalWithInterest = borrowBalanceCurrent(msg.sender);
         uint256 currentBorrowAssetPrice = oracle.getPriceInUSD(asset);
-        uint256 borrowedTotalInUSDNormalized = borrowedTotalWithInterestNormalized * currentBorrowAssetPrice;
-        uint256 borrowLimitInUSDNormalized = getBorrowLimitNormalizedInUSD(msg.sender);
+
+        uint256 borrowedTotalInUSDNormalized = normalize(borrowedTotalWithInterest, _borrowAssetUnderlyingDecimal) * currentBorrowAssetPrice;
+        uint256 borrowLimitInUSDNormalized = normalize(getBorrowLimit(msg.sender), _collateralAssetUnderlyingDecimal) * getPriceOfCollateral();
 
         uint256 borrowAmountAllowedInUSDNormalized = borrowLimitInUSDNormalized - borrowedTotalInUSDNormalized;
         
         // borrow amount in usd normalized
-        uint256 borrowAmountInUSDNormalized = currentBorrowAssetPrice * wrapperBorrowedAsset.normalizeAmount(_amountToBorrow);
+        uint256 borrowAmountInUSDNormalized = normalize(_amountToBorrow, _borrowAssetUnderlyingDecimal) * currentBorrowAssetPrice;
 
         // require the amount being borrowed is less than 
         // or equal to the amount they are aloud to borrow
@@ -563,6 +588,16 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         );
     }
 
+    /// @notice getTotalAvailableCollateralValue returns the total availible collaeral value for an account
+    /// @param _account is the address whos collateral is being retreived
+    /// @dev this function runs calculations to accrue interest for an up to date amount
+    function getTotalAvailableCollateralValue(address _account)
+        public
+        returns (uint256)
+    {
+        return vault.toUnderlying(collateralAsset, collateralOfAccount(_account));  // convert the amount of collateral to underlying amount
+    }
+
     /// @dev returns price of collateral in usd
     function getPriceOfCollateral() public returns (uint256) {
         return oracle.getPriceInUSD(collateralAsset);
@@ -621,6 +656,18 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         return calcBorrowLimit(availibleCollateralValue);
     }
 
+
+    /// @notice getBorrowLimit returns the borrow limit for an account
+    /// @param _account is the input account address
+    /// @dev this calculation uses current values for calculations
+    function getBorrowLimit(address _account) public returns (uint256) {
+        uint256 availibleCollateralValue = getTotalAvailableCollateralValue(
+            _account
+        );
+
+        return calcBorrowLimit(availibleCollateralValue);
+    }
+
     /// @notice getTotalAvailableCollateralValueNormalizedInUSD returns the total availible collaeral value for an account in USD
     /// @param _account is the address whos collateral is being retreived
     /// @dev this function runs calculations to accrue interest for an up to date amount
@@ -654,27 +701,16 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         return calcBorrowLimit(availibleCollateralValue);
     }
 
-    /// @notice account borrows normalized to 1e18 decimal places
-    function getAccountCurrentBorrowsNormalized(address _borrower) internal returns(uint256, uint256) {
-        uint256 borrowedAmountTotal = borrowBalanceCurrent(_borrower);
-
-        uint actualBorrowBalance = vault.toUnderlying(asset, borrowedAmountTotal);
-        uint256 normalizedBalance = wrapperBorrowedAsset.normalizeAmount(
-            actualBorrowBalance
-        );
-        return (normalizedBalance, borrowedAmountTotal);
-    }
-
     function liquidate(address _borrower) external {
         // require the liquidator is not also the borrower
         require(msg.sender != _borrower, "NOT_LIQUIDATE_YOURSELF");
 
         (
-            uint256 normalizedBorrowedAmountTotal, 
+            uint256 normalizedBorrowedAmountInUSDTotal, 
             uint256 actualBorrowedAmountTotal
         ) = getAccountCurrentBorrowsNormalized(_borrower);
 
-        uint256 borrowedNormalizedAmountInUSD = getPriceOfToken(asset, normalizedBorrowedAmountTotal);
+        uint256 borrowedNormalizedAmountInUSD = getPriceOfToken(asset, normalizedBorrowedAmountInUSDTotal);
         uint256 borrowNormalizedLimitInUSD = getBorrowLimitNormalizedInUSD(_borrower);
 
         // check if the borrow is less than the borrowed amount
@@ -753,4 +789,5 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         emit ReserveWithdraw(msg.sender, _toWithdraw);
     }
+
 }
