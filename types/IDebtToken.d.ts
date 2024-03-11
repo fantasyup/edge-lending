@@ -31,6 +31,7 @@ interface IDebtTokenInterface extends ethers.utils.Interface {
     "mint(address,uint256)": FunctionFragment;
     "normalizeAmount(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
+    "principal(address)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
@@ -70,6 +71,7 @@ interface IDebtTokenInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "principal", values: [string]): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
     values?: undefined
@@ -102,6 +104,7 @@ interface IDebtTokenInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "principal", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
     data: BytesLike
@@ -270,6 +273,16 @@ export class IDebtToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
+    principal(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "principal(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "totalSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -406,6 +419,13 @@ export class IDebtToken extends Contract {
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
+  principal(_account: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  "principal(address)"(
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
   "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -541,6 +561,13 @@ export class IDebtToken extends Contract {
     owner(overrides?: CallOverrides): Promise<string>;
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
+
+    principal(_account: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "principal(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -699,6 +726,13 @@ export class IDebtToken extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    principal(_account: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "principal(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
     "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -838,6 +872,16 @@ export class IDebtToken extends Contract {
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    principal(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "principal(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

@@ -91,8 +91,8 @@ contract ERC20 is IERC20 {
   function _mint(address _account, uint256 _amount) internal virtual {
     require(_account != address(0), "ERC20: mint to the zero address");
 
-    _totalSupply = _totalSupply + _amount;
-    _balances[_account] = _balances[_account] + _amount;
+    _totalSupply += _amount;
+    _balances[_account] += _amount;
     emit Transfer(address(0), _account, _amount);
   }
 

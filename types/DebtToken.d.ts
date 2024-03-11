@@ -38,6 +38,7 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     "normalizeAmount(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
+    "principal(address)": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -106,6 +107,7 @@ interface DebtTokenInterface extends ethers.utils.Interface {
       BytesLike
     ]
   ): string;
+  encodeFunctionData(functionFragment: "principal", values: [string]): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -159,6 +161,7 @@ interface DebtTokenInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "principal", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -255,12 +258,12 @@ export class DebtToken extends Contract {
     balanceOf(
       _account: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { balance: BigNumber }>;
+    ): Promise<[BigNumber]>;
 
     "balanceOf(address)"(
       _account: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { balance: BigNumber }>;
+    ): Promise<[BigNumber]>;
 
     burn(
       _from: string,
@@ -396,6 +399,16 @@ export class DebtToken extends Contract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    principal(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "principal(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
@@ -606,6 +619,13 @@ export class DebtToken extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  principal(_account: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  "principal(address)"(
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   symbol(overrides?: CallOverrides): Promise<string>;
 
   "symbol()"(overrides?: CallOverrides): Promise<string>;
@@ -814,6 +834,13 @@ export class DebtToken extends Contract {
       s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    principal(_account: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "principal(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -1045,6 +1072,13 @@ export class DebtToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    principal(_account: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "principal(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1261,6 +1295,16 @@ export class DebtToken extends Contract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    principal(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "principal(address)"(
+      _account: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;

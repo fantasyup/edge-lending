@@ -23,6 +23,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
   functions: {
     "accountInterestIndex(address)": FunctionFragment;
     "asset()": FunctionFragment;
+    "borrowBalancePrior(address)": FunctionFragment;
     "borrowIndex()": FunctionFragment;
     "calcBorrowLimit(uint256)": FunctionFragment;
     "collateralAsset()": FunctionFragment;
@@ -41,6 +42,10 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "borrowBalancePrior",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "borrowIndex",
     values?: undefined
@@ -101,6 +106,10 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "asset", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "borrowBalancePrior",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "borrowIndex",
     data: BytesLike
@@ -214,6 +223,16 @@ export class IBSLendingPair extends Contract {
     asset(overrides?: CallOverrides): Promise<[string]>;
 
     "asset()"(overrides?: CallOverrides): Promise<[string]>;
+
+    borrowBalancePrior(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "borrowBalancePrior(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     borrowIndex(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -350,6 +369,16 @@ export class IBSLendingPair extends Contract {
 
   "asset()"(overrides?: CallOverrides): Promise<string>;
 
+  borrowBalancePrior(
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "borrowBalancePrior(address)"(
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   borrowIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
   "borrowIndex()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -484,6 +513,16 @@ export class IBSLendingPair extends Contract {
     asset(overrides?: CallOverrides): Promise<string>;
 
     "asset()"(overrides?: CallOverrides): Promise<string>;
+
+    borrowBalancePrior(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "borrowBalancePrior(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     borrowIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -751,6 +790,16 @@ export class IBSLendingPair extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    borrowBalancePrior(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "borrowBalancePrior(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     borrowIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
     "borrowIndex()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -886,6 +935,16 @@ export class IBSLendingPair extends Contract {
     asset(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "asset()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    borrowBalancePrior(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "borrowBalancePrior(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     borrowIndex(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

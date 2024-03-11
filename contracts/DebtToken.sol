@@ -28,26 +28,13 @@ contract DebtToken is WrapperToken, IDebtToken {
         underlying = address(0);
     }
 
+    function principal(address _account) external view override returns(uint256) {
+        return _balances[_account];
+    } 
+
     /// @dev calculates the debt balance of account
-    function balanceOf(address _account) public view override(ERC20, IERC20) returns(uint256 balance) {
-        uint256 principalTimesIndex;
-        // Get borrowBalance and borrowIndex
-        uint256 principal = _balances[_account];
-
-        console.logString("balanceOf");
-        console.logUint(principal);
-
-        // If borrowBalance = 0 then borrowIndex is likely also 0.
-        // Rather than failing the calculation with a division by 0, we immediately return 0 in this case.
-        if (principal == 0) {
-            return 0;
-        }
-
-        uint256 borrowInterestIndex = _owner.accountInterestIndex(_account);
-        // Calculate new borrow balance using the interest index:
-        // recentBorrowBalance = borrower.borrowBalance * market.borrowIndex / borrower.borrowIndex
-        principalTimesIndex = principal * _owner.borrowIndex();
-        balance = principalTimesIndex / borrowInterestIndex;
+    function balanceOf(address _account) public view override(ERC20, IERC20) returns(uint256) {
+        return _owner.borrowBalancePrior(_account);
     }
 
     /**
@@ -57,9 +44,9 @@ contract DebtToken is WrapperToken, IDebtToken {
     **/
     function burn(address _from, uint256 _amount) external override(IBSWrapperToken, WrapperToken) onlyLendingPair {
         _balances[_from] = balanceOf(_from) - _amount;
-        console.logString("burn");
-        console.logUint(_totalSupply);
-        console.logUint(_amount);
+        // console.logString("burn");
+        // console.logUint(_totalSupply);
+        // console.logUint(_amount);
         if(_amount > _totalSupply) {
             _totalSupply = 0;
         } else {
@@ -72,9 +59,9 @@ contract DebtToken is WrapperToken, IDebtToken {
     * @param _amount is the amount to increase
     **/
     function increaseTotalDebt(uint256 _amount) external override onlyLendingPair {
-        console.logString("totaldebt");
-        console.logUint(_totalSupply);
-        console.logUint(_amount);
+        // console.logString("totaldebt");
+        // console.logUint(_totalSupply);
+        // console.logUint(_amount);
 
         _totalSupply = _totalSupply + _amount;
     }

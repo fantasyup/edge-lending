@@ -160,5 +160,5 @@ interface IBSLendingPair {
     function accountInterestIndex(address) external view returns(uint256);
     function borrowIndex() external view returns(uint256);
     function debtToken() external view returns(IDebtToken);
-
+    function borrowBalancePrior(address _account) external view returns(uint256);
 }
