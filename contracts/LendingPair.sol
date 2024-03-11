@@ -93,7 +93,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         _;
     }
 
-
     /// @notice Initialize function
     /// @param _blackSmithTeam admin address
     /// @param _oracle price oracle
@@ -181,17 +180,24 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @param _amountToBorrow is the amount of the borrow asset vault shares the user wants to borrow
     function borrow(uint256 _amountToBorrow) external {
-        uint256 borrowedTotalWithInterest = borrowBalanceCurrent(msg.sender);
+        (uint256 borrowedTotalWithInterestNormalized,) = getAccountCurrentBorrowsNormalized(msg.sender);
         uint256 currentBorrowAssetPrice = oracle.getPriceInUSD(asset);
-        uint256 borrowedTotalInUSD = borrowedTotalWithInterest * currentBorrowAssetPrice;
-        uint256 borrowLimitInUSD = getBorrowLimitInUSD(msg.sender);
-        uint256 borrowAmountAllowedInUSD = borrowLimitInUSD - borrowedTotalInUSD;
+        uint256 borrowedTotalInUSDNormalized = borrowedTotalWithInterestNormalized * currentBorrowAssetPrice;
+        uint256 borrowLimitInUSDNormalized = getBorrowLimitNormalizedInUSD(msg.sender);
 
-        uint256 borrowAmountInUSD = currentBorrowAssetPrice * _amountToBorrow;
+        uint256 borrowAmountAllowedInUSDNormalized = borrowLimitInUSDNormalized - borrowedTotalInUSDNormalized;
+        
+        // borrow amount in usd normalized
+        uint256 borrowAmountInUSDNormalized = currentBorrowAssetPrice * wrapperBorrowedAsset.normalizeAmount(_amountToBorrow);
+
         // require the amount being borrowed is less than 
         // or equal to the amount they are aloud to borrow
+        console.logString("Borrow");
+        console.logUint(_amountToBorrow);
+        console.logUint(borrowAmountAllowedInUSDNormalized);
+        console.logUint(borrowAmountInUSDNormalized);
         require(
-            borrowAmountAllowedInUSD >= borrowAmountInUSD,
+            borrowAmountAllowedInUSDNormalized >= borrowAmountInUSDNormalized,
             "BORROWING_MORE_THAN_ALLOWED"
         );
 
@@ -199,7 +205,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         
         // mint debt tokens to account
         debtToken.mint(msg.sender, _amountToBorrow);
-        // set interest index
+        // // set interest index
         accountInterestIndex[msg.sender] = borrowIndex;
         // transfer borrow asset to borrower
         vault.transfer(asset, address(this), msg.sender, amountOfSharesToBorrow);
@@ -333,14 +339,15 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     function exchangeRateCurrent() public returns (uint256) {
         accrueInterest();
 
-        uint256 currentTotalSupply = wrapperBorrowedAsset.totalSupply();
+        // convert amount to underlying
+        uint256 currentTotalSupply = vault.toUnderlying(asset, wrapperBorrowedAsset.totalSupply());
 
         if (currentTotalSupply == 0) {
             // If there are no tokens minted: exchangeRate = initialExchangeRate
             return initialExchangeRateMantissa;
         } else {
             // Otherwise: exchangeRate = (totalCash + totalBorrows - totalReserves) / totalSupply
-            uint256 totalCash = getCashPrior(); //get contract asset balance
+            uint256 totalCash = getCashPrior(); // get contract asset balance
             uint256 cashPlusBorrowsMinusReserves;
             Exp memory exchangeRate;
 
@@ -358,10 +365,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         }
     } 
 
-    
     /// @notice getCashPrior is a view funcion that returns the balance of all held borrow asset
     function getCashPrior() public view returns (uint256) {
-        return vault.balanceOf(asset, address(this));
+        return vault.toUnderlying(asset, vault.balanceOf(asset, address(this)));
     }
 
     /// @notice Total amount of outstanding borrows of the asset in this market
@@ -387,8 +393,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // read the previous values out of storage
         uint256 cashPrior = getCashPrior();
         uint256 borrowsPrior = totalBorrows();
-
         uint256 reservesPrior = totalReserves;
+
         uint256 borrowIndexPrior = borrowIndex;
         // calculate the current borrow interest rate
         uint256 borrowRateMantissa = interestRate.getBorrowRate(
@@ -520,13 +526,24 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         override
         returns (uint256)
     {
-        uint256 borrowedTotal = getTotalBorrowedValueInUSD(account);
-        uint256 collateralValue = getTotalAvailableCollateralValueInUSD(account);
-        uint256 requiredCollateral = calcCollateralRequired(borrowedTotal);
-        if (collateralValue < requiredCollateral) {
+
+        (
+            uint256 normalizedBorrowedAmountTotal, 
+        ) = getAccountCurrentBorrowsNormalized(account);
+
+        uint256 borrowedTotalNormalizedAmountInUSD = getPriceOfToken(asset, normalizedBorrowedAmountTotal);
+        // uint256 borrowedTotal = getTotalBorrowedValueInUSD(account);
+        uint256 collateralValueNormalized = getTotalAvailableCollateralValueNormalizedInUSD(account);
+        uint256 requiredCollateralNormalized = calcCollateralRequired(borrowedTotalNormalizedAmountInUSD);
+
+        if (collateralValueNormalized < requiredCollateralNormalized) {
             return 0;
         }
-        uint256 leftoverCollateral = collateralValue - requiredCollateral;
+
+        // remaining collateral denormalized
+        uint256 leftoverCollateral = wrappedCollateralAsset.denormalizeAmount(
+            collateralValueNormalized - requiredCollateralNormalized
+        );
 
         uint256 currentCollateralValueInUSD = getPriceOfCollateral();
         return leftoverCollateral / currentCollateralValueInUSD;
@@ -604,20 +621,70 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         return calcBorrowLimit(availibleCollateralValue);
     }
 
+    /// @notice getTotalAvailableCollateralValueNormalizedInUSD returns the total availible collaeral value for an account in USD
+    /// @param _account is the address whos collateral is being retreived
+    /// @dev this function runs calculations to accrue interest for an up to date amount
+    function getTotalAvailableCollateralValueNormalizedInUSD(address _account)
+        public
+        returns (uint256)
+    {
+        return getPriceOfToken(
+            collateralAsset, 
+            wrappedCollateralAsset.normalizeAmount(
+                vault.toUnderlying(
+                    collateralAsset,
+                    collateralOfAccount(_account)
+                )
+            )  // convert the amount of collateral to underlying amount
+        );
+    }
+
+
+    /// @notice borrow limit normalized to 1e18 decimal places
+    function getBorrowLimitNormalizedInUSD(address _account) internal returns (uint256) {
+        uint256 normalizedBalance = wrappedCollateralAsset.normalizeAmount(
+            vault.toUnderlying(collateralAsset, collateralOfAccount(_account))
+        );
+
+        uint256 availibleCollateralValue = getPriceOfToken(
+            collateralAsset, 
+            normalizedBalance
+        );
+
+        return calcBorrowLimit(availibleCollateralValue);
+    }
+
+    /// @notice account borrows normalized to 1e18 decimal places
+    function getAccountCurrentBorrowsNormalized(address _borrower) internal returns(uint256, uint256) {
+        uint256 borrowedAmountTotal = borrowBalanceCurrent(_borrower);
+
+        uint actualBorrowBalance = vault.toUnderlying(asset, borrowedAmountTotal);
+        uint256 normalizedBalance = wrapperBorrowedAsset.normalizeAmount(
+            actualBorrowBalance
+        );
+        return (normalizedBalance, borrowedAmountTotal);
+    }
+
     function liquidate(address _borrower) external {
         // require the liquidator is not also the borrower
         require(msg.sender != _borrower, "NOT_LIQUIDATE_YOURSELF");
 
-        uint256 borrowedAmountTotal = borrowBalanceCurrent(_borrower);
-        uint256 borrowedAmountInUSD = getPriceOfToken(asset, borrowedAmountTotal);
-        uint256 borrowLimitInUSD = getBorrowLimitInUSD(_borrower);
+        (
+            uint256 normalizedBorrowedAmountTotal, 
+            uint256 actualBorrowedAmountTotal
+        ) = getAccountCurrentBorrowsNormalized(_borrower);
+
+        uint256 borrowedNormalizedAmountInUSD = getPriceOfToken(asset, normalizedBorrowedAmountTotal);
+        uint256 borrowNormalizedLimitInUSD = getBorrowLimitNormalizedInUSD(_borrower);
 
         // check if the borrow is less than the borrowed amount
-        if (borrowLimitInUSD <= borrowedAmountInUSD) {
+        if (borrowNormalizedLimitInUSD <= borrowedNormalizedAmountInUSD) {
+            console.logString("in liquidate");
+            console.logUint(actualBorrowedAmountTotal);
             _repayLiquidatingLoan(
                 _borrower,
                 msg.sender,
-                borrowedAmountTotal
+                actualBorrowedAmountTotal
             );
 
             // Clear the borrowers interest rate index
@@ -643,9 +710,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint256 amountInShares = vault.toShare(asset, _borrowedAmount + fee, true);
         // transfer liquidated position to eldning
         vault.transfer(asset, _liquidator, address(this), amountInShares);
-        // add fee amount to reserves
+        // // add fee amount to reserves
         totalReserves = totalReserves + fee;
         // burn borrower debt
+        console.logAddress(address(debtToken));
         debtToken.burn(_borrower, _borrowedAmount);
     }
 

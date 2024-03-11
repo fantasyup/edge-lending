@@ -3,6 +3,11 @@ pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MockToken is ERC20("Mock", "MCT") {
+    uint8 _decimals;
+    constructor(uint8 __decimals) {
+        _decimals = __decimals;
+    }
+
     function setBalanceTo(address to, uint value) public {
 		_mint(to, value);
 	}
@@ -15,4 +20,7 @@ contract MockToken is ERC20("Mock", "MCT") {
         _burn(_from, _amount);
     }
 
+    function decimals() public view override returns(uint8) {
+        return _decimals;
+    }
 }

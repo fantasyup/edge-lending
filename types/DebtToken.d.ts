@@ -28,12 +28,14 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     "burn(address,uint256)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
+    "denormalizeAmount(uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "increaseTotalDebt(uint256)": FunctionFragment;
     "initialize(address,address,string,string)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "nonces(address)": FunctionFragment;
+    "normalizeAmount(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -66,6 +68,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "denormalizeAmount",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "increaseAllowance",
     values: [string, BigNumberish]
   ): string;
@@ -83,6 +89,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "nonces", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "normalizeAmount",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "permit",
@@ -128,6 +138,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "denormalizeAmount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "increaseAllowance",
     data: BytesLike
   ): Result;
@@ -139,6 +153,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "normalizeAmount",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
@@ -272,6 +290,16 @@ export class DebtToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    denormalizeAmount(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "denormalizeAmount(uint256)"(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     increaseAllowance(
       arg0: string,
       arg1: BigNumberish,
@@ -330,6 +358,16 @@ export class DebtToken extends Contract {
 
     "nonces(address)"(
       owner: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    normalizeAmount(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "normalizeAmount(uint256)"(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -461,6 +499,16 @@ export class DebtToken extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  denormalizeAmount(
+    _amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "denormalizeAmount(uint256)"(
+    _amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   increaseAllowance(
     arg0: string,
     arg1: BigNumberish,
@@ -519,6 +567,16 @@ export class DebtToken extends Contract {
 
   "nonces(address)"(
     owner: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  normalizeAmount(
+    _amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "normalizeAmount(uint256)"(
+    _amount: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -650,6 +708,16 @@ export class DebtToken extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    denormalizeAmount(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "denormalizeAmount(uint256)"(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     increaseAllowance(
       arg0: string,
       arg1: BigNumberish,
@@ -708,6 +776,16 @@ export class DebtToken extends Contract {
 
     "nonces(address)"(
       owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    normalizeAmount(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "normalizeAmount(uint256)"(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -860,6 +938,16 @@ export class DebtToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    denormalizeAmount(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "denormalizeAmount(uint256)"(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     increaseAllowance(
       arg0: string,
       arg1: BigNumberish,
@@ -918,6 +1006,16 @@ export class DebtToken extends Contract {
 
     "nonces(address)"(
       owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    normalizeAmount(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "normalizeAmount(uint256)"(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1055,6 +1153,16 @@ export class DebtToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    denormalizeAmount(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "denormalizeAmount(uint256)"(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     increaseAllowance(
       arg0: string,
       arg1: BigNumberish,
@@ -1116,6 +1224,16 @@ export class DebtToken extends Contract {
 
     "nonces(address)"(
       owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    normalizeAmount(
+      _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "normalizeAmount(uint256)"(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

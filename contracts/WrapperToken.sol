@@ -6,6 +6,7 @@ import "./token/ERC20Permit.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./token/IERC20Details.sol";
+import "hardhat/console.sol";
 
 import "./util/Initializable.sol";
 
@@ -27,6 +28,8 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     /// @dev version
     uint8 constant VERSION = 0x1;
     
+    /// @dev scale
+    uint8 internal underlyingDecimal;
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -44,7 +47,7 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     ) external virtual override initializer {
         require(address(__owner) != address(0), "invalid owner");
         _owner = __owner;
-        uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
+        underlyingDecimal = IERC20Details(_underlying).decimals();
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
         initializeERC20Permit(_tokenName);
         underlying = _underlying;
@@ -72,4 +75,27 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     function owner() external view override returns(IBSLendingPair) {
         return _owner;
     }
+
+    /// @dev scales the input to 18 decimal places
+    function normalizeAmount(uint256 _amount) external view override returns(uint256) {
+        // save on sload
+        uint8 _underlyingDecimal = underlyingDecimal;
+        if (_underlyingDecimal >= 18) {
+            return _amount / 10 ** (_underlyingDecimal - 18);
+        } else {
+            return _amount * (10 ** (18 - _underlyingDecimal));
+        }
+    }
+
+    /// @dev scales the input to underlying decimal places
+    function denormalizeAmount(uint256 _amount) external view override returns(uint256) {
+        // save on sload
+        uint8 _underlyingDecimal = underlyingDecimal;
+        if (_underlyingDecimal >= 18) {
+            return _amount * 10 ** (_underlyingDecimal - 18);
+        } else {
+            return _amount / (10 ** (18 - _underlyingDecimal));
+        }
+    }
+
 }

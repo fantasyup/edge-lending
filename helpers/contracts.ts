@@ -44,8 +44,8 @@ export const deployVault = async() => {
     return await deployContract<Vault>(ContractId.Vault, [])
 }
 
-export const deployMockToken = async() => {
-    return await deployContract<MockToken>(ContractId.MockToken, [])
+export const deployMockToken = async(decimals ?: number) => {
+    return await deployContract<MockToken>(ContractId.MockToken, [decimals || 18])
 }
 
 export const deployLendingPair = async () => {

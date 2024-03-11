@@ -33,6 +33,10 @@ contract DebtToken is WrapperToken, IDebtToken {
         uint256 principalTimesIndex;
         // Get borrowBalance and borrowIndex
         uint256 principal = _balances[_account];
+
+        console.logString("balanceOf");
+        console.logUint(principal);
+
         // If borrowBalance = 0 then borrowIndex is likely also 0.
         // Rather than failing the calculation with a division by 0, we immediately return 0 in this case.
         if (principal == 0) {
@@ -53,7 +57,14 @@ contract DebtToken is WrapperToken, IDebtToken {
     **/
     function burn(address _from, uint256 _amount) external override(IBSWrapperToken, WrapperToken) onlyLendingPair {
         _balances[_from] = balanceOf(_from) - _amount;
-        _totalSupply = _totalSupply - _amount;
+        console.logString("burn");
+        console.logUint(_totalSupply);
+        console.logUint(_amount);
+        if(_amount > _totalSupply) {
+            _totalSupply = 0;
+        } else {
+            _totalSupply -= _amount;
+        }
     }
 
     /**
@@ -61,6 +72,10 @@ contract DebtToken is WrapperToken, IDebtToken {
     * @param _amount is the amount to increase
     **/
     function increaseTotalDebt(uint256 _amount) external override onlyLendingPair {
+        console.logString("totaldebt");
+        console.logUint(_totalSupply);
+        console.logUint(_amount);
+
         _totalSupply = _totalSupply + _amount;
     }
 

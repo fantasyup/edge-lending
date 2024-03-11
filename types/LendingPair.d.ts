@@ -44,6 +44,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "getPriceOfCollateral()": FunctionFragment;
     "getPriceOfToken(address,uint256)": FunctionFragment;
     "getTotalAvailableCollateralValueInUSD(address)": FunctionFragment;
+    "getTotalAvailableCollateralValueNormalizedInUSD(address)": FunctionFragment;
     "getTotalBorrowedValueInUSD(address)": FunctionFragment;
     "initialize(address,address,address,address,tuple,address,address)": FunctionFragment;
     "interestRate()": FunctionFragment;
@@ -145,6 +146,10 @@ interface LendingPairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getTotalAvailableCollateralValueInUSD",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTotalAvailableCollateralValueNormalizedInUSD",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -293,6 +298,10 @@ interface LendingPairInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getTotalAvailableCollateralValueInUSD",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTotalAvailableCollateralValueNormalizedInUSD",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -589,6 +598,16 @@ export class LendingPair extends Contract {
     ): Promise<ContractTransaction>;
 
     "getTotalAvailableCollateralValueInUSD(address)"(
+      _account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    getTotalAvailableCollateralValueNormalizedInUSD(
+      _account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "getTotalAvailableCollateralValueNormalizedInUSD(address)"(
       _account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -914,6 +933,16 @@ export class LendingPair extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  getTotalAvailableCollateralValueNormalizedInUSD(
+    _account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "getTotalAvailableCollateralValueNormalizedInUSD(address)"(
+    _account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   getTotalBorrowedValueInUSD(
     _account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1219,6 +1248,16 @@ export class LendingPair extends Contract {
     ): Promise<BigNumber>;
 
     "getTotalAvailableCollateralValueInUSD(address)"(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getTotalAvailableCollateralValueNormalizedInUSD(
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getTotalAvailableCollateralValueNormalizedInUSD(address)"(
       _account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1669,6 +1708,16 @@ export class LendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    getTotalAvailableCollateralValueNormalizedInUSD(
+      _account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "getTotalAvailableCollateralValueNormalizedInUSD(address)"(
+      _account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     getTotalBorrowedValueInUSD(
       _account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1993,6 +2042,16 @@ export class LendingPair extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "getTotalAvailableCollateralValueInUSD(address)"(
+      _account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getTotalAvailableCollateralValueNormalizedInUSD(
+      _account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "getTotalAvailableCollateralValueNormalizedInUSD(address)"(
       _account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

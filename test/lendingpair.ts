@@ -22,7 +22,7 @@ import {
   deployVault,
   deployWrappedToken
 } from "../helpers/contracts";
-import { advanceNBlocks } from "./lib";
+import { advanceNBlocks, makeLendingPairTestSuiteVars } from "./lib";
 
 // list of accounts
 let accounts: Signer[];
@@ -54,7 +54,7 @@ const BASE = ethers.utils.parseUnits("1", 18)
 async function depositInVault(
   asset: MockToken,
   account: Signer,
-  amountToDeposit: number
+  amountToDeposit: number | BigNumber
 ) {
   const addr = await account.getAddress()
   await asset.connect(account).setBalanceTo(addr, amountToDeposit)
@@ -65,29 +65,31 @@ async function depositInVault(
 async function depositBorrowAsset(
   lendingPair: BLendingPair,
   account: string,
-  amountToDeposit: number
+  amountToDeposit: number | BigNumber,
+  asset?: MockToken
 ) {
   const signer = await ethers.getSigner(account)
-
-  await depositInVault(BorrowAsset, signer, amountToDeposit)
+  const assetToDeposit = asset ||  BorrowAsset
+  await depositInVault(assetToDeposit, signer, amountToDeposit)
   // approve 
   await Vault.connect(signer).approveContract(lendingPair.address, true);
-  const userShareBalance = await (await Vault.balanceOf(BorrowAsset.address, account)).toNumber()
-
-  return await LendingPair.connect(signer).depositBorrowAsset(account, userShareBalance)
+  const userShareBalance = await (await Vault.balanceOf(assetToDeposit.address, account))
+  return await lendingPair.connect(signer).depositBorrowAsset(account, userShareBalance)
 }
 
 async function depositCollateralAsset(
   lendingPair: BLendingPair,
   account: string,
-  amountToDeposit: number
+  amountToDeposit: number | BigNumber,
+  asset?: MockToken
 ) {
   const signer = await ethers.getSigner(account)
 
-  await depositInVault(CollateralAsset, signer, amountToDeposit)
+  await depositInVault(asset || CollateralAsset, signer, amountToDeposit)
   // approve 
   await Vault.connect(signer).approveContract(lendingPair.address, true);
-  return await LendingPair.connect(signer).depositCollateral(account, amountToDeposit)
+
+  return await lendingPair.connect(signer).depositCollateral(account, amountToDeposit)
 }
 
 async function initializeWrapperTokens(
@@ -102,6 +104,14 @@ async function initializeWrapperTokens(
     "DMO"
   )
 }
+
+const initialExchangeRateMantissa = "1000000000000000000"
+const reserveFactorMantissa = "500000000000000000"
+  // 150%
+const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
+// 0.005%
+const liquidationFee = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
+
 
 describe("LendingPair", async function () {
   before(async function () {
@@ -119,6 +129,7 @@ describe("LendingPair", async function () {
     Vault = await deployVault()
     LendingPair = await deployLendingPair()
     MockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(18))
+    // borrow asset with 6 decimal places
     BorrowAsset = await deployMockToken()
     CollateralAsset = await deployMockToken()
     BorrowAssetDepositWrapperToken = await deployWrappedToken()
@@ -158,13 +169,6 @@ describe("LendingPair", async function () {
   });
 
   it("initialize", async function () {
-    const initialExchangeRateMantissa = "1000000000000000000"
-    const reserveFactorMantissa = "500000000000000000"
-    // 150%
-    const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
-    // 0.005%
-    const liquidationFee = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
-
     await LendingPair.initialize(
       admin,
       MockPriceOracle.address,
@@ -549,8 +553,21 @@ describe("LendingPair", async function () {
           expect((await Vault.balanceOf(CollateralAsset.address, admin)).toNumber()).to.eq(
             adminCollateralBalanceInVault + jamesCollateralInVault
           )
-
         })
+
+        it("withdrawFees", async function() {
+          await expect(
+            LendingPair.withdrawFees(10000000)
+          ).to.be.revertedWith("NOT_ENOUGH_BALANCE")
+
+          const teamVaultBalance = await (await Vault.balanceOf(BorrowAsset.address, admin)).toNumber()
+          const feesToWithdraw = 10
+          await LendingPair.withdrawFees(feesToWithdraw)
+
+          const newTeamVaultBalance =  await (await Vault.balanceOf(BorrowAsset.address, admin)).toNumber()
+          expect(newTeamVaultBalance).to.eq(teamVaultBalance + feesToWithdraw)
+        })
+
     })
 
     describe("accrueInterest", function() {
@@ -570,7 +587,7 @@ describe("LendingPair", async function () {
         await LendingPair.connect(zubiSigner).borrow(amountToBorrow);
 
         // mine
-        await advanceNBlocks(1000)
+        // await advanceNBlocks(1000)
 
         // // call accrueInterest
         await (await LendingPair.accrueInterest()).wait()
@@ -583,9 +600,6 @@ describe("LendingPair", async function () {
         // await advanceNBlocks(1000)
 
         // repay everything
-
-
-
       })
     })
 
