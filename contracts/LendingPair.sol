@@ -789,19 +789,4 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         emit ReserveWithdraw(msg.sender, _toWithdraw);
     }
-
-    /// @notice borrow limit normalized to 1e18 decimal places
-    function getBorrowLimitNormalizedInUSD(address _account) internal returns (uint256) {
-        uint256 normalizedBalance = wrappedCollateralAsset.normalizeAmount(
-            vault.toUnderlying(collateralAsset, collateralOfAccount(_account))
-        );
-
-        uint256 availibleCollateralValue = getPriceOfToken(
-            collateralAsset, 
-            normalizedBalance
-        );
-
-        return calcBorrowLimit(availibleCollateralValue);
-    }
-
 }
