@@ -180,7 +180,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
         /// @dev scales the input to 18 decimal places
-    function normalize(uint256 _amount, uint8 _underlyingDecimal) external view override returns(uint256) {
+    function normalize(uint256 _amount, uint8 _underlyingDecimal) internal view override returns(uint256) {
         if (_underlyingDecimal >= 18) {
             return _amount / 10 ** (_underlyingDecimal - 18);
         } else {
@@ -189,7 +189,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /// @dev scales the input to underlying decimal places
-    function denormalizeAmount(uint256 _underlyingDecimal, uint256 _amount) external view override returns(uint256) {
+    function denormalizeAmount(uint256 _underlyingDecimal, uint256 _amount) internal view override returns(uint256) {
         if (_underlyingDecimal >= 18) {
             return _amount * 10 ** (_underlyingDecimal - 18);
         } else {
@@ -788,6 +788,20 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         vault.transfer(asset, address(this), blackSmithTeam, _toWithdraw);
 
         emit ReserveWithdraw(msg.sender, _toWithdraw);
+    }
+
+    /// @notice borrow limit normalized to 1e18 decimal places
+    function getBorrowLimitNormalizedInUSD(address _account) internal returns (uint256) {
+        uint256 normalizedBalance = wrappedCollateralAsset.normalizeAmount(
+            vault.toUnderlying(collateralAsset, collateralOfAccount(_account))
+        );
+
+        uint256 availibleCollateralValue = getPriceOfToken(
+            collateralAsset, 
+            normalizedBalance
+        );
+
+        return calcBorrowLimit(availibleCollateralValue);
     }
 
 }
