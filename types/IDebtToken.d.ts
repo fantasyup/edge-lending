@@ -25,11 +25,9 @@ interface IDebtTokenInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
-    "denormalizeAmount(uint256)": FunctionFragment;
     "increaseTotalDebt(uint256)": FunctionFragment;
     "initialize(address,address,string,string)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
-    "normalizeAmount(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "principal(address)": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -51,10 +49,6 @@ interface IDebtTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "denormalizeAmount",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "increaseTotalDebt",
     values: [BigNumberish]
   ): string;
@@ -65,10 +59,6 @@ interface IDebtTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "mint",
     values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "normalizeAmount",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "principal", values: [string]): string;
@@ -90,19 +80,11 @@ interface IDebtTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "denormalizeAmount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "increaseTotalDebt",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "normalizeAmount",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "principal", data: BytesLike): Result;
   decodeFunctionResult(
@@ -211,16 +193,6 @@ export class IDebtToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    denormalizeAmount(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "denormalizeAmount(uint256)"(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     increaseTotalDebt(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -258,16 +230,6 @@ export class IDebtToken extends Contract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    normalizeAmount(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "normalizeAmount(uint256)"(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -357,16 +319,6 @@ export class IDebtToken extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  denormalizeAmount(
-    _amount: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  "denormalizeAmount(uint256)"(
-    _amount: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   increaseTotalDebt(
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -404,16 +356,6 @@ export class IDebtToken extends Contract {
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  normalizeAmount(
-    _amount: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  "normalizeAmount(uint256)"(
-    _amount: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -500,16 +442,6 @@ export class IDebtToken extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    denormalizeAmount(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "denormalizeAmount(uint256)"(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     increaseTotalDebt(
       _amount: BigNumberish,
       overrides?: CallOverrides
@@ -547,16 +479,6 @@ export class IDebtToken extends Contract {
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    normalizeAmount(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "normalizeAmount(uint256)"(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -664,16 +586,6 @@ export class IDebtToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    denormalizeAmount(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "denormalizeAmount(uint256)"(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     increaseTotalDebt(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -710,16 +622,6 @@ export class IDebtToken extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    normalizeAmount(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "normalizeAmount(uint256)"(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -811,16 +713,6 @@ export class IDebtToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    denormalizeAmount(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "denormalizeAmount(uint256)"(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     increaseTotalDebt(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -857,16 +749,6 @@ export class IDebtToken extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    normalizeAmount(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "normalizeAmount(uint256)"(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;

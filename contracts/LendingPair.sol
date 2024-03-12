@@ -87,7 +87,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice Mapping of account addresses to their interest interest index
     mapping( address => uint256 ) public override accountInterestIndex;
 
+    /// @dev borrow asset underlying decimal
     uint8 private _borrowAssetUnderlyingDecimal;
+    /// @dev collateral asset underlying decimal
     uint8 private _collateralAssetUnderlyingDecimal;
 
     modifier onlyBlackSmithTeam() {
@@ -193,8 +195,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         }
     }
 
-    /// @dev scales the input to underlying decimal places
-    function denormalizeAmount(uint256 _underlyingDecimal, uint256 _amount) internal pure returns(uint256) {
+    /// @dev scales the input to from 18 decinal to underlying decimal places
+    function denormalize(uint256 _amount, uint8 _underlyingDecimal) internal pure returns(uint256) {
         if (_underlyingDecimal >= 18) {
             return _amount * 10 ** (_underlyingDecimal - 18);
         } else {
@@ -494,9 +496,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint256 principalTimesIndex;
         // Get borrowBalance and borrowIndex
         uint256 principal = debtToken.principal(_account);
-        // console.logString("balanceOf");
-        // console.logUint(principal);
-
         // If borrowBalance = 0 then borrowIndex is likely also 0.
         // Rather than failing the calculation with a division by 0, we immediately return 0 in this case.
         if (principal == 0) {
@@ -507,7 +506,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // Calculate new borrow balance using the interest index:
         // recentBorrowBalance = borrower.borrowBalance * market.borrowIndex / borrower.borrowIndex
         principalTimesIndex = principal * borrowIndex;
-
+        
         balance = principalTimesIndex / borrowInterestIndex;
     } 
 
@@ -560,34 +559,37 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /// @notice Figures out how much of a given collateral an account is allowed to withdraw
-    /// @param account is the account being checked
+    /// @param _account is the account being checked
     /// @dev this function runs calculations to accrue interest for an up to date amount
-    function getMaxWithdrawAllowed(address account)
+    function getMaxWithdrawAllowed(address _account)
         public
         override
         returns (uint256)
     {
+        // save on sload
+        uint8 __collateralAssetUnderlyingDecimal = _collateralAssetUnderlyingDecimal;
 
-        (
-            uint256 normalizedBorrowedAmountTotal,
-
-        ) = getAccountCurrentBorrowsNormalized(account);
+        uint256 normalizedBorrowedAmountTotal = normalize(
+            borrowBalanceCurrent(_account),
+            _borrowAssetUnderlyingDecimal
+        );
+        
+        uint256 currentCollateralValueInUSD = getPriceOfCollateral();
 
         uint256 borrowedTotalNormalizedAmountInUSD = getPriceOfToken(asset, normalizedBorrowedAmountTotal);
-        // uint256 borrowedTotal = getTotalBorrowedValueInUSD(account);
-        uint256 collateralValueNormalized = getTotalAvailableCollateralValueNormalizedInUSD(account);
-        uint256 requiredCollateralNormalized = calcCollateralRequired(borrowedTotalNormalizedAmountInUSD);
+        uint256 collateralValueNormalizedInUSD = normalize(getTotalAvailableCollateralValue(_account), __collateralAssetUnderlyingDecimal) * currentCollateralValueInUSD;
+        uint256 requiredCollateralNormalizedInUSD = calcCollateralRequired(borrowedTotalNormalizedAmountInUSD);
 
-        if (collateralValueNormalized < requiredCollateralNormalized) {
+        if (collateralValueNormalizedInUSD < requiredCollateralNormalizedInUSD) {
             return 0;
         }
 
         // remaining collateral denormalized
-        uint256 leftoverCollateral = wrappedCollateralAsset.denormalizeAmount(
-            collateralValueNormalized - requiredCollateralNormalized
+        uint256 leftoverCollateral = denormalize(
+            collateralValueNormalizedInUSD - requiredCollateralNormalizedInUSD,
+            __collateralAssetUnderlyingDecimal
         );
 
-        uint256 currentCollateralValueInUSD = getPriceOfCollateral();
         return leftoverCollateral / currentCollateralValueInUSD;
     }
 
@@ -685,70 +687,19 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         return calcBorrowLimit(availibleCollateralValue);
     }
 
-    /// @notice getTotalAvailableCollateralValueNormalizedInUSD returns the total availible collaeral value for an account in USD
-    /// @param _account is the address whos collateral is being retreived
-    /// @dev this function runs calculations to accrue interest for an up to date amount
-    function getTotalAvailableCollateralValueNormalizedInUSD(address _account)
-        public
-        returns (uint256)
-    {
-        return getPriceOfToken(
-            collateralAsset, 
-            wrappedCollateralAsset.normalizeAmount(
-                vault.toUnderlying(
-                    collateralAsset,
-                    collateralOfAccount(_account)
-                )
-            )  // convert the amount of collateral to underlying amount
-        );
-    }
-
-
-    /// @notice borrow limit normalized to 1e18 decimal places
-    function getBorrowLimitNormalizedInUSD(address _account) internal returns (uint256) {
-        uint256 normalizedBalance = wrappedCollateralAsset.normalizeAmount(
-            vault.toUnderlying(collateralAsset, collateralOfAccount(_account))
-        );
-
-        uint256 availibleCollateralValue = getPriceOfToken(
-            collateralAsset, 
-            normalizedBalance
-        );
-
-        return calcBorrowLimit(availibleCollateralValue);
-    }
-
-        /// @notice account borrows normalized to 1e18 decimal places
-    function getAccountCurrentBorrowsNormalized(address _borrower) internal returns(uint256, uint256) {
-        uint256 borrowedAmountTotal = borrowBalanceCurrent(_borrower);
-
-        uint actualBorrowBalance = vault.toUnderlying(asset, borrowedAmountTotal);
-        uint256 normalizedBalance = wrapperBorrowedAsset.normalizeAmount(
-            actualBorrowBalance
-        );
-        return (normalizedBalance, borrowedAmountTotal);
-    }
-
     function liquidate(address _borrower) external {
         // require the liquidator is not also the borrower
         require(msg.sender != _borrower, "NOT_LIQUIDATE_YOURSELF");
-
-        (
-            uint256 normalizedBorrowedAmountInUSDTotal, 
-            uint256 actualBorrowedAmountTotal
-        ) = getAccountCurrentBorrowsNormalized(_borrower);
-
-        uint256 borrowedNormalizedAmountInUSD = getPriceOfToken(asset, normalizedBorrowedAmountInUSDTotal);
-        uint256 borrowNormalizedLimitInUSD = getBorrowLimitNormalizedInUSD(_borrower);
+        uint256 borrowedTotalWithInterest = borrowBalanceCurrent(_borrower);
+        uint256 borrowedTotalInUSDNormalized = getPriceOfToken(asset, normalize(borrowedTotalWithInterest, _borrowAssetUnderlyingDecimal));
+        uint256 borrowLimitInUSDNormalized = normalize(getBorrowLimit(_borrower), _collateralAssetUnderlyingDecimal) * getPriceOfCollateral();
 
         // check if the borrow is less than the borrowed amount
-        if (borrowNormalizedLimitInUSD <= borrowedNormalizedAmountInUSD) {
-            console.logString("in liquidate");
-            console.logUint(actualBorrowedAmountTotal);
+        if (borrowLimitInUSDNormalized <= borrowedTotalInUSDNormalized) {
             _repayLiquidatingLoan(
                 _borrower,
                 msg.sender,
-                actualBorrowedAmountTotal
+                borrowedTotalWithInterest
             );
 
             // Clear the borrowers interest rate index
@@ -777,7 +728,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // // add fee amount to reserves
         totalReserves = totalReserves + fee;
         // burn borrower debt
-        console.logAddress(address(debtToken));
         debtToken.burn(_borrower, _borrowedAmount);
     }
 
