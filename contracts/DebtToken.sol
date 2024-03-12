@@ -2,6 +2,7 @@
 pragma solidity 0.8.1;
 
 import "./WrapperToken.sol";
+import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IDebtToken.sol";
 import "hardhat/console.sol";
 
@@ -15,12 +16,12 @@ contract DebtToken is WrapperToken, IDebtToken {
 
     /// @notice
     function initialize(
-        IBSLendingPair __owner,
+        address __owner,
         address _underlying,
         string memory _tokenName,
         string memory _tokenSymbol
     ) external override(WrapperToken, IBSWrapperToken) initializer {
-        require(address(__owner) != address(0), "invalid owner");
+        require(__owner != address(0), "invalid owner");
         _owner = __owner;
         uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
@@ -34,7 +35,7 @@ contract DebtToken is WrapperToken, IDebtToken {
 
     /// @dev calculates the debt balance of account
     function balanceOf(address _account) public view override(ERC20, IERC20) returns(uint256) {
-        return _owner.borrowBalancePrior(_account);
+        return IBSLendingPair(_owner).borrowBalancePrior(_account);
     }
 
     /**

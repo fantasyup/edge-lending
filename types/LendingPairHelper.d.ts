@@ -23,6 +23,7 @@ interface LendingPairHelperInterface extends ethers.utils.Interface {
     "vault()": FunctionFragment;
     "viewBorrowLimit(address[],address)": FunctionFragment;
     "viewBorrowedValue(address[],address)": FunctionFragment;
+    "viewBorrowedValueInUSD(address[],address)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "vault", values?: undefined): string;
@@ -34,6 +35,10 @@ interface LendingPairHelperInterface extends ethers.utils.Interface {
     functionFragment: "viewBorrowedValue",
     values: [string[], string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "viewBorrowedValueInUSD",
+    values: [string[], string]
+  ): string;
 
   decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
   decodeFunctionResult(
@@ -42,6 +47,10 @@ interface LendingPairHelperInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "viewBorrowedValue",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "viewBorrowedValueInUSD",
     data: BytesLike
   ): Result;
 
@@ -119,6 +128,18 @@ export class LendingPairHelper extends Contract {
       _account: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
+
+    viewBorrowedValueInUSD(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
+
+    "viewBorrowedValueInUSD(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { totals: BigNumber[] }>;
   };
 
   vault(overrides?: CallOverrides): Promise<string>;
@@ -149,6 +170,18 @@ export class LendingPairHelper extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
+  viewBorrowedValueInUSD(
+    pairs: string[],
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  "viewBorrowedValueInUSD(address[],address)"(
+    pairs: string[],
+    _account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
   callStatic: {
     vault(overrides?: CallOverrides): Promise<string>;
 
@@ -173,6 +206,18 @@ export class LendingPairHelper extends Contract {
     ): Promise<BigNumber[]>;
 
     "viewBorrowedValue(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    viewBorrowedValueInUSD(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    "viewBorrowedValueInUSD(address[],address)"(
       pairs: string[],
       _account: string,
       overrides?: CallOverrides
@@ -209,6 +254,18 @@ export class LendingPairHelper extends Contract {
       _account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    viewBorrowedValueInUSD(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "viewBorrowedValueInUSD(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -235,6 +292,18 @@ export class LendingPairHelper extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "viewBorrowedValue(address[],address)"(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    viewBorrowedValueInUSD(
+      pairs: string[],
+      _account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "viewBorrowedValueInUSD(address[],address)"(
       pairs: string[],
       _account: string,
       overrides?: CallOverrides

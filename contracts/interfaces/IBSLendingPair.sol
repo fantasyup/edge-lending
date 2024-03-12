@@ -3,10 +3,10 @@ pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./IPriceOracleAggregator.sol";
-import "./IBSVault.sol";
-import "../DataTypes.sol";
 import "./IBSWrapperToken.sol";
 import "./IDebtToken.sol";
+import "./IBSVault.sol";
+import "../DataTypes.sol";
 
 interface IBSLendingPair {
 

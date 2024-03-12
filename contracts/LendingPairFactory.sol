@@ -189,7 +189,7 @@ contract LendingPairFactory is Pausable {
         wrapper = clone(implementation);
 
         initializeWrapperTokens(
-            IBSLendingPair(pair),
+            pair,
             IBSWrapperToken(wrapper),
             IERC20Details(assetDetails),
             symbol
@@ -197,7 +197,7 @@ contract LendingPairFactory is Pausable {
     }
 
     function initializeWrapperTokens(
-        IBSLendingPair _pair,
+        address _pair,
         IBSWrapperToken _wrapperToken,
         IERC20Details _assetDetails,
         string memory _tokenType

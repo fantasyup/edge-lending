@@ -155,7 +155,7 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IBSLendingPair",
+        internalType: "address",
         name: "_owner",
         type: "address",
       },
@@ -203,7 +203,7 @@ const _abi = [
     name: "owner",
     outputs: [
       {
-        internalType: "contract IBSLendingPair",
+        internalType: "address",
         name: "",
         type: "address",
       },

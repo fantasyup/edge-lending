@@ -23,7 +23,7 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     address public underlying;
 
     /// @dev the LendingPair is the "owner" for WrapperTokens
-    IBSLendingPair internal _owner;
+    address internal _owner;
 
     /// @dev version
     uint8 constant VERSION = 0x1;
@@ -38,12 +38,12 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
 
     /// @notice
     function initialize(
-        IBSLendingPair __owner,
+        address __owner,
         address _underlying,
         string memory _tokenName,
         string memory _tokenSymbol
     ) external virtual override initializer {
-        require(address(__owner) != address(0), "invalid owner");
+        require(__owner != address(0), "invalid owner");
         _owner = __owner;
         uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
@@ -70,7 +70,7 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
         _burn(_from, _amount);
     }
 
-    function owner() external view override returns(IBSLendingPair) {
+    function owner() external view override returns(address) {
         return _owner;
     }
 }

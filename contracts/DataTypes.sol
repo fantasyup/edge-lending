@@ -20,7 +20,7 @@ library DataTypes {
         IDebtToken debtToken;
     }
 
-    function validBorrowAssetConfig(BorrowAssetConfig calldata self, IBSLendingPair _owner) external view {
+    function validBorrowAssetConfig(BorrowAssetConfig calldata self, address _owner) external view {
         require(address(self.interestRate) != address(0), "IR");
         require(self.initialExchangeRateMantissa > 0, "IE");
         require(self.reserveFactorMantissa > 0, "IF");

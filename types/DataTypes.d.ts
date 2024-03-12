@@ -20,7 +20,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface DataTypesInterface extends ethers.utils.Interface {
   functions: {
-    "validBorrowAssetConfig(tuple,IBSLendingPair)": FunctionFragment;
+    "validBorrowAssetConfig(tuple,address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -105,7 +105,7 @@ export class DataTypes extends Contract {
       overrides?: CallOverrides
     ): Promise<[void]>;
 
-    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),IBSLendingPair)"(
+    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),address)"(
       self: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
@@ -134,7 +134,7 @@ export class DataTypes extends Contract {
     overrides?: CallOverrides
   ): Promise<void>;
 
-  "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),IBSLendingPair)"(
+  "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),address)"(
     self: {
       interestRate: string;
       initialExchangeRateMantissa: BigNumberish;
@@ -163,7 +163,7 @@ export class DataTypes extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),IBSLendingPair)"(
+    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),address)"(
       self: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
@@ -195,7 +195,7 @@ export class DataTypes extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),IBSLendingPair)"(
+    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),address)"(
       self: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
@@ -225,7 +225,7 @@ export class DataTypes extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),IBSLendingPair)"(
+    "validBorrowAssetConfig((IInterestRateModel,uint256,uint256,uint256,IBSWrapperToken,uint256,IDebtToken),address)"(
       self: {
         interestRate: string;
         initialExchangeRateMantissa: BigNumberish;

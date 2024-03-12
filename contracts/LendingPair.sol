@@ -121,8 +121,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // invalid asset or collateral asset
         require(address(_asset) != address(0) && address(_collateralAsset) != address(0), "IAC");
         // validate borrow config
-        borrowConfig.validBorrowAssetConfig(IBSLendingPair(address(this)));
-        require(address(_wrappedCollateralAsset.owner()) == address(this), "IVWC");
+        borrowConfig.validBorrowAssetConfig(address(this));
+        require(_wrappedCollateralAsset.owner() == address(this), "IVWC");
 
         blackSmithTeam = _blackSmithTeam;
         vault = _vault;

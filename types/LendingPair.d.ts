@@ -370,6 +370,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "Deposit(address,address,address,address,uint256)": EventFragment;
     "FlashLoan(address,address,address,uint256,uint256)": EventFragment;
     "InterestAccrued(address,uint256,uint256,uint256,uint256)": EventFragment;
+    "InterestShortCircuit(uint256)": EventFragment;
     "Liquidate(address,address,address,uint256,address)": EventFragment;
     "Redeem(address,address,address,address,uint256,uint256)": EventFragment;
     "Repay(address,address,address,address,uint256)": EventFragment;
@@ -381,6 +382,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InterestAccrued"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InterestShortCircuit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Liquidate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Redeem"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Repay"): EventFragment;
@@ -1526,6 +1528,10 @@ export class LendingPair extends Contract {
         totalReserves: BigNumber;
       }
     >;
+
+    InterestShortCircuit(
+      blockNumber: null
+    ): TypedEventFilter<[BigNumber], { blockNumber: BigNumber }>;
 
     Liquidate(
       pair: string | null,
