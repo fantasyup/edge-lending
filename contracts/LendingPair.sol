@@ -406,8 +406,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         // short-circuit accumulating 0 interest
         if (accrualBlockNumberPrior == currentBlockNumber) {
-            // @TODO confirm need for this
-            // emit InterestShortCircuit(currentBlockNumber);
+            emit InterestShortCircuit(currentBlockNumber);
             return;
         }
 

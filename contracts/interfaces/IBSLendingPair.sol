@@ -129,6 +129,8 @@ interface IBSLendingPair {
         uint256 totalReserves
     );
 
+    event InterestShortCircuit(uint256 blockNumber);
+
     function asset() external view returns (IERC20);
 
     function depositBorrowAsset(address _tokenReceipeint, uint256 _amount) external;
