@@ -44,9 +44,6 @@ contract DebtToken is WrapperToken, IDebtToken {
     **/
     function burn(address _from, uint256 _amount) external override(IBSWrapperToken, WrapperToken) onlyLendingPair {
         _balances[_from] = balanceOf(_from) - _amount;
-        // console.logString("burn");
-        // console.logUint(_totalSupply);
-        // console.logUint(_amount);
         if(_amount > _totalSupply) {
             _totalSupply = 0;
         } else {
@@ -59,10 +56,6 @@ contract DebtToken is WrapperToken, IDebtToken {
     * @param _amount is the amount to increase
     **/
     function increaseTotalDebt(uint256 _amount) external override onlyLendingPair {
-        // console.logString("totaldebt");
-        // console.logUint(_totalSupply);
-        // console.logUint(_amount);
-
         _totalSupply = _totalSupply + _amount;
     }
 

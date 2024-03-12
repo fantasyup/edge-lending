@@ -28,8 +28,6 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     /// @dev version
     uint8 constant VERSION = 0x1;
     
-    /// @dev scale
-    uint8 internal underlyingDecimal;
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -47,7 +45,7 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     ) external virtual override initializer {
         require(address(__owner) != address(0), "invalid owner");
         _owner = __owner;
-        underlyingDecimal = IERC20Details(_underlying).decimals();
+        uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
         initializeERC20Permit(_tokenName);
         underlying = _underlying;
