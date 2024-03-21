@@ -54,7 +54,8 @@ interface IBSVault is IERC3156FlashLender {
     );
 
     event TransferControl(
-        address _newTeam
+        address _newTeam,
+        uint256 timestamp
     );
 
     event UpdateFlashLoanRate(
@@ -62,6 +63,8 @@ interface IBSVault is IERC3156FlashLender {
     );
 
     event Approval(address indexed user, address indexed allowed, bool status);
+
+    event OwnershipAccepted(address newOwner, uint256 timestamp);
 
     // ************** //
     // *** FUNCTIONS *** //

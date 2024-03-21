@@ -24,8 +24,8 @@ contract Vault is VaultBase {
     using SafeERC20 for IERC20;
 
     /// @notice modifier to allow only blacksmith team to call a function
-    modifier onlyBlacksmithTeam {
-        require(msg.sender == blackSmithTeam, "ONLY_BLACK_SMITH_TEAM");
+    modifier onlyOwner {
+        require(msg.sender == owner, "ONLY_OWNER");
         _;
     }
 
@@ -38,13 +38,15 @@ contract Vault is VaultBase {
     // UUPSProxiable
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    function initialize(uint256 _flashLoanRate, address _blackSmithTeam)
+    function initialize(uint256 _flashLoanRate, address _owner)
         external
         initializer
     {
-        require(_blackSmithTeam != address(0), "INVALID_TEAM");
+        require(_owner != address(0), "INVALID_OWNER");
+        require(flashLoanRate < MAX_FLASHLOAN_RATE, "INVALID_RATE");
+
         flashLoanRate = _flashLoanRate;
-        blackSmithTeam = _blackSmithTeam;
+        owner = _owner;
     }
 
     function proxiableUUID() public pure override returns (bytes32) {
@@ -57,7 +59,7 @@ contract Vault is VaultBase {
     function updateCode(address newAddress)
         external
         override
-        onlyBlacksmithTeam
+        onlyOwner
     {
         _updateCodeAddress(newAddress);
     }
@@ -67,19 +69,51 @@ contract Vault is VaultBase {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /// @notice approve a contract to enable the contract to withdraw
-    function approveContract(address _contract, bool _status) external  {
-        require(_contract != address(0), "Vault: Cannot approve 0"); 
-        userApprovedContracts[msg.sender][_contract] = _status;
-        emit Approval(msg.sender, _contract, _status);
+    function approveContract(
+        address _user,
+        address _contract,
+        bool _status,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external  {
+        require(_contract != address(0), "Vault: Cannot approve 0");
+
+        bytes32 digest =
+            keccak256(
+                abi.encodePacked(
+                    "\x19\x01",
+                    _domainSeparatorV4(),
+                    keccak256(
+                        abi.encode(
+                            _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
+                            _status
+                                ? keccak256("Grant full access to funds in Blacksmith Vault? Read more here https://blackmith.com/permission")
+                                : keccak256("Revoke access to Blacksmith Vault? Read more here https://blackmith.com/revoke"),
+                            _user,
+                            _contract,
+                            _status,
+                            userApprovalNonce[_user]++
+                        )
+                    )
+                )
+            );
+
+        address recoveredAddress = ecrecover(digest, v, r, s);
+        require(recoveredAddress == _user, "Vault: Invalid Signature");
+
+        userApprovedContracts[_user][_contract] = _status;
+
+        emit Approval(_user, _contract, _status);
     }
 
     /// @notice pause vault actions
-    function pause() onlyBlacksmithTeam external {
+    function pause() onlyOwner external {
         _pause();
     }
 
     /// @notice unpause vault actions
-    function unpause() onlyBlacksmithTeam external {
+    function unpause() onlyOwner external {
         _unpause();
     }
 
@@ -145,6 +179,22 @@ contract Vault is VaultBase {
         uint256 _shares
     ) external override whenNotPaused allowed(_from) {
         _transfer(_token, _from, _to, _shares);
+    }
+
+    /// @notice accept transfer of control
+    function acceptOwnership() external {
+        require(msg.sender == newOwner, "invalid owner");
+        owner = newOwner;
+        newOwner = address(0);
+        emit OwnershipAccepted(newOwner, block.timestamp);
+    }
+
+    /// @notice Transfer control from current owner address to another
+    /// @param _newOwner The new team
+    function transferToOwner(address _newOwner) external onlyOwner {
+        require(_newOwner != address(0), "INVALID_NEW_TEAM");
+        newOwner = _newOwner;
+        emit TransferControl(_newOwner, block.timestamp);
     }
 
     function _transfer(
@@ -225,7 +275,8 @@ contract Vault is VaultBase {
 
     /// @dev Update the flashloan rate charged, only blacksmith team can call
     /// @param _newRate The ERC-20 token.
-    function updateFlashloanRate(uint256 _newRate) external onlyBlacksmithTeam {
+    function updateFlashloanRate(uint256 _newRate) external onlyOwner {
+        require(_newRate < MAX_FLASHLOAN_RATE, "invalid rate");
         flashLoanRate = _newRate;
         emit UpdateFlashLoanRate(_newRate);
     }
@@ -233,9 +284,9 @@ contract Vault is VaultBase {
     /// @dev Helper function to represent an `amount` of `token` in shares.
     /// @param _token The ERC-20 token.
     /// @param _amount The `token` amount.
-    /// @param _roundUp If to round up the amount or not
+    /// @param _ceil If to ceil the amount or not
     /// @return share The token amount represented in shares.
-    function toShare(IERC20 _token, uint256 _amount, bool _roundUp)
+    function toShare(IERC20 _token, uint256 _amount, bool _ceil)
         public
         view
         override
@@ -246,7 +297,7 @@ contract Vault is VaultBase {
             uint256 currentUnderlyingBalance = _token.balanceOf(address(this));
             share = (_amount * currentTotal) / currentUnderlyingBalance;
             
-            if(_roundUp && ((share * currentUnderlyingBalance) / currentTotal) < _amount) {
+            if(_ceil && ((share * currentUnderlyingBalance) / currentTotal) < _amount) {
                 share = share + 1;
             }
 
@@ -265,14 +316,7 @@ contract Vault is VaultBase {
         override
         returns (uint256 amount)
     {
-        return (_share * _token.balanceOf(address(this))) / totals[_token];
+        amount = (_share * _token.balanceOf(address(this))) / totals[_token];
     }
 
-    /// @notice Transfer control from current team address to another
-    /// @param _newTeam The new team
-    function transferToNewTeam(address _newTeam) external onlyBlacksmithTeam {
-        require(_newTeam != address(0), "INVALID_NEW_TEAM");
-        blackSmithTeam = _newTeam;
-        emit TransferControl(_newTeam);
-    }
 }

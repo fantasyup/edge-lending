@@ -13,7 +13,7 @@ import "./DataTypes.sol";
 
 contract LendingPairFactory is Pausable {
 
-    address immutable public admin;
+    address immutable public owner;
 
     address public lendingPairImplementation;
     address public collateralWrapperImplementation;
@@ -25,20 +25,26 @@ contract LendingPairFactory is Pausable {
     event NewLendingPair(address pair, uint256 created);
     event LogicContractUpdated(address pairLogic);
 
-    /// @notice modifier to allow only blacksmith team to call a function
-    modifier onlyAdmin {
-        require(msg.sender == admin, "ONLY_ADMIN");
+    /// @notice modifier to allow only the owner to call a function
+    modifier onlyOwner {
+        require(msg.sender == owner, "ONLY_OWNER");
         _;
     }
 
     constructor(
-        address _admin,
+        address _owner,
         address _pairLogic,
         address _collateralWrapperLogic,
         address _debtTokenLogic,
         address _borrowAssetWrapperLogic
     ) {
-        admin = _admin;
+        require(_owner != address(0), "invalid owner");
+        require(_pairLogic != address(0), "invalid pair logic");
+        require(_collateralWrapperLogic != address(0), "invalid collateral wrapper logic");
+        require(_debtTokenLogic != address(0), "invalid debt logic");
+        require(_borrowAssetWrapperLogic != address(0), "invalid borrow asset logic");
+
+        owner = _owner;
         lendingPairImplementation = _pairLogic;
         collateralWrapperImplementation = _collateralWrapperLogic;
         debtTokenImplementation = _debtTokenLogic;
@@ -46,31 +52,31 @@ contract LendingPairFactory is Pausable {
     }
 
     /// @notice pause factory actions
-    function pause() onlyAdmin external {
+    function pause() onlyOwner external {
         _pause();
     }
 
     /// @notice unpause vault actions
-    function unpause() onlyAdmin external {
+    function unpause() onlyOwner external {
         _unpause();
     }
 
-    function updatePairImpl(address _newLogicContract) external onlyAdmin {
+    function updatePairImpl(address _newLogicContract) external onlyOwner {
         lendingPairImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
     
-    function updateCollateralWrapperImpl(address _newLogicContract) external onlyAdmin {
+    function updateCollateralWrapperImpl(address _newLogicContract) external onlyOwner {
         collateralWrapperImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
     
-    function updateDebtTokenImpl(address _newLogicContract) external onlyAdmin {
+    function updateDebtTokenImpl(address _newLogicContract) external onlyOwner {
         debtTokenImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
     
-    function updateBorrowAssetWrapperImpl(address _newLogicContract) external onlyAdmin {
+    function updateBorrowAssetWrapperImpl(address _newLogicContract) external onlyOwner {
         borrowAssetWrapperImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
