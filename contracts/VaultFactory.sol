@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 import "./upgradability/UUPSProxy.sol";
+import "./interfaces/IBSVault.sol";
 
 contract VaultFactory {
     address public vaultLogic;
@@ -33,14 +34,14 @@ contract VaultFactory {
     }
 
     function createVaultWithProxy(
-        // uint256 _flashLoanRate,
-        // address _vaultOwner
+        uint256 _flashLoanRate,
+        address _vaultOwner
     ) external returns(address) {
         UUPSProxy proxy = new UUPSProxy();
         proxy.initializeProxy(vaultLogic);
 
         /// initiailize vault
-        // proxy.initialize(_flashLoanRate, _vaultOwner);
+        IBSVault(address(proxy)).initialize(_flashLoanRate, _vaultOwner);
 
         emit NewVault(address(proxy), block.timestamp);
 

@@ -40,12 +40,14 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
     /// @dev EIP712 type hash
     bytes32 private constant _EIP712_TYPE_HASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"); 
     bytes32 private constant _HASHED_NAME = keccak256("blackmsith");
-    bytes32 private constant _HASHED_VERSION = keccak256("1");
+    bytes32 private immutable _HASHED_VERSION;
     bytes32 private immutable _CACHED_DOMAIN_SEPARATOR;
     uint256 private immutable _CACHED_CHAIN_ID;
     
-    constructor() {
-        _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_EIP712_TYPE_HASH, _HASHED_NAME, _HASHED_VERSION);
+    constructor(string memory _version) {
+        bytes32 hashedVersion = keccak256(bytes(_version));
+        _HASHED_VERSION = hashedVersion;
+        _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_EIP712_TYPE_HASH, _HASHED_NAME, hashedVersion);
         _CACHED_CHAIN_ID = _getChainId();
     }
 

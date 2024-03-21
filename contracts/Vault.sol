@@ -77,7 +77,7 @@ contract Vault is VaultBase {
         bytes32 r,
         bytes32 s
     ) external  {
-        require(_contract != address(0), "Vault: Cannot approve 0");
+        require(_contract != address(0), "INVALID_CONTRACT");
 
         bytes32 digest =
             keccak256(
@@ -100,7 +100,7 @@ contract Vault is VaultBase {
             );
 
         address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress == _user, "Vault: Invalid Signature");
+        require(recoveredAddress == _user, "INVALID_SIGNATURE");
 
         userApprovedContracts[_user][_contract] = _status;
 

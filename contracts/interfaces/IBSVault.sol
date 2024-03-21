@@ -70,6 +70,9 @@ interface IBSVault is IERC3156FlashLender {
     // *** FUNCTIONS *** //
     // ************** //
 
+    function initialize(uint256 _flashLoanRate, address _owner)
+        external;
+
     function deposit(
         IERC20 _token,
         address _from,
