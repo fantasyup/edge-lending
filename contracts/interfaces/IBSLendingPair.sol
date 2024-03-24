@@ -122,6 +122,8 @@ interface IBSLendingPair {
     event ChangeFeeWithdrawalAddress(address newAddr, uint256 timestamp);
 
     function initialize(
+        string memory _name,
+        string memory _symbol,
         IERC20 _asset,
         IERC20 _collateralAsset,
         DataTypes.BorrowAssetConfig calldata borrowConfig,

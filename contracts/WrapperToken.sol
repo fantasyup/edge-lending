@@ -18,14 +18,15 @@ import "./util/Initializable.sol";
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
+    
+    /// @dev wrapper token version
+    uint256 constant public VERSION = 0x1;
+
     /// @dev underlying wrapper token
     address public underlying;
 
     /// @dev the LendingPair is the "owner" for WrapperTokens
     address internal _owner;
-
-    /// @dev version
-    uint256 constant VERSION = 0x1;
 
     /**
      * @dev Throws if called by any account other than the owner.
@@ -57,7 +58,7 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     @param _to is the address that will receive the new tokens
     @param _amount is the amount of token they will receive
     **/
-    function mint(address _to, uint256 _amount) external override onlyLendingPair {
+    function mint(address _to, uint256 _amount) external virtual override onlyLendingPair {
         _mint(_to, _amount);
     }
 

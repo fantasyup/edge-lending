@@ -11,7 +11,6 @@ import "./interfaces/IDebtToken.sol";
 
 library DataTypes {
     struct BorrowAssetConfig {
-        IInterestRateModel interestRate;
         uint256 initialExchangeRateMantissa;
         uint256 reserveFactorMantissa;
         uint256 collateralFactor;
@@ -21,7 +20,6 @@ library DataTypes {
     }
 
     function validBorrowAssetConfig(BorrowAssetConfig calldata self, address _owner) external view {
-        require(address(self.interestRate) != address(0), "IR");
         require(self.initialExchangeRateMantissa > 0, "IE");
         require(self.reserveFactorMantissa > 0, "IF");
         require(self.collateralFactor > 0, "IC");

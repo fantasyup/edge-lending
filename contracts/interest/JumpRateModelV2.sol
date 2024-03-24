@@ -42,7 +42,7 @@ contract JumpRateModelV2 {
      * @param multiplierPerYear The rate of increase in interest rate wrt utilization (scaled by 1e18)
      * @param jumpMultiplierPerYear The multiplierPerBlock after hitting a specified utilization point
      * @param kink_ The utilization point at which the jump multiplier is applied
-     * @param owner_ The address of the owner, i.e. the Timelock contract (which has the ability to update parameters directly)
+     * @param owner_ The address of the owner, i.e. which has the ability to update parameters directly
      * @param borrowRateMaxMantissa_ maximum borrow rate per second
      * @param blocksPerYear_ the number of blocks on the chain per year
      */

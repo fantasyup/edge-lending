@@ -29,8 +29,29 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     enum Actions {Deposit, Borrow}
 
+    /// @dev lending pair name
+    string public name;
+
+    /// @dev lending pair symbol
+    string public symbol;
+
     /// @dev version
     uint256 public constant VERSION = 0x1;
+
+    /// @notice where the tokens are stored
+    IBSVault public immutable vault;
+
+    /// @notice protocol liquidation fee percent in 1e18
+    uint256 public immutable procotolLiquidationFeeShare;
+
+    /// @notice The interest rate model for the borrow asset
+    IInterestRateModel public immutable interestRate;
+
+    /// @notice The price oracle for the assets
+    IPriceOracleAggregator public immutable override oracle;
+
+    /// @notice The address to withdraw fees to
+    address public feeWithdrawalAddr;
 
     /// @dev borrow asset underlying decimal
     uint8 private _borrowAssetUnderlyingDecimal;
@@ -62,23 +83,11 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice liquidation fee in 1e18
     uint256 public liquidationFee;
 
-    /// @notice protocol liquidation fee percent in 1e18
-    uint256 public immutable procotolLiquidationFeeShare;
-
     /// @dev liquidation fee precision
     uint256 private constant LIQUIDATION_FEES_PRECISION = 1e18;
 
-    /// @notice where the tokens are stored
-    IBSVault public immutable vault;
-
-    /// @notice The address to withdraw fees to
-    address public feeWithdrawalAddr;
-
     /// @notice the address that can pause borrow & deposits of assets
     address public pauseGuardian;
-
-    /// @notice The price oracle for the assets
-    IPriceOracleAggregator public override oracle;
 
     /// @notice The pair borrow asset
     IERC20 public override asset;
@@ -94,9 +103,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @notice The wrapper token for debt
     IDebtToken public override debtToken;
-
-    /// @notice The interest rate model for the borrow asset
-    IInterestRateModel public interestRate;
 
     /// @notice Mapping of account addresses to their interest interest index
     mapping(address => uint256) public override accountInterestIndex;
@@ -118,25 +124,35 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         IBSVault _vault,
         IPriceOracleAggregator _oracle,
         address _feeWithdrawalAddr,
-        uint256 _procotolLiquidationFeeShare
+        uint256 _procotolLiquidationFeeShare,
+        IInterestRateModel _interestRate
     ) {
         // invalid vault or oracle
         require(address(_vault) != address(0), "IV0");
         // invalid vault or oracle
         require(address(_oracle) != address(0), "IV0");
+        // invalid fee withdrawal addr
+        require(_feeWithdrawalAddr != address(0), "IVWA");
+        // interest rate model
+        require(address(_interestRate) != address(0), "IVIR");
 
         vault = _vault;
         oracle = _oracle;
         feeWithdrawalAddr = _feeWithdrawalAddr;
         procotolLiquidationFeeShare = _procotolLiquidationFeeShare;
+        interestRate = _interestRate;
     }
 
     /// @notice Initialize function
+    /// @param _name for lending pair
+    /// @param _symbol for lending pair
     /// @param _asset borrow asset
     /// @param _collateralAsset pair collateral
     /// @param _wrappedCollateralAsset wrapped token minted when depositing collateral asset
     /// @param _pauseGuardian pause guardian address
     function initialize(
+        string memory _name,
+        string memory _symbol,
         IERC20 _asset,
         IERC20 _collateralAsset,
         DataTypes.BorrowAssetConfig calldata borrowConfig,
@@ -152,12 +168,13 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // validate borrow config
         borrowConfig.validBorrowAssetConfig(address(this));
 
+        name = _name;
+        symbol = _symbol;
         pauseGuardian = _pauseGuardian;
         asset = _asset;
         collateralAsset = _collateralAsset;
         borrowIndex = mantissaOne;
 
-        interestRate = borrowConfig.interestRate;
         initialExchangeRateMantissa = borrowConfig.initialExchangeRateMantissa;
         reserveFactorMantissa = borrowConfig.reserveFactorMantissa;
         collateralFactor = borrowConfig.collateralFactor;
@@ -235,8 +252,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /// @param _amountToBorrow is the amount of the borrow asset vault shares the user wants to borrow
+    /// @param _debtOwner this should be the msg.sender or address that delegates credit to the msg.sender
     /// @dev we use normalized amounts to calculate the
-    function borrow(uint256 _amountToBorrow) external whenNotPaused(Actions.Borrow) {
+    function borrow(uint256 _amountToBorrow, address _debtOwner) external whenNotPaused(Actions.Borrow) {
+        require(_debtOwner != address(0), "INVALID_DEBT_OWNER");
         // save on sload
         uint8 __borrowAssetUnderlyingDecimal = _borrowAssetUnderlyingDecimal;
 
@@ -261,8 +280,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         );
 
         uint256 amountOfSharesToBorrow = vault.toShare(asset, _amountToBorrow, false);
-        // mint debt tokens to account
-        debtToken.mint(msg.sender, _amountToBorrow);
+        // mint debt tokens to _debtOwner account
+        debtToken.mint(_debtOwner, msg.sender, _amountToBorrow);
         // set interest index
         accountInterestIndex[msg.sender] = borrowIndex;
         // transfer borrow asset to borrower
@@ -485,7 +504,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /**
-    @notice Accrue interest to updated borrowIndex and then calculate account's borrow balance using the updated borrowIndex
+    @notice Accrue interest to updated borrowIndex and then calculate account's borrow balance 
+            using the updated borrowIndex
     @param _account The address whose balance should be calculated after updating borrowIndex
     @return The calculated balance
     **/
@@ -614,7 +634,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         return
             getPriceOfToken(
                 collateralAsset,
-                vault.toUnderlying(collateralAsset, collateralOfAccount(_account)) // convert the amount of collateral to underlying amount
+                // convert the amount of collateral to underlying amount
+                vault.toUnderlying(collateralAsset, collateralOfAccount(_account))
             );
     }
 
@@ -622,7 +643,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _account is the address whos collateral is being retreived
     /// @dev this function runs calculations to accrue interest for an up to date amount
     function getTotalAvailableCollateralValue(address _account) public view returns (uint256) {
-        return vault.toUnderlying(collateralAsset, collateralOfAccount(_account)); // convert the amount of collateral to underlying amount
+        // convert the amount of collateral to underlying amount
+        return vault.toUnderlying(collateralAsset, collateralOfAccount(_account));
     }
 
     /// @dev returns price of collateral in usd
@@ -649,7 +671,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         return getPriceOfToken(asset, borrowBalanceCurrent(_account));
     }
 
-    /// @notice calcBorrowLimit is used to calculate the borrow limit for an account based on the input value of their collateral
+    /// @notice calcBorrowLimit is used to calculate the borrow limit for an account 
+    /// based on the input value of their collateral
     /// @param _collateralValueInUSD is the USD value of the users collateral
     function calcBorrowLimit(uint256 _collateralValueInUSD) public view override returns (uint256) {
         return (_collateralValueInUSD * COLLATERAL_FACTOR_PRECSIION) / collateralFactor;

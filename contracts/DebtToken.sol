@@ -14,13 +14,15 @@ import "hardhat/console.sol";
 contract DebtToken is WrapperToken, IDebtToken {
     bool constant isDebtToken = true;
 
+    mapping(address => mapping(address => uint256)) private _borrowAllowances;
+
     /// @notice
     function initialize(
         address __owner,
         address _underlying,
         string memory _tokenName,
         string memory _tokenSymbol
-    ) external override(WrapperToken, IBSWrapperToken) initializer {
+    ) external override(WrapperToken, IBSWrapperTokenBase) initializer {
         require(__owner != address(0), "invalid owner");
         _owner = __owner;
         uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
@@ -38,6 +40,13 @@ contract DebtToken is WrapperToken, IDebtToken {
         return IBSLendingPair(_owner).borrowBalancePrior(_account);
     }
 
+    function mint(address _debtOwner, address _to, uint256 _amount) external override onlyLendingPair {
+        if(_debtOwner != _to) {
+            _decreaseBorrowAllowance(_debtOwner, _to, _amount);
+        }
+        _mint(_debtOwner, _amount);
+    }
+
     /**
      * @notice burn is an only owner function that allows the owner to burn  tokens from an input account
      * @param _from is the address where the tokens will be burnt
@@ -45,7 +54,7 @@ contract DebtToken is WrapperToken, IDebtToken {
      **/
     function burn(address _from, uint256 _amount)
         external
-        override(IBSWrapperToken, WrapperToken)
+        override(IBSWrapperTokenBase, WrapperToken)
         onlyLendingPair
     {
         _balances[_from] = balanceOf(_from) - _amount;
@@ -56,10 +65,24 @@ contract DebtToken is WrapperToken, IDebtToken {
         }
     }
 
-    /**
-     * @notice used to increase the debt of the system
-     * @param _amount is the amount to increase
-     **/
+    function borrowAllowance(address _from, address _to) external view returns(uint256) {
+        return _borrowAllowances[_from][_to];
+    }
+
+    function delegateBorrow(address _to, uint256 _amount) external {
+        require(_to != address(0), "invalid _to");
+
+        _borrowAllowances[msg.sender][_to] = _amount;
+        emit DelegateBorrow(msg.sender, _to, _amount, block.timestamp);
+    }
+
+    function _decreaseBorrowAllowance(address _from, address _to, uint256 _amount) internal {
+        _borrowAllowances[_from][_to] =  _borrowAllowances[_from][_to] - _amount;
+        emit DelegateBorrow(_from, _to, _amount, block.timestamp);
+    }
+    
+    /// @notice used to increase the debt of the system
+    /// @param _amount is the amount to increase
     function increaseTotalDebt(uint256 _amount) external override onlyLendingPair {
         _totalSupply = _totalSupply + _amount;
     }
