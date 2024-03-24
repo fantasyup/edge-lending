@@ -9,5 +9,9 @@ interface IDebtToken is IBSWrapperTokenBase {
 
     function principal(address _account) external view returns (uint256);
 
-    function mint(address _to, address _owner, uint256 _amount) external;
+    function mint(
+        address _to,
+        address _owner,
+        uint256 _amount
+    ) external;
 }

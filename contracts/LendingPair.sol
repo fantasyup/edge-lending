@@ -10,10 +10,10 @@ import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./interfaces/IDebtToken.sol";
 import "./interfaces/IPriceOracleAggregator.sol";
-import "hardhat/console.sol";
 import "./DataTypes.sol";
 import "./util/Initializable.sol";
 import "./token/IERC20Details.sol";
+import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///
