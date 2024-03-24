@@ -82,6 +82,7 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
     }
 
     function _getChainId() private view returns (uint256 chainId) {
+        // solhint-disable-next-line
         this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
         // solhint-disable-next-line no-inline-assembly
         assembly {

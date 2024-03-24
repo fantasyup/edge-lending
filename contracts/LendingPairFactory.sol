@@ -133,7 +133,7 @@ contract LendingPairFactory is Pausable {
         IERC20 _collateralAsset,
         BorrowLocalVars calldata _borrowVars
     ) external whenNotPaused returns (address newLendingPair) {
-        bytes32 salt = keccak256(abi.encode(allPairs.length));
+        bytes32 salt = keccak256(abi.encode(_lendingPairName, _lendingPairSymbol, allPairs.length));
 
         newLendingPair = lendingPairImplementation.cloneDeterministic(salt);
 
