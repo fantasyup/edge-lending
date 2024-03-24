@@ -40,7 +40,13 @@ contract DebtToken is WrapperToken, IDebtToken {
         return IBSLendingPair(_owner).borrowBalancePrior(_account);
     }
 
+    /// @dev mint debt tokens to the debtOwner address
+    /// @param _debtOwner the address to mint the debt tokens to
+    /// @param _to the address requesting the debt, when (_to != _debtOwner) debtOwner must have 
+    /// delegated some borrow allowance to the _to address
+    /// @param _amount the amount of debt tokens to mint
     function mint(address _debtOwner, address _to, uint256 _amount) external override onlyLendingPair {
+        require(_debtOwner != address(0), "invalid debt owner");
         if(_debtOwner != _to) {
             _decreaseBorrowAllowance(_debtOwner, _to, _amount);
         }
