@@ -53,7 +53,7 @@ contract Vault is VaultBase {
     }
 
     function proxiableUUID() public pure override returns (bytes32) {
-        return keccak256("org.blacksmith.contracts.blacksmithvault.implementation");
+        return keccak256("org.edge.contracts.edgevault.implementation");
     }
 
     function updateCode(address newAddress) external override onlyOwner {
@@ -85,7 +85,8 @@ contract Vault is VaultBase {
                             _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
                             _status
                                 ? keccak256(
-                                    "Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission"
+                                    // solhint-disable-next-line
+                                   "Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission"
                                 )
                                 : keccak256(
                                     "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
