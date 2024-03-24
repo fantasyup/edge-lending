@@ -4,7 +4,7 @@ import "../interfaces/IBSLendingPair.sol";
 import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-/// 
+///
 /// @title LendingPair
 /// @author @samparsky
 /// @notice Helper functions to fetch data from LendingPairs
@@ -12,48 +12,48 @@ import "hardhat/console.sol";
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract LendingPairHelper {
-    
-    IBSVault immutable public vault;
+    IBSVault public immutable vault;
 
     constructor(IBSVault _vault) {
-        vault =_vault;
+        vault = _vault;
     }
 
-    function viewBorrowedValue(
-        IBSLendingPair[] calldata pairs,
-        address _account
-    ) external view returns(uint256[] memory totals) {
-        totals = new uint[](pairs.length);
+    function viewBorrowedValue(IBSLendingPair[] calldata pairs, address _account)
+        external
+        view
+        returns (uint256[] memory totals)
+    {
+        totals = new uint256[](pairs.length);
         for (uint256 i = 0; i < pairs.length; i++) {
             IBSLendingPair pair = pairs[i];
             totals[i] = pair.debtToken().balanceOf(_account);
         }
     }
 
-    function viewBorrowedValueInUSD(
-        IBSLendingPair[] calldata pairs,
-        address _account
-    ) external view returns(uint256[] memory totals) {
-        totals = new uint[](pairs.length);
+    function viewBorrowedValueInUSD(IBSLendingPair[] calldata pairs, address _account)
+        external
+        view
+        returns (uint256[] memory totals)
+    {
+        totals = new uint256[](pairs.length);
         for (uint256 i = 0; i < pairs.length; i++) {
             IBSLendingPair pair = pairs[i];
-            uint currentBorrowBalance = pair.borrowBalancePrior(_account);
+            uint256 currentBorrowBalance = pair.borrowBalancePrior(_account);
             uint256 priceInUSD = pair.oracle().viewPriceInUSD(pair.asset()) * currentBorrowBalance;
             totals[i] = priceInUSD;
         }
     }
 
-    function viewBorrowLimit(
-        IBSLendingPair[] calldata pairs,
-        address _account
-    ) external view returns(uint256[] memory totals) {
-        totals = new uint[](pairs.length);
+    function viewBorrowLimit(IBSLendingPair[] calldata pairs, address _account)
+        external
+        view
+        returns (uint256[] memory totals)
+    {
+        totals = new uint256[](pairs.length);
         for (uint256 i = 0; i < pairs.length; i++) {
             IBSLendingPair pair = pairs[i];
-            uint256 underlyingAmount = vault.toUnderlying(
-                pair.collateralAsset(),
-                pair.collateralOfAccount(_account)
-            );
+            uint256 underlyingAmount =
+                vault.toUnderlying(pair.collateralAsset(), pair.collateralOfAccount(_account));
 
             totals[i] = pair.calcBorrowLimit(underlyingAmount);
         }

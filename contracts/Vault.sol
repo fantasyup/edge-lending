@@ -10,7 +10,7 @@ import "./interfaces/IBSLendingPair.sol";
 import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-/// 
+///
 /// @title Vault
 /// @author samparsky
 /// @notice Vault contract stores assets deposited into the Lending pairs.
@@ -30,18 +30,21 @@ contract Vault is VaultBase {
     }
 
     modifier allowed(address _from) {
-        require(msg.sender == _from || userApprovedContracts[_from][msg.sender] == true, "ONLY_ALLOWED");
+        require(
+            msg.sender == _from || userApprovedContracts[_from][msg.sender] == true,
+            "ONLY_ALLOWED"
+        );
         _;
     }
-    
+
+    /// @dev setup a vault
+    constructor(string memory _name, string memory _version) VaultBase(_name, _version) {}
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // UUPSProxiable
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    function initialize(uint256 _flashLoanRate, address _owner)
-        external
-        initializer
-    {
+    function initialize(uint256 _flashLoanRate, address _owner) external override initializer {
         require(_owner != address(0), "INVALID_OWNER");
         require(flashLoanRate < MAX_FLASHLOAN_RATE, "INVALID_RATE");
 
@@ -50,17 +53,10 @@ contract Vault is VaultBase {
     }
 
     function proxiableUUID() public pure override returns (bytes32) {
-        return
-            keccak256(
-                "org.blacksmith.contracts.blacksmithvault.implementation"
-            );
+        return keccak256("org.blacksmith.contracts.blacksmithvault.implementation");
     }
 
-    function updateCode(address newAddress)
-        external
-        override
-        onlyOwner
-    {
+    function updateCode(address newAddress) external override onlyOwner {
         _updateCodeAddress(newAddress);
     }
 
@@ -76,7 +72,7 @@ contract Vault is VaultBase {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external  {
+    ) external {
         require(_contract != address(0), "INVALID_CONTRACT");
 
         bytes32 digest =
@@ -88,8 +84,12 @@ contract Vault is VaultBase {
                         abi.encode(
                             _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
                             _status
-                                ? keccak256("Grant full access to funds in Blacksmith Vault? Read more here https://blackmith.com/permission")
-                                : keccak256("Revoke access to Blacksmith Vault? Read more here https://blackmith.com/revoke"),
+                                ? keccak256(
+                                    "Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission"
+                                )
+                                : keccak256(
+                                    "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
+                                ),
                             _user,
                             _contract,
                             _status,
@@ -108,12 +108,12 @@ contract Vault is VaultBase {
     }
 
     /// @notice pause vault actions
-    function pause() onlyOwner external {
+    function pause() external onlyOwner {
         _pause();
     }
 
     /// @notice unpause vault actions
-    function unpause() onlyOwner external {
+    function unpause() external onlyOwner {
         _unpause();
     }
 
@@ -213,12 +213,7 @@ contract Vault is VaultBase {
     /// @notice The amount of currency available to be lent.
     /// @param _token The loan currency.
     /// @return The amount of `token` that can be borrowed.
-    function maxFlashLoan(address _token)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function maxFlashLoan(address _token) external view override returns (uint256) {
         return totals[IERC20(_token)];
     }
 
@@ -226,10 +221,7 @@ contract Vault is VaultBase {
     /// @param // _token The loan currency.
     /// @param _amount The amount of tokens lent.
     /// @return The amount of `token` to be charged for the loan, on top of the returned principal.
-    function flashFee(
-        address,
-        uint256 _amount
-    ) public view override returns (uint256) {
+    function flashFee(address, uint256 _amount) public view override returns (uint256) {
         return (_amount * flashLoanRate) / 1e18;
     }
 
@@ -259,11 +251,7 @@ contract Vault is VaultBase {
         );
 
         // receive loans and fees
-        token.safeTransferFrom(
-            address(_receiver),
-            address(this),
-            _amount + fee
-        );
+        token.safeTransferFrom(address(_receiver), address(this), _amount + fee);
 
         uint256 receivedFees = token.balanceOf(address(this)) - tokenBalBefore;
         require(receivedFees >= fee, "not enough fees");
@@ -286,21 +274,19 @@ contract Vault is VaultBase {
     /// @param _amount The `token` amount.
     /// @param _ceil If to ceil the amount or not
     /// @return share The token amount represented in shares.
-    function toShare(IERC20 _token, uint256 _amount, bool _ceil)
-        public
-        view
-        override
-        returns (uint256 share)
-    {
+    function toShare(
+        IERC20 _token,
+        uint256 _amount,
+        bool _ceil
+    ) public view override returns (uint256 share) {
         uint256 currentTotal = totals[_token];
         if (currentTotal > 0) {
             uint256 currentUnderlyingBalance = _token.balanceOf(address(this));
             share = (_amount * currentTotal) / currentUnderlyingBalance;
-            
-            if(_ceil && ((share * currentUnderlyingBalance) / currentTotal) < _amount) {
+
+            if (_ceil && ((share * currentUnderlyingBalance) / currentTotal) < _amount) {
                 share = share + 1;
             }
-
         } else {
             share = _amount;
         }
@@ -318,5 +304,4 @@ contract Vault is VaultBase {
     {
         amount = (_share * _token.balanceOf(address(this))) / totals[_token];
     }
-
 }

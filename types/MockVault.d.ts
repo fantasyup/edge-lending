@@ -21,10 +21,11 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockVaultInterface extends ethers.utils.Interface {
   functions: {
+    "MAX_FLASHLOAN_RATE()": FunctionFragment;
+    "acceptOwnership()": FunctionFragment;
     "addProfit(address,uint256)": FunctionFragment;
-    "approveContract(address,bool)": FunctionFragment;
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "blackSmithTeam()": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
     "flashFee(address,uint256)": FunctionFragment;
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
@@ -32,6 +33,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "getCodeAddress()": FunctionFragment;
     "initialize(uint256,address)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
+    "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
@@ -39,29 +41,34 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
     "transfer(address,address,address,uint256)": FunctionFragment;
-    "transferToNewTeam(address)": FunctionFragment;
+    "transferToOwner(address)": FunctionFragment;
     "unpause()": FunctionFragment;
     "updateCode(address)": FunctionFragment;
     "updateFlashloanRate(uint256)": FunctionFragment;
+    "userApprovalNonce(address)": FunctionFragment;
     "userApprovedContracts(address,address)": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "MAX_FLASHLOAN_RATE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "acceptOwnership",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "addProfit",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "approveContract",
-    values: [string, boolean]
+    values: [string, string, boolean, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "blackSmithTeam",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
@@ -91,6 +98,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     functionFragment: "maxFlashLoan",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
@@ -111,7 +119,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferToNewTeam",
+    functionFragment: "transferToOwner",
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
@@ -119,6 +127,10 @@ interface MockVaultInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "updateFlashloanRate",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "userApprovalNonce",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "userApprovedContracts",
@@ -129,16 +141,20 @@ interface MockVaultInterface extends ethers.utils.Interface {
     values: [string, string, string, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "MAX_FLASHLOAN_RATE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "acceptOwnership",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "addProfit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "approveContract",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "blackSmithTeam",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashFee", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashLoan", data: BytesLike): Result;
@@ -155,6 +171,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     functionFragment: "maxFlashLoan",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
@@ -169,13 +186,17 @@ interface MockVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "totals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "transferToNewTeam",
+    functionFragment: "transferToOwner",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "updateFlashloanRate",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "userApprovalNonce",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -189,9 +210,10 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "CodeUpdated(bytes32,address)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
+    "OwnershipAccepted(address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
-    "TransferControl(address)": EventFragment;
+    "TransferControl(address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
     "UpdateFlashLoanRate(uint256)": EventFragment;
     "Withdraw(address,address,address,uint256,uint256)": EventFragment;
@@ -201,6 +223,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
@@ -253,6 +276,18 @@ export class MockVault extends Contract {
   interface: MockVaultInterface;
 
   functions: {
+    MAX_FLASHLOAN_RATE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "MAX_FLASHLOAN_RATE()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "acceptOwnership()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     addProfit(
       _token: string,
       _amount: BigNumberish,
@@ -266,14 +301,22 @@ export class MockVault extends Contract {
     ): Promise<ContractTransaction>;
 
     approveContract(
+      _user: string,
       _contract: string,
       _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "approveContract(address,bool)"(
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
       _contract: string,
       _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -288,10 +331,6 @@ export class MockVault extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
-
-    blackSmithTeam(overrides?: CallOverrides): Promise<[string]>;
-
-    "blackSmithTeam()"(overrides?: CallOverrides): Promise<[string]>;
 
     deposit(
       _token: string,
@@ -351,13 +390,13 @@ export class MockVault extends Contract {
 
     initialize(
       _flashLoanRate: BigNumberish,
-      _blackSmithTeam: string,
+      _owner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "initialize(uint256,address)"(
       _flashLoanRate: BigNumberish,
-      _blackSmithTeam: string,
+      _owner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -370,6 +409,10 @@ export class MockVault extends Contract {
       _token: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    owner(overrides?: CallOverrides): Promise<[string]>;
+
+    "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
     pause(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -390,14 +433,14 @@ export class MockVault extends Contract {
     toShare(
       _token: string,
       _amount: BigNumberish,
-      _roundUp: boolean,
+      _ceil: boolean,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { share: BigNumber }>;
 
     "toShare(address,uint256,bool)"(
       _token: string,
       _amount: BigNumberish,
-      _roundUp: boolean,
+      _ceil: boolean,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { share: BigNumber }>;
 
@@ -436,13 +479,13 @@ export class MockVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    transferToNewTeam(
-      _newTeam: string,
+    transferToOwner(
+      _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferToNewTeam(address)"(
-      _newTeam: string,
+    "transferToOwner(address)"(
+      _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -474,6 +517,16 @@ export class MockVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    userApprovalNonce(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "userApprovalNonce(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     userApprovedContracts(
       arg0: string,
       arg1: string,
@@ -503,6 +556,18 @@ export class MockVault extends Contract {
     ): Promise<ContractTransaction>;
   };
 
+  MAX_FLASHLOAN_RATE(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "MAX_FLASHLOAN_RATE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  acceptOwnership(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "acceptOwnership()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   addProfit(
     _token: string,
     _amount: BigNumberish,
@@ -516,14 +581,22 @@ export class MockVault extends Contract {
   ): Promise<ContractTransaction>;
 
   approveContract(
+    _user: string,
     _contract: string,
     _status: boolean,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "approveContract(address,bool)"(
+  "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+    _user: string,
     _contract: string,
     _status: boolean,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -538,10 +611,6 @@ export class MockVault extends Contract {
     arg1: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
-
-  blackSmithTeam(overrides?: CallOverrides): Promise<string>;
-
-  "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
   deposit(
     _token: string,
@@ -597,13 +666,13 @@ export class MockVault extends Contract {
 
   initialize(
     _flashLoanRate: BigNumberish,
-    _blackSmithTeam: string,
+    _owner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "initialize(uint256,address)"(
     _flashLoanRate: BigNumberish,
-    _blackSmithTeam: string,
+    _owner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -613,6 +682,10 @@ export class MockVault extends Contract {
     _token: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  owner(overrides?: CallOverrides): Promise<string>;
+
+  "owner()"(overrides?: CallOverrides): Promise<string>;
 
   pause(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -633,14 +706,14 @@ export class MockVault extends Contract {
   toShare(
     _token: string,
     _amount: BigNumberish,
-    _roundUp: boolean,
+    _ceil: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   "toShare(address,uint256,bool)"(
     _token: string,
     _amount: BigNumberish,
-    _roundUp: boolean,
+    _ceil: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -679,13 +752,13 @@ export class MockVault extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  transferToNewTeam(
-    _newTeam: string,
+  transferToOwner(
+    _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transferToNewTeam(address)"(
-    _newTeam: string,
+  "transferToOwner(address)"(
+    _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -717,6 +790,16 @@ export class MockVault extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  userApprovalNonce(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "userApprovalNonce(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   userApprovedContracts(
     arg0: string,
     arg1: string,
@@ -746,6 +829,14 @@ export class MockVault extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    MAX_FLASHLOAN_RATE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "MAX_FLASHLOAN_RATE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    acceptOwnership(overrides?: CallOverrides): Promise<void>;
+
+    "acceptOwnership()"(overrides?: CallOverrides): Promise<void>;
+
     addProfit(
       _token: string,
       _amount: BigNumberish,
@@ -759,14 +850,22 @@ export class MockVault extends Contract {
     ): Promise<void>;
 
     approveContract(
+      _user: string,
       _contract: string,
       _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "approveContract(address,bool)"(
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
       _contract: string,
       _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -781,10 +880,6 @@ export class MockVault extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    blackSmithTeam(overrides?: CallOverrides): Promise<string>;
-
-    "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
     deposit(
       _token: string,
@@ -840,13 +935,13 @@ export class MockVault extends Contract {
 
     initialize(
       _flashLoanRate: BigNumberish,
-      _blackSmithTeam: string,
+      _owner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "initialize(uint256,address)"(
       _flashLoanRate: BigNumberish,
-      _blackSmithTeam: string,
+      _owner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -856,6 +951,10 @@ export class MockVault extends Contract {
       _token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    owner(overrides?: CallOverrides): Promise<string>;
+
+    "owner()"(overrides?: CallOverrides): Promise<string>;
 
     pause(overrides?: CallOverrides): Promise<void>;
 
@@ -872,14 +971,14 @@ export class MockVault extends Contract {
     toShare(
       _token: string,
       _amount: BigNumberish,
-      _roundUp: boolean,
+      _ceil: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "toShare(address,uint256,bool)"(
       _token: string,
       _amount: BigNumberish,
-      _roundUp: boolean,
+      _ceil: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -918,13 +1017,13 @@ export class MockVault extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    transferToNewTeam(
-      _newTeam: string,
+    transferToOwner(
+      _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "transferToNewTeam(address)"(
-      _newTeam: string,
+    "transferToOwner(address)"(
+      _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -948,6 +1047,16 @@ export class MockVault extends Contract {
       _newRate: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    userApprovalNonce(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "userApprovalNonce(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     userApprovedContracts(
       arg0: string,
@@ -1030,6 +1139,14 @@ export class MockVault extends Contract {
       }
     >;
 
+    OwnershipAccepted(
+      newOwner: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { newOwner: string; timestamp: BigNumber }
+    >;
+
     Paused(account: null): TypedEventFilter<[string], { account: string }>;
 
     Transfer(
@@ -1043,8 +1160,12 @@ export class MockVault extends Contract {
     >;
 
     TransferControl(
-      _newTeam: null
-    ): TypedEventFilter<[string], { _newTeam: string }>;
+      _newTeam: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { _newTeam: string; timestamp: BigNumber }
+    >;
 
     Unpaused(account: null): TypedEventFilter<[string], { account: string }>;
 
@@ -1071,6 +1192,18 @@ export class MockVault extends Contract {
   };
 
   estimateGas: {
+    MAX_FLASHLOAN_RATE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "MAX_FLASHLOAN_RATE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "acceptOwnership()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     addProfit(
       _token: string,
       _amount: BigNumberish,
@@ -1084,14 +1217,22 @@ export class MockVault extends Contract {
     ): Promise<BigNumber>;
 
     approveContract(
+      _user: string,
       _contract: string,
       _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "approveContract(address,bool)"(
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
       _contract: string,
       _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1106,10 +1247,6 @@ export class MockVault extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    blackSmithTeam(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "blackSmithTeam()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     deposit(
       _token: string,
@@ -1165,13 +1302,13 @@ export class MockVault extends Contract {
 
     initialize(
       _flashLoanRate: BigNumberish,
-      _blackSmithTeam: string,
+      _owner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "initialize(uint256,address)"(
       _flashLoanRate: BigNumberish,
-      _blackSmithTeam: string,
+      _owner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1181,6 +1318,10 @@ export class MockVault extends Contract {
       _token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     pause(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1201,14 +1342,14 @@ export class MockVault extends Contract {
     toShare(
       _token: string,
       _amount: BigNumberish,
-      _roundUp: boolean,
+      _ceil: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "toShare(address,uint256,bool)"(
       _token: string,
       _amount: BigNumberish,
-      _roundUp: boolean,
+      _ceil: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1247,13 +1388,13 @@ export class MockVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    transferToNewTeam(
-      _newTeam: string,
+    transferToOwner(
+      _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transferToNewTeam(address)"(
-      _newTeam: string,
+    "transferToOwner(address)"(
+      _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1283,6 +1424,16 @@ export class MockVault extends Contract {
     "updateFlashloanRate(uint256)"(
       _newRate: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    userApprovalNonce(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "userApprovalNonce(address)"(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     userApprovedContracts(
@@ -1315,6 +1466,22 @@ export class MockVault extends Contract {
   };
 
   populateTransaction: {
+    MAX_FLASHLOAN_RATE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "MAX_FLASHLOAN_RATE()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "acceptOwnership()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     addProfit(
       _token: string,
       _amount: BigNumberish,
@@ -1328,14 +1495,22 @@ export class MockVault extends Contract {
     ): Promise<PopulatedTransaction>;
 
     approveContract(
+      _user: string,
       _contract: string,
       _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "approveContract(address,bool)"(
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
       _contract: string,
       _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1348,12 +1523,6 @@ export class MockVault extends Contract {
     "balanceOf(address,address)"(
       arg0: string,
       arg1: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    blackSmithTeam(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "blackSmithTeam()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1413,13 +1582,13 @@ export class MockVault extends Contract {
 
     initialize(
       _flashLoanRate: BigNumberish,
-      _blackSmithTeam: string,
+      _owner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "initialize(uint256,address)"(
       _flashLoanRate: BigNumberish,
-      _blackSmithTeam: string,
+      _owner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1432,6 +1601,10 @@ export class MockVault extends Contract {
       _token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pause(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1452,14 +1625,14 @@ export class MockVault extends Contract {
     toShare(
       _token: string,
       _amount: BigNumberish,
-      _roundUp: boolean,
+      _ceil: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "toShare(address,uint256,bool)"(
       _token: string,
       _amount: BigNumberish,
-      _roundUp: boolean,
+      _ceil: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1501,13 +1674,13 @@ export class MockVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferToNewTeam(
-      _newTeam: string,
+    transferToOwner(
+      _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transferToNewTeam(address)"(
-      _newTeam: string,
+    "transferToOwner(address)"(
+      _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1537,6 +1710,16 @@ export class MockVault extends Contract {
     "updateFlashloanRate(uint256)"(
       _newRate: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    userApprovalNonce(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "userApprovalNonce(address)"(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     userApprovedContracts(

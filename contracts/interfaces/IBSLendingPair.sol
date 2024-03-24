@@ -9,17 +9,6 @@ import "./IBSVault.sol";
 import "../DataTypes.sol";
 
 interface IBSLendingPair {
-
-    function initialize(
-        address _blackSmithTeam,
-        IPriceOracleAggregator _oracle,
-        IBSVault _vault,
-        IERC20 _asset, 
-        DataTypes.BorrowAssetConfig calldata borrowConfig,
-        IERC20 _collateralAsset,
-        IBSWrapperToken _wrappedCollateralAsset
-    ) external;
-
     /**
      * Emitted on deposit
      *
@@ -57,10 +46,7 @@ interface IBSLendingPair {
         uint256 amountofWrappedBurned
     );
 
-    event WithdrawCollateral(
-        address account,
-        uint256 amount
-    );
+    event WithdrawCollateral(address account, uint256 amount);
 
     event ReserveWithdraw(address user, uint256 shares);
 
@@ -131,36 +117,46 @@ interface IBSLendingPair {
 
     event InterestShortCircuit(uint256 blockNumber);
 
+    event ActionPaused(uint8 action, uint256 timestamp);
+    event ActionUnPaused(uint8 action, uint256 timestamp);
+    event ChangeFeeWithdrawalAddress(address newAddr, uint256 timestamp);
+
+    function initialize(
+        IERC20 _asset,
+        IERC20 _collateralAsset,
+        DataTypes.BorrowAssetConfig calldata borrowConfig,
+        IBSWrapperToken _wrappedCollateralAsset,
+        address _pauseGuardian
+    ) external;
+
     function asset() external view returns (IERC20);
 
     function depositBorrowAsset(address _tokenReceipeint, uint256 _amount) external;
-    function depositCollateral(address _tokenReceipeint, uint256 _vaultShareAmount) external;
-    function redeem(
-        address _to,
-        uint256 _amount
-    ) external;
-    
-    function collateralOfAccount(address _account)
-        external
-        view
-        returns (uint256);
 
-    function getMaxWithdrawAllowed(address account)
-        external
-        returns(uint256);
-    
+    function depositCollateral(address _tokenReceipeint, uint256 _vaultShareAmount) external;
+
+    function redeem(address _to, uint256 _amount) external;
+
+    function collateralOfAccount(address _account) external view returns (uint256);
+
+    function getMaxWithdrawAllowed(address account) external returns (uint256);
+
     // function borrowBalancePrior(address account)
     //     external
     //     view
     //     returns(uint256, uint256);
-    
-    function oracle() external view returns(IPriceOracleAggregator);
-    function collateralAsset() external view returns(IERC20);
 
-    function calcBorrowLimit(uint256 amount) external view returns(uint256);
+    function oracle() external view returns (IPriceOracleAggregator);
 
-    function accountInterestIndex(address) external view returns(uint256);
-    function borrowIndex() external view returns(uint256);
-    function debtToken() external view returns(IDebtToken);
-    function borrowBalancePrior(address _account) external view returns(uint256);
+    function collateralAsset() external view returns (IERC20);
+
+    function calcBorrowLimit(uint256 amount) external view returns (uint256);
+
+    function accountInterestIndex(address) external view returns (uint256);
+
+    function borrowIndex() external view returns (uint256);
+
+    function debtToken() external view returns (IDebtToken);
+
+    function borrowBalancePrior(address _account) external view returns (uint256);
 }

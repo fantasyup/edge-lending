@@ -3,7 +3,7 @@ import { task } from "hardhat/config";
 import "hardhat-typechain";
 import "@nomiclabs/hardhat-waffle";
 import "solidity-coverage"
-// import "hardhat-contract-sizer"
+import "hardhat-contract-sizer"
 import "hardhat-tracer"
 import "hardhat-deploy"
 import 'hardhat-deploy-ethers'

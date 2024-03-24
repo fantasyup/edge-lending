@@ -10,17 +10,13 @@ pragma solidity 0.8.1;
  */
 
 contract Exponential {
-    uint constant expScale = 1e18;
-    uint constant doubleScale = 1e36;
-    uint constant halfExpScale = expScale/2;
-    uint constant mantissaOne = expScale;
+    uint256 constant expScale = 1e18;
+    // uint constant doubleScale = 1e36;
+    // uint constant halfExpScale = expScale/2;
+    uint256 constant mantissaOne = expScale;
 
     struct Exp {
-        uint mantissa;
-    }
-
-    struct Double {
-        uint mantissa;
+        uint256 mantissa;
     }
 
     /**
@@ -28,24 +24,24 @@ contract Exponential {
      *      Note: Returns an error if (`num` * 10e18) > MAX_INT,
      *            or if `denom` is zero.
      */
-    function getExp(uint num, uint denom) pure internal returns (Exp memory) {
-        uint scaledNumerator  = num * expScale;
-        uint rational = scaledNumerator / denom;
+    function getExp(uint256 num, uint256 denom) internal pure returns (Exp memory) {
+        uint256 scaledNumerator = num * expScale;
+        uint256 rational = scaledNumerator / denom;
         return Exp({mantissa: rational});
     }
 
     /**
      * @dev Multiply an Exp by a scalar, returning a new Exp.
      */
-    function mulScalar(Exp memory a, uint scalar) pure internal returns (Exp memory) {
-        uint scaledMantissa = a.mantissa * scalar;
+    function mulScalar(Exp memory a, uint256 scalar) internal pure returns (Exp memory) {
+        uint256 scaledMantissa = a.mantissa * scalar;
         return Exp({mantissa: scaledMantissa});
     }
 
     /**
      * @dev Multiply an Exp by a scalar, then truncate to return an unsigned integer.
      */
-    function mulScalarTruncate(Exp memory a, uint scalar) pure internal returns (uint) {
+    function mulScalarTruncate(Exp memory a, uint256 scalar) internal pure returns (uint256) {
         Exp memory product = mulScalar(a, scalar);
         return truncate(product);
     }
@@ -53,7 +49,11 @@ contract Exponential {
     /**
      * @dev Multiply an Exp by a scalar, truncate, then add an to an unsigned integer, returning an unsigned integer.
      */
-    function mulScalarTruncateAddUInt(Exp memory a, uint scalar, uint addend) pure internal returns (uint) {
+    function mulScalarTruncateAddUInt(
+        Exp memory a,
+        uint256 scalar,
+        uint256 addend
+    ) internal pure returns (uint256) {
         Exp memory product = mulScalar(a, scalar);
         return truncate(product) + addend;
     }
@@ -61,15 +61,15 @@ contract Exponential {
     /**
      * @dev Divide an Exp by a scalar, returning a new Exp.
      */
-    function divScalar(Exp memory a, uint scalar) pure internal returns (Exp memory) {
-        uint descaledMantissa = a.mantissa / scalar;
-        return  Exp({mantissa: descaledMantissa});
+    function divScalar(Exp memory a, uint256 scalar) internal pure returns (Exp memory) {
+        uint256 descaledMantissa = a.mantissa / scalar;
+        return Exp({mantissa: descaledMantissa});
     }
 
     /**
      * @dev Divide a scalar by an Exp, returning a new Exp.
      */
-    function divScalarByExp(uint scalar, Exp memory divisor) pure internal returns (Exp memory) {
+    function divScalarByExp(uint256 scalar, Exp memory divisor) internal pure returns (Exp memory) {
         /*
           We are doing this as:
           getExp(mulUInt(expScale, scalar), divisor.mantissa)
@@ -79,14 +79,18 @@ contract Exponential {
           Scalar = s;
           `s / (a / b)` = `b * s / a` and since for an Exp `a = mantissa, b = expScale`
         */
-        uint numerator = expScale * scalar;
+        uint256 numerator = expScale * scalar;
         return getExp(numerator, divisor.mantissa);
     }
 
     /**
      * @dev Divide a scalar by an Exp, then truncate to return an unsigned integer.
      */
-    function divScalarByExpTruncate(uint scalar, Exp memory divisor) pure internal returns(uint) {
+    function divScalarByExpTruncate(uint256 scalar, Exp memory divisor)
+        internal
+        pure
+        returns (uint256)
+    {
         Exp memory fraction = divScalarByExp(scalar, divisor);
         return truncate(fraction);
     }
@@ -95,7 +99,7 @@ contract Exponential {
      * @dev Truncates the given exp to a whole number value.
      *      For example, truncate(Exp{mantissa: 15 * expScale}) = 15
      */
-    function truncate(Exp memory exp) pure internal returns (uint) {
+    function truncate(Exp memory exp) internal pure returns (uint256) {
         // Note: We are not using careful math here as we're performing a division that cannot fail
         return exp.mantissa / expScale;
     }

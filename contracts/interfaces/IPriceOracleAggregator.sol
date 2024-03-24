@@ -4,5 +4,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface IPriceOracleAggregator {
     function getPriceInUSD(IERC20 _token) external returns (uint256);
-    function viewPriceInUSD(IERC20 _token) external view returns(uint256);
+
+    function viewPriceInUSD(IERC20 _token) external view returns (uint256);
 }

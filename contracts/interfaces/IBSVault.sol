@@ -1,11 +1,9 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./IERC3156FlashLender.sol";
 
 interface IBSVault is IERC3156FlashLender {
-
     // ************** //
     // *** EVENTS *** //
     // ************** //
@@ -38,12 +36,7 @@ interface IBSVault is IERC3156FlashLender {
         uint256 amount
     );
 
-    event Transfer(
-        IERC20 indexed token,
-        address indexed from,
-        address indexed to,
-        uint256 amount
-    );
+    event Transfer(IERC20 indexed token, address indexed from, address indexed to, uint256 amount);
 
     event FlashLoan(
         address indexed borrower,
@@ -53,14 +46,9 @@ interface IBSVault is IERC3156FlashLender {
         address indexed receiver
     );
 
-    event TransferControl(
-        address _newTeam,
-        uint256 timestamp
-    );
+    event TransferControl(address _newTeam, uint256 timestamp);
 
-    event UpdateFlashLoanRate(
-        uint256 newRate
-    );
+    event UpdateFlashLoanRate(uint256 newRate);
 
     event Approval(address indexed user, address indexed allowed, bool status);
 
@@ -70,27 +58,23 @@ interface IBSVault is IERC3156FlashLender {
     // *** FUNCTIONS *** //
     // ************** //
 
-    function initialize(uint256 _flashLoanRate, address _owner)
-        external;
+    function initialize(uint256 _flashLoanRate, address _owner) external;
 
     function deposit(
         IERC20 _token,
         address _from,
         address _to,
         uint256 _amount
-    ) external returns(uint256);
+    ) external returns (uint256);
 
     function withdraw(
         IERC20 _token,
         address _from,
         address _to,
         uint256 _amount
-    ) external returns(uint256);
+    ) external returns (uint256);
 
-    function balanceOf(
-        IERC20,
-        address
-    ) external view returns(uint256);
+    function balanceOf(IERC20, address) external view returns (uint256);
 
     function transfer(
         IERC20 _token,
@@ -102,11 +86,8 @@ interface IBSVault is IERC3156FlashLender {
     function toShare(
         IERC20 token,
         uint256 amount,
-        bool roundUp
+        bool ceil
     ) external view returns (uint256);
 
-    function toUnderlying(
-        IERC20 token,
-        uint256 share
-    ) external view returns (uint256);
+    function toUnderlying(IERC20 token, uint256 share) external view returns (uint256);
 }

@@ -7,13 +7,12 @@ import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./interfaces/IDebtToken.sol";
-import "./compound/JumpRateModelV2.sol";
+import "./interest/JumpRateModelV2.sol";
 import "./LendingPair.sol";
 import "./DataTypes.sol";
 
 contract LendingPairFactory is Pausable {
-
-    address immutable public owner;
+    address public immutable owner;
 
     address public lendingPairImplementation;
     address public collateralWrapperImplementation;
@@ -52,31 +51,35 @@ contract LendingPairFactory is Pausable {
     }
 
     /// @notice pause factory actions
-    function pause() onlyOwner external {
+    function pause() external onlyOwner {
         _pause();
     }
 
     /// @notice unpause vault actions
-    function unpause() onlyOwner external {
+    function unpause() external onlyOwner {
         _unpause();
     }
 
     function updatePairImpl(address _newLogicContract) external onlyOwner {
+        require(_newLogicContract != address(0), "INVALID_CONTRACT");
         lendingPairImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
-    
+
     function updateCollateralWrapperImpl(address _newLogicContract) external onlyOwner {
+        require(_newLogicContract != address(0), "INVALID_CONTRACT");
         collateralWrapperImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
-    
+
     function updateDebtTokenImpl(address _newLogicContract) external onlyOwner {
+        require(_newLogicContract != address(0), "INVALID_CONTRACT");
         debtTokenImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
-    
+
     function updateBorrowAssetWrapperImpl(address _newLogicContract) external onlyOwner {
+        require(_newLogicContract != address(0), "INVALID_CONTRACT");
         borrowAssetWrapperImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
@@ -88,9 +91,13 @@ contract LendingPairFactory is Pausable {
             let ptr := mload(0x40)
             mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
             mstore(add(ptr, 0x14), shl(0x60, implementation))
-            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
+            mstore(
+                add(ptr, 0x28),
+                0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000
+            )
             instance := create(0, ptr, 0x37)
         }
+
         require(instance != address(0), "ERC1167: create failed");
     }
 
@@ -102,17 +109,19 @@ contract LendingPairFactory is Pausable {
     }
 
     /// @dev create interest rate model
-    function createIR(
-        NewLendingVaultIRLocalVars calldata _interestRateVars,
-        address _team
-    ) external returns (address ir) {
+    function createIR(NewLendingVaultIRLocalVars calldata _interestRateVars, address _team)
+        external
+        returns (address ir)
+    {
+        require(address(_team) != address(0), "invalid team");
+
         ir = address(
             new JumpRateModelV2(
                 _interestRateVars.baseRatePerYear,
                 _interestRateVars.multiplierPerYear,
                 _interestRateVars.jumpMultiplierPerYear,
                 _interestRateVars.optimal,
-                address(_team)
+                _team
             )
         );
     }
@@ -127,9 +136,7 @@ contract LendingPairFactory is Pausable {
 
     /// @dev create lending pair with clones
     function createLendingPairWithProxy(
-        address _team,
-        IPriceOracleAggregator _oracle,
-        IBSVault _vault,
+        address _pauseGuardian,
         IERC20 _collateralAsset,
         BorrowLocalVars calldata _borrowVars,
         address interestRateModel
@@ -137,52 +144,60 @@ contract LendingPairFactory is Pausable {
         newLendingPair = clone(lendingPairImplementation);
 
         // initialize wrapper borrow asset
-        IBSWrapperToken wrappedBorrowAsset = IBSWrapperToken(initWrapperTokensWithProxy(
-            borrowAssetWrapperImplementation,
-            newLendingPair,
-            address(_borrowVars.borrowAsset),
-            "BOR"
-        ));
+        IBSWrapperToken wrappedBorrowAsset =
+            IBSWrapperToken(
+                initWrapperTokensWithProxy(
+                    borrowAssetWrapperImplementation,
+                    newLendingPair,
+                    address(_borrowVars.borrowAsset),
+                    "BOR"
+                )
+            );
 
         // initialize wrapper collateral asset
-        IBSWrapperToken wrappedCollateralAsset = IBSWrapperToken(initWrapperTokensWithProxy(
-            collateralWrapperImplementation,
-            newLendingPair,
-            address(_collateralAsset),
-            "COL"
-        ));
+        IBSWrapperToken wrappedCollateralAsset =
+            IBSWrapperToken(
+                initWrapperTokensWithProxy(
+                    collateralWrapperImplementation,
+                    newLendingPair,
+                    address(_collateralAsset),
+                    "COL"
+                )
+            );
 
         // initialize debt token
-        IDebtToken debtToken = IDebtToken(initWrapperTokensWithProxy(
-            debtTokenImplementation,
-            newLendingPair,
-            address(_borrowVars.borrowAsset),
-            "DEB"
-        ));
-        
-        DataTypes.BorrowAssetConfig memory borrowConfig = DataTypes.BorrowAssetConfig(
-            IInterestRateModel(interestRateModel),
-            _borrowVars.initialExchangeRateMantissa,
-            _borrowVars.reserveFactorMantissa,
-            _borrowVars.collateralFactor,
-            wrappedBorrowAsset,
-            _borrowVars.liquidationFee,
-            debtToken
-        );
+        IDebtToken debtToken =
+            IDebtToken(
+                initWrapperTokensWithProxy(
+                    debtTokenImplementation,
+                    newLendingPair,
+                    address(_borrowVars.borrowAsset),
+                    "DEB"
+                )
+            );
+
+        DataTypes.BorrowAssetConfig memory borrowConfig =
+            DataTypes.BorrowAssetConfig(
+                IInterestRateModel(interestRateModel),
+                _borrowVars.initialExchangeRateMantissa,
+                _borrowVars.reserveFactorMantissa,
+                _borrowVars.collateralFactor,
+                wrappedBorrowAsset,
+                _borrowVars.liquidationFee,
+                debtToken
+            );
 
         // initialize lending pair
         IBSLendingPair(newLendingPair).initialize(
-            _team,
-            _oracle,
-            _vault,
             _borrowVars.borrowAsset,
-            borrowConfig,
             _collateralAsset,
-            wrappedCollateralAsset
+            borrowConfig,
+            wrappedCollateralAsset,
+            _pauseGuardian
         );
 
         allPairs.push(newLendingPair);
-        
+
         emit NewLendingPair(newLendingPair, block.timestamp);
     }
 
@@ -191,7 +206,7 @@ contract LendingPairFactory is Pausable {
         address pair,
         address assetDetails,
         string memory symbol
-    ) public returns(address wrapper){
+    ) internal returns (address wrapper) {
         wrapper = clone(implementation);
 
         initializeWrapperTokens(

@@ -29,23 +29,27 @@ contract DebtToken is WrapperToken, IDebtToken {
         underlying = address(0);
     }
 
-    function principal(address _account) external view override returns(uint256) {
+    function principal(address _account) external view override returns (uint256) {
         return _balances[_account];
-    } 
+    }
 
     /// @dev calculates the debt balance of account
-    function balanceOf(address _account) public view override(ERC20, IERC20) returns(uint256) {
+    function balanceOf(address _account) public view override(ERC20, IERC20) returns (uint256) {
         return IBSLendingPair(_owner).borrowBalancePrior(_account);
     }
 
     /**
-    * @notice burn is an only owner function that allows the owner to burn  tokens from an input account
-    * @param _from is the address where the tokens will be burnt
-    * @param _amount is the amount of token to be burnt
-    **/
-    function burn(address _from, uint256 _amount) external override(IBSWrapperToken, WrapperToken) onlyLendingPair {
+     * @notice burn is an only owner function that allows the owner to burn  tokens from an input account
+     * @param _from is the address where the tokens will be burnt
+     * @param _amount is the amount of token to be burnt
+     **/
+    function burn(address _from, uint256 _amount)
+        external
+        override(IBSWrapperToken, WrapperToken)
+        onlyLendingPair
+    {
         _balances[_from] = balanceOf(_from) - _amount;
-        if(_amount > _totalSupply) {
+        if (_amount > _totalSupply) {
             _totalSupply = 0;
         } else {
             _totalSupply -= _amount;
@@ -53,64 +57,53 @@ contract DebtToken is WrapperToken, IDebtToken {
     }
 
     /**
-    * @notice used to increase the debt of the system
-    * @param _amount is the amount to increase
-    **/
+     * @notice used to increase the debt of the system
+     * @param _amount is the amount to increase
+     **/
     function increaseTotalDebt(uint256 _amount) external override onlyLendingPair {
         _totalSupply = _totalSupply + _amount;
     }
 
-    function transfer(address /*recipient*/, uint256 /*amount*/)
-        public
-        override(ERC20, IERC20)
-        pure
-        returns (bool)
-    {
+    function transfer(
+        address, /*recipient*/
+        uint256 /*amount*/
+    ) public pure override(ERC20, IERC20) returns (bool) {
         revert("TRANSFER_NOT_SUPPORTED");
     }
 
-    function approve(address /*spender*/, uint256 /*amount*/)
-        public
-        virtual
-        override(ERC20, IERC20)
-        returns (bool)
-    {
+    function approve(
+        address, /*spender*/
+        uint256 /*amount*/
+    ) public virtual override(ERC20, IERC20) returns (bool) {
         revert("APPROVAL_NOT_SUPPORTED");
     }
 
-    function allowance(address /*owner*/, address /*spender*/)
-        public
-        view
-        virtual
-        override(ERC20, IERC20)
-        returns (uint256)
-    {
+    function allowance(
+        address, /*owner*/
+        address /*spender*/
+    ) public view virtual override(ERC20, IERC20) returns (uint256) {
         revert("ALLOWANCE_NOT_SUPPORTED");
     }
 
     function transferFrom(
-        address /*sender*/,
-        address /*recipient*/,
+        address, /*sender*/
+        address, /*recipient*/
         uint256 /*amount*/
     ) public virtual override(ERC20, IERC20) returns (bool) {
         revert("TRANSFER_NOT_SUPPORTED");
     }
 
-    function increaseAllowance(address /*spender*/, uint256 /*addedValue*/)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function increaseAllowance(
+        address, /*spender*/
+        uint256 /*addedValue*/
+    ) public virtual override returns (bool) {
         revert("ALLOWANCE_NOT_SUPPORTED");
     }
 
-    function decreaseAllowance(address /*spender*/, uint256 /*subtractedValue*/)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function decreaseAllowance(
+        address, /*spender*/
+        uint256 /*subtractedValue*/
+    ) public virtual override returns (bool) {
         revert("ALLOWANCE_NOT_SUPPORTED");
     }
 }

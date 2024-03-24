@@ -120,6 +120,25 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "OwnershipAccepted",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: "contract IERC20",
         name: "token",
@@ -155,6 +174,12 @@ const _abi = [
         internalType: "address",
         name: "_newTeam",
         type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
       },
     ],
     name: "TransferControl",
@@ -329,6 +354,24 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "_flashLoanRate",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_owner",
+        type: "address",
+      },
+    ],
+    name: "initialize",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "token",
         type: "address",
@@ -359,7 +402,7 @@ const _abi = [
       },
       {
         internalType: "bool",
-        name: "roundUp",
+        name: "ceil",
         type: "bool",
       },
     ],

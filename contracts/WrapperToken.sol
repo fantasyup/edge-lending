@@ -13,12 +13,11 @@ import "./util/Initializable.sol";
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title WrapperToken
 /// @author @samparsky
-/// @dev 
-/// 
+/// @dev
+///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
-    
     /// @dev underlying wrapper token
     address public underlying;
 
@@ -26,8 +25,8 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     address internal _owner;
 
     /// @dev version
-    uint8 constant VERSION = 0x1;
-    
+    uint256 constant VERSION = 0x1;
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -44,6 +43,8 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
         string memory _tokenSymbol
     ) external virtual override initializer {
         require(__owner != address(0), "invalid owner");
+        require(_underlying != address(0), "invalid underlying");
+
         _owner = __owner;
         uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
@@ -61,16 +62,16 @@ contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
     }
 
     /**
-    * @notice burn is an only owner function that allows the owner to burn  tokens from an input account
-    * @dev IMPORTANT: it reverts if user doesn't have enough balance
-    * @param _from is the address where the tokens will be burnt
-    * @param _amount is the amount of token to be burnt
-    **/
+     * @notice burn is an only owner function that allows the owner to burn  tokens from an input account
+     * @dev IMPORTANT: it reverts if user doesn't have enough balance
+     * @param _from is the address where the tokens will be burnt
+     * @param _amount is the amount of token to be burnt
+     **/
     function burn(address _from, uint256 _amount) external virtual override onlyLendingPair {
         _burn(_from, _amount);
     }
 
-    function owner() external view override returns(address) {
+    function owner() external view override returns (address) {
         return _owner;
     }
 }

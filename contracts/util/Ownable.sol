@@ -31,7 +31,6 @@ contract Ownable is Initializable {
         emit OwnershipTransferred(address(0), _owner);
     }
 
-
     /**
      * @dev Returns the address of the current owner.
      */

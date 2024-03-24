@@ -31,6 +31,7 @@ abstract contract EIP712 {
     bytes32 private _HASHED_NAME;
     bytes32 private _HASHED_VERSION;
     bytes32 private _TYPE_HASH;
+
     /* solhint-enable var-name-mixedcase */
 
     /**
@@ -45,10 +46,13 @@ abstract contract EIP712 {
      * NOTE: These parameters cannot be changed except through a xref:learn::upgrading-smart-contracts.adoc[smart
      * contract upgrade].
      */
-    function initializeEIP712 (string memory name, string memory version) internal {
+    function initializeEIP712(string memory name, string memory version) internal {
         bytes32 hashedName = keccak256(bytes(name));
         bytes32 hashedVersion = keccak256(bytes(version));
-        bytes32 typeHash = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"); 
+        bytes32 typeHash =
+            keccak256(
+                "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+            );
         _HASHED_NAME = hashedName;
         _HASHED_VERSION = hashedVersion;
         _CACHED_CHAIN_ID = _getChainId();
@@ -67,16 +71,12 @@ abstract contract EIP712 {
         }
     }
 
-    function _buildDomainSeparator(bytes32 typeHash, bytes32 name, bytes32 version) private view returns (bytes32) {
-        return keccak256(
-            abi.encode(
-                typeHash,
-                name,
-                version,
-                _getChainId(),
-                address(this)
-            )
-        );
+    function _buildDomainSeparator(
+        bytes32 typeHash,
+        bytes32 name,
+        bytes32 version
+    ) private view returns (bytes32) {
+        return keccak256(abi.encode(typeHash, name, version, _getChainId(), address(this)));
     }
 
     /**

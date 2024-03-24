@@ -21,15 +21,14 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface LendingPairFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "admin()": FunctionFragment;
     "allPairs(uint256)": FunctionFragment;
     "borrowAssetWrapperImplementation()": FunctionFragment;
     "collateralWrapperImplementation()": FunctionFragment;
     "createIR(tuple,address)": FunctionFragment;
-    "createLendingPairWithProxy(address,address,address,address,tuple,address)": FunctionFragment;
+    "createLendingPairWithProxy(address,address,tuple,address)": FunctionFragment;
     "debtTokenImplementation()": FunctionFragment;
-    "initWrapperTokensWithProxy(address,address,address,string)": FunctionFragment;
     "lendingPairImplementation()": FunctionFragment;
+    "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "unpause()": FunctionFragment;
@@ -39,7 +38,6 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     "updatePairImpl(address)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "allPairs",
     values: [BigNumberish]
@@ -69,8 +67,6 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     values: [
       string,
       string,
-      string,
-      string,
       {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
@@ -86,13 +82,10 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "initWrapperTokensWithProxy",
-    values: [string, string, string, string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "lendingPairImplementation",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
@@ -113,7 +106,6 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
 
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allPairs", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "borrowAssetWrapperImplementation",
@@ -133,13 +125,10 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "initWrapperTokensWithProxy",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "lendingPairImplementation",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
@@ -217,10 +206,6 @@ export class LendingPairFactory extends Contract {
   interface: LendingPairFactoryInterface;
 
   functions: {
-    admin(overrides?: CallOverrides): Promise<[string]>;
-
-    "admin()"(overrides?: CallOverrides): Promise<[string]>;
-
     allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     "allPairs(uint256)"(
@@ -267,9 +252,7 @@ export class LendingPairFactory extends Contract {
     ): Promise<ContractTransaction>;
 
     createLendingPairWithProxy(
-      _team: string,
-      _oracle: string,
-      _vault: string,
+      _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
         borrowAsset: string;
@@ -282,10 +265,8 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
-      _team: string,
-      _oracle: string,
-      _vault: string,
+    "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+      _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
         borrowAsset: string;
@@ -302,25 +283,13 @@ export class LendingPairFactory extends Contract {
 
     "debtTokenImplementation()"(overrides?: CallOverrides): Promise<[string]>;
 
-    initWrapperTokensWithProxy(
-      implementation: string,
-      pair: string,
-      assetDetails: string,
-      symbol: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "initWrapperTokensWithProxy(address,address,address,string)"(
-      implementation: string,
-      pair: string,
-      assetDetails: string,
-      symbol: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     lendingPairImplementation(overrides?: CallOverrides): Promise<[string]>;
 
     "lendingPairImplementation()"(overrides?: CallOverrides): Promise<[string]>;
+
+    owner(overrides?: CallOverrides): Promise<[string]>;
+
+    "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
     pause(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -383,10 +352,6 @@ export class LendingPairFactory extends Contract {
     ): Promise<ContractTransaction>;
   };
 
-  admin(overrides?: CallOverrides): Promise<string>;
-
-  "admin()"(overrides?: CallOverrides): Promise<string>;
-
   allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   "allPairs(uint256)"(
@@ -429,9 +394,7 @@ export class LendingPairFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   createLendingPairWithProxy(
-    _team: string,
-    _oracle: string,
-    _vault: string,
+    _pauseGuardian: string,
     _collateralAsset: string,
     _borrowVars: {
       borrowAsset: string;
@@ -444,10 +407,8 @@ export class LendingPairFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
-    _team: string,
-    _oracle: string,
-    _vault: string,
+  "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+    _pauseGuardian: string,
     _collateralAsset: string,
     _borrowVars: {
       borrowAsset: string;
@@ -464,25 +425,13 @@ export class LendingPairFactory extends Contract {
 
   "debtTokenImplementation()"(overrides?: CallOverrides): Promise<string>;
 
-  initWrapperTokensWithProxy(
-    implementation: string,
-    pair: string,
-    assetDetails: string,
-    symbol: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "initWrapperTokensWithProxy(address,address,address,string)"(
-    implementation: string,
-    pair: string,
-    assetDetails: string,
-    symbol: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   lendingPairImplementation(overrides?: CallOverrides): Promise<string>;
 
   "lendingPairImplementation()"(overrides?: CallOverrides): Promise<string>;
+
+  owner(overrides?: CallOverrides): Promise<string>;
+
+  "owner()"(overrides?: CallOverrides): Promise<string>;
 
   pause(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -545,10 +494,6 @@ export class LendingPairFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    admin(overrides?: CallOverrides): Promise<string>;
-
-    "admin()"(overrides?: CallOverrides): Promise<string>;
-
     allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     "allPairs(uint256)"(
@@ -593,9 +538,7 @@ export class LendingPairFactory extends Contract {
     ): Promise<string>;
 
     createLendingPairWithProxy(
-      _team: string,
-      _oracle: string,
-      _vault: string,
+      _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
         borrowAsset: string;
@@ -608,10 +551,8 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
-      _team: string,
-      _oracle: string,
-      _vault: string,
+    "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+      _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
         borrowAsset: string;
@@ -628,25 +569,13 @@ export class LendingPairFactory extends Contract {
 
     "debtTokenImplementation()"(overrides?: CallOverrides): Promise<string>;
 
-    initWrapperTokensWithProxy(
-      implementation: string,
-      pair: string,
-      assetDetails: string,
-      symbol: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "initWrapperTokensWithProxy(address,address,address,string)"(
-      implementation: string,
-      pair: string,
-      assetDetails: string,
-      symbol: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     lendingPairImplementation(overrides?: CallOverrides): Promise<string>;
 
     "lendingPairImplementation()"(overrides?: CallOverrides): Promise<string>;
+
+    owner(overrides?: CallOverrides): Promise<string>;
+
+    "owner()"(overrides?: CallOverrides): Promise<string>;
 
     pause(overrides?: CallOverrides): Promise<void>;
 
@@ -720,10 +649,6 @@ export class LendingPairFactory extends Contract {
   };
 
   estimateGas: {
-    admin(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     "allPairs(uint256)"(
@@ -770,9 +695,7 @@ export class LendingPairFactory extends Contract {
     ): Promise<BigNumber>;
 
     createLendingPairWithProxy(
-      _team: string,
-      _oracle: string,
-      _vault: string,
+      _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
         borrowAsset: string;
@@ -785,10 +708,8 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
-      _team: string,
-      _oracle: string,
-      _vault: string,
+    "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+      _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
         borrowAsset: string;
@@ -805,27 +726,15 @@ export class LendingPairFactory extends Contract {
 
     "debtTokenImplementation()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    initWrapperTokensWithProxy(
-      implementation: string,
-      pair: string,
-      assetDetails: string,
-      symbol: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "initWrapperTokensWithProxy(address,address,address,string)"(
-      implementation: string,
-      pair: string,
-      assetDetails: string,
-      symbol: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     lendingPairImplementation(overrides?: CallOverrides): Promise<BigNumber>;
 
     "lendingPairImplementation()"(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     pause(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -889,10 +798,6 @@ export class LendingPairFactory extends Contract {
   };
 
   populateTransaction: {
-    admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     allPairs(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -942,9 +847,7 @@ export class LendingPairFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     createLendingPairWithProxy(
-      _team: string,
-      _oracle: string,
-      _vault: string,
+      _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
         borrowAsset: string;
@@ -957,10 +860,8 @@ export class LendingPairFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createLendingPairWithProxy(address,address,address,address,(address,uint256,uint256,uint256,uint256),address)"(
-      _team: string,
-      _oracle: string,
-      _vault: string,
+    "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+      _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
         borrowAsset: string;
@@ -981,22 +882,6 @@ export class LendingPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    initWrapperTokensWithProxy(
-      implementation: string,
-      pair: string,
-      assetDetails: string,
-      symbol: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "initWrapperTokensWithProxy(address,address,address,string)"(
-      implementation: string,
-      pair: string,
-      assetDetails: string,
-      symbol: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     lendingPairImplementation(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1004,6 +889,10 @@ export class LendingPairFactory extends Contract {
     "lendingPairImplementation()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pause(
       overrides?: Overrides & { from?: string | Promise<string> }

@@ -25,6 +25,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     "deposit(address,address,address,uint256)": FunctionFragment;
     "flashFee(address,uint256)": FunctionFragment;
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
+    "initialize(uint256,address)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
     "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
@@ -47,6 +48,10 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "flashLoan",
     values: [string, string, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "maxFlashLoan",
@@ -73,6 +78,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashFee", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashLoan", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "maxFlashLoan",
     data: BytesLike
@@ -89,8 +95,9 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     "Approval(address,address,bool)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
+    "OwnershipAccepted(address,uint256)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
-    "TransferControl(address)": EventFragment;
+    "TransferControl(address,uint256)": EventFragment;
     "UpdateFlashLoanRate(uint256)": EventFragment;
     "Withdraw(address,address,address,uint256,uint256)": EventFragment;
   };
@@ -98,6 +105,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateFlashLoanRate"): EventFragment;
@@ -204,6 +212,18 @@ export class IBSVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    initialize(
+      _flashLoanRate: BigNumberish,
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "initialize(uint256,address)"(
+      _flashLoanRate: BigNumberish,
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     maxFlashLoan(
       token: string,
       overrides?: CallOverrides
@@ -217,14 +237,14 @@ export class IBSVault extends Contract {
     toShare(
       token: string,
       amount: BigNumberish,
-      roundUp: boolean,
+      ceil: boolean,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     "toShare(address,uint256,bool)"(
       token: string,
       amount: BigNumberish,
-      roundUp: boolean,
+      ceil: boolean,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -329,6 +349,18 @@ export class IBSVault extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  initialize(
+    _flashLoanRate: BigNumberish,
+    _owner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "initialize(uint256,address)"(
+    _flashLoanRate: BigNumberish,
+    _owner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   maxFlashLoan(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "maxFlashLoan(address)"(
@@ -339,14 +371,14 @@ export class IBSVault extends Contract {
   toShare(
     token: string,
     amount: BigNumberish,
-    roundUp: boolean,
+    ceil: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   "toShare(address,uint256,bool)"(
     token: string,
     amount: BigNumberish,
-    roundUp: boolean,
+    ceil: boolean,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -451,6 +483,18 @@ export class IBSVault extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    initialize(
+      _flashLoanRate: BigNumberish,
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "initialize(uint256,address)"(
+      _flashLoanRate: BigNumberish,
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     maxFlashLoan(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxFlashLoan(address)"(
@@ -461,14 +505,14 @@ export class IBSVault extends Contract {
     toShare(
       token: string,
       amount: BigNumberish,
-      roundUp: boolean,
+      ceil: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "toShare(address,uint256,bool)"(
       token: string,
       amount: BigNumberish,
-      roundUp: boolean,
+      ceil: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -561,6 +605,14 @@ export class IBSVault extends Contract {
       }
     >;
 
+    OwnershipAccepted(
+      newOwner: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { newOwner: string; timestamp: BigNumber }
+    >;
+
     Transfer(
       token: string | null,
       from: string | null,
@@ -572,8 +624,12 @@ export class IBSVault extends Contract {
     >;
 
     TransferControl(
-      _newTeam: null
-    ): TypedEventFilter<[string], { _newTeam: string }>;
+      _newTeam: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { _newTeam: string; timestamp: BigNumber }
+    >;
 
     UpdateFlashLoanRate(
       newRate: null
@@ -654,6 +710,18 @@ export class IBSVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    initialize(
+      _flashLoanRate: BigNumberish,
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "initialize(uint256,address)"(
+      _flashLoanRate: BigNumberish,
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     maxFlashLoan(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxFlashLoan(address)"(
@@ -664,14 +732,14 @@ export class IBSVault extends Contract {
     toShare(
       token: string,
       amount: BigNumberish,
-      roundUp: boolean,
+      ceil: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "toShare(address,uint256,bool)"(
       token: string,
       amount: BigNumberish,
-      roundUp: boolean,
+      ceil: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -777,6 +845,18 @@ export class IBSVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    initialize(
+      _flashLoanRate: BigNumberish,
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "initialize(uint256,address)"(
+      _flashLoanRate: BigNumberish,
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     maxFlashLoan(
       token: string,
       overrides?: CallOverrides
@@ -790,14 +870,14 @@ export class IBSVault extends Contract {
     toShare(
       token: string,
       amount: BigNumberish,
-      roundUp: boolean,
+      ceil: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "toShare(address,uint256,bool)"(
       token: string,
       amount: BigNumberish,
-      roundUp: boolean,
+      ceil: boolean,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

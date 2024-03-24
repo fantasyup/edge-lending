@@ -12,7 +12,7 @@ import "hardhat/console.sol";
 
 contract CollateralWrapperToken is WrapperToken {
     function transfer(address _recipient, uint256 _amount) external override returns (bool) {
-        uint maxWithdrawAllowed = IBSLendingPair(this.owner()).getMaxWithdrawAllowed(msg.sender);
+        uint256 maxWithdrawAllowed = IBSLendingPair(this.owner()).getMaxWithdrawAllowed(msg.sender);
         require(_amount <= maxWithdrawAllowed, "EXCEEDS_ALLOWED");
         _transfer(msg.sender, _recipient, _amount);
         return true;

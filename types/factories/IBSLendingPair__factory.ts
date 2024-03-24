@@ -21,6 +21,44 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: "uint8",
+        name: "action",
+        type: "uint8",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "ActionPaused",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "action",
+        type: "uint8",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "ActionUnPaused",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: "address",
         name: "borrower",
@@ -501,23 +539,13 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_blackSmithTeam",
-        type: "address",
-      },
-      {
-        internalType: "contract IPriceOracleAggregator",
-        name: "_oracle",
-        type: "address",
-      },
-      {
-        internalType: "contract IBSVault",
-        name: "_vault",
+        internalType: "contract IERC20",
+        name: "_asset",
         type: "address",
       },
       {
         internalType: "contract IERC20",
-        name: "_asset",
+        name: "_collateralAsset",
         type: "address",
       },
       {
@@ -563,13 +591,13 @@ const _abi = [
         type: "tuple",
       },
       {
-        internalType: "contract IERC20",
-        name: "_collateralAsset",
+        internalType: "contract IBSWrapperToken",
+        name: "_wrappedCollateralAsset",
         type: "address",
       },
       {
-        internalType: "contract IBSWrapperToken",
-        name: "_wrappedCollateralAsset",
+        internalType: "address",
+        name: "_pauseGuardian",
         type: "address",
       },
     ],

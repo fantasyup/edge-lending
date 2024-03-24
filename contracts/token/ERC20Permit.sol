@@ -17,11 +17,13 @@ import "./EIP712.sol";
  */
 
 abstract contract ERC20Permit is ERC20, IERC20Permit, EIP712 {
-
-    mapping (address => uint256) private _nonces;
+    mapping(address => uint256) private _nonces;
 
     // solhint-disable-next-line var-name-mixedcase
-    bytes32 private immutable _PERMIT_TYPEHASH = keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
+    bytes32 private immutable _PERMIT_TYPEHASH =
+        keccak256(
+            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+        );
 
     /**
      * @dev Initializes the {EIP712} domain separator using the `name` parameter, and setting `version` to `"1"`.
@@ -29,26 +31,28 @@ abstract contract ERC20Permit is ERC20, IERC20Permit, EIP712 {
      * It's a good idea to use the same `name` that is defined as the ERC20 token name.
      */
     function initializeERC20Permit(string memory _name) internal {
-      initializeEIP712(_name, "1");
+        initializeEIP712(_name, "1");
     }
 
     /**
      * @dev See {IERC20Permit-permit}.
      */
-    function permit(address owner, address spender, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s) public virtual override {
+    function permit(
+        address owner,
+        address spender,
+        uint256 amount,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public virtual override {
         // solhint-disable-next-line not-rely-on-time
         require(block.timestamp <= deadline, "ERC20Permit: expired deadline");
 
-        bytes32 structHash = keccak256(
-            abi.encode(
-                _PERMIT_TYPEHASH,
-                owner,
-                spender,
-                amount,
-                _nonces[owner],
-                deadline
-            )
-        );
+        bytes32 structHash =
+            keccak256(
+                abi.encode(_PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner], deadline)
+            );
 
         bytes32 hash = _hashTypedDataV4(structHash);
 

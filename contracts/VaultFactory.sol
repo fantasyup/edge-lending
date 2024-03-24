@@ -5,11 +5,10 @@ import "./interfaces/IBSVault.sol";
 
 contract VaultFactory {
     address public vaultLogic;
-    address immutable public owner;
+    address public immutable owner;
 
     event NewVault(address vault, uint256 created);
     event VaultUpdated(address vault, uint256 created);
-
 
     /// @notice modifier to allow only the owner to call a function
     modifier onlyOwner {
@@ -17,10 +16,7 @@ contract VaultFactory {
         _;
     }
 
-    constructor(
-        address _owner,
-        address _vaultLogic
-    ) {
+    constructor(address _owner, address _vaultLogic) {
         require(_vaultLogic != address(0), "invalid vault");
         owner = _owner;
         vaultLogic = _vaultLogic;
@@ -33,10 +29,10 @@ contract VaultFactory {
         emit VaultUpdated(_newVault, block.timestamp);
     }
 
-    function createVaultWithProxy(
-        uint256 _flashLoanRate,
-        address _vaultOwner
-    ) external returns(address) {
+    function createVaultWithProxy(uint256 _flashLoanRate, address _vaultOwner)
+        external
+        returns (address)
+    {
         UUPSProxy proxy = new UUPSProxy();
         proxy.initializeProxy(vaultLogic);
 
@@ -47,5 +43,4 @@ contract VaultFactory {
 
         return address(proxy);
     }
-
 }
