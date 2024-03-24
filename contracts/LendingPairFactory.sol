@@ -2,6 +2,8 @@
 pragma solidity 0.8.1;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/proxy/Clones.sol";
+
 import "./interfaces/IPriceOracleAggregator.sol";
 import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
@@ -12,6 +14,8 @@ import "./LendingPair.sol";
 import "./DataTypes.sol";
 
 contract LendingPairFactory is Pausable {
+    using Clones for address;
+
     address public immutable owner;
 
     address public lendingPairImplementation;
@@ -84,28 +88,13 @@ contract LendingPairFactory is Pausable {
         emit LogicContractUpdated(_newLogicContract);
     }
 
-    /// @dev creates clone using EIP 1167 minimal proxy contract
-    function clone(address implementation) internal returns (address instance) {
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            let ptr := mload(0x40)
-            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
-            mstore(add(ptr, 0x14), shl(0x60, implementation))
-            mstore(
-                add(ptr, 0x28),
-                0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000
-            )
-            instance := create(0, ptr, 0x37)
-        }
-
-        require(instance != address(0), "ERC1167: create failed");
-    }
-
     struct NewLendingVaultIRLocalVars {
         uint256 baseRatePerYear;
         uint256 multiplierPerYear;
         uint256 jumpMultiplierPerYear;
         uint256 optimal;
+        uint256 borrowRateMaxMantissa;
+        uint256 blocksPerYear;
     }
 
     /// @dev create interest rate model
@@ -121,7 +110,9 @@ contract LendingPairFactory is Pausable {
                 _interestRateVars.multiplierPerYear,
                 _interestRateVars.jumpMultiplierPerYear,
                 _interestRateVars.optimal,
-                _team
+                _team,
+                _interestRateVars.borrowRateMaxMantissa,
+                _interestRateVars.blocksPerYear
             )
         );
     }
@@ -136,12 +127,15 @@ contract LendingPairFactory is Pausable {
 
     /// @dev create lending pair with clones
     function createLendingPairWithProxy(
+        string memory _lendingPairName,
+        string memory _lendingPairSymbol,
         address _pauseGuardian,
         IERC20 _collateralAsset,
-        BorrowLocalVars calldata _borrowVars,
-        address interestRateModel
+        BorrowLocalVars calldata _borrowVars
     ) external whenNotPaused returns (address newLendingPair) {
-        newLendingPair = clone(lendingPairImplementation);
+        bytes32 salt = keccak256(abi.encode(allPairs.length));
+
+        newLendingPair = lendingPairImplementation.cloneDeterministic(salt);
 
         // initialize wrapper borrow asset
         IBSWrapperToken wrappedBorrowAsset =
@@ -150,7 +144,8 @@ contract LendingPairFactory is Pausable {
                     borrowAssetWrapperImplementation,
                     newLendingPair,
                     address(_borrowVars.borrowAsset),
-                    "BOR"
+                    "BOR",
+                    salt
                 )
             );
 
@@ -161,7 +156,8 @@ contract LendingPairFactory is Pausable {
                     collateralWrapperImplementation,
                     newLendingPair,
                     address(_collateralAsset),
-                    "COL"
+                    "COL",
+                    salt
                 )
             );
 
@@ -172,13 +168,13 @@ contract LendingPairFactory is Pausable {
                     debtTokenImplementation,
                     newLendingPair,
                     address(_borrowVars.borrowAsset),
-                    "DEB"
+                    "DEB",
+                    salt
                 )
             );
 
         DataTypes.BorrowAssetConfig memory borrowConfig =
             DataTypes.BorrowAssetConfig(
-                IInterestRateModel(interestRateModel),
                 _borrowVars.initialExchangeRateMantissa,
                 _borrowVars.reserveFactorMantissa,
                 _borrowVars.collateralFactor,
@@ -189,6 +185,8 @@ contract LendingPairFactory is Pausable {
 
         // initialize lending pair
         IBSLendingPair(newLendingPair).initialize(
+            _lendingPairName,
+            _lendingPairSymbol,
             _borrowVars.borrowAsset,
             _collateralAsset,
             borrowConfig,
@@ -205,9 +203,10 @@ contract LendingPairFactory is Pausable {
         address implementation,
         address pair,
         address assetDetails,
-        string memory symbol
+        string memory symbol,
+        bytes32 salt
     ) internal returns (address wrapper) {
-        wrapper = clone(implementation);
+        wrapper = implementation.cloneDeterministic(salt);
 
         initializeWrapperTokens(
             pair,
