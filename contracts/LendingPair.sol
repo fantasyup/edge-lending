@@ -298,12 +298,13 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @notice Sender repays their own borrow
     /// @param _repayAmount The amount of borrow asset to repay
-    function repay(uint256 _repayAmount) public {
+    /// @param _beneficiary address to repay loan position
+    function repay(uint256 _repayAmount, address _beneficiary) public {
         // create local vars storage
         RepayBorrowLocalVars memory vars;
 
         // We fetch the amount the borrower owes, with accumulated interest
-        vars.accountBorrows = borrowBalanceCurrent(msg.sender);
+        vars.accountBorrows = borrowBalanceCurrent(_beneficiary);
 
         // require the borrower cant pay more than they owe
         require(_repayAmount <= vars.accountBorrows, "PAYING_MORE_THAN_OWED");
@@ -325,14 +326,14 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // transfer the borrow asset from the borrower to LendingPair
         vault.transfer(asset, msg.sender, address(this), repayAmountInShares);
 
-        accountInterestIndex[msg.sender] = borrowIndex;
+        accountInterestIndex[_beneficiary] = borrowIndex;
 
-        debtToken.burn(msg.sender, vars.repayAmount);
+        debtToken.burn(_beneficiary, vars.repayAmount);
 
         emit Repay(
             address(this),
             address(asset),
-            msg.sender, // @TODO add beneficiary
+            _beneficiary,
             msg.sender,
             _repayAmount
         );
@@ -710,14 +711,12 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint256 priceOfCollateralInUSD = getPriceOfCollateral();
 
         uint256 borrowedTotalWithInterest = borrowBalanceCurrent(_borrower);
-        uint256 borrowedTotalInUSDNormalized =
-            getPriceOfToken(
-                asset,
-                normalize(borrowedTotalWithInterest, _borrowAssetUnderlyingDecimal)
-            );
+        uint256 borrowedTotalInUSDNormalized = 
+            normalize(borrowedTotalWithInterest, _borrowAssetUnderlyingDecimal) *
+                currentBorrowAssetPriceInUSD;
         uint256 borrowLimitInUSDNormalized =
             normalize(getBorrowLimit(_borrower), _collateralAssetUnderlyingDecimal) *
-                getPriceOfCollateral();
+                priceOfCollateralInUSD;
 
         // check if the borrow is less than the borrowed amount
         if (borrowLimitInUSDNormalized <= borrowedTotalInUSDNormalized) {
@@ -725,7 +724,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             uint256 totalLiquidationFee = calculateLiquidationFee(borrowedTotalWithInterest);
             uint256 protocolLiquidationFeeShare =
                 (totalLiquidationFee * procotolLiquidationFeeShare) / LIQUIDATION_FEES_PRECISION;
-            uint256 borrowedTotal = borrowedTotalWithInterest + totalLiquidationFee;
 
             _repayLiquidatingLoan(
                 _borrower,
@@ -738,10 +736,12 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             // add protocol liquidaiton fee amount to reserves
             totalReserves = totalReserves + protocolLiquidationFeeShare;
 
-            // convert borrowedTotal to usd and divide by collateral usd price
-            uint256 borrowedTotalInUSD = currentBorrowAssetPriceInUSD * borrowedTotal;
-            uint256 amountOfCollateralToLiquidate = borrowedTotalInUSD / priceOfCollateralInUSD;
+            // convert borrowedTotal to usd
+            uint256 borrowedTotalInUSD =
+                currentBorrowAssetPriceInUSD * (borrowedTotalWithInterest + totalLiquidationFee);
 
+            // @TODO ceil!?
+            uint256 amountOfCollateralToLiquidate = borrowedTotalInUSD / priceOfCollateralInUSD;
             uint256 amountOfCollateralToLiquidateInVaultShares =
                 vault.toShare(collateralAsset, amountOfCollateralToLiquidate, true);
 

@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-/**
- * @title
- * @author
- * @notice
- */
+////////////////////////////////////////////////////////////////////////////////////////////
+/// @title JumpRateModelV2
+/// @author 
+////////////////////////////////////////////////////////////////////////////////////////////
 
 contract JumpRateModelV2 {
     event NewInterestParams(
@@ -35,17 +34,15 @@ contract JumpRateModelV2 {
 
     /// @dev Maximum borrow rate that can ever be applied per second
     uint256 internal immutable borrowRateMaxMantissa;
-
-    /**
-     * @notice Construct an interest rate model
-     * @param baseRatePerYear The approximate target base APR, as a mantissa (scaled by 1e18)
-     * @param multiplierPerYear The rate of increase in interest rate wrt utilization (scaled by 1e18)
-     * @param jumpMultiplierPerYear The multiplierPerBlock after hitting a specified utilization point
-     * @param kink_ The utilization point at which the jump multiplier is applied
-     * @param owner_ The address of the owner, i.e. which has the ability to update parameters directly
-     * @param borrowRateMaxMantissa_ maximum borrow rate per second
-     * @param blocksPerYear_ the number of blocks on the chain per year
-     */
+    
+    /// @notice Construct an interest rate model
+    /// @param baseRatePerYear The approximate target base APR, as a mantissa (scaled by 1e18)
+    /// @param multiplierPerYear The rate of increase in interest rate wrt utilization (scaled by 1e18)
+    /// @param jumpMultiplierPerYear The multiplierPerBlock after hitting a specified utilization point
+    /// @param kink_ The utilization point at which the jump multiplier is applied
+    /// @param owner_ The address of the owner, i.e. which has the ability to update parameters directly
+    /// @param borrowRateMaxMantissa_ maximum borrow rate per second
+    /// @param blocksPerYear_ the number of blocks on the chain per year
     constructor(
         uint256 baseRatePerYear,
         uint256 multiplierPerYear,
@@ -74,14 +71,12 @@ contract JumpRateModelV2 {
             blocksPerYear_
         );
     }
-
-    /**
-     * @notice Update the parameters of the interest rate model (only callable by owner, i.e. Timelock)
-     * @param baseRatePerYear The approximate target base APR, as a mantissa (scaled by 1e18)
-     * @param multiplierPerYear The rate of increase in interest rate wrt utilization (scaled by 1e18)
-     * @param jumpMultiplierPerYear The multiplierPerBlock after hitting a specified utilization point
-     * @param kink_ The utilization point at which the jump multiplier is applied
-     */
+    
+    /// @notice Update the parameters of the interest rate model (only callable by owner, i.e. Timelock)
+    /// @param baseRatePerYear The approximate target base APR, as a mantissa (scaled by 1e18)
+    /// @param multiplierPerYear The rate of increase in interest rate wrt utilization (scaled by 1e18)
+    /// @param jumpMultiplierPerYear The multiplierPerBlock after hitting a specified utilization point
+    /// @param kink_ The utilization point at which the jump multiplier is applied
     function updateJumpRateModel(
         uint256 baseRatePerYear,
         uint256 multiplierPerYear,
@@ -103,13 +98,12 @@ contract JumpRateModelV2 {
         );
     }
 
-    /**
-     * @notice Calculates the utilization rate of the market: `borrows / (cash + borrows - reserves)`
-     * @param cash The amount of cash in the market
-     * @param borrows The amount of borrows in the market
-     * @param reserves The amount of reserves in the market (currently unused)
-     * @return The utilization rate as a mantissa between [0, 1e18]
-     */
+    
+    /// @notice Calculates the utilization rate of the market: `borrows / (cash + borrows - reserves)`
+    /// @param cash The amount of cash in the market
+    /// @param borrows The amount of borrows in the market
+    /// @param reserves The amount of reserves in the market (currently unused)
+    /// @return The utilization rate as a mantissa between [0, 1e18]
     function utilizationRate(
         uint256 cash,
         uint256 borrows,
@@ -123,13 +117,11 @@ contract JumpRateModelV2 {
         return (borrows * (1e18)) / (cash + borrows - reserves);
     }
 
-    /**
-     * @notice Calculates the current borrow rate per block, with the error code expected by the market
-     * @param cash The amount of cash in the market
-     * @param borrows The amount of borrows in the market
-     * @param reserves The amount of reserves in the market
-     * @return The borrow rate percentage per block as a mantissa (scaled by 1e18)
-     */
+    /// @notice Calculates the current borrow rate per block, with the error code expected by the market
+    /// @param cash The amount of cash in the market
+    /// @param borrows The amount of borrows in the market
+    /// @param reserves The amount of reserves in the market
+    /// @return The borrow rate percentage per block as a mantissa (scaled by 1e18)
     function getBorrowRateInternal(
         uint256 cash,
         uint256 borrows,
@@ -147,12 +139,12 @@ contract JumpRateModelV2 {
     }
 
     /**
-     * @notice Calculates the current supply rate per block
-     * @param cash The amount of cash in the market
-     * @param borrows The amount of borrows in the market
-     * @param reserves The amount of reserves in the market
-     * @param reserveFactorMantissa The current reserve factor for the market
-     * @return The supply rate percentage per block as a mantissa (scaled by 1e18)
+    /// @notice Calculates the current supply rate per block
+    /// @param cash The amount of cash in the market
+    /// @param borrows The amount of borrows in the market
+    /// @param reserves The amount of reserves in the market
+    /// @param reserveFactorMantissa The current reserve factor for the market
+    /// @return The supply rate percentage per block as a mantissa (scaled by 1e18)
      */
     function getSupplyRate(
         uint256 cash,
@@ -166,13 +158,11 @@ contract JumpRateModelV2 {
         return (utilizationRate(cash, borrows, reserves) * rateToPool) / 1e18;
     }
 
-    /**
-     * @notice Internal function to update the parameters of the interest rate model
-     * @param baseRatePerYear The approximate target base APR, as a mantissa (scaled by 1e18)
-     * @param multiplierPerYear The rate of increase in interest rate wrt utilization (scaled by 1e18)
-     * @param jumpMultiplierPerYear The multiplierPerBlock after hitting a specified utilization point
-     * @param kink_ The utilization point at which the jump multiplier is applied
-     */
+    /// @notice Internal function to update the parameters of the interest rate model
+    /// @param baseRatePerYear The approximate target base APR, as a mantissa (scaled by 1e18)
+    /// @param multiplierPerYear The rate of increase in interest rate wrt utilization (scaled by 1e18)
+    /// @param jumpMultiplierPerYear The multiplierPerBlock after hitting a specified utilization point
+    /// @param kink_ The utilization point at which the jump multiplier is applied
     function updateJumpRateModelInternal(
         uint256 baseRatePerYear,
         uint256 multiplierPerYear,
@@ -188,13 +178,12 @@ contract JumpRateModelV2 {
         emit NewInterestParams(baseRatePerBlock, multiplierPerBlock, jumpMultiplierPerBlock, kink);
     }
 
-    /**
-     * @notice Calculates the current borrow rate per block
-     * @param cash The amount of cash in the market
-     * @param borrows The amount of borrows in the market
-     * @param reserves The amount of reserves in the market
-     * @return The borrow rate percentage per block as a mantissa (scaled by 1e18)
-     */
+    
+    /// @notice Calculates the current borrow rate per block
+    /// @param cash The amount of cash in the market
+    /// @param borrows The amount of borrows in the market
+    /// @param reserves The amount of reserves in the market
+    /// @return The borrow rate percentage per block as a mantissa (scaled by 1e18)
     function getBorrowRate(
         uint256 cash,
         uint256 borrows,
