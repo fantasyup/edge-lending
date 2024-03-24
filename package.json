@@ -8,6 +8,11 @@
     "test": "npx hardhat test",
     "prettier:solidity": "npx prettier --write contracts/**/*.sol"
   },
+  "husky": {
+    "hooks": {
+       "pre-push": "npm run prettier:solidity"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cryptotechmaker/blacksmith.git"
