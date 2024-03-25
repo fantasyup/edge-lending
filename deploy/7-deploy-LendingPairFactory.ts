@@ -1,6 +1,6 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
-import { ContractId, EthereumAddress } from "../helpers/types"
+import { ContractId } from "../helpers/types"
 
 const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployments: { deploy, get }, getNamedAccounts } = hre;

@@ -13,12 +13,20 @@ const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnv
     deterministicDeployment: true
   })
 
+  // deploy library with deterministic set to true
+  const SafeERC20Lib = await deploy(ContractId.SafeERC20, {
+    from: deployer,
+    args: [],
+    deterministicDeployment: true
+  })
+
   await deploy(ContractId.LendingPair, {
     from: deployer,
     args: [],
     log: true,
     libraries: {
-      [ContractId.DataTypes]: DataTypesLib.address
+      [ContractId.DataTypes]: DataTypesLib.address,
+      [ContractId.SafeERC20]: SafeERC20Lib.address
     }
   });
 

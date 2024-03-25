@@ -25,7 +25,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     "borrowAssetWrapperImplementation()": FunctionFragment;
     "collateralWrapperImplementation()": FunctionFragment;
     "createIR(tuple,address)": FunctionFragment;
-    "createLendingPairWithProxy(address,address,tuple,address)": FunctionFragment;
+    "createLendingPairWithProxy(string,string,address,address,tuple)": FunctionFragment;
     "debtTokenImplementation()": FunctionFragment;
     "lendingPairImplementation()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -58,6 +58,8 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        blocksPerYear: BigNumberish;
       },
       string
     ]
@@ -67,14 +69,15 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     values: [
       string,
       string,
+      string,
+      string,
       {
         borrowAsset: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
-      },
-      string
+      }
     ]
   ): string;
   encodeFunctionData(
@@ -235,23 +238,29 @@ export class LendingPairFactory extends Contract {
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        blocksPerYear: BigNumberish;
       },
       _team: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createIR((uint256,uint256,uint256,uint256),address)"(
+    "createIR((uint256,uint256,uint256,uint256,uint256,uint256),address)"(
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        blocksPerYear: BigNumberish;
       },
       _team: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     createLendingPairWithProxy(
+      _lendingPairName: string,
+      _lendingPairSymbol: string,
       _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
@@ -261,11 +270,12 @@ export class LendingPairFactory extends Contract {
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
       },
-      interestRateModel: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+      _lendingPairName: string,
+      _lendingPairSymbol: string,
       _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
@@ -275,7 +285,6 @@ export class LendingPairFactory extends Contract {
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
       },
-      interestRateModel: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -377,23 +386,29 @@ export class LendingPairFactory extends Contract {
       multiplierPerYear: BigNumberish;
       jumpMultiplierPerYear: BigNumberish;
       optimal: BigNumberish;
+      borrowRateMaxMantissa: BigNumberish;
+      blocksPerYear: BigNumberish;
     },
     _team: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createIR((uint256,uint256,uint256,uint256),address)"(
+  "createIR((uint256,uint256,uint256,uint256,uint256,uint256),address)"(
     _interestRateVars: {
       baseRatePerYear: BigNumberish;
       multiplierPerYear: BigNumberish;
       jumpMultiplierPerYear: BigNumberish;
       optimal: BigNumberish;
+      borrowRateMaxMantissa: BigNumberish;
+      blocksPerYear: BigNumberish;
     },
     _team: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   createLendingPairWithProxy(
+    _lendingPairName: string,
+    _lendingPairSymbol: string,
     _pauseGuardian: string,
     _collateralAsset: string,
     _borrowVars: {
@@ -403,11 +418,12 @@ export class LendingPairFactory extends Contract {
       collateralFactor: BigNumberish;
       liquidationFee: BigNumberish;
     },
-    interestRateModel: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+  "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+    _lendingPairName: string,
+    _lendingPairSymbol: string,
     _pauseGuardian: string,
     _collateralAsset: string,
     _borrowVars: {
@@ -417,7 +433,6 @@ export class LendingPairFactory extends Contract {
       collateralFactor: BigNumberish;
       liquidationFee: BigNumberish;
     },
-    interestRateModel: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -521,23 +536,29 @@ export class LendingPairFactory extends Contract {
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        blocksPerYear: BigNumberish;
       },
       _team: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createIR((uint256,uint256,uint256,uint256),address)"(
+    "createIR((uint256,uint256,uint256,uint256,uint256,uint256),address)"(
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        blocksPerYear: BigNumberish;
       },
       _team: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
     createLendingPairWithProxy(
+      _lendingPairName: string,
+      _lendingPairSymbol: string,
       _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
@@ -547,11 +568,12 @@ export class LendingPairFactory extends Contract {
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
       },
-      interestRateModel: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+      _lendingPairName: string,
+      _lendingPairSymbol: string,
       _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
@@ -561,7 +583,6 @@ export class LendingPairFactory extends Contract {
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
       },
-      interestRateModel: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -678,23 +699,29 @@ export class LendingPairFactory extends Contract {
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        blocksPerYear: BigNumberish;
       },
       _team: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createIR((uint256,uint256,uint256,uint256),address)"(
+    "createIR((uint256,uint256,uint256,uint256,uint256,uint256),address)"(
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        blocksPerYear: BigNumberish;
       },
       _team: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     createLendingPairWithProxy(
+      _lendingPairName: string,
+      _lendingPairSymbol: string,
       _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
@@ -704,11 +731,12 @@ export class LendingPairFactory extends Contract {
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
       },
-      interestRateModel: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+      _lendingPairName: string,
+      _lendingPairSymbol: string,
       _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
@@ -718,7 +746,6 @@ export class LendingPairFactory extends Contract {
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
       },
-      interestRateModel: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -830,23 +857,29 @@ export class LendingPairFactory extends Contract {
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        blocksPerYear: BigNumberish;
       },
       _team: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createIR((uint256,uint256,uint256,uint256),address)"(
+    "createIR((uint256,uint256,uint256,uint256,uint256,uint256),address)"(
       _interestRateVars: {
         baseRatePerYear: BigNumberish;
         multiplierPerYear: BigNumberish;
         jumpMultiplierPerYear: BigNumberish;
         optimal: BigNumberish;
+        borrowRateMaxMantissa: BigNumberish;
+        blocksPerYear: BigNumberish;
       },
       _team: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     createLendingPairWithProxy(
+      _lendingPairName: string,
+      _lendingPairSymbol: string,
       _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
@@ -856,11 +889,12 @@ export class LendingPairFactory extends Contract {
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
       },
-      interestRateModel: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createLendingPairWithProxy(address,address,(address,uint256,uint256,uint256,uint256),address)"(
+    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+      _lendingPairName: string,
+      _lendingPairSymbol: string,
       _pauseGuardian: string,
       _collateralAsset: string,
       _borrowVars: {
@@ -870,7 +904,6 @@ export class LendingPairFactory extends Contract {
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
       },
-      interestRateModel: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

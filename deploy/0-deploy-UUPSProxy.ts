@@ -1,6 +1,6 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
-import { ContractId, EthereumAddress } from "../helpers/types"
+import { ContractId } from "../helpers/types"
 
 const deployUUPSProxy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments: { deploy }, getNamedAccounts } = hre;
@@ -15,4 +15,4 @@ const deployUUPSProxy: DeployFunction = async function (hre: HardhatRuntimeEnvir
 }
 
 export default deployUUPSProxy
-deployUUPSProxy.tags = ['UUPSProxy']
+deployUUPSProxy.tags = [ContractId.UUPSProxy]

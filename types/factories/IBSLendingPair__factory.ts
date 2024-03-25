@@ -78,6 +78,25 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: "address",
+        name: "newAddr",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "ChangeFeeWithdrawalAddress",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: "address",
         name: "pair",
@@ -539,6 +558,16 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_symbol",
+        type: "string",
+      },
+      {
         internalType: "contract IERC20",
         name: "_asset",
         type: "address",
@@ -550,11 +579,6 @@ const _abi = [
       },
       {
         components: [
-          {
-            internalType: "contract IInterestRateModel",
-            name: "interestRate",
-            type: "address",
-          },
           {
             internalType: "uint256",
             name: "initialExchangeRateMantissa",

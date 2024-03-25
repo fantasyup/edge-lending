@@ -1,4 +1,4 @@
-import { ethers, waffle } from "hardhat";
+import { deployments, ethers, waffle } from "hardhat";
 import { Signer, Contract, BigNumber } from "ethers"
 import { ContractId, EthereumAddress } from "../helpers/types"
 import { Vault } from '../types/Vault'
@@ -42,6 +42,34 @@ export const deployDataTypesLib = async () => {
 
 export const deployVault = async() => {
     return await deployContract<Vault>(ContractId.Vault, [])
+}
+
+export const getVaultDeployment = async(): Promise<Vault> =>{
+    return (await ethers.getContractAt(
+        ContractId.Vault,
+        (await deployments.fixture(ContractId.Vault))[ContractId.Vault].address
+    )) as Vault
+}
+
+export const getCollateralWrapperDeployment = async(): Promise<WrapperToken> =>{
+    return (await ethers.getContractAt(
+        ContractId.CollateralWrapperToken,
+        (await deployments.fixture(ContractId.CollateralWrapperToken))[ContractId.CollateralWrapperToken].address
+    )) as WrapperToken
+}
+
+export const getBorrowWrapperDeployment = async(): Promise<WrapperToken> =>{
+    return (await ethers.getContractAt(
+        ContractId.WrapperToken,
+        (await deployments.fixture(ContractId.WrapperToken))[ContractId.WrapperToken].address
+    )) as WrapperToken
+}
+
+export const getDebtTokenDeployment = async(): Promise<DebtToken> =>{
+    return (await ethers.getContractAt(
+        ContractId.DebtToken,
+        (await deployments.fixture(ContractId.DebtToken))[ContractId.DebtToken].address
+    )) as DebtToken
 }
 
 export const deployMockToken = async(decimals ?: number) => {

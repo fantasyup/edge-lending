@@ -14,7 +14,17 @@ import "hardhat/console.sol";
 contract DebtToken is WrapperToken, IDebtToken {
     bool constant isDebtToken = true;
 
+    /// @dev debt token delegate borrow message digest
+    bytes32 internal constant _DEBT_BORROW_DELEGATE_SIGNATURE_TYPE_HASH =
+        keccak256(
+            "BorrowDelegate(string warning,address user,address contract,uint amount,uint256 nonce)"
+        );
+
+    /// @dev user delegated borrow allowances
     mapping(address => mapping(address => uint256)) private _borrowAllowances;
+
+    /// @notice mapping of user to approval nonce
+    mapping(address => uint256) public userBorrowAllowanceNonce;
 
     /// @notice
     function initialize(
@@ -23,7 +33,8 @@ contract DebtToken is WrapperToken, IDebtToken {
         string memory _tokenName,
         string memory _tokenSymbol
     ) external override(WrapperToken, IBSWrapperTokenBase) initializer {
-        require(__owner != address(0), "invalid owner");
+        require(__owner != address(0), "INVALID_OWNER");
+
         _owner = __owner;
         uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
@@ -46,7 +57,7 @@ contract DebtToken is WrapperToken, IDebtToken {
     /// delegated some borrow allowance to the _to address
     /// @param _amount the amount of debt tokens to mint
     function mint(address _debtOwner, address _to, uint256 _amount) external override onlyLendingPair {
-        require(_debtOwner != address(0), "invalid debt owner");
+        require(_debtOwner != address(0), "INVALID_DEBT_OWNER");
         if(_debtOwner != _to) {
             _decreaseBorrowAllowance(_debtOwner, _to, _amount);
         }
@@ -76,10 +87,48 @@ contract DebtToken is WrapperToken, IDebtToken {
     }
 
     function delegateBorrow(address _to, uint256 _amount) external {
-        require(_to != address(0), "invalid _to");
+        require(_to != address(0), "INVALID_TO");
 
         _borrowAllowances[msg.sender][_to] = _amount;
         emit DelegateBorrow(msg.sender, _to, _amount, block.timestamp);
+    }
+
+    function delegateBorrowWithSignedMessage(
+        address _from,
+        address _to,
+        uint256 _amount,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        require(_to != address(0), "INVALID_TO");
+
+         bytes32 digest =
+            keccak256(
+                abi.encodePacked(
+                    "\x19\x01",
+                    _domainSeparatorV4(),
+                    keccak256(
+                        abi.encode(
+                            _DEBT_BORROW_DELEGATE_SIGNATURE_TYPE_HASH,
+                            keccak256(
+                                // solhint-disable-next-line
+                                "You are delegating borrow to user, read more here: https://edge.finance/delegate"
+                            ),
+                            _from,
+                            _to,
+                            _amount,
+                            userBorrowAllowanceNonce[_from]++
+                        )
+                    )
+                )
+            );
+
+        address recoveredAddress = ecrecover(digest, v, r, s);
+        require(recoveredAddress == _from, "INVALID_SIGNATURE");
+
+        _borrowAllowances[_from][_to] = _amount;
+        emit DelegateBorrow(_from, _to, _amount, block.timestamp);
     }
 
     function _decreaseBorrowAllowance(address _from, address _to, uint256 _amount) internal {

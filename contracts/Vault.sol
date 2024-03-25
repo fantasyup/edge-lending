@@ -5,14 +5,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IERC3156FlashBorrower.sol";
-import "./VaultBase.sol";
 import "./interfaces/IBSLendingPair.sol";
+import "./VaultBase.sol";
 import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///
 /// @title Vault
-/// @author samparsky
+/// @author @samparsky
 /// @notice Vault contract stores assets deposited into the Lending pairs.
 /// It enables deposit, withdrawal, flashloans and transfer of tokens.
 /// It represents the deposited token amount in form of shares
@@ -130,8 +130,7 @@ contract Vault is VaultBase {
         address _to,
         uint256 _amount
     ) external override whenNotPaused allowed(_from) returns (uint256 amountOut) {
-        // Checks
-        require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
+        require(_to != address(0), "INVALID_TO_ADDRESS");
 
         amountOut = toShare(_token, _amount, false);
         // transfer appropriate amount of underlying from _from to vault
@@ -156,8 +155,7 @@ contract Vault is VaultBase {
         address _to,
         uint256 _shares
     ) external override whenNotPaused allowed(_from) returns (uint256 amountOut) {
-        // Checks
-        require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
+        require(_to != address(0), "INVALID_TO_ADDRESS");
 
         amountOut = toUnderlying(_token, _shares);
         balanceOf[_token][_from] = balanceOf[_token][_from] - _shares;

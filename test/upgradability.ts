@@ -1,8 +1,9 @@
-import { ethers, waffle } from "hardhat";
+import { ethers, waffle, deployments } from "hardhat";
 import { Signer } from "ethers";
 import { expect, assert } from "chai";
 import { MockLendingPair as BMockLendingPair, UUPSProxy as BUUPSProxy } from "../types";
 import { deployMockLendingPair, deployUUPSProxy } from "../helpers/contracts";
+import { ContractId } from "../helpers/types"
 
 let UUPSProxy: BUUPSProxy
 let MockLendingPair: BMockLendingPair
@@ -10,7 +11,8 @@ let MockLendingPair: BMockLendingPair
 describe("UUPSProxy", function() {
 
     before(async function() {
-        UUPSProxy = await deployUUPSProxy()
+        const deployment = await deployments.fixture(ContractId.UUPSProxy)
+        UUPSProxy = await ethers.getContractAt(ContractId.UUPSProxy, deployment[ContractId.UUPSProxy].address) as BUUPSProxy
         MockLendingPair = await deployMockLendingPair()
     })
 

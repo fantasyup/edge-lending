@@ -21,16 +21,18 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface LendingPairInterface extends ethers.utils.Interface {
   functions: {
+    "VERSION()": FunctionFragment;
     "accountInterestIndex(address)": FunctionFragment;
     "accrueInterest()": FunctionFragment;
     "asset()": FunctionFragment;
-    "borrow(uint256)": FunctionFragment;
+    "borrow(uint256,address)": FunctionFragment;
     "borrowBalanceCurrent(address)": FunctionFragment;
     "borrowBalancePrior(address)": FunctionFragment;
     "borrowIndex()": FunctionFragment;
     "calcBorrowLimit(uint256)": FunctionFragment;
     "calcCollateralRequired(uint256)": FunctionFragment;
-    "calculateFee(uint256)": FunctionFragment;
+    "calculateLiquidationFee(uint256)": FunctionFragment;
+    "changeFeeWithdrawalAddress(address)": FunctionFragment;
     "collateralAsset()": FunctionFragment;
     "collateralFactor()": FunctionFragment;
     "collateralOfAccount(address)": FunctionFragment;
@@ -43,21 +45,25 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "getBorrowLimitInUSD(address)": FunctionFragment;
     "getCashPrior()": FunctionFragment;
     "getMaxWithdrawAllowed(address)": FunctionFragment;
+    "getPriceOfBorrowAsset()": FunctionFragment;
     "getPriceOfCollateral()": FunctionFragment;
     "getPriceOfToken(address,uint256)": FunctionFragment;
     "getTotalAvailableCollateralValue(address)": FunctionFragment;
     "getTotalAvailableCollateralValueInUSD(address)": FunctionFragment;
     "getTotalBorrowedValueInUSD(address)": FunctionFragment;
-    "initialize(address,address,tuple,address,address)": FunctionFragment;
+    "initialize(string,string,address,address,tuple,address,address)": FunctionFragment;
     "interestRate()": FunctionFragment;
     "liquidate(address)": FunctionFragment;
     "liquidationFee()": FunctionFragment;
+    "name()": FunctionFragment;
     "oracle()": FunctionFragment;
     "pause(uint8)": FunctionFragment;
     "pauseGuardian()": FunctionFragment;
     "pauseStatus(uint8)": FunctionFragment;
+    "procotolLiquidationFeeShare()": FunctionFragment;
     "redeem(address,uint256)": FunctionFragment;
-    "repay(uint256)": FunctionFragment;
+    "repay(uint256,address)": FunctionFragment;
+    "symbol()": FunctionFragment;
     "totalBorrows()": FunctionFragment;
     "totalReserves()": FunctionFragment;
     "unpause(uint8)": FunctionFragment;
@@ -68,6 +74,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "wrapperBorrowedAsset()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "accountInterestIndex",
     values: [string]
@@ -79,7 +86,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "borrow",
-    values: [BigNumberish]
+    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "borrowBalanceCurrent",
@@ -102,8 +109,12 @@ interface LendingPairInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "calculateFee",
+    functionFragment: "calculateLiquidationFee",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "changeFeeWithdrawalAddress",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "collateralAsset",
@@ -151,6 +162,10 @@ interface LendingPairInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "getPriceOfBorrowAsset",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getPriceOfCollateral",
     values?: undefined
   ): string;
@@ -175,8 +190,9 @@ interface LendingPairInterface extends ethers.utils.Interface {
     values: [
       string,
       string,
+      string,
+      string,
       {
-        interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
@@ -197,6 +213,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     functionFragment: "liquidationFee",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "oracle", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -208,10 +225,18 @@ interface LendingPairInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "procotolLiquidationFeeShare",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "redeem",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "repay", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "repay",
+    values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalBorrows",
     values?: undefined
@@ -242,6 +267,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "accountInterestIndex",
     data: BytesLike
@@ -273,7 +299,11 @@ interface LendingPairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "calculateFee",
+    functionFragment: "calculateLiquidationFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "changeFeeWithdrawalAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -322,6 +352,10 @@ interface LendingPairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getPriceOfBorrowAsset",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getPriceOfCollateral",
     data: BytesLike
   ): Result;
@@ -351,6 +385,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     functionFragment: "liquidationFee",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(
@@ -361,8 +396,13 @@ interface LendingPairInterface extends ethers.utils.Interface {
     functionFragment: "pauseStatus",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "procotolLiquidationFeeShare",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "repay", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalBorrows",
     data: BytesLike
@@ -394,6 +434,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "ActionPaused(uint8,uint256)": EventFragment;
     "ActionUnPaused(uint8,uint256)": EventFragment;
     "Borrow(address,uint256)": EventFragment;
+    "ChangeFeeWithdrawalAddress(address,uint256)": EventFragment;
     "Deposit(address,address,address,address,uint256)": EventFragment;
     "FlashLoan(address,address,address,uint256,uint256)": EventFragment;
     "InterestAccrued(address,uint256,uint256,uint256,uint256)": EventFragment;
@@ -408,6 +449,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ActionPaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ActionUnPaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Borrow"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ChangeFeeWithdrawalAddress"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InterestAccrued"): EventFragment;
@@ -463,6 +505,10 @@ export class LendingPair extends Contract {
   interface: LendingPairInterface;
 
   functions: {
+    VERSION(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "VERSION()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     accountInterestIndex(
       arg0: string,
       overrides?: CallOverrides
@@ -487,11 +533,13 @@ export class LendingPair extends Contract {
 
     borrow(
       _amountToBorrow: BigNumberish,
+      _debtOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "borrow(uint256)"(
+    "borrow(uint256,address)"(
       _amountToBorrow: BigNumberish,
+      _debtOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -539,15 +587,25 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    calculateFee(
-      _payedAmount: BigNumberish,
+    calculateLiquidationFee(
+      _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { fee: BigNumber }>;
 
-    "calculateFee(uint256)"(
-      _payedAmount: BigNumberish,
+    "calculateLiquidationFee(uint256)"(
+      _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { fee: BigNumber }>;
+
+    changeFeeWithdrawalAddress(
+      _newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "changeFeeWithdrawalAddress(address)"(
+      _newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     collateralAsset(overrides?: CallOverrides): Promise<[string]>;
 
@@ -584,13 +642,13 @@ export class LendingPair extends Contract {
     ): Promise<ContractTransaction>;
 
     depositCollateral(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _vaultShareAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "depositCollateral(address,uint256)"(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _vaultShareAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -638,6 +696,14 @@ export class LendingPair extends Contract {
 
     "getMaxWithdrawAllowed(address)"(
       _account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    getPriceOfBorrowAsset(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "getPriceOfBorrowAsset()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -692,10 +758,11 @@ export class LendingPair extends Contract {
     ): Promise<ContractTransaction>;
 
     initialize(
+      _name: string,
+      _symbol: string,
       _asset: string,
       _collateralAsset: string,
       borrowConfig: {
-        interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
@@ -708,11 +775,12 @@ export class LendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,(address,uint256,uint256,uint256,address,uint256,address),address,address)"(
+    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+      _name: string,
+      _symbol: string,
       _asset: string,
       _collateralAsset: string,
       borrowConfig: {
-        interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
@@ -743,6 +811,10 @@ export class LendingPair extends Contract {
 
     "liquidationFee()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    name(overrides?: CallOverrides): Promise<[string]>;
+
+    "name()"(overrides?: CallOverrides): Promise<[string]>;
+
     oracle(overrides?: CallOverrides): Promise<[string]>;
 
     "oracle()"(overrides?: CallOverrides): Promise<[string]>;
@@ -771,6 +843,14 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    procotolLiquidationFeeShare(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "procotolLiquidationFeeShare()"(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     redeem(
       _to: string,
       _amount: BigNumberish,
@@ -785,13 +865,19 @@ export class LendingPair extends Contract {
 
     repay(
       _repayAmount: BigNumberish,
+      _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "repay(uint256)"(
+    "repay(uint256,address)"(
       _repayAmount: BigNumberish,
+      _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    symbol(overrides?: CallOverrides): Promise<[string]>;
+
+    "symbol()"(overrides?: CallOverrides): Promise<[string]>;
 
     totalBorrows(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -844,6 +930,10 @@ export class LendingPair extends Contract {
     "wrapperBorrowedAsset()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
+  VERSION(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "VERSION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   accountInterestIndex(
     arg0: string,
     overrides?: CallOverrides
@@ -868,11 +958,13 @@ export class LendingPair extends Contract {
 
   borrow(
     _amountToBorrow: BigNumberish,
+    _debtOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "borrow(uint256)"(
+  "borrow(uint256,address)"(
     _amountToBorrow: BigNumberish,
+    _debtOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -920,15 +1012,25 @@ export class LendingPair extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  calculateFee(
-    _payedAmount: BigNumberish,
+  calculateLiquidationFee(
+    _amount: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "calculateFee(uint256)"(
-    _payedAmount: BigNumberish,
+  "calculateLiquidationFee(uint256)"(
+    _amount: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  changeFeeWithdrawalAddress(
+    _newAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "changeFeeWithdrawalAddress(address)"(
+    _newAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   collateralAsset(overrides?: CallOverrides): Promise<string>;
 
@@ -965,13 +1067,13 @@ export class LendingPair extends Contract {
   ): Promise<ContractTransaction>;
 
   depositCollateral(
-    _tokenReceipeint: string,
+    _tokenRecipient: string,
     _vaultShareAmount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "depositCollateral(address,uint256)"(
-    _tokenReceipeint: string,
+    _tokenRecipient: string,
     _vaultShareAmount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1019,6 +1121,14 @@ export class LendingPair extends Contract {
 
   "getMaxWithdrawAllowed(address)"(
     _account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  getPriceOfBorrowAsset(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "getPriceOfBorrowAsset()"(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -1073,10 +1183,11 @@ export class LendingPair extends Contract {
   ): Promise<ContractTransaction>;
 
   initialize(
+    _name: string,
+    _symbol: string,
     _asset: string,
     _collateralAsset: string,
     borrowConfig: {
-      interestRate: string;
       initialExchangeRateMantissa: BigNumberish;
       reserveFactorMantissa: BigNumberish;
       collateralFactor: BigNumberish;
@@ -1089,11 +1200,12 @@ export class LendingPair extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,(address,uint256,uint256,uint256,address,uint256,address),address,address)"(
+  "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+    _name: string,
+    _symbol: string,
     _asset: string,
     _collateralAsset: string,
     borrowConfig: {
-      interestRate: string;
       initialExchangeRateMantissa: BigNumberish;
       reserveFactorMantissa: BigNumberish;
       collateralFactor: BigNumberish;
@@ -1124,6 +1236,10 @@ export class LendingPair extends Contract {
 
   "liquidationFee()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  name(overrides?: CallOverrides): Promise<string>;
+
+  "name()"(overrides?: CallOverrides): Promise<string>;
+
   oracle(overrides?: CallOverrides): Promise<string>;
 
   "oracle()"(overrides?: CallOverrides): Promise<string>;
@@ -1149,6 +1265,12 @@ export class LendingPair extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  procotolLiquidationFeeShare(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "procotolLiquidationFeeShare()"(
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   redeem(
     _to: string,
     _amount: BigNumberish,
@@ -1163,13 +1285,19 @@ export class LendingPair extends Contract {
 
   repay(
     _repayAmount: BigNumberish,
+    _beneficiary: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "repay(uint256)"(
+  "repay(uint256,address)"(
     _repayAmount: BigNumberish,
+    _beneficiary: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  symbol(overrides?: CallOverrides): Promise<string>;
+
+  "symbol()"(overrides?: CallOverrides): Promise<string>;
 
   totalBorrows(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1222,6 +1350,10 @@ export class LendingPair extends Contract {
   "wrapperBorrowedAsset()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    VERSION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "VERSION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     accountInterestIndex(
       arg0: string,
       overrides?: CallOverrides
@@ -1242,11 +1374,13 @@ export class LendingPair extends Contract {
 
     borrow(
       _amountToBorrow: BigNumberish,
+      _debtOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "borrow(uint256)"(
+    "borrow(uint256,address)"(
       _amountToBorrow: BigNumberish,
+      _debtOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1294,15 +1428,25 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    calculateFee(
-      _payedAmount: BigNumberish,
+    calculateLiquidationFee(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "calculateFee(uint256)"(
-      _payedAmount: BigNumberish,
+    "calculateLiquidationFee(uint256)"(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    changeFeeWithdrawalAddress(
+      _newAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "changeFeeWithdrawalAddress(address)"(
+      _newAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     collateralAsset(overrides?: CallOverrides): Promise<string>;
 
@@ -1339,13 +1483,13 @@ export class LendingPair extends Contract {
     ): Promise<void>;
 
     depositCollateral(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _vaultShareAmount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "depositCollateral(address,uint256)"(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _vaultShareAmount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1391,6 +1535,10 @@ export class LendingPair extends Contract {
       _account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getPriceOfBorrowAsset(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getPriceOfBorrowAsset()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     getPriceOfCollateral(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1439,10 +1587,11 @@ export class LendingPair extends Contract {
     ): Promise<BigNumber>;
 
     initialize(
+      _name: string,
+      _symbol: string,
       _asset: string,
       _collateralAsset: string,
       borrowConfig: {
-        interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
@@ -1455,11 +1604,12 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,(address,uint256,uint256,uint256,address,uint256,address),address,address)"(
+    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+      _name: string,
+      _symbol: string,
       _asset: string,
       _collateralAsset: string,
       borrowConfig: {
-        interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
@@ -1487,6 +1637,10 @@ export class LendingPair extends Contract {
 
     "liquidationFee()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    name(overrides?: CallOverrides): Promise<string>;
+
+    "name()"(overrides?: CallOverrides): Promise<string>;
+
     oracle(overrides?: CallOverrides): Promise<string>;
 
     "oracle()"(overrides?: CallOverrides): Promise<string>;
@@ -1512,6 +1666,12 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    procotolLiquidationFeeShare(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "procotolLiquidationFeeShare()"(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     redeem(
       _to: string,
       _amount: BigNumberish,
@@ -1524,12 +1684,21 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    repay(_repayAmount: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    "repay(uint256)"(
+    repay(
       _repayAmount: BigNumberish,
+      _beneficiary: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    "repay(uint256,address)"(
+      _repayAmount: BigNumberish,
+      _beneficiary: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    symbol(overrides?: CallOverrides): Promise<string>;
+
+    "symbol()"(overrides?: CallOverrides): Promise<string>;
 
     totalBorrows(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1602,6 +1771,14 @@ export class LendingPair extends Contract {
     ): TypedEventFilter<
       [string, BigNumber],
       { borrower: string; amount: BigNumber }
+    >;
+
+    ChangeFeeWithdrawalAddress(
+      newAddr: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { newAddr: string; timestamp: BigNumber }
     >;
 
     Deposit(
@@ -1730,6 +1907,10 @@ export class LendingPair extends Contract {
   };
 
   estimateGas: {
+    VERSION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "VERSION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     accountInterestIndex(
       arg0: string,
       overrides?: CallOverrides
@@ -1754,11 +1935,13 @@ export class LendingPair extends Contract {
 
     borrow(
       _amountToBorrow: BigNumberish,
+      _debtOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "borrow(uint256)"(
+    "borrow(uint256,address)"(
       _amountToBorrow: BigNumberish,
+      _debtOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1806,14 +1989,24 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    calculateFee(
-      _payedAmount: BigNumberish,
+    calculateLiquidationFee(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "calculateFee(uint256)"(
-      _payedAmount: BigNumberish,
+    "calculateLiquidationFee(uint256)"(
+      _amount: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    changeFeeWithdrawalAddress(
+      _newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "changeFeeWithdrawalAddress(address)"(
+      _newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     collateralAsset(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1851,13 +2044,13 @@ export class LendingPair extends Contract {
     ): Promise<BigNumber>;
 
     depositCollateral(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _vaultShareAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "depositCollateral(address,uint256)"(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _vaultShareAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1905,6 +2098,14 @@ export class LendingPair extends Contract {
 
     "getMaxWithdrawAllowed(address)"(
       _account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    getPriceOfBorrowAsset(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "getPriceOfBorrowAsset()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1959,10 +2160,11 @@ export class LendingPair extends Contract {
     ): Promise<BigNumber>;
 
     initialize(
+      _name: string,
+      _symbol: string,
       _asset: string,
       _collateralAsset: string,
       borrowConfig: {
-        interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
@@ -1975,11 +2177,12 @@ export class LendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,address,(address,uint256,uint256,uint256,address,uint256,address),address,address)"(
+    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+      _name: string,
+      _symbol: string,
       _asset: string,
       _collateralAsset: string,
       borrowConfig: {
-        interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
@@ -2010,6 +2213,10 @@ export class LendingPair extends Contract {
 
     "liquidationFee()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    name(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     oracle(overrides?: CallOverrides): Promise<BigNumber>;
 
     "oracle()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -2038,6 +2245,12 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    procotolLiquidationFeeShare(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "procotolLiquidationFeeShare()"(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     redeem(
       _to: string,
       _amount: BigNumberish,
@@ -2052,13 +2265,19 @@ export class LendingPair extends Contract {
 
     repay(
       _repayAmount: BigNumberish,
+      _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "repay(uint256)"(
+    "repay(uint256,address)"(
       _repayAmount: BigNumberish,
+      _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    symbol(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalBorrows(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -2112,6 +2331,10 @@ export class LendingPair extends Contract {
   };
 
   populateTransaction: {
+    VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "VERSION()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     accountInterestIndex(
       arg0: string,
       overrides?: CallOverrides
@@ -2136,11 +2359,13 @@ export class LendingPair extends Contract {
 
     borrow(
       _amountToBorrow: BigNumberish,
+      _debtOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "borrow(uint256)"(
+    "borrow(uint256,address)"(
       _amountToBorrow: BigNumberish,
+      _debtOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -2188,14 +2413,24 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    calculateFee(
-      _payedAmount: BigNumberish,
+    calculateLiquidationFee(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "calculateFee(uint256)"(
-      _payedAmount: BigNumberish,
+    "calculateLiquidationFee(uint256)"(
+      _amount: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    changeFeeWithdrawalAddress(
+      _newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "changeFeeWithdrawalAddress(address)"(
+      _newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     collateralAsset(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -2237,13 +2472,13 @@ export class LendingPair extends Contract {
     ): Promise<PopulatedTransaction>;
 
     depositCollateral(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _vaultShareAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "depositCollateral(address,uint256)"(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _vaultShareAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2293,6 +2528,14 @@ export class LendingPair extends Contract {
 
     "getMaxWithdrawAllowed(address)"(
       _account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getPriceOfBorrowAsset(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "getPriceOfBorrowAsset()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -2347,10 +2590,11 @@ export class LendingPair extends Contract {
     ): Promise<PopulatedTransaction>;
 
     initialize(
+      _name: string,
+      _symbol: string,
       _asset: string,
       _collateralAsset: string,
       borrowConfig: {
-        interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
@@ -2363,11 +2607,12 @@ export class LendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,(address,uint256,uint256,uint256,address,uint256,address),address,address)"(
+    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+      _name: string,
+      _symbol: string,
       _asset: string,
       _collateralAsset: string,
       borrowConfig: {
-        interestRate: string;
         initialExchangeRateMantissa: BigNumberish;
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
@@ -2400,6 +2645,10 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     oracle(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "oracle()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -2428,6 +2677,14 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    procotolLiquidationFeeShare(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "procotolLiquidationFeeShare()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     redeem(
       _to: string,
       _amount: BigNumberish,
@@ -2442,13 +2699,19 @@ export class LendingPair extends Contract {
 
     repay(
       _repayAmount: BigNumberish,
+      _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "repay(uint256)"(
+    "repay(uint256,address)"(
       _repayAmount: BigNumberish,
+      _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "symbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalBorrows(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
