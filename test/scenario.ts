@@ -99,17 +99,17 @@ runTestSuite("scenarios", (vars: TestVars) => {
         await helper.approveLendingPairInVault(admin, true)
 
 
-      //   // deposit 1000 asset
-      //   await helper.depositCollateralAsset(
-      //     frank.address,
-      //     BigNumber.from(1000).mul(CollateralTokenDecimal)
-      //   );
+        // deposit 1000 asset
+        await helper.depositCollateralAsset(
+          frank,
+          BigNumber.from(1000).mul(CollateralTokenDecimal)
+        );
 
-      //   await helper.depositBorrowAsset(
-      //     bob.address,
-      //     BigNumber.from(1000).mul(BorrowTokenDecimal),
-      //     BorrowTokenWith6Decimals
-      //   );
+        await helper.depositBorrowAsset(
+          bob,
+          BigNumber.from(1000).mul(BorrowTokenDecimal),
+          BorrowTokenWithDecimals
+        );
 
       //   // check decimals
       //   expect(await newLendingPair.asset()).to.eq(BorrowTokenWith6Decimals.address);

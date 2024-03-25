@@ -97,10 +97,7 @@ contract Vault is VaultBase {
                     )
                 )
             );
-        console.logString("domain");
-        console.logBytes32(_domainSeparatorV4());
-        console.logBytes32(digest);
-        
+
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress == _user, "INVALID_SIGNATURE");
 
