@@ -20,9 +20,13 @@ const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnv
     deterministicDeployment: true
   })
 
+  
+
   await deploy(ContractId.LendingPair, {
     from: deployer,
-    args: [],
+    args: [
+
+    ],
     log: true,
     libraries: {
       [ContractId.DataTypes]: DataTypesLib.address,

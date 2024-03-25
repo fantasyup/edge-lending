@@ -22,4 +22,15 @@ export enum ContractId {
     SafeERC20 = 'SafeERC20'
 }
 
+export interface ITokenDetails {
+    name: string,
+    address: EthereumAddress,
+    chainId: number
+}
+
+export interface IApproveMessageData {
+    nonce: number,
+    approve: boolean,
+    user: EthereumAddress,
+}
 export type EthereumAddress = string;

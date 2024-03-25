@@ -130,6 +130,7 @@ contract Vault is VaultBase {
         address _to,
         uint256 _amount
     ) external override whenNotPaused allowed(_from) returns (uint256 amountOut) {
+        // Checks
         require(_to != address(0), "INVALID_TO_ADDRESS");
 
         amountOut = toShare(_token, _amount, false);
@@ -155,6 +156,7 @@ contract Vault is VaultBase {
         address _to,
         uint256 _shares
     ) external override whenNotPaused allowed(_from) returns (uint256 amountOut) {
+        // Checks
         require(_to != address(0), "INVALID_TO_ADDRESS");
 
         amountOut = toUnderlying(_token, _shares);

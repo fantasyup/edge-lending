@@ -47,8 +47,8 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
             "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
         );
 
-    bytes32 private immutable _HASHED_NAME;
-    bytes32 private immutable _HASHED_VERSION;
+    bytes32 internal immutable _HASHED_NAME;
+    bytes32 internal immutable _HASHED_VERSION;
     bytes32 private immutable _CACHED_DOMAIN_SEPARATOR;
     uint256 private immutable _CACHED_CHAIN_ID;
 
@@ -70,7 +70,7 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
         bytes32 typeHash,
         bytes32 name,
         bytes32 version
-    ) private view returns (bytes32) {
+    ) internal view returns (bytes32) {
         return keccak256(abi.encode(typeHash, name, version, _getChainId(), address(this)));
     }
 

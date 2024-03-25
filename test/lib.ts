@@ -24,10 +24,11 @@ import {
   getCollateralWrapperDeployment,
   getVaultDeployment,
   getDebtTokenDeployment,
-  getBorrowWrapperDeployment
+  getBorrowWrapperDeployment,
+  getLendingPairHelperDeployment,
+  getLendingPairDeployment
 } from "../helpers/contracts";
 import { EthereumAddress } from "../helpers/types";
-import { title } from "node:process";
 
 export async function depositInVault(
     Vault: BVault,
@@ -41,16 +42,16 @@ export async function depositInVault(
     await (await Vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
 }
 
-export async function makeLendingPairTestSuiteVars(price?: BigNumber, admin ?: EthereumAddress) {
+export async function makeLendingPairTestSuiteVars(price?: BigNumber, admin ?: EthereumAddress): Promise<Omit<TestVars, 'accounts' | 'LendingPairHelper'>> {
     return {
-        Vault: await deployVault(),
-        LendingPair: await deployLendingPair(),
+        Vault: await getVaultDeployment(),
+        LendingPair: await getLendingPairDeployment(),
         MockPriceOracle: await deployMockPriceOracle(price || BigNumber.from(10).pow(8)),
         BorrowAsset: await deployMockToken(),
         CollateralAsset: await deployMockToken(),
-        BorrowAssetDepositWrapperToken: await deployWrappedToken(),
-        DebtWrapperToken: await deployDebtToken(),
-        CollateralWrapperToken: await deployCollateralWrapperToken(),
+        CollateralWrapperToken: await getCollateralWrapperDeployment(),
+        BorrowWrapperToken: await getBorrowWrapperDeployment(),
+        DebtToken: await getDebtTokenDeployment(),
         InterestRateModel: await deployInterestRateModel(
             "30000000000000000",
             "52222222222200000",
@@ -80,7 +81,7 @@ export async function initializeWrapperTokens(
     )
 }
 
-interface TestVars {
+export interface TestVars {
     BorrowAsset: MockToken,
     CollateralAsset: MockToken,
     Vault: Vault,
@@ -88,6 +89,7 @@ interface TestVars {
     BorrowWrapperToken: WrapperToken,
     DebtToken: DebtToken,
     InterestRateModel: JumpRateModelV2,
+    LendingPair: LendingPair,
     LendingPairHelper: LendingPairHelper,
     MockPriceOracle: IPriceOracleAggregator,
     accounts: {address: EthereumAddress, signer: Signer}[] 
@@ -95,7 +97,7 @@ interface TestVars {
 
 export async function runTestSuite(title: string, tests: (arg: TestVars) => void) {
     describe(title, function() {
-        const testVars: TestVars = {
+        let testVars: TestVars = {
             BorrowAsset: {} as MockToken,
             CollateralAsset: {} as MockToken,
             Vault: {} as Vault,
@@ -105,33 +107,36 @@ export async function runTestSuite(title: string, tests: (arg: TestVars) => void
             InterestRateModel: {} as JumpRateModelV2,
             MockPriceOracle: {} as IPriceOracleAggregator,
             accounts: {} as {address: EthereumAddress, signer: Signer}[],
-            LendingPairHelper: {} as LendingPairHelper
+            LendingPairHelper: {} as LendingPairHelper,
+            LendingPair: {} as LendingPair
         }
 
         before(async function() {
             testVars.accounts = await Promise.all((await ethers.getSigners()).map(async signer => ({ address: await signer.getAddress(), signer})))
-            testVars.BorrowAsset = await deployMockToken()
-            testVars.CollateralAsset = await deployMockToken()
-            testVars.Vault = await getVaultDeployment()
-            testVars.CollateralWrapperToken = await getCollateralWrapperDeployment()
-            testVars.BorrowWrapperToken = await getBorrowWrapperDeployment()
-            testVars.DebtToken = await getDebtTokenDeployment()
-            testVars.InterestRateModel = await deployInterestRateModel(
-                "30000000000000000",
-                "52222222222200000",
-                "70",
-                "1000000000000000000",
-                testVars.accounts[0].address
-            )
-            testVars.MockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(18))
-            testVars.LendingPairHelper = 
+            testVars.LendingPairHelper = await getLendingPairHelperDeployment()
+        })
+
+        beforeEach(async function() {
+            testVars = { ...testVars, ...await makeLendingPairTestSuiteVars(BigNumber.from(10).pow(18), testVars.accounts[0].address) }
+            // testVars.Vault = await getVaultDeployment()
+            // testVars.LendingPair = await getLendingPairDeployment()
+            // testVars.MockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(18))
+
+            // testVars.BorrowAsset = await deployMockToken()
+            // testVars.CollateralAsset = await deployMockToken()
+            // testVars.CollateralWrapperToken = await getCollateralWrapperDeployment()
+            // testVars.BorrowWrapperToken = await getBorrowWrapperDeployment()
+            // testVars.DebtToken = await getDebtTokenDeployment()
+            // testVars.InterestRateModel = await deployInterestRateModel(
+            //     "30000000000000000",
+            //     "52222222222200000",
+            //     "70",
+            //     "1000000000000000000",
+            //     testVars.accounts[0].address
+            // )
         })
         
-        // tests()
-
-        after(async function() {
-            
-        })
+        tests(testVars)
     })
 }
 

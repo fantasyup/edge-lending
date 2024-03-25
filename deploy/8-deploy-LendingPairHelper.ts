@@ -6,6 +6,8 @@ const deployLendingPairHelper: DeployFunction = async function (hre: HardhatRunt
     const { deployments: { deploy, get }, getNamedAccounts } = hre;
     const { deployer } = await getNamedAccounts();
     // @TODO update to vault proxy
+    // check if mainnet or testsnet and use vault proxy
+    // instead
     const vault = await get(ContractId.Vault)
 
     await deploy(ContractId.LendingPairFactory, {

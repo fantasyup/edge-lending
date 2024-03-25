@@ -72,6 +72,21 @@ export const getDebtTokenDeployment = async(): Promise<DebtToken> =>{
     )) as DebtToken
 }
 
+export const getLendingPairHelperDeployment = async(): Promise<LendingPairHelper> =>{
+    return (await ethers.getContractAt(
+        ContractId.LendingPairHelper,
+        (await deployments.fixture(ContractId.LendingPairHelper))[ContractId.LendingPairHelper].address
+    )) as LendingPairHelper
+}
+
+export const getLendingPairDeployment = async(): Promise<LendingPair> =>{
+    return (await ethers.getContractAt(
+        ContractId.LendingPair,
+        (await deployments.fixture(ContractId.LendingPair))[ContractId.LendingPair].address
+    )) as LendingPair
+}
+
+getLendingPairDeployment
 export const deployMockToken = async(decimals ?: number) => {
     return await deployContract<MockToken>(ContractId.MockToken, [decimals || 18])
 }
@@ -147,7 +162,9 @@ export const deployInterestRateModel = async (
             multiplierPerYear,
             jumpMultiplierPerYear,
             kink,
-            owner
+            owner,
+            BigNumber.from(5).mul(BigNumber.from(10).pow(13)),
+            2102400 // blocks per year
         ]
     )
 }
