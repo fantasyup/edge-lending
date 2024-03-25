@@ -32,6 +32,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     "getCodeAddress()": FunctionFragment;
     "initialize(uint256,address)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
+    "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
@@ -47,6 +48,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     "userApprovalNonce(address)": FunctionFragment;
     "userApprovedContracts(address,address)": FunctionFragment;
     "validateStorageLayout()": FunctionFragment;
+    "version()": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
@@ -94,6 +96,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     functionFragment: "maxFlashLoan",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
@@ -136,6 +139,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     functionFragment: "validateStorageLayout",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdraw",
     values: [string, string, string, BigNumberish]
@@ -170,6 +174,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     functionFragment: "maxFlashLoan",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
@@ -206,6 +211,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     functionFragment: "validateStorageLayout",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
@@ -401,6 +407,10 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    name(overrides?: CallOverrides): Promise<[string]>;
+
+    "name()"(overrides?: CallOverrides): Promise<[string]>;
+
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
@@ -534,6 +544,10 @@ export class VaultStorageLayoutTester extends Contract {
 
     "validateStorageLayout()"(overrides?: CallOverrides): Promise<[void]>;
 
+    version(overrides?: CallOverrides): Promise<[string]>;
+
+    "version()"(overrides?: CallOverrides): Promise<[string]>;
+
     withdraw(
       _token: string,
       _from: string,
@@ -665,6 +679,10 @@ export class VaultStorageLayoutTester extends Contract {
     _token: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  name(overrides?: CallOverrides): Promise<string>;
+
+  "name()"(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -799,6 +817,10 @@ export class VaultStorageLayoutTester extends Contract {
 
   "validateStorageLayout()"(overrides?: CallOverrides): Promise<void>;
 
+  version(overrides?: CallOverrides): Promise<string>;
+
+  "version()"(overrides?: CallOverrides): Promise<string>;
+
   withdraw(
     _token: string,
     _from: string,
@@ -927,6 +949,10 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    name(overrides?: CallOverrides): Promise<string>;
+
+    "name()"(overrides?: CallOverrides): Promise<string>;
+
     owner(overrides?: CallOverrides): Promise<string>;
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
@@ -1048,6 +1074,10 @@ export class VaultStorageLayoutTester extends Contract {
     validateStorageLayout(overrides?: CallOverrides): Promise<void>;
 
     "validateStorageLayout()"(overrides?: CallOverrides): Promise<void>;
+
+    version(overrides?: CallOverrides): Promise<string>;
+
+    "version()"(overrides?: CallOverrides): Promise<string>;
 
     withdraw(
       _token: string,
@@ -1286,6 +1316,10 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    name(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1418,6 +1452,10 @@ export class VaultStorageLayoutTester extends Contract {
     validateStorageLayout(overrides?: CallOverrides): Promise<BigNumber>;
 
     "validateStorageLayout()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "version()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
       _token: string,
@@ -1561,6 +1599,10 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1700,6 +1742,10 @@ export class VaultStorageLayoutTester extends Contract {
     "validateStorageLayout()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "version()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
       _token: string,

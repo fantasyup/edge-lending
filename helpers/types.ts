@@ -22,8 +22,9 @@ export enum ContractId {
     SafeERC20 = 'SafeERC20'
 }
 
-export interface ITokenDetails {
+export interface IAssetDetails {
     name: string,
+    version: string,
     address: EthereumAddress,
     chainId: number
 }
@@ -32,5 +33,7 @@ export interface IApproveMessageData {
     nonce: number,
     approve: boolean,
     user: EthereumAddress,
+    contract: EthereumAddress
 }
+
 export type EthereumAddress = string;

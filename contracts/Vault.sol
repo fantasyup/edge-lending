@@ -84,10 +84,8 @@ contract Vault is VaultBase {
                         abi.encode(
                             _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
                             _status
-                                ? keccak256(
-                                    // solhint-disable-next-line
-                                   "Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission"
-                                )
+                                // solhint-disable-next-line
+                                ? keccak256("Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission")
                                 : keccak256(
                                     "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
                                 ),
@@ -99,7 +97,10 @@ contract Vault is VaultBase {
                     )
                 )
             );
-
+        console.logString("domain");
+        console.logBytes32(_domainSeparatorV4());
+        console.logBytes32(digest);
+        
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress == _user, "INVALID_SIGNATURE");
 

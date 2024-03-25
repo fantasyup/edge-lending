@@ -10,7 +10,7 @@ const deployLendingPairHelper: DeployFunction = async function (hre: HardhatRunt
     // instead
     const vault = await get(ContractId.Vault)
 
-    await deploy(ContractId.LendingPairFactory, {
+    await deploy(ContractId.LendingPairHelper, {
         from: deployer,
         args: [
             vault.address

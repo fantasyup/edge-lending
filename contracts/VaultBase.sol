@@ -5,8 +5,15 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {UUPSProxiableAndPausable} from "./upgradability/UUPSProxiableAndPausable.sol";
 import "./interfaces/IBSVault.sol";
+import "hardhat/console.sol";
 
 abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
+    /// @notice name
+    string public name;
+
+    /// @notice version
+    string public version;
+
     /// @notice max flashlaon rate 10%
     uint256 public constant MAX_FLASHLOAN_RATE = 1 * 10**17;
 
@@ -38,7 +45,7 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
     /// @dev vault approval message digest
     bytes32 internal constant _VAULT_APPROVAL_SIGNATURE_TYPE_HASH =
         keccak256(
-            "VaultAccessApproval(string warning,address user,address contract,bool approved,uint256 nonce)"
+            "VaultAccessApproval(bytes32 warning,address user,address contract,bool approved,uint256 nonce)"
         );
 
     /// @dev EIP712 type hash
@@ -53,6 +60,9 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
     uint256 private immutable _CACHED_CHAIN_ID;
 
     constructor(string memory _name, string memory _version) {
+        name = _name;
+        version = _version;
+
         bytes32 hashedVersion = keccak256(bytes(_version));
         bytes32 hashedName = keccak256(bytes(_name));
 
@@ -67,11 +77,11 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
     }
 
     function _buildDomainSeparator(
-        bytes32 typeHash,
-        bytes32 name,
-        bytes32 version
+        bytes32 _typeHash,
+        bytes32 _name,
+        bytes32 _version
     ) internal view returns (bytes32) {
-        return keccak256(abi.encode(typeHash, name, version, _getChainId(), address(this)));
+        return keccak256(abi.encode(_typeHash, _name, _version, _getChainId(), address(this)));
     }
 
     function _domainSeparatorV4() internal view returns (bytes32) {

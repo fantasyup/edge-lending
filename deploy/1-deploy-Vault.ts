@@ -14,4 +14,4 @@ const deployVault: DeployFunction = async function (hre: HardhatRuntimeEnvironme
 };
 
 export default deployVault
-deployVault.tags = ['Vault']
+deployVault.tags = [ContractId.Vault]

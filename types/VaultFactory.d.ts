@@ -21,30 +21,33 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface VaultFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createVaultWithProxy(uint256,address)": FunctionFragment;
+    "createUpgradableVault(uint256,address)": FunctionFragment;
     "owner()": FunctionFragment;
-    "updateVault(address)": FunctionFragment;
+    "updateVaultLogic(address)": FunctionFragment;
     "vaultLogic()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "createVaultWithProxy",
+    functionFragment: "createUpgradableVault",
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "updateVault", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "updateVaultLogic",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "vaultLogic",
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "createVaultWithProxy",
+    functionFragment: "createUpgradableVault",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "updateVault",
+    functionFragment: "updateVaultLogic",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "vaultLogic", data: BytesLike): Result;
@@ -102,13 +105,13 @@ export class VaultFactory extends Contract {
   interface: VaultFactoryInterface;
 
   functions: {
-    createVaultWithProxy(
+    createUpgradableVault(
       _flashLoanRate: BigNumberish,
       _vaultOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createVaultWithProxy(uint256,address)"(
+    "createUpgradableVault(uint256,address)"(
       _flashLoanRate: BigNumberish,
       _vaultOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -118,12 +121,12 @@ export class VaultFactory extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
-    updateVault(
+    updateVaultLogic(
       _newVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "updateVault(address)"(
+    "updateVaultLogic(address)"(
       _newVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -133,13 +136,13 @@ export class VaultFactory extends Contract {
     "vaultLogic()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  createVaultWithProxy(
+  createUpgradableVault(
     _flashLoanRate: BigNumberish,
     _vaultOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createVaultWithProxy(uint256,address)"(
+  "createUpgradableVault(uint256,address)"(
     _flashLoanRate: BigNumberish,
     _vaultOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -149,12 +152,12 @@ export class VaultFactory extends Contract {
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
-  updateVault(
+  updateVaultLogic(
     _newVault: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "updateVault(address)"(
+  "updateVaultLogic(address)"(
     _newVault: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -164,13 +167,13 @@ export class VaultFactory extends Contract {
   "vaultLogic()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    createVaultWithProxy(
+    createUpgradableVault(
       _flashLoanRate: BigNumberish,
       _vaultOwner: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createVaultWithProxy(uint256,address)"(
+    "createUpgradableVault(uint256,address)"(
       _flashLoanRate: BigNumberish,
       _vaultOwner: string,
       overrides?: CallOverrides
@@ -180,9 +183,12 @@ export class VaultFactory extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
 
-    updateVault(_newVault: string, overrides?: CallOverrides): Promise<void>;
+    updateVaultLogic(
+      _newVault: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    "updateVault(address)"(
+    "updateVaultLogic(address)"(
       _newVault: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -211,13 +217,13 @@ export class VaultFactory extends Contract {
   };
 
   estimateGas: {
-    createVaultWithProxy(
+    createUpgradableVault(
       _flashLoanRate: BigNumberish,
       _vaultOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createVaultWithProxy(uint256,address)"(
+    "createUpgradableVault(uint256,address)"(
       _flashLoanRate: BigNumberish,
       _vaultOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -227,12 +233,12 @@ export class VaultFactory extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    updateVault(
+    updateVaultLogic(
       _newVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "updateVault(address)"(
+    "updateVaultLogic(address)"(
       _newVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -243,13 +249,13 @@ export class VaultFactory extends Contract {
   };
 
   populateTransaction: {
-    createVaultWithProxy(
+    createUpgradableVault(
       _flashLoanRate: BigNumberish,
       _vaultOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createVaultWithProxy(uint256,address)"(
+    "createUpgradableVault(uint256,address)"(
       _flashLoanRate: BigNumberish,
       _vaultOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -259,12 +265,12 @@ export class VaultFactory extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    updateVault(
+    updateVaultLogic(
       _newVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "updateVault(address)"(
+    "updateVaultLogic(address)"(
       _newVault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

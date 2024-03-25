@@ -31,6 +31,7 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "delegateBorrow(address,uint256)": FunctionFragment;
+    "delegateBorrowWithSignedMessage(address,address,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "increaseTotalDebt(uint256)": FunctionFragment;
     "initialize(address,address,string,string)": FunctionFragment;
@@ -45,6 +46,7 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "underlying()": FunctionFragment;
+    "userBorrowAllowanceNonce(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -77,6 +79,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "delegateBorrow",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "delegateBorrowWithSignedMessage",
+    values: [string, string, BigNumberish, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "increaseAllowance",
@@ -127,6 +133,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     functionFragment: "underlying",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "userBorrowAllowanceNonce",
+    values: [string]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "DOMAIN_SEPARATOR",
@@ -148,6 +158,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "delegateBorrow",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "delegateBorrowWithSignedMessage",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -176,6 +190,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "underlying", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "userBorrowAllowanceNonce",
+    data: BytesLike
+  ): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
@@ -326,6 +344,26 @@ export class DebtToken extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    delegateBorrowWithSignedMessage(
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "delegateBorrowWithSignedMessage(address,address,uint256,uint8,bytes32,bytes32)"(
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     increaseAllowance(
       arg0: string,
       arg1: BigNumberish,
@@ -461,6 +499,16 @@ export class DebtToken extends Contract {
     underlying(overrides?: CallOverrides): Promise<[string]>;
 
     "underlying()"(overrides?: CallOverrides): Promise<[string]>;
+
+    userBorrowAllowanceNonce(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "userBorrowAllowanceNonce(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
   };
 
   DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
@@ -551,6 +599,26 @@ export class DebtToken extends Contract {
   "delegateBorrow(address,uint256)"(
     _to: string,
     _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  delegateBorrowWithSignedMessage(
+    _from: string,
+    _to: string,
+    _amount: BigNumberish,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "delegateBorrowWithSignedMessage(address,address,uint256,uint8,bytes32,bytes32)"(
+    _from: string,
+    _to: string,
+    _amount: BigNumberish,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -687,6 +755,16 @@ export class DebtToken extends Contract {
 
   "underlying()"(overrides?: CallOverrides): Promise<string>;
 
+  userBorrowAllowanceNonce(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "userBorrowAllowanceNonce(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   callStatic: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
@@ -776,6 +854,26 @@ export class DebtToken extends Contract {
     "delegateBorrow(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    delegateBorrowWithSignedMessage(
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "delegateBorrowWithSignedMessage(address,address,uint256,uint8,bytes32,bytes32)"(
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -911,6 +1009,16 @@ export class DebtToken extends Contract {
     underlying(overrides?: CallOverrides): Promise<string>;
 
     "underlying()"(overrides?: CallOverrides): Promise<string>;
+
+    userBorrowAllowanceNonce(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "userBorrowAllowanceNonce(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {
@@ -1032,6 +1140,26 @@ export class DebtToken extends Contract {
     "delegateBorrow(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    delegateBorrowWithSignedMessage(
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "delegateBorrowWithSignedMessage(address,address,uint256,uint8,bytes32,bytes32)"(
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1167,6 +1295,16 @@ export class DebtToken extends Contract {
     underlying(overrides?: CallOverrides): Promise<BigNumber>;
 
     "underlying()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    userBorrowAllowanceNonce(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "userBorrowAllowanceNonce(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1263,6 +1401,26 @@ export class DebtToken extends Contract {
     "delegateBorrow(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    delegateBorrowWithSignedMessage(
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "delegateBorrowWithSignedMessage(address,address,uint256,uint8,bytes32,bytes32)"(
+      _from: string,
+      _to: string,
+      _amount: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1404,5 +1562,15 @@ export class DebtToken extends Contract {
     underlying(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "underlying()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    userBorrowAllowanceNonce(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "userBorrowAllowanceNonce(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
   };
 }

@@ -32,6 +32,7 @@ interface VaultInterface extends ethers.utils.Interface {
     "getCodeAddress()": FunctionFragment;
     "initialize(uint256,address)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
+    "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
@@ -46,6 +47,7 @@ interface VaultInterface extends ethers.utils.Interface {
     "updateFlashloanRate(uint256)": FunctionFragment;
     "userApprovalNonce(address)": FunctionFragment;
     "userApprovedContracts(address,address)": FunctionFragment;
+    "version()": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
@@ -93,6 +95,7 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "maxFlashLoan",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
@@ -131,6 +134,7 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "userApprovedContracts",
     values: [string, string]
   ): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdraw",
     values: [string, string, string, BigNumberish]
@@ -165,6 +169,7 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "maxFlashLoan",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
@@ -197,6 +202,7 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "userApprovedContracts",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
@@ -392,6 +398,10 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    name(overrides?: CallOverrides): Promise<[string]>;
+
+    "name()"(overrides?: CallOverrides): Promise<[string]>;
+
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
@@ -520,6 +530,10 @@ export class Vault extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    version(overrides?: CallOverrides): Promise<[string]>;
+
+    "version()"(overrides?: CallOverrides): Promise<[string]>;
 
     withdraw(
       _token: string,
@@ -653,6 +667,10 @@ export class Vault extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  name(overrides?: CallOverrides): Promise<string>;
+
+  "name()"(overrides?: CallOverrides): Promise<string>;
+
   owner(overrides?: CallOverrides): Promise<string>;
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
@@ -782,6 +800,10 @@ export class Vault extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  version(overrides?: CallOverrides): Promise<string>;
+
+  "version()"(overrides?: CallOverrides): Promise<string>;
+
   withdraw(
     _token: string,
     _from: string,
@@ -910,6 +932,10 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    name(overrides?: CallOverrides): Promise<string>;
+
+    "name()"(overrides?: CallOverrides): Promise<string>;
+
     owner(overrides?: CallOverrides): Promise<string>;
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
@@ -1027,6 +1053,10 @@ export class Vault extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    version(overrides?: CallOverrides): Promise<string>;
+
+    "version()"(overrides?: CallOverrides): Promise<string>;
 
     withdraw(
       _token: string,
@@ -1265,6 +1295,10 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    name(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1393,6 +1427,10 @@ export class Vault extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "version()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
       _token: string,
@@ -1536,6 +1574,10 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1667,6 +1709,10 @@ export class Vault extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "version()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
       _token: string,

@@ -7,7 +7,7 @@ import "solidity-coverage"
 import "hardhat-tracer"
 import "hardhat-deploy"
 import 'hardhat-deploy-ethers'
-import "hardhat-gas-reporter"
+// import "hardhat-gas-reporter"
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -26,6 +26,11 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 export default {
+  networks: {
+    hardhat: {
+      mnemonic: "test test test test test test test test test test test junk"
+    }
+  },
   solidity: {
     version: "0.8.1",
     settings: {
@@ -47,7 +52,8 @@ export default {
   namedAccounts: {
     deployer: 0,
     // @TODO replace with proper address
-    blackSmithTeam: '0x5B9d721f482E60efA99e555Cb59c7DBF4Df15Dc7',
+    blackSmithTeam: 1,
+
   },
   gasReporter: {
     enabled: true,

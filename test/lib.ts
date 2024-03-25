@@ -1,5 +1,5 @@
-import { ethers, waffle } from "hardhat";
-import { BigNumber, Signer } from "ethers";
+import { deployments, ethers, waffle } from "hardhat";
+import { BigNumber, Signer, Wallet } from "ethers";
 import {
     DebtToken,
     IPriceOracleAggregator,
@@ -16,7 +16,7 @@ import {
     deployCollateralWrapperToken,
     deployDebtToken,
   deployInterestRateModel,
-  deployLendingPair,
+//   deployLendingPair,
   deployMockPriceOracle,
   deployMockToken,
   deployVault,
@@ -26,9 +26,12 @@ import {
   getDebtTokenDeployment,
   getBorrowWrapperDeployment,
   getLendingPairHelperDeployment,
-  getLendingPairDeployment
+  getLendingPairDeployment,
+  getInterestRateModelDeployment
 } from "../helpers/contracts";
-import { EthereumAddress } from "../helpers/types";
+import { EthereumAddress, IAssetDetails } from "../helpers/types";
+import { signVaultApproveContractMessage } from "../helpers/message";
+import { assert } from "chai";
 
 export async function depositInVault(
     Vault: BVault,
@@ -42,24 +45,21 @@ export async function depositInVault(
     await (await Vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
 }
 
-export async function makeLendingPairTestSuiteVars(price?: BigNumber, admin ?: EthereumAddress): Promise<Omit<TestVars, 'accounts' | 'LendingPairHelper'>> {
+export async function makeLendingPairTestSuiteVars(
+        price?: BigNumber, admin ?: EthereumAddress
+    ): Promise<Omit<TestVars, 'accounts' | 'LendingPairHelper'>> {
     return {
         Vault: await getVaultDeployment(),
-        LendingPair: await getLendingPairDeployment(),
         MockPriceOracle: await deployMockPriceOracle(price || BigNumber.from(10).pow(8)),
         BorrowAsset: await deployMockToken(),
         CollateralAsset: await deployMockToken(),
         CollateralWrapperToken: await getCollateralWrapperDeployment(),
         BorrowWrapperToken: await getBorrowWrapperDeployment(),
         DebtToken: await getDebtTokenDeployment(),
-        InterestRateModel: await deployInterestRateModel(
-            "30000000000000000",
-            "52222222222200000",
-            "70",
-            "1000000000000000000",
-            admin || ethers.constants.AddressZero
-        )
+        InterestRateModel: await getInterestRateModelDeployment(),
+        LendingPair: await getLendingPairDeployment(),
     }
+
 }
 
 export async function advanceNBlocks(n: number) {
@@ -81,6 +81,11 @@ export async function initializeWrapperTokens(
     )
 }
 
+export interface IAccount {
+    address: EthereumAddress,
+    signer: Signer,
+    privateKey: string
+}
 export interface TestVars {
     BorrowAsset: MockToken,
     CollateralAsset: MockToken,
@@ -92,48 +97,45 @@ export interface TestVars {
     LendingPair: LendingPair,
     LendingPairHelper: LendingPairHelper,
     MockPriceOracle: IPriceOracleAggregator,
-    accounts: {address: EthereumAddress, signer: Signer}[] 
+    accounts: IAccount[] 
 }
 
-export async function runTestSuite(title: string, tests: (arg: TestVars) => void) {
-    describe(title, function() {
-        let testVars: TestVars = {
-            BorrowAsset: {} as MockToken,
-            CollateralAsset: {} as MockToken,
-            Vault: {} as Vault,
-            CollateralWrapperToken: {} as WrapperToken,
-            BorrowWrapperToken: {} as WrapperToken,
-            DebtToken: {} as DebtToken,
-            InterestRateModel: {} as JumpRateModelV2,
-            MockPriceOracle: {} as IPriceOracleAggregator,
-            accounts: {} as {address: EthereumAddress, signer: Signer}[],
-            LendingPairHelper: {} as LendingPairHelper,
-            LendingPair: {} as LendingPair
-        }
+const testVars: TestVars = {
+    BorrowAsset: {} as MockToken,
+    CollateralAsset: {} as MockToken,
+    Vault: {} as Vault,
+    CollateralWrapperToken: {} as WrapperToken,
+    BorrowWrapperToken: {} as WrapperToken,
+    DebtToken: {} as DebtToken,
+    InterestRateModel: {} as JumpRateModelV2,
+    MockPriceOracle: {} as IPriceOracleAggregator,
+    accounts: {} as IAccount[],
+    LendingPairHelper: {} as LendingPairHelper,
+    LendingPair: {} as LendingPair
+}
 
-        before(async function() {
-            testVars.accounts = await Promise.all((await ethers.getSigners()).map(async signer => ({ address: await signer.getAddress(), signer})))
-            testVars.LendingPairHelper = await getLendingPairHelperDeployment()
+export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
+    describe(title, () => {
+        before(async () => {
+            // we manually derive the signers address using the mnemonic
+            // defined in the hardhat config
+            const mnemonic = "test test test test test test test test test test test junk"
+            testVars.accounts = await Promise.all((await ethers.getSigners()).map(async (signer, index) => ({ 
+                address: await signer.getAddress(), 
+                signer,
+                privateKey: ethers.Wallet.fromMnemonic(mnemonic, `m/44'/60'/0'/0/${index}`).privateKey
+            })))
+            /// @TODO asset the private key is correct to fail early
+            assert.equal(
+                new Wallet(testVars.accounts[0].privateKey).address, 
+                testVars.accounts[0].address, 
+                'invalid mmemonic or address'
+            )
         })
 
-        beforeEach(async function() {
-            testVars = { ...testVars, ...await makeLendingPairTestSuiteVars(BigNumber.from(10).pow(18), testVars.accounts[0].address) }
-            // testVars.Vault = await getVaultDeployment()
-            // testVars.LendingPair = await getLendingPairDeployment()
-            // testVars.MockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(18))
-
-            // testVars.BorrowAsset = await deployMockToken()
-            // testVars.CollateralAsset = await deployMockToken()
-            // testVars.CollateralWrapperToken = await getCollateralWrapperDeployment()
-            // testVars.BorrowWrapperToken = await getBorrowWrapperDeployment()
-            // testVars.DebtToken = await getDebtTokenDeployment()
-            // testVars.InterestRateModel = await deployInterestRateModel(
-            //     "30000000000000000",
-            //     "52222222222200000",
-            //     "70",
-            //     "1000000000000000000",
-            //     testVars.accounts[0].address
-            // )
+        beforeEach(async () => {
+            await deployments.fixture();
+            Object.assign(testVars, await makeLendingPairTestSuiteVars(BigNumber.from(10).pow(18), testVars.accounts[0].address))
         })
         
         tests(testVars)
@@ -147,44 +149,68 @@ export function LendingPairHelpers(
     collateralAsset: MockToken
 ) {
     return {
+        approveLendingPairInVault: async(
+            account: IAccount,
+            approve: boolean
+        ) => {
+            const vaultDetails = { 
+                name: await vault.name(),
+                address: vault.address,
+                chainId: (await ethers.provider.getNetwork()).chainId,
+                version: await vault.version()
+            };
+            console.log(vaultDetails)
+            const nonce = (await vault.userApprovalNonce(account.address)).toNumber()
+            console.log({ nonce })
+            const {v,r,s} = await signVaultApproveContractMessage(
+                account.privateKey,
+                vaultDetails,
+                {
+                    approve,
+                    user: account.address,
+                    nonce,
+                    contract: lendingPair.address
+                }
+            )
+
+            return await vault.connect(account.signer).approveContract(
+                account.address,
+                lendingPair.address,
+                approve,
+                v,
+                r,
+                s
+            )
+        },
         depositInVault: async(
-            asset: MockToken,
             account: Signer,
+            asset: MockToken,
             amountToDeposit: number | BigNumber
         ) => {
             const addr = await account.getAddress()
             await asset.connect(account).setBalanceTo(addr, amountToDeposit)
             await asset.connect(account).approve(vault.address, amountToDeposit)
-            // await vault.connect(account).approveContract(lendingPair.address, true);
             await (await vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
         },
           
         depositBorrowAsset: async (
-            account: string,
+            account: IAccount,
             amountToDeposit: number | BigNumber,
             asset?: MockToken
         ) => {
-            const signer = await ethers.getSigner(account)
             const assetToDeposit = asset ||  borrowAsset
-            await depositInVault(vault, assetToDeposit, signer, amountToDeposit)
-            // approve 
-            // await vault.connect(signer).approveContract(lendingPair.address, true);
-            const userShareBalance = await (await vault.balanceOf(assetToDeposit.address, account))
-            return await lendingPair.connect(signer).depositBorrowAsset(account, userShareBalance)
+            await depositInVault(vault, assetToDeposit, account.signer, amountToDeposit)
+            const userShareBalance = await (await vault.balanceOf(assetToDeposit.address, account.address))
+            return await lendingPair.connect(account.signer).depositBorrowAsset(account.address, userShareBalance)
         },
           
         depositCollateralAsset: async(
-            account: string,
+            account: IAccount,
             amountToDeposit: number | BigNumber,
             asset?: MockToken
-          ) => {
-            const signer = await ethers.getSigner(account)
-          
-            await depositInVault(vault, asset || collateralAsset, signer, amountToDeposit)
-            // approve 
-            // await vault.connect(signer).approveContract(lendingPair.address, true);
-          
-            return await lendingPair.connect(signer).depositCollateral(account, amountToDeposit)
+          ) => {          
+            await depositInVault(vault, asset || collateralAsset, account.signer, amountToDeposit)          
+            return await lendingPair.connect(account.signer).depositCollateral(account.address, amountToDeposit)
           }
     }
 }

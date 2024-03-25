@@ -86,19 +86,26 @@ export const getLendingPairDeployment = async(): Promise<LendingPair> =>{
     )) as LendingPair
 }
 
-getLendingPairDeployment
+export const getInterestRateModelDeployment = async(): Promise<JumpRateModelV2> =>{
+    return (await ethers.getContractAt(
+        ContractId.JumpRateModelV2,
+        (await deployments.fixture(ContractId.JumpRateModelV2))[ContractId.JumpRateModelV2].address
+    )) as JumpRateModelV2
+}
+
+// getLendingPairDeployment
 export const deployMockToken = async(decimals ?: number) => {
     return await deployContract<MockToken>(ContractId.MockToken, [decimals || 18])
 }
 
-export const deployLendingPair = async () => {
-    const dataTypesLib = await deployDataTypesLib()
+// export const deployLendingPair = async () => {
+//     const dataTypesLib = await deployDataTypesLib()
 
-    return await deployContract<LendingPair>(ContractId.LendingPair, [], 
-    {
-        DataTypes: dataTypesLib.address
-    })
-}
+//     return await deployContract<LendingPair>(ContractId.LendingPair, [], 
+//     {
+//         DataTypes: dataTypesLib.address
+//     })
+// }
 
 export const deployUUPSProxy = async () => {
     return await deployContract<UUPSProxy>(ContractId.UUPSProxy, [])
