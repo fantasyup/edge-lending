@@ -30,9 +30,10 @@ runTestSuite("scenarios", (vars: TestVars) => {
           [3, 5],
         ]
 
-        for( let i = 0 ; i < decimalPlaces.length; i++ ) {
-          // reset the contract stat
+        for (let i = 0 ; i < decimalPlaces.length; i++ ) {
+          // resets the contract state
           await deployments.fixture();
+          
           const BorrowTokenDecimalPlaces = decimalPlaces[i][0];
           const CollateralTokenDecimalPlaces = decimalPlaces[i][1];
           const {

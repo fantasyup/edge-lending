@@ -16,60 +16,59 @@ import {
     deployInterestRateModel,
     deployLendingPairFactory
 } from "../helpers/contracts"
-import { makeLendingPairTestSuiteVars } from "./lib";
+import { runTestSuite, TestVars } from "./lib";
 
-// list of accounts
-let accounts: Signer[];
+// // list of accounts
+// let accounts: Signer[];
 
-let admin: string; // account used in deploying
-let bob: string;
-let frank: string;
+// let admin: string; // account used in deploying
+// let bob: string;
+// let frank: string;
 
-let Vault: BVault;
-let LendingPair: BLendingPair;
-let MockPriceOracle: IPriceOracleAggregator;
-let BorrowAsset: MockToken;
-let CollateralAsset: MockToken
-let BorrowAssetDepositWrapperToken: WrapperToken
-let DebtWrapperToken: DebtToken
-let CollateralWrapperToken: WrapperToken
-let InterestRateModel: JumpRateModelV2;
-let LendingPairHelper: BLendingPairHelper
+// let Vault: BVault;
+// let LendingPair: BLendingPair;
+// let MockPriceOracle: IPriceOracleAggregator;
+// let BorrowAsset: MockToken;
+// let CollateralAsset: MockToken
+// let BorrowAssetDepositWrapperToken: WrapperToken
+// let DebtWrapperToken: DebtToken
+// let CollateralWrapperToken: WrapperToken
+// let InterestRateModel: JumpRateModelV2;
+// let LendingPairHelper: BLendingPairHelper
 
 let LendingPairFactory: BLendingPairFactory
+    // before(async function() {
+    //     accounts = await ethers.getSigners();
 
-describe("LendingPairFactory", function() {
+    //     ([
+    //         admin,
+    //         bob,
+    //         frank,
+    //     ] = await Promise.all(accounts.slice(0, 10).map(x => x.getAddress())));
 
-    before(async function() {
-        accounts = await ethers.getSigners();
+    //     ({
+    //         Vault,
+    //         LendingPair,
+    //         MockPriceOracle,
+    //         BorrowAsset,
+    //         CollateralAsset,
+    //         CollateralWrapperToken,
+    //         BorrowAssetDepositWrapperToken,
+    //         DebtWrapperToken,
+    //     } = await makeLendingPairTestSuiteVars());
 
-        ([
-            admin,
-            bob,
-            frank,
-        ] = await Promise.all(accounts.slice(0, 10).map(x => x.getAddress())));
+    //     LendingPairFactory = await deployLendingPairFactory(
+    //         admin,
+    //         LendingPair.address,
+    //         CollateralWrapperToken.address,
+    //         DebtWrapperToken.address,
+    //         BorrowAssetDepositWrapperToken.address
+    //     )
+    // })
+runTestSuite("LendingPairFactory", (vars: TestVars) => {
 
-        ({
-            Vault,
-            LendingPair,
-            MockPriceOracle,
-            BorrowAsset,
-            CollateralAsset,
-            CollateralWrapperToken,
-            BorrowAssetDepositWrapperToken,
-            DebtWrapperToken,
-        } = await makeLendingPairTestSuiteVars());
-
-        LendingPairFactory = await deployLendingPairFactory(
-            admin,
-            LendingPair.address,
-            CollateralWrapperToken.address,
-            DebtWrapperToken.address,
-            BorrowAssetDepositWrapperToken.address
-        )
-    })
-
-    it("createIR", async function() {
+    it("createIR", async ()  => {
+        const { } = vars
         await expect(
             LendingPairFactory.createIR(
                 {
@@ -83,7 +82,7 @@ describe("LendingPairFactory", function() {
         ).to.not.be.reverted
     })
 
-    it("createPair", async function() {
+    it("createPair", async () => {
         const interestRateModel = await deployInterestRateModel(
             "30000000000000000",
             "52222222222200000",

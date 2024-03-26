@@ -184,4 +184,16 @@ contract DebtToken is WrapperToken, IDebtToken {
     ) public virtual override returns (bool) {
         revert("ALLOWANCE_NOT_SUPPORTED");
     }
+
+    function permit(
+        address /* owner */,
+        address /* spender */,
+        uint256 /* amount */,
+        uint256 /* deadline */,
+        uint8 /* v */,
+        bytes32 /* r */,
+        bytes32 /* s */
+    ) public virtual override {
+        revert("PERMIT_NOT_SUPPORTED");
+    }
 }
