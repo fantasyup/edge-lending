@@ -7,8 +7,10 @@ import {
     LendingPair as BLendingPair,
     LendingPair,
     LendingPairHelper,
+    MockFlashBorrower,
     MockPriceOracle,
     MockToken,
+    MockVault,
     Vault as BVault,
     Vault,
     WrapperToken,
@@ -29,7 +31,9 @@ import {
   getLendingPairHelperDeployment,
   getLendingPairDeployment,
   getInterestRateModelDeployment,
-  getPriceOracleAggregatorDeployment
+  getPriceOracleAggregatorDeployment,
+  deployMockFlashBorrower,
+  deployMockVault
 } from "../helpers/contracts";
 import { EthereumAddress, IAssetDetails } from "../helpers/types";
 import { signVaultApproveContractMessage } from "../helpers/message";
@@ -88,6 +92,7 @@ export interface IAccount {
 export interface TestVars {
     BorrowAsset: MockToken,
     CollateralAsset: MockToken,
+    MockVault: MockVault,
     Vault: Vault,
     CollateralWrapperToken: WrapperToken,
     BorrowWrapperToken: WrapperToken,
@@ -100,11 +105,14 @@ export interface TestVars {
     blackSmithTeam: IAccount,
     BorrowAssetMockPriceOracle: MockPriceOracle,
     CollateralAssetMockPriceOracle: MockPriceOracle,
+    FlashBorrower: MockFlashBorrower,
+
 }
 
 const testVars: TestVars = {
     BorrowAsset: {} as MockToken,
     CollateralAsset: {} as MockToken,
+    MockVault: {} as MockVault,
     Vault: {} as Vault,
     CollateralWrapperToken: {} as WrapperToken,
     BorrowWrapperToken: {} as WrapperToken,
@@ -116,7 +124,8 @@ const testVars: TestVars = {
     accounts: {} as IAccount[],
     LendingPairHelper: {} as LendingPairHelper,
     LendingPair: {} as LendingPair,
-    blackSmithTeam: {} as IAccount
+    blackSmithTeam: {} as IAccount,
+    FlashBorrower: {} as MockFlashBorrower,
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
@@ -138,6 +147,7 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
             )
 
             const { blackSmithTeam } = await getNamedAccounts()
+            // address used in performing admin actions in InterestRateModel
             testVars.blackSmithTeam  = testVars.accounts.find(x => x.address.toLowerCase() === blackSmithTeam.toLowerCase()) as IAccount
             // do this here because of some unusual race condition
             // in the deployments code
@@ -145,6 +155,8 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
             testVars.CollateralAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
             testVars.BorrowAsset = await deployMockToken()
             testVars.CollateralAsset = await deployMockToken()
+            testVars.FlashBorrower = await deployMockFlashBorrower()
+            testVars.MockVault = await deployMockVault()
         })
 
         beforeEach(async () => {
@@ -156,6 +168,46 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
     })
 }
 
+// export class VaultActionHelper {
+//     vault: Vault
+//     constructor(vault: Vault) {
+//         this.vault = vault
+//     }
+
+//     approveLendingPairInVault = async (
+//         account: IAccount,
+//         approve: boolean
+//     ) => {
+//         const vaultDetails = { 
+//             name: await this.vault.name(),
+//             address: this.vault.address,
+//             chainId: (await ethers.provider.getNetwork()).chainId,
+//             version: await this.vault.version()
+//         };
+//         const nonce = (await this.vault.userApprovalNonce(account.address)).toNumber()
+//         const {v,r,s} = await signVaultApproveContractMessage(
+//             account.privateKey,
+//             vaultDetails,
+//             {
+//                 approve,
+//                 user: account.address,
+//                 nonce,
+//                 contract: lendingPair.address
+//             }
+//         )
+//         return await vault.connect(account.signer).approveContract(
+//             account.address,
+//             lendingPair.address,
+//             approve,
+//             v,
+//             r,
+//             s
+//         )
+//     }
+
+
+// }
+
 export function LendingPairHelpers(
     vault: Vault,
     lendingPair: LendingPair,
@@ -164,7 +216,38 @@ export function LendingPairHelpers(
     oracleAggregator: IPriceOracleAggregator,
     team: IAccount
 ) {
+
+    const approveInVault = async(account: IAccount, addressToApprove: EthereumAddress, approve: boolean) => {
+        const vaultDetails = { 
+            name: await vault.name(),
+            address: vault.address,
+            chainId: (await ethers.provider.getNetwork()).chainId,
+            version: await vault.version()
+        };
+        const nonce = (await vault.userApprovalNonce(account.address)).toNumber()
+        const { v, r, s } = await signVaultApproveContractMessage(
+            account.privateKey,
+            vaultDetails,
+            {
+                approve,
+                user: account.address,
+                nonce,
+                contract: addressToApprove
+            }
+        )
+
+        return await vault.connect(account.signer).approveContract(
+            account.address,
+            addressToApprove,
+            approve,
+            v,
+            r,
+            s
+        )
+    }
+
     return {
+        approveInVault,
         addPriceOracleForAsset: async(
             asset: MockToken,
             priceOracle: MockPriceOracle
@@ -174,36 +257,36 @@ export function LendingPairHelpers(
                 priceOracle.address
             )
         },
-
         approveLendingPairInVault: async(
             account: IAccount,
             approve: boolean
         ) => {
-            const vaultDetails = { 
-                name: await vault.name(),
-                address: vault.address,
-                chainId: (await ethers.provider.getNetwork()).chainId,
-                version: await vault.version()
-            };
-            const nonce = (await vault.userApprovalNonce(account.address)).toNumber()
-            const {v,r,s} = await signVaultApproveContractMessage(
-                account.privateKey,
-                vaultDetails,
-                {
-                    approve,
-                    user: account.address,
-                    nonce,
-                    contract: lendingPair.address
-                }
-            )
-            return await vault.connect(account.signer).approveContract(
-                account.address,
-                lendingPair.address,
-                approve,
-                v,
-                r,
-                s
-            )
+            return approveInVault(account, lendingPair.address, approve)
+            // const vaultDetails = { 
+            //     name: await vault.name(),
+            //     address: vault.address,
+            //     chainId: (await ethers.provider.getNetwork()).chainId,
+            //     version: await vault.version()
+            // };
+            // const nonce = (await vault.userApprovalNonce(account.address)).toNumber()
+            // const {v,r,s} = await signVaultApproveContractMessage(
+            //     account.privateKey,
+            //     vaultDetails,
+            //     {
+            //         approve,
+            //         user: account.address,
+            //         nonce,
+            //         contract: lendingPair.address
+            //     }
+            // )
+            // return await vault.connect(account.signer).approveContract(
+            //     account.address,
+            //     lendingPair.address,
+            //     approve,
+            //     v,
+            //     r,
+            //     s
+            // )
         },
         depositInVault: async(
             account: Signer,

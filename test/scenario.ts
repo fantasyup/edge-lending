@@ -170,9 +170,3 @@ runTestSuite("scenarios", (vars: TestVars) => {
       }
   });
 });
-
-// deposit
-// borrow
-// earn interest
-// deposit
-//
