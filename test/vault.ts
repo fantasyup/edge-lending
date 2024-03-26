@@ -2,54 +2,12 @@ import { ethers, waffle } from "hardhat";
 import { Signer } from "ethers";
 import { expect, assert } from "chai";
 import {
-  MockToken as BMockToken,
-  UUPSProxy as BUUPSProxy,
-  Vault as BVault,
-  MockVault as BMockVault,
-  UUPSProxiable as BUUPSProxiable,
   Vault,
   MockToken
 } from "../types";
-import {
-  deployVault,
-  deployMockToken,
-  deployMockFlashBorrower,
-  deployProxiedVault,
-  deployMockVault,
-  deployVaultStorageLayoutTester,
-} from "../helpers/contracts";
-import { FlashBorrower as BFlashBorrower } from "../types/FlashBorrower";
 import { IAccount, LendingPairHelpers, runTestSuite, TestVars } from "./lib";
 import { signVaultApproveContractMessage } from "../helpers/message";
 import { EthereumAddress } from "../helpers/types";
-
-// let accounts: Signer[];
-// let Vault: BVault;
-// let MockVault: BMockVault;
-// let MockToken: BMockToken;
-// let FlashBorrower: BFlashBorrower;
-
-// // users
-// let admin: string; // account used in deploying
-// let bob: string;
-// let alice: string;
-// describe("Vault", function () {
-  // before(async function () {
-  //   accounts = await ethers.getSigners();
-
-  //   ([
-  //       admin,
-  //       bob,
-  //       alice
-  //     ] = await Promise.all(accounts.slice(0, 3).map(x => x.getAddress())))
-
-  //   Vault = await deployVault();
-  //   MockToken = await deployMockToken();
-  //   MockVault = await deployMockVault();
-  //   FlashBorrower = await deployMockFlashBorrower();
-
-  //   await MockToken.setBalanceTo(admin, 1000000);
-  // });
 
 const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
 const BASE = ethers.utils.parseUnits("1", 18);
@@ -529,12 +487,6 @@ runTestSuite("Vault", (vars: TestVars) => {
     expect(await Vault.owner()).to.eq(alice.address)
   });
 
-    // async function vaultDeposit(Vault: BMockVault, user: string, amount: number) {
-  //   await MockToken.connect(await ethers.getSigner(user)).setBalanceTo(user, amount)
-  //   await MockToken.connect(await ethers.getSigner(user)).approve(MockVault.address, amount);
-  //   await MockVault.connect(await ethers.getSigner(user)).deposit(MockToken.address, user, user, amount);
-  // }
-
   it("toShare/toUnderlying - convert to appropriate shares & underlying", async function() {
     const { Vault, BorrowAsset, accounts: [admin, bob, alice] } = vars
 
@@ -600,32 +552,7 @@ runTestSuite("Vault", (vars: TestVars) => {
 
 
   // describe("Upgradable Deployment", function() {
-  //   it("updateCode", async function() {
-  //       const newVault = await deployVault()
-  //       const proxiedVault = await deployProxiedVault(Vault.address)
 
-  //       // initialize proxiedVault
-  //       await proxiedVault.initialize(flashLoanRate, admin);
-
-  //       const currentImplAddress = await proxiedVault.getCodeAddress();
-  //       expect(currentImplAddress).to.eq(Vault.address)
-
-  //       const uuid = (await Vault.proxiableUUID()).toString()
-
-  //       const receipt =  await (await proxiedVault.updateCode(newVault.address)).wait()
-
-  //       assert.ok(receipt.events?.find(x => x.event === 'CodeUpdated'), 'should emit CodeUpdated event')
-
-  //       // @TODO introduce grace period
-  //       const newImplAddress = await proxiedVault.getCodeAddress()
-  //       expect(newImplAddress).to.eq(newVault.address)        
-  //   })
-  // })
-
-
-  // it("test storage layout", async function() {
-  //   const storageLayoutTester = await deployVaultStorageLayoutTester()
-  //   await expect(storageLayoutTester.validateStorageLayout()).to.not.be.reverted;
   // })
 
 
