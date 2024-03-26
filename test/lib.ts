@@ -1,4 +1,4 @@
-import { deployments, ethers, waffle } from "hardhat";
+import { deployments, ethers, getNamedAccounts, waffle } from "hardhat";
 import { BigNumber, Signer, Wallet } from "ethers";
 import {
     DebtToken,
@@ -7,6 +7,7 @@ import {
     LendingPair as BLendingPair,
     LendingPair,
     LendingPairHelper,
+    MockPriceOracle,
     MockToken,
     Vault as BVault,
     Vault,
@@ -27,7 +28,8 @@ import {
   getBorrowWrapperDeployment,
   getLendingPairHelperDeployment,
   getLendingPairDeployment,
-  getInterestRateModelDeployment
+  getInterestRateModelDeployment,
+  getPriceOracleAggregatorDeployment
 } from "../helpers/contracts";
 import { EthereumAddress, IAssetDetails } from "../helpers/types";
 import { signVaultApproveContractMessage } from "../helpers/message";
@@ -46,20 +48,17 @@ export async function depositInVault(
 }
 
 export async function makeLendingPairTestSuiteVars(
-        price?: BigNumber, admin ?: EthereumAddress
-    ): Promise<Omit<TestVars, 'accounts' | 'LendingPairHelper'>> {
+        price?: BigNumber
+    ): Promise<Pick<TestVars, 'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair'>> {
     return {
         Vault: await getVaultDeployment(),
-        MockPriceOracle: await deployMockPriceOracle(price || BigNumber.from(10).pow(8)),
-        BorrowAsset: await deployMockToken(),
-        CollateralAsset: await deployMockToken(),
+        PriceOracleAggregator: await getPriceOracleAggregatorDeployment(),
         CollateralWrapperToken: await getCollateralWrapperDeployment(),
         BorrowWrapperToken: await getBorrowWrapperDeployment(),
         DebtToken: await getDebtTokenDeployment(),
         InterestRateModel: await getInterestRateModelDeployment(),
         LendingPair: await getLendingPairDeployment(),
     }
-
 }
 
 export async function advanceNBlocks(n: number) {
@@ -96,8 +95,11 @@ export interface TestVars {
     InterestRateModel: JumpRateModelV2,
     LendingPair: LendingPair,
     LendingPairHelper: LendingPairHelper,
-    MockPriceOracle: IPriceOracleAggregator,
-    accounts: IAccount[] 
+    PriceOracleAggregator: IPriceOracleAggregator,
+    accounts: IAccount[],
+    blackSmithTeam: IAccount,
+    BorrowAssetMockPriceOracle: MockPriceOracle,
+    CollateralAssetMockPriceOracle: MockPriceOracle,
 }
 
 const testVars: TestVars = {
@@ -108,10 +110,13 @@ const testVars: TestVars = {
     BorrowWrapperToken: {} as WrapperToken,
     DebtToken: {} as DebtToken,
     InterestRateModel: {} as JumpRateModelV2,
-    MockPriceOracle: {} as IPriceOracleAggregator,
+    PriceOracleAggregator: {} as IPriceOracleAggregator,
+    BorrowAssetMockPriceOracle: {} as MockPriceOracle,
+    CollateralAssetMockPriceOracle: {} as MockPriceOracle,
     accounts: {} as IAccount[],
     LendingPairHelper: {} as LendingPairHelper,
-    LendingPair: {} as LendingPair
+    LendingPair: {} as LendingPair,
+    blackSmithTeam: {} as IAccount
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
@@ -120,22 +125,31 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
             // we manually derive the signers address using the mnemonic
             // defined in the hardhat config
             const mnemonic = "test test test test test test test test test test test junk"
+
             testVars.accounts = await Promise.all((await ethers.getSigners()).map(async (signer, index) => ({ 
                 address: await signer.getAddress(), 
                 signer,
                 privateKey: ethers.Wallet.fromMnemonic(mnemonic, `m/44'/60'/0'/0/${index}`).privateKey
-            })))
-            /// @TODO asset the private key is correct to fail early
+            })))            
             assert.equal(
                 new Wallet(testVars.accounts[0].privateKey).address, 
                 testVars.accounts[0].address, 
-                'invalid mmemonic or address'
+                'invalid mnemonic or address'
             )
+
+            const { blackSmithTeam } = await getNamedAccounts()
+            testVars.blackSmithTeam  = testVars.accounts.find(x => x.address.toLowerCase() === blackSmithTeam.toLowerCase()) as IAccount
+            // do this here because of some unusual race condition
+            // in the deployments code
+            testVars.BorrowAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
+            testVars.CollateralAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
+            testVars.BorrowAsset = await deployMockToken()
+            testVars.CollateralAsset = await deployMockToken()
         })
 
         beforeEach(async () => {
             await deployments.fixture();
-            Object.assign(testVars, await makeLendingPairTestSuiteVars(BigNumber.from(10).pow(18), testVars.accounts[0].address))
+            Object.assign(testVars, await makeLendingPairTestSuiteVars())
         })
         
         tests(testVars)
@@ -146,9 +160,21 @@ export function LendingPairHelpers(
     vault: Vault,
     lendingPair: LendingPair,
     borrowAsset: MockToken,
-    collateralAsset: MockToken
+    collateralAsset: MockToken,
+    oracleAggregator: IPriceOracleAggregator,
+    team: IAccount
 ) {
     return {
+        addPriceOracleForAsset: async(
+            asset: MockToken,
+            priceOracle: MockPriceOracle
+        ) => {
+            return await oracleAggregator.connect(team.signer).updateOracleForAsset(
+                asset.address,
+                priceOracle.address
+            )
+        },
+
         approveLendingPairInVault: async(
             account: IAccount,
             approve: boolean
@@ -159,9 +185,7 @@ export function LendingPairHelpers(
                 chainId: (await ethers.provider.getNetwork()).chainId,
                 version: await vault.version()
             };
-            console.log(vaultDetails)
             const nonce = (await vault.userApprovalNonce(account.address)).toNumber()
-            console.log({ nonce })
             const {v,r,s} = await signVaultApproveContractMessage(
                 account.privateKey,
                 vaultDetails,
@@ -172,7 +196,6 @@ export function LendingPairHelpers(
                     contract: lendingPair.address
                 }
             )
-
             return await vault.connect(account.signer).approveContract(
                 account.address,
                 lendingPair.address,

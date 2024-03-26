@@ -93,6 +93,14 @@ export const getInterestRateModelDeployment = async(): Promise<JumpRateModelV2> 
     )) as JumpRateModelV2
 }
 
+export const getPriceOracleAggregatorDeployment = async(): Promise<IPriceOracleAggregator> =>{
+    return (await ethers.getContractAt(
+        ContractId.PriceOracleAggregator,
+        (await deployments.fixture(ContractId.PriceOracleAggregator))[ContractId.PriceOracleAggregator].address
+    )) as IPriceOracleAggregator
+}
+
+
 // getLendingPairDeployment
 export const deployMockToken = async(decimals ?: number) => {
     return await deployContract<MockToken>(ContractId.MockToken, [decimals || 18])
@@ -149,7 +157,7 @@ export const deployCollateralWrapperToken = async() => {
 }
 
 export const deployMockPriceOracle = async(price: BigNumber) => {
-    return await deployContract<IPriceOracleAggregator>(
+    return await deployContract<MockPriceOracle>(
         ContractId.MockPriceOracle,
         [price.toString()]
     )

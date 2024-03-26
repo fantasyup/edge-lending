@@ -42,7 +42,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     IBSVault public immutable vault;
 
     /// @notice protocol liquidation fee percent in 1e18
-    uint256 public immutable procotolLiquidationFeeShare;
+    uint256 public immutable protocolLiquidationFeeShare;
 
     /// @notice The interest rate model for the borrow asset
     IInterestRateModel public immutable interestRate;
@@ -139,7 +139,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         vault = _vault;
         oracle = _oracle;
         feeWithdrawalAddr = _feeWithdrawalAddr;
-        procotolLiquidationFeeShare = _procotolLiquidationFeeShare;
+        protocolLiquidationFeeShare = _procotolLiquidationFeeShare;
         interestRate = _interestRate;
     }
 
@@ -722,19 +722,20 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         if (borrowLimitInUSDNormalized <= borrowedTotalInUSDNormalized) {
             // liquidation fee
             uint256 totalLiquidationFee = calculateLiquidationFee(borrowedTotalWithInterest);
-            uint256 protocolLiquidationFeeShare =
-                (totalLiquidationFee * procotolLiquidationFeeShare) / LIQUIDATION_FEES_PRECISION;
+            uint256 protocolFeeShareValue =
+                (totalLiquidationFee * protocolLiquidationFeeShare) / LIQUIDATION_FEES_PRECISION;
 
             _repayLiquidatingLoan(
                 _borrower,
                 msg.sender,
-                borrowedTotalWithInterest + protocolLiquidationFeeShare
+                borrowedTotalWithInterest,
+                borrowedTotalWithInterest + protocolFeeShareValue
             );
 
             // Clear the borrowers interest rate index
             accountInterestIndex[_borrower] = 0;
             // add protocol liquidaiton fee amount to reserves
-            totalReserves = totalReserves + protocolLiquidationFeeShare;
+            totalReserves = totalReserves + protocolFeeShareValue;
 
             // convert borrowedTotal to usd
             uint256 borrowedTotalInUSD =
@@ -744,7 +745,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             uint256 amountOfCollateralToLiquidate = borrowedTotalInUSD / priceOfCollateralInUSD;
             uint256 amountOfCollateralToLiquidateInVaultShares =
                 vault.toShare(collateralAsset, amountOfCollateralToLiquidate, true);
-
+            
             _liquidate(_borrower, msg.sender, amountOfCollateralToLiquidateInVaultShares);
         }
     }
@@ -757,10 +758,11 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     function _repayLiquidatingLoan(
         address _borrower,
         address _liquidator,
-        uint256 _borrowedAmount
+        uint256 _borrowedAmount,
+        uint256 _borrowedAmountPlusFee
     ) internal {
         // borrowed amount + liquidation fee
-        uint256 amountInShares = vault.toShare(asset, _borrowedAmount, true);
+        uint256 amountInShares = vault.toShare(asset, _borrowedAmountPlusFee, true);
         // repay the liquidated position
         vault.transfer(asset, _liquidator, address(this), amountInShares);
         // burn borrower debt
@@ -775,8 +777,16 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         address _liquidator,
         uint256 amountOfCollateralToLiquidateInVaultShares
     ) internal {
+        uint accountCollateralBalance = wrappedCollateralAsset.balanceOf(_account);
+        // incase the value of the collateral drops
+        // faster than liquidate
+        if (amountOfCollateralToLiquidateInVaultShares > accountCollateralBalance) {
+            amountOfCollateralToLiquidateInVaultShares = accountCollateralBalance;
+        }
+        
         // reset the borrowers collateral tracker
         wrappedCollateralAsset.burn(_account, amountOfCollateralToLiquidateInVaultShares);
+
         // transfer the collateral tokens to the liquidator
         vault.transfer(
             collateralAsset,

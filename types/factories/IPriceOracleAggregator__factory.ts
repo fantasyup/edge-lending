@@ -44,6 +44,24 @@ const _abi = [
     inputs: [
       {
         internalType: "contract IERC20",
+        name: "_asset",
+        type: "address",
+      },
+      {
+        internalType: "contract IOracle",
+        name: "_oracle",
+        type: "address",
+      },
+    ],
+    name: "updateOracleForAsset",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IERC20",
         name: "_token",
         type: "address",
       },

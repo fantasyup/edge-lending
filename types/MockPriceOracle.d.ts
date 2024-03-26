@@ -21,22 +21,22 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockPriceOracleInterface extends ethers.utils.Interface {
   functions: {
-    "getPriceInUSD(address)": FunctionFragment;
-    "setPrice(address,uint256)": FunctionFragment;
-    "viewPriceInUSD(address)": FunctionFragment;
+    "getPriceInUSD()": FunctionFragment;
+    "setPrice(uint256)": FunctionFragment;
+    "viewPriceInUSD()": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "getPriceInUSD",
-    values: [string]
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "setPrice",
-    values: [string, BigNumberish]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "viewPriceInUSD",
-    values: [string]
+    values?: undefined
   ): string;
 
   decodeFunctionResult(
@@ -49,7 +49,11 @@ interface MockPriceOracleInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
 
-  events: {};
+  events: {
+    "PriceUpdated(address,uint256)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "PriceUpdated"): EventFragment;
 }
 
 export class MockPriceOracle extends Contract {
@@ -96,159 +100,108 @@ export class MockPriceOracle extends Contract {
   interface: MockPriceOracleInterface;
 
   functions: {
-    getPriceInUSD(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    getPriceInUSD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "getPriceInUSD(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    "getPriceInUSD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     setPrice(
-      _asset: string,
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setPrice(address,uint256)"(
-      _asset: string,
+    "setPrice(uint256)"(
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    viewPriceInUSD(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    viewPriceInUSD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "viewPriceInUSD(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
-  getPriceInUSD(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
+  getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getPriceInUSD(address)"(
-    _token: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   setPrice(
-    _asset: string,
     _newPrice: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setPrice(address,uint256)"(
-    _asset: string,
+  "setPrice(uint256)"(
     _newPrice: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  viewPriceInUSD(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+  viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "viewPriceInUSD(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    getPriceInUSD(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setPrice(
-      _asset: string,
+    setPrice(_newPrice: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    "setPrice(uint256)"(
       _newPrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setPrice(address,uint256)"(
-      _asset: string,
-      _newPrice: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    viewPriceInUSD(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
-  filters: {};
+  filters: {
+    PriceUpdated(
+      asset: null,
+      newPrice: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { asset: string; newPrice: BigNumber }
+    >;
+  };
 
   estimateGas: {
-    getPriceInUSD(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     setPrice(
-      _asset: string,
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setPrice(address,uint256)"(
-      _asset: string,
+    "setPrice(uint256)"(
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    viewPriceInUSD(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "viewPriceInUSD(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getPriceInUSD(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getPriceInUSD(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "getPriceInUSD()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setPrice(
-      _asset: string,
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setPrice(address,uint256)"(
-      _asset: string,
+    "setPrice(uint256)"(
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    viewPriceInUSD(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    viewPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "viewPriceInUSD(address)"(
-      arg0: string,
+    "viewPriceInUSD()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

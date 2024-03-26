@@ -23,6 +23,8 @@ interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
   functions: {
     "aggregator()": FunctionFragment;
     "asset()": FunctionFragment;
+    "assetName()": FunctionFragment;
+    "assetSymbol()": FunctionFragment;
     "getPriceInUSD()": FunctionFragment;
     "viewPriceInUSD()": FunctionFragment;
   };
@@ -32,6 +34,11 @@ interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "asset", values?: undefined): string;
+  encodeFunctionData(functionFragment: "assetName", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "assetSymbol",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getPriceInUSD",
     values?: undefined
@@ -43,6 +50,11 @@ interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "aggregator", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "asset", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "assetName", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "assetSymbol",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getPriceInUSD",
     data: BytesLike
@@ -111,6 +123,14 @@ export class ChainlinkUSDAdapter extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<[string]>;
 
+    assetName(overrides?: CallOverrides): Promise<[string]>;
+
+    "assetName()"(overrides?: CallOverrides): Promise<[string]>;
+
+    assetSymbol(overrides?: CallOverrides): Promise<[string]>;
+
+    "assetSymbol()"(overrides?: CallOverrides): Promise<[string]>;
+
     getPriceInUSD(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -132,6 +152,14 @@ export class ChainlinkUSDAdapter extends Contract {
 
   "asset()"(overrides?: CallOverrides): Promise<string>;
 
+  assetName(overrides?: CallOverrides): Promise<string>;
+
+  "assetName()"(overrides?: CallOverrides): Promise<string>;
+
+  assetSymbol(overrides?: CallOverrides): Promise<string>;
+
+  "assetSymbol()"(overrides?: CallOverrides): Promise<string>;
+
   getPriceInUSD(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -152,6 +180,14 @@ export class ChainlinkUSDAdapter extends Contract {
     asset(overrides?: CallOverrides): Promise<string>;
 
     "asset()"(overrides?: CallOverrides): Promise<string>;
+
+    assetName(overrides?: CallOverrides): Promise<string>;
+
+    "assetName()"(overrides?: CallOverrides): Promise<string>;
+
+    assetSymbol(overrides?: CallOverrides): Promise<string>;
+
+    "assetSymbol()"(overrides?: CallOverrides): Promise<string>;
 
     getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -181,6 +217,14 @@ export class ChainlinkUSDAdapter extends Contract {
 
     "asset()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    assetName(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "assetName()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    assetSymbol(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "assetSymbol()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getPriceInUSD(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -202,6 +246,14 @@ export class ChainlinkUSDAdapter extends Contract {
     asset(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "asset()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    assetName(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "assetName()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    assetSymbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "assetSymbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getPriceInUSD(
       overrides?: Overrides & { from?: string | Promise<string> }

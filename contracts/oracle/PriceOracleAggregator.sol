@@ -32,7 +32,7 @@ contract PriceOracleAggregator is IPriceOracleAggregator {
     /// @notice adds oracle for an asset e.g. ETH
     /// @param _asset the oracle for the asset
     /// @param _oracle the oracle address
-    function updateOracleForAsset(IERC20 _asset, IOracle _oracle) external onlyBlackSmithTeam {
+    function updateOracleForAsset(IERC20 _asset, IOracle _oracle) external override onlyBlackSmithTeam {
         require(address(_asset) != address(0), "INVALID_ASSET");
         require(address(_oracle) != address(0), "INVALID_ORACLE");
         assetToOracle[_asset] = _oracle;

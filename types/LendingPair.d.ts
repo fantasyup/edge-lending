@@ -60,7 +60,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "pause(uint8)": FunctionFragment;
     "pauseGuardian()": FunctionFragment;
     "pauseStatus(uint8)": FunctionFragment;
-    "procotolLiquidationFeeShare()": FunctionFragment;
+    "protocolLiquidationFeeShare()": FunctionFragment;
     "redeem(address,uint256)": FunctionFragment;
     "repay(uint256,address)": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -225,7 +225,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "procotolLiquidationFeeShare",
+    functionFragment: "protocolLiquidationFeeShare",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -397,7 +397,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "procotolLiquidationFeeShare",
+    functionFragment: "protocolLiquidationFeeShare",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
@@ -843,11 +843,11 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    procotolLiquidationFeeShare(
+    protocolLiquidationFeeShare(
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "procotolLiquidationFeeShare()"(
+    "protocolLiquidationFeeShare()"(
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -1265,9 +1265,9 @@ export class LendingPair extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  procotolLiquidationFeeShare(overrides?: CallOverrides): Promise<BigNumber>;
+  protocolLiquidationFeeShare(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "procotolLiquidationFeeShare()"(
+  "protocolLiquidationFeeShare()"(
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -1666,9 +1666,9 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    procotolLiquidationFeeShare(overrides?: CallOverrides): Promise<BigNumber>;
+    protocolLiquidationFeeShare(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "procotolLiquidationFeeShare()"(
+    "protocolLiquidationFeeShare()"(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2245,9 +2245,9 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    procotolLiquidationFeeShare(overrides?: CallOverrides): Promise<BigNumber>;
+    protocolLiquidationFeeShare(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "procotolLiquidationFeeShare()"(
+    "protocolLiquidationFeeShare()"(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -2677,11 +2677,11 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    procotolLiquidationFeeShare(
+    protocolLiquidationFeeShare(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "procotolLiquidationFeeShare()"(
+    "protocolLiquidationFeeShare()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

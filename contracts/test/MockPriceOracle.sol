@@ -1,31 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../interfaces/IPriceOracleAggregator.sol";
+import "../interfaces/IOracle.sol";
 
-contract MockPriceOracle is IPriceOracleAggregator {
+contract MockPriceOracle is IOracle {
     uint256 lastestAnswer;
 
-    mapping(IERC20 => uint256) prices;
 
     constructor(uint256 _price) {
         lastestAnswer = _price;
     }
 
-    function setPrice(IERC20 _asset, uint256 _newPrice) external {
-        prices[_asset] = _newPrice;
+    function setPrice(uint256 _newPrice) external {
+        lastestAnswer = _newPrice;
     }
 
-    function getPriceInUSD(IERC20 _token) external view override returns (uint256) {
-        if (prices[_token] != 0) {
-            return prices[_token];
-        }
+    function getPriceInUSD() external view override returns (uint256) {
         return lastestAnswer;
     }
 
-    function viewPriceInUSD(
-        IERC20 /*_token*/
-    ) external view override returns (uint256) {
+    function viewPriceInUSD() external view override returns (uint256) {
         return lastestAnswer;
     }
 }

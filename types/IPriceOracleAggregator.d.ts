@@ -22,6 +22,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface IPriceOracleAggregatorInterface extends ethers.utils.Interface {
   functions: {
     "getPriceInUSD(address)": FunctionFragment;
+    "updateOracleForAsset(address,address)": FunctionFragment;
     "viewPriceInUSD(address)": FunctionFragment;
   };
 
@@ -30,12 +31,20 @@ interface IPriceOracleAggregatorInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "updateOracleForAsset",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "viewPriceInUSD",
     values: [string]
   ): string;
 
   decodeFunctionResult(
     functionFragment: "getPriceInUSD",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateOracleForAsset",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -100,6 +109,18 @@ export class IPriceOracleAggregator extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    updateOracleForAsset(
+      _asset: string,
+      _oracle: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updateOracleForAsset(address,address)"(
+      _asset: string,
+      _oracle: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     viewPriceInUSD(
       _token: string,
       overrides?: CallOverrides
@@ -121,6 +142,18 @@ export class IPriceOracleAggregator extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  updateOracleForAsset(
+    _asset: string,
+    _oracle: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updateOracleForAsset(address,address)"(
+    _asset: string,
+    _oracle: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   viewPriceInUSD(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "viewPriceInUSD(address)"(
@@ -138,6 +171,18 @@ export class IPriceOracleAggregator extends Contract {
       _token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    updateOracleForAsset(
+      _asset: string,
+      _oracle: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "updateOracleForAsset(address,address)"(
+      _asset: string,
+      _oracle: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     viewPriceInUSD(
       _token: string,
@@ -163,6 +208,18 @@ export class IPriceOracleAggregator extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    updateOracleForAsset(
+      _asset: string,
+      _oracle: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updateOracleForAsset(address,address)"(
+      _asset: string,
+      _oracle: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     viewPriceInUSD(
       _token: string,
       overrides?: CallOverrides
@@ -182,6 +239,18 @@ export class IPriceOracleAggregator extends Contract {
 
     "getPriceInUSD(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateOracleForAsset(
+      _asset: string,
+      _oracle: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updateOracleForAsset(address,address)"(
+      _asset: string,
+      _oracle: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

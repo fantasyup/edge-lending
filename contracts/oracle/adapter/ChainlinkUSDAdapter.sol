@@ -5,6 +5,13 @@ import "../../interfaces/IOracle.sol";
 import "../../interfaces/IChainlinkV3Aggregator.sol";
 
 contract ChainlinkUSDAdapter is IOracle {
+    
+    /// @dev asset name
+    string public assetName;
+
+    /// @dev asset symbol
+    string public assetSymbol;
+
     /// @notice the asset with the price oracle
     address public immutable asset;
 
@@ -14,10 +21,16 @@ contract ChainlinkUSDAdapter is IOracle {
     /// @dev the latestAnser returned
     uint256 private latestAnswer;
 
-    constructor(address _asset, IChainlinkV3Aggregator _aggregator) {
+    constructor(
+        string memory _assetName,
+        string memory _assetSymbol,
+        address _asset,
+        IChainlinkV3Aggregator _aggregator
+    ) {
         require(_asset != address(0), "invalid asset");
         require(address(_aggregator) != address(0), "invalid aggregator");
-
+        assetName = _assetName;
+        assetSymbol = _assetSymbol;
         asset = _asset;
         aggregator = _aggregator;
     }
