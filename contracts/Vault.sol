@@ -190,8 +190,8 @@ contract Vault is VaultBase {
 
     /// @notice Transfer control from current owner address to another
     /// @param _newOwner The new team
-    function transferToOwner(address _newOwner) external onlyOwner {
-        require(_newOwner != address(0), "INVALID_NEW_TEAM");
+    function transferToNewOwner(address _newOwner) external onlyOwner {
+        require(_newOwner != address(0), "INVALID_NEW_OWNER");
         newOwner = _newOwner;
         emit TransferControl(_newOwner, block.timestamp);
     }
@@ -202,7 +202,7 @@ contract Vault is VaultBase {
         address _to,
         uint256 _shares
     ) internal {
-        require(_to != address(0), "VAULT: INVALID_TO_ADDRESS");
+        require(_to != address(0), "INVALID_TO_ADDRESS");
         // Effects
         balanceOf[_token][_from] = balanceOf[_token][_from] - _shares;
         balanceOf[_token][_to] = balanceOf[_token][_to] + _shares;

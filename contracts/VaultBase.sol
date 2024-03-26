@@ -24,7 +24,7 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
     address public owner;
 
     /// @dev the address that access to perform `admin` functions
-    address internal newOwner;
+    address public newOwner;
 
     /// @notice mapping of token asset to user address and balance
     mapping(IERC20 => mapping(address => uint256)) public override balanceOf;

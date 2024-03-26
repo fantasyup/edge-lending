@@ -34,6 +34,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "initialize(uint256,address)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
     "name()": FunctionFragment;
+    "newOwner()": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
@@ -42,7 +43,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
     "transfer(address,address,address,uint256)": FunctionFragment;
-    "transferToOwner(address)": FunctionFragment;
+    "transferToNewOwner(address)": FunctionFragment;
     "unpause()": FunctionFragment;
     "updateCode(address)": FunctionFragment;
     "updateFlashloanRate(uint256)": FunctionFragment;
@@ -101,6 +102,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "newOwner", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
@@ -122,7 +124,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferToOwner",
+    functionFragment: "transferToNewOwner",
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
@@ -176,6 +178,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "newOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
@@ -191,7 +194,7 @@ interface MockVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "totals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "transferToOwner",
+    functionFragment: "transferToNewOwner",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
@@ -420,6 +423,10 @@ export class MockVault extends Contract {
 
     "name()"(overrides?: CallOverrides): Promise<[string]>;
 
+    newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    "newOwner()"(overrides?: CallOverrides): Promise<[string]>;
+
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
@@ -489,12 +496,12 @@ export class MockVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    transferToOwner(
+    transferToNewOwner(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferToOwner(address)"(
+    "transferToNewOwner(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -701,6 +708,10 @@ export class MockVault extends Contract {
 
   "name()"(overrides?: CallOverrides): Promise<string>;
 
+  newOwner(overrides?: CallOverrides): Promise<string>;
+
+  "newOwner()"(overrides?: CallOverrides): Promise<string>;
+
   owner(overrides?: CallOverrides): Promise<string>;
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
@@ -770,12 +781,12 @@ export class MockVault extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  transferToOwner(
+  transferToNewOwner(
     _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transferToOwner(address)"(
+  "transferToNewOwner(address)"(
     _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -978,6 +989,10 @@ export class MockVault extends Contract {
 
     "name()"(overrides?: CallOverrides): Promise<string>;
 
+    newOwner(overrides?: CallOverrides): Promise<string>;
+
+    "newOwner()"(overrides?: CallOverrides): Promise<string>;
+
     owner(overrides?: CallOverrides): Promise<string>;
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
@@ -1043,12 +1058,12 @@ export class MockVault extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    transferToOwner(
+    transferToNewOwner(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "transferToOwner(address)"(
+    "transferToNewOwner(address)"(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1353,6 +1368,10 @@ export class MockVault extends Contract {
 
     "name()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "newOwner()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1422,12 +1441,12 @@ export class MockVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    transferToOwner(
+    transferToNewOwner(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transferToOwner(address)"(
+    "transferToNewOwner(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1644,6 +1663,10 @@ export class MockVault extends Contract {
 
     "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "newOwner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1716,12 +1739,12 @@ export class MockVault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferToOwner(
+    transferToNewOwner(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transferToOwner(address)"(
+    "transferToNewOwner(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

@@ -31,6 +31,7 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     "initialize(uint256,address)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
     "name()": FunctionFragment;
+    "newOwner()": FunctionFragment;
     "owner()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
@@ -82,6 +83,7 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "newOwner", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
@@ -138,6 +140,7 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "newOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
@@ -331,6 +334,10 @@ export class VaultBase extends Contract {
     name(overrides?: CallOverrides): Promise<[string]>;
 
     "name()"(overrides?: CallOverrides): Promise<[string]>;
+
+    newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    "newOwner()"(overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -537,6 +544,10 @@ export class VaultBase extends Contract {
 
   "name()"(overrides?: CallOverrides): Promise<string>;
 
+  newOwner(overrides?: CallOverrides): Promise<string>;
+
+  "newOwner()"(overrides?: CallOverrides): Promise<string>;
+
   owner(overrides?: CallOverrides): Promise<string>;
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
@@ -741,6 +752,10 @@ export class VaultBase extends Contract {
     name(overrides?: CallOverrides): Promise<string>;
 
     "name()"(overrides?: CallOverrides): Promise<string>;
+
+    newOwner(overrides?: CallOverrides): Promise<string>;
+
+    "newOwner()"(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -1049,6 +1064,10 @@ export class VaultBase extends Contract {
 
     "name()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "newOwner()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1263,6 +1282,10 @@ export class VaultBase extends Contract {
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "newOwner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
