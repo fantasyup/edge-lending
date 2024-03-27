@@ -13,6 +13,7 @@ const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
 const BASE = ethers.utils.parseUnits("1", 18);
 const amountToDeposit = 100
 const sharesToTransfer = 5
+
 const initializeVault = (vault: Vault, user: IAccount) =>  vault.initialize(flashLoanRate, user.address);
 
 const setupAccountBalance = async (asset: MockToken, accounts: EthereumAddress[], amount ?: number) => {
@@ -525,39 +526,5 @@ runTestSuite("Vault", (vars: TestVars) => {
     // const computationalLimit = ethers.BigNumber.from(2).pow(256).sub(1)
     // it("extreme limits", async function() {
     // })
-
-
-  // describe("vault actions", function () {
-  //   const amountToDeposit = 100;
-
-  //   describe("deposit", function () {
-  //   });
-
-  //   describe("transfer", function () {
-  //     const sharesToTransfer = 5;
-
-  //    
-  //   });
-
-  //   describe("flashLoan", function () {
- 
-
-  //   describe("withdraw", function () {
-  //   });
-  // });
-
-
-  // describe("admin functions", function () {
-  // });
-
-
-  // describe("Upgradable Deployment", function() {
-
-  // })
-
-
-
-  // describe("Ratio - Conversion", function() {
-  // })
 
 });

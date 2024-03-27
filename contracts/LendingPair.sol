@@ -258,7 +258,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         require(_debtOwner != address(0), "INVALID_DEBT_OWNER");
         // save on sload
         uint8 __borrowAssetUnderlyingDecimal = _borrowAssetUnderlyingDecimal;
-
         uint256 borrowedTotalWithInterest = borrowBalanceCurrent(msg.sender);
         uint256 currentBorrowAssetPrice = oracle.getPriceInUSD(asset);
         uint256 borrowedTotalInUSDNormalized =
@@ -286,6 +285,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         accountInterestIndex[msg.sender] = borrowIndex;
         // transfer borrow asset to borrower
         vault.transfer(asset, address(this), msg.sender, amountOfSharesToBorrow);
+        
         emit Borrow(msg.sender, _amountToBorrow);
     }
 
@@ -423,7 +423,11 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @notice getCashPrior is a view funcion that returns the balance of all held borrow asset
     function getCashPrior() public view returns (uint256) {
-        return vault.toUnderlying(asset, vault.balanceOf(asset, address(this)));
+        uint256 currentBalance = vault.balanceOf(asset, address(this));
+        if (currentBalance > 0 ) {
+            return vault.toUnderlying(asset, currentBalance);
+        }
+        return currentBalance;
     }
 
     /// @notice Total amount of outstanding borrows of the asset in this market

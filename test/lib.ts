@@ -53,7 +53,7 @@ export async function depositInVault(
 
 export async function makeLendingPairTestSuiteVars(
         price?: BigNumber
-    ): Promise<Pick<TestVars, 'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair'>> {
+    ): Promise<Pick<TestVars, 'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair' | 'LendingPairHelper'>> {
     return {
         Vault: await getVaultDeployment(),
         PriceOracleAggregator: await getPriceOracleAggregatorDeployment(),
@@ -62,6 +62,7 @@ export async function makeLendingPairTestSuiteVars(
         DebtToken: await getDebtTokenDeployment(),
         InterestRateModel: await getInterestRateModelDeployment(),
         LendingPair: await getLendingPairDeployment(),
+        LendingPairHelper: await getLendingPairHelperDeployment()
     }
 }
 
@@ -168,46 +169,6 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
     })
 }
 
-// export class VaultActionHelper {
-//     vault: Vault
-//     constructor(vault: Vault) {
-//         this.vault = vault
-//     }
-
-//     approveLendingPairInVault = async (
-//         account: IAccount,
-//         approve: boolean
-//     ) => {
-//         const vaultDetails = { 
-//             name: await this.vault.name(),
-//             address: this.vault.address,
-//             chainId: (await ethers.provider.getNetwork()).chainId,
-//             version: await this.vault.version()
-//         };
-//         const nonce = (await this.vault.userApprovalNonce(account.address)).toNumber()
-//         const {v,r,s} = await signVaultApproveContractMessage(
-//             account.privateKey,
-//             vaultDetails,
-//             {
-//                 approve,
-//                 user: account.address,
-//                 nonce,
-//                 contract: lendingPair.address
-//             }
-//         )
-//         return await vault.connect(account.signer).approveContract(
-//             account.address,
-//             lendingPair.address,
-//             approve,
-//             v,
-//             r,
-//             s
-//         )
-//     }
-
-
-// }
-
 export function LendingPairHelpers(
     vault: Vault,
     lendingPair: LendingPair,
@@ -262,32 +223,8 @@ export function LendingPairHelpers(
             approve: boolean
         ) => {
             return approveInVault(account, lendingPair.address, approve)
-            // const vaultDetails = { 
-            //     name: await vault.name(),
-            //     address: vault.address,
-            //     chainId: (await ethers.provider.getNetwork()).chainId,
-            //     version: await vault.version()
-            // };
-            // const nonce = (await vault.userApprovalNonce(account.address)).toNumber()
-            // const {v,r,s} = await signVaultApproveContractMessage(
-            //     account.privateKey,
-            //     vaultDetails,
-            //     {
-            //         approve,
-            //         user: account.address,
-            //         nonce,
-            //         contract: lendingPair.address
-            //     }
-            // )
-            // return await vault.connect(account.signer).approveContract(
-            //     account.address,
-            //     lendingPair.address,
-            //     approve,
-            //     v,
-            //     r,
-            //     s
-            // )
         },
+
         depositInVault: async(
             account: Signer,
             asset: MockToken,

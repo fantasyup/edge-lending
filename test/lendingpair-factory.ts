@@ -66,7 +66,6 @@ let LendingPairFactory: BLendingPairFactory
     //     )
     // })
 runTestSuite("LendingPairFactory", (vars: TestVars) => {
-
     it("createIR", async ()  => {
         const { } = vars
         await expect(
