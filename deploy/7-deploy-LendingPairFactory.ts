@@ -11,6 +11,14 @@ const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRun
     const debtTokenImplementation = await get(ContractId.DebtToken)
     const collateralWrapperImplementation = await get(ContractId.CollateralWrapperToken)
     const borrowWrapperImpl = await get(ContractId.WrapperToken)
+    
+    // deploy library with deterministic set to true
+    const ClonesLib = await deploy('Clones', {
+      from: deployer,
+      args: [],
+      deterministicDeployment: true
+    })
+
 
     await deploy(ContractId.LendingPairFactory, {
       from: deployer,
@@ -23,7 +31,8 @@ const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRun
       ],
       log: true,
       libraries: {
-        [ContractId.DataTypes]: dataTypesLib.address
+        [ContractId.DataTypes]: dataTypesLib.address,
+        'Clones': ClonesLib.address
       }
     });
 }

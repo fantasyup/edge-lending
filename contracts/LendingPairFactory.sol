@@ -3,14 +3,13 @@ pragma solidity 0.8.1;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
-
 import "./interfaces/IPriceOracleAggregator.sol";
 import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./interfaces/IDebtToken.sol";
 import "./interest/JumpRateModelV2.sol";
-import "./LendingPair.sol";
+import "./token/IERC20Details.sol";
 import "./DataTypes.sol";
 
 contract LendingPairFactory is Pausable {
@@ -25,8 +24,11 @@ contract LendingPairFactory is Pausable {
 
     address[] public allPairs;
 
+    mapping (address => bool) public validInterestRateModels;
+
     event NewLendingPair(address pair, uint256 created);
     event LogicContractUpdated(address pairLogic);
+    event NewInterestRateModel(address ir, uint256 timestamp);
 
     /// @notice modifier to allow only the owner to call a function
     modifier onlyOwner {
@@ -54,12 +56,12 @@ contract LendingPairFactory is Pausable {
         borrowAssetWrapperImplementation = _borrowAssetWrapperLogic;
     }
 
-    /// @notice pause factory actions
+    /// @notice pause
     function pause() external onlyOwner {
         _pause();
     }
 
-    /// @notice unpause vault actions
+    /// @notice unpause
     function unpause() external onlyOwner {
         _unpause();
     }
@@ -100,6 +102,7 @@ contract LendingPairFactory is Pausable {
     /// @dev create interest rate model
     function createIR(NewLendingVaultIRLocalVars calldata _interestRateVars, address _team)
         external
+        onlyOwner
         returns (address ir)
     {
         require(address(_team) != address(0), "invalid team");
@@ -115,14 +118,25 @@ contract LendingPairFactory is Pausable {
                 _interestRateVars.blocksPerYear
             )
         );
-    }
 
+        validInterestRateModels[ir] = true;
+
+        emit NewInterestRateModel(ir, block.timestamp);
+    }
+    
+    /// @dev disable interest rate model
+    function disableIR(address ir) external onlyOwner {
+        require(validInterestRateModels[ir] == true, "IR_NOT_EXIST");
+        validInterestRateModels[ir] = false;
+    }
+    
     struct BorrowLocalVars {
         IERC20 borrowAsset;
         uint256 initialExchangeRateMantissa;
         uint256 reserveFactorMantissa;
         uint256 collateralFactor;
         uint256 liquidationFee;
+        IInterestRateModel interestRateModel;
     }
 
     struct WrappedAssetLocalVars {
@@ -139,6 +153,11 @@ contract LendingPairFactory is Pausable {
         IERC20 _collateralAsset,
         BorrowLocalVars calldata _borrowVars
     ) external whenNotPaused returns (address newLendingPair) {
+        require(
+            validInterestRateModels[address(_borrowVars.interestRateModel)] == true,
+            "INVALID_INTEREST_MODEL"
+        );
+
         WrappedAssetLocalVars memory wrappedAssetLocalVars;
         
         bytes32 salt = keccak256(abi.encode(_lendingPairName, _lendingPairSymbol, allPairs.length));
@@ -198,6 +217,7 @@ contract LendingPairFactory is Pausable {
             _collateralAsset,
             borrowConfig,
             wrappedAssetLocalVars.wrappedCollateralAsset,
+            _borrowVars.interestRateModel,
             _pauseGuardian
         );
         

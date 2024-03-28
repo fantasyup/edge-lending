@@ -27,6 +27,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     "createIR(tuple,address)": FunctionFragment;
     "createLendingPairWithProxy(string,string,address,address,tuple)": FunctionFragment;
     "debtTokenImplementation()": FunctionFragment;
+    "disableIR(address)": FunctionFragment;
     "lendingPairImplementation()": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
@@ -36,6 +37,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     "updateCollateralWrapperImpl(address)": FunctionFragment;
     "updateDebtTokenImpl(address)": FunctionFragment;
     "updatePairImpl(address)": FunctionFragment;
+    "validInterestRateModels(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -77,6 +79,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
+        interestRateModel: string;
       }
     ]
   ): string;
@@ -84,6 +87,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "debtTokenImplementation",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "disableIR", values: [string]): string;
   encodeFunctionData(
     functionFragment: "lendingPairImplementation",
     values?: undefined
@@ -108,6 +112,10 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "updatePairImpl",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "validInterestRateModels",
+    values: [string]
+  ): string;
 
   decodeFunctionResult(functionFragment: "allPairs", data: BytesLike): Result;
   decodeFunctionResult(
@@ -127,6 +135,7 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "debtTokenImplementation",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "disableIR", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lendingPairImplementation",
     data: BytesLike
@@ -151,15 +160,21 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "updatePairImpl",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "validInterestRateModels",
+    data: BytesLike
+  ): Result;
 
   events: {
     "LogicContractUpdated(address)": EventFragment;
+    "NewInterestRateModel(address,uint256)": EventFragment;
     "NewLendingPair(address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "Unpaused(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "LogicContractUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NewInterestRateModel"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NewLendingPair"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
@@ -269,11 +284,12 @@ export class LendingPairFactory extends Contract {
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
+        interestRateModel: string;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256,address))"(
       _lendingPairName: string,
       _lendingPairSymbol: string,
       _pauseGuardian: string,
@@ -284,6 +300,7 @@ export class LendingPairFactory extends Contract {
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
+        interestRateModel: string;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -291,6 +308,16 @@ export class LendingPairFactory extends Contract {
     debtTokenImplementation(overrides?: CallOverrides): Promise<[string]>;
 
     "debtTokenImplementation()"(overrides?: CallOverrides): Promise<[string]>;
+
+    disableIR(
+      ir: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "disableIR(address)"(
+      ir: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     lendingPairImplementation(overrides?: CallOverrides): Promise<[string]>;
 
@@ -359,6 +386,16 @@ export class LendingPairFactory extends Contract {
       _newLogicContract: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    validInterestRateModels(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "validInterestRateModels(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
   };
 
   allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
@@ -417,11 +454,12 @@ export class LendingPairFactory extends Contract {
       reserveFactorMantissa: BigNumberish;
       collateralFactor: BigNumberish;
       liquidationFee: BigNumberish;
+      interestRateModel: string;
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+  "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256,address))"(
     _lendingPairName: string,
     _lendingPairSymbol: string,
     _pauseGuardian: string,
@@ -432,6 +470,7 @@ export class LendingPairFactory extends Contract {
       reserveFactorMantissa: BigNumberish;
       collateralFactor: BigNumberish;
       liquidationFee: BigNumberish;
+      interestRateModel: string;
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -439,6 +478,16 @@ export class LendingPairFactory extends Contract {
   debtTokenImplementation(overrides?: CallOverrides): Promise<string>;
 
   "debtTokenImplementation()"(overrides?: CallOverrides): Promise<string>;
+
+  disableIR(
+    ir: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "disableIR(address)"(
+    ir: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   lendingPairImplementation(overrides?: CallOverrides): Promise<string>;
 
@@ -508,6 +557,16 @@ export class LendingPairFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  validInterestRateModels(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "validInterestRateModels(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   callStatic: {
     allPairs(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -567,11 +626,12 @@ export class LendingPairFactory extends Contract {
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
+        interestRateModel: string;
       },
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256,address))"(
       _lendingPairName: string,
       _lendingPairSymbol: string,
       _pauseGuardian: string,
@@ -582,6 +642,7 @@ export class LendingPairFactory extends Contract {
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
+        interestRateModel: string;
       },
       overrides?: CallOverrides
     ): Promise<string>;
@@ -589,6 +650,10 @@ export class LendingPairFactory extends Contract {
     debtTokenImplementation(overrides?: CallOverrides): Promise<string>;
 
     "debtTokenImplementation()"(overrides?: CallOverrides): Promise<string>;
+
+    disableIR(ir: string, overrides?: CallOverrides): Promise<void>;
+
+    "disableIR(address)"(ir: string, overrides?: CallOverrides): Promise<void>;
 
     lendingPairImplementation(overrides?: CallOverrides): Promise<string>;
 
@@ -649,12 +714,30 @@ export class LendingPairFactory extends Contract {
       _newLogicContract: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    validInterestRateModels(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "validInterestRateModels(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
   };
 
   filters: {
     LogicContractUpdated(
       pairLogic: null
     ): TypedEventFilter<[string], { pairLogic: string }>;
+
+    NewInterestRateModel(
+      ir: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { ir: string; timestamp: BigNumber }
+    >;
 
     NewLendingPair(
       pair: null,
@@ -730,11 +813,12 @@ export class LendingPairFactory extends Contract {
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
+        interestRateModel: string;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256,address))"(
       _lendingPairName: string,
       _lendingPairSymbol: string,
       _pauseGuardian: string,
@@ -745,6 +829,7 @@ export class LendingPairFactory extends Contract {
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
+        interestRateModel: string;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -752,6 +837,16 @@ export class LendingPairFactory extends Contract {
     debtTokenImplementation(overrides?: CallOverrides): Promise<BigNumber>;
 
     "debtTokenImplementation()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    disableIR(
+      ir: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "disableIR(address)"(
+      ir: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     lendingPairImplementation(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -822,6 +917,16 @@ export class LendingPairFactory extends Contract {
       _newLogicContract: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    validInterestRateModels(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "validInterestRateModels(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -888,11 +993,12 @@ export class LendingPairFactory extends Contract {
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
+        interestRateModel: string;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256))"(
+    "createLendingPairWithProxy(string,string,address,address,(address,uint256,uint256,uint256,uint256,address))"(
       _lendingPairName: string,
       _lendingPairSymbol: string,
       _pauseGuardian: string,
@@ -903,6 +1009,7 @@ export class LendingPairFactory extends Contract {
         reserveFactorMantissa: BigNumberish;
         collateralFactor: BigNumberish;
         liquidationFee: BigNumberish;
+        interestRateModel: string;
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -913,6 +1020,16 @@ export class LendingPairFactory extends Contract {
 
     "debtTokenImplementation()"(
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    disableIR(
+      ir: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "disableIR(address)"(
+      ir: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     lendingPairImplementation(
@@ -985,6 +1102,16 @@ export class LendingPairFactory extends Contract {
     "updatePairImpl(address)"(
       _newLogicContract: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    validInterestRateModels(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "validInterestRateModels(address)"(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
 }

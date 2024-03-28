@@ -17,7 +17,7 @@ contract DebtToken is WrapperToken, IDebtToken {
     /// @dev debt token delegate borrow message digest
     bytes32 internal constant _DEBT_BORROW_DELEGATE_SIGNATURE_TYPE_HASH =
         keccak256(
-            "BorrowDelegate(string warning,address user,address contract,uint amount,uint256 nonce)"
+            "BorrowDelegate(bytes32 warning,address user,address contract,uint amount,uint256 nonce)"
         );
 
     /// @dev user delegated borrow allowances
@@ -87,10 +87,14 @@ contract DebtToken is WrapperToken, IDebtToken {
     }
 
     function delegateBorrow(address _to, uint256 _amount) external {
+        _delegateBorrowInternal(msg.sender, _to, _amount);
+    }
+
+    function _delegateBorrowInternal(address _from, address _to, uint256 _amount) internal {
         require(_to != address(0), "INVALID_TO");
 
-        _borrowAllowances[msg.sender][_to] = _amount;
-        emit DelegateBorrow(msg.sender, _to, _amount, block.timestamp);
+        _borrowAllowances[_from][_to] = _amount;
+        emit DelegateBorrow(_from, _to, _amount, block.timestamp);
     }
 
     function delegateBorrowWithSignedMessage(
@@ -127,8 +131,7 @@ contract DebtToken is WrapperToken, IDebtToken {
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress == _from, "INVALID_SIGNATURE");
 
-        _borrowAllowances[_from][_to] = _amount;
-        emit DelegateBorrow(_from, _to, _amount, block.timestamp);
+        _delegateBorrowInternal(_from, _to, _amount);
     }
 
     function _decreaseBorrowAllowance(address _from, address _to, uint256 _amount) internal {

@@ -1,112 +1,205 @@
 import { ethers, waffle } from "hardhat";
-import { BigNumber, Signer } from "ethers";
+import { BigNumber, Event, Signer } from "ethers";
 import { expect, assert } from "chai";
-import {
-    IPriceOracleAggregator,
-    JumpRateModelV2,
-    LendingPair as BLendingPair,
-    MockToken,
-    Vault as BVault,
-    WrapperToken,
-    LendingPairHelper as BLendingPairHelper,
-    DebtToken,
-    LendingPairFactory as BLendingPairFactory,
-} from "../types";
-import { 
-    deployInterestRateModel,
-    deployLendingPairFactory
-} from "../helpers/contracts"
 import { runTestSuite, TestVars } from "./lib";
 
-// // list of accounts
-// let accounts: Signer[];
+const irParams = {
+    baseRatePerYear: "30000000000000000",
+    multiplierPerYear: "52222222222200000",
+    jumpMultiplierPerYear: "70",
+    optimal: "1000000000000000000",
+    blocksPerYear: "2102400",
+    borrowRateMaxMantissa: BigNumber.from(5).mul(BigNumber.from(10).pow(13))
+}
 
-// let admin: string; // account used in deploying
-// let bob: string;
-// let frank: string;
+const getIRAddressFromTx = (ev: Array<Event>) => {
+    const v = ev?.find(x => x.event === 'NewInterestRateModel')
+    return v!.args!.ir
+}
 
-// let Vault: BVault;
-// let LendingPair: BLendingPair;
-// let MockPriceOracle: IPriceOracleAggregator;
-// let BorrowAsset: MockToken;
-// let CollateralAsset: MockToken
-// let BorrowAssetDepositWrapperToken: WrapperToken
-// let DebtWrapperToken: DebtToken
-// let CollateralWrapperToken: WrapperToken
-// let InterestRateModel: JumpRateModelV2;
-// let LendingPairHelper: BLendingPairHelper
+const createIRAndReturnAddress = async (vars: TestVars): Promise<string> => {
+    const modelTx = await (await vars.LendingPairFactory.connect(vars.blackSmithTeam.signer).createIR(
+        irParams,
+        vars.blackSmithTeam.address
+    )).wait();
 
-let LendingPairFactory: BLendingPairFactory
-    // before(async function() {
-    //     accounts = await ethers.getSigners();
+    const modelEv = modelTx.events?.find(x => x.event === 'NewInterestRateModel')
 
-    //     ([
-    //         admin,
-    //         bob,
-    //         frank,
-    //     ] = await Promise.all(accounts.slice(0, 10).map(x => x.getAddress())));
+    return modelEv!.args!.ir
+}
 
-    //     ({
-    //         Vault,
-    //         LendingPair,
-    //         MockPriceOracle,
-    //         BorrowAsset,
-    //         CollateralAsset,
-    //         CollateralWrapperToken,
-    //         BorrowAssetDepositWrapperToken,
-    //         DebtWrapperToken,
-    //     } = await makeLendingPairTestSuiteVars());
-
-    //     LendingPairFactory = await deployLendingPairFactory(
-    //         admin,
-    //         LendingPair.address,
-    //         CollateralWrapperToken.address,
-    //         DebtWrapperToken.address,
-    //         BorrowAssetDepositWrapperToken.address
-    //     )
-    // })
 runTestSuite("LendingPairFactory", (vars: TestVars) => {
-    it("createIR", async ()  => {
-        const { } = vars
+    it("updatePairImpl", async () => {
+        const { LendingPairFactory, accounts: [admin, bob] } = vars
+
         await expect(
-            LendingPairFactory.createIR(
-                {
-                    baseRatePerYear: "30000000000000000",
-                    multiplierPerYear: "52222222222200000",
-                    jumpMultiplierPerYear: "70",
-                    optimal: "1000000000000000000",
-                },
-                admin
-            )
-        ).to.not.be.reverted
+            LendingPairFactory.updatePairImpl(bob.address)
+        ).to.revertedWith("ONLY_OWNER")
+
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).updatePairImpl(ethers.constants.AddressZero)
+        ).to.revertedWith("INVALID_CONTRACT")
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).updatePairImpl(bob.address)
+        ).to.not.reverted
+
+        expect(await LendingPairFactory["lendingPairImplementation()"]()).to.be.eq(bob.address)
     })
 
-    it("createPair", async () => {
-        const interestRateModel = await deployInterestRateModel(
-            "30000000000000000",
-            "52222222222200000",
-            "70",
-            "1000000000000000000",
-            admin
-          )
+    it("updateCollateralWrapperImpl", async () => {
+        const { LendingPairFactory, accounts: [admin, bob] } = vars
+
+        await expect(
+            LendingPairFactory.updateCollateralWrapperImpl(bob.address)
+        ).to.revertedWith("ONLY_OWNER")
+
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).updateCollateralWrapperImpl(ethers.constants.AddressZero)
+        ).to.revertedWith("INVALID_CONTRACT")
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).updateCollateralWrapperImpl(bob.address)
+        ).to.not.reverted
+
+        expect(await LendingPairFactory["collateralWrapperImplementation()"]()).to.be.eq(bob.address)
+    })
+
+    it("updateDebtTokenImpl", async () => {
+        const { LendingPairFactory, accounts: [admin, bob] } = vars
+
+        await expect(
+            LendingPairFactory.updateDebtTokenImpl(bob.address)
+        ).to.revertedWith("ONLY_OWNER")
+
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).updateDebtTokenImpl(ethers.constants.AddressZero)
+        ).to.revertedWith("INVALID_CONTRACT")
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).updateDebtTokenImpl(bob.address)
+        ).to.not.reverted
+
+        expect(await LendingPairFactory["debtTokenImplementation()"]()).to.be.eq(bob.address)
+    })
+
+    it("updateBorrowAssetWrapperImpl", async () => {
+        const { LendingPairFactory, accounts: [admin, bob] } = vars
+
+        await expect(
+            LendingPairFactory.updateBorrowAssetWrapperImpl(bob.address)
+        ).to.revertedWith("ONLY_OWNER")
+
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).updateBorrowAssetWrapperImpl(ethers.constants.AddressZero)
+        ).to.revertedWith("INVALID_CONTRACT")
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).updateBorrowAssetWrapperImpl(bob.address)
+        ).to.not.reverted
+
+        expect(await LendingPairFactory["borrowAssetWrapperImplementation()"]()).to.be.eq(bob.address)
+    })
+
+    it("pause", async () => {
+        const { LendingPairFactory, accounts: [admin, bob] } = vars
+
+        await expect(
+            LendingPairFactory.pause()
+        ).to.revertedWith("ONLY_OWNER")
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).pause()
+        ).to.not.be.reverted
+
+        expect(await LendingPairFactory["paused()"]()).to.be.true
+    })
+
+    it("unpause", async () => {
+        const { LendingPairFactory, accounts: [admin, bob] } = vars
+
+        await expect(
+            LendingPairFactory.unpause()
+        ).to.revertedWith("ONLY_OWNER")
         
+        await LendingPairFactory.connect(vars.blackSmithTeam.signer).pause()
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).unpause()
+        ).to.not.be.reverted
+
+        expect(await LendingPairFactory["paused()"]()).to.be.false
+    })
+
+    it("disableIR", async () => {
+        const { LendingPairFactory, accounts: [admin, bob] } = vars
+        await LendingPairFactory.connect(vars.blackSmithTeam.signer).createIR(irParams, admin.address)
+        // const connectedLendingPair = 
+        const addr = await createIRAndReturnAddress(vars)
+
+        await expect(
+            LendingPairFactory.disableIR(addr)
+        ).to.revertedWith("ONLY_OWNER")
+
+        await expect(
+            LendingPairFactory.connect(vars.blackSmithTeam.signer).disableIR(bob.address)
+        ).to.revertedWith("IR_NOT_EXIST")
+
+        // disableIR
+        await LendingPairFactory.connect(vars.blackSmithTeam.signer).disableIR(addr)
+
+        expect(await LendingPairFactory.validInterestRateModels(addr)).to.be.false
+    })
+
+    it("createIR", async ()  => {
+        const { LendingPairFactory, accounts: [admin] } = vars
+
+        await expect(
+            LendingPairFactory.createIR(irParams, admin.address)
+        ).to.revertedWith("ONLY_OWNER")
+
+        const tx = await (await LendingPairFactory.connect(vars.blackSmithTeam.signer).createIR(
+                irParams,
+                admin.address
+            )).wait();
+
+        const ev = tx.events?.find(x => x.event === 'NewInterestRateModel')
+        expect(ev).to.be.ok
+
+        // tslint:disable-next-line
+        expect(await LendingPairFactory.validInterestRateModels(ev!.args!.ir)).to.be.true
+    })
+
+    it("createLendingPairWithProxy", async () => {
+        const { LendingPairFactory, LendingPair, Vault, CollateralAsset, BorrowAsset, accounts: [admin] } = vars
+
+        const modelTx = await (await LendingPairFactory.connect(vars.blackSmithTeam.signer).createIR(
+            irParams,
+            admin.address
+        )).wait();
+
+        const modelEv = modelTx.events?.find(x => x.event === 'NewInterestRateModel')
         const liquidationFee = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
         const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
 
         await expect(
             LendingPairFactory.createLendingPairWithProxy(
-                admin,
-                MockPriceOracle.address,
-                Vault.address,
+                "demo",
+                "dst",
+                admin.address,
                 CollateralAsset.address,
                 {
                     borrowAsset: BorrowAsset.address,
                     initialExchangeRateMantissa: "1000000000000000000",
                     reserveFactorMantissa: "500000000000000000",
                     collateralFactor,
-                    liquidationFee
+                    liquidationFee,
+                    interestRateModel: modelEv!.args!.ir
                 },
-                interestRateModel.address
             )
         ).to.not.be.reverted
 
@@ -118,8 +211,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
         await expect(await lendingPair.collateralAsset()).eq(CollateralAsset.address)
         await expect(await lendingPair.asset()).eq(BorrowAsset.address)
         await expect(await lendingPair.vault()).eq(Vault.address)
-        await expect(await lendingPair.interestRate()).eq(interestRateModel.address)
-
+        await expect(await lendingPair.interestRate()).eq(modelEv!.args!.ir)
         await expect(await (await lendingPair.liquidationFee()).toString()).eq(liquidationFee.toString())
         await expect(await (await lendingPair.collateralFactor()).toString()).eq(collateralFactor.toString())
     })

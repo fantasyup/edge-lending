@@ -128,6 +128,7 @@ interface IBSLendingPair {
         IERC20 _collateralAsset,
         DataTypes.BorrowAssetConfig calldata borrowConfig,
         IBSWrapperToken _wrappedCollateralAsset,
+        IInterestRateModel _interestRate,
         address _pauseGuardian
     ) external;
 

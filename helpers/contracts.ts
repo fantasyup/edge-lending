@@ -86,6 +86,13 @@ export const getLendingPairDeployment = async(): Promise<LendingPair> =>{
     )) as LendingPair
 }
 
+export const getLendingPairFactoryDeployment = async(): Promise<LendingPairFactory> =>{
+    return (await ethers.getContractAt(
+        ContractId.LendingPairFactory,
+        (await deployments.fixture(ContractId.LendingPairFactory))[ContractId.LendingPairFactory].address
+    )) as LendingPairFactory
+}
+
 export const getInterestRateModelDeployment = async(): Promise<JumpRateModelV2> =>{
     return (await ethers.getContractAt(
         ContractId.JumpRateModelV2,

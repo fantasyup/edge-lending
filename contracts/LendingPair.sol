@@ -45,7 +45,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     uint256 public immutable protocolLiquidationFeeShare;
 
     /// @notice The interest rate model for the borrow asset
-    IInterestRateModel public immutable interestRate;
+    IInterestRateModel public interestRate;
 
     /// @notice The price oracle for the assets
     IPriceOracleAggregator public immutable override oracle;
@@ -124,8 +124,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         IBSVault _vault,
         IPriceOracleAggregator _oracle,
         address _feeWithdrawalAddr,
-        uint256 _procotolLiquidationFeeShare,
-        IInterestRateModel _interestRate
+        uint256 _procotolLiquidationFeeShare
     ) {
         // invalid vault or oracle
         require(address(_vault) != address(0), "IV0");
@@ -133,14 +132,11 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         require(address(_oracle) != address(0), "IV0");
         // invalid fee withdrawal addr
         require(_feeWithdrawalAddr != address(0), "IVWA");
-        // interest rate model
-        require(address(_interestRate) != address(0), "IVIR");
 
         vault = _vault;
         oracle = _oracle;
         feeWithdrawalAddr = _feeWithdrawalAddr;
         protocolLiquidationFeeShare = _procotolLiquidationFeeShare;
-        interestRate = _interestRate;
     }
 
     /// @notice Initialize function
@@ -157,6 +153,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         IERC20 _collateralAsset,
         DataTypes.BorrowAssetConfig calldata borrowConfig,
         IBSWrapperToken _wrappedCollateralAsset,
+        IInterestRateModel _interestRate,
         address _pauseGuardian
     ) external override initializer {
         // invalid asset or collateral asset
@@ -165,6 +162,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         require(_pauseGuardian != address(0), "IVP");
         // validate wrapped collateral asset owner
         require(_wrappedCollateralAsset.owner() == address(this), "IVWC");
+        // interest rate model
+        require(address(_interestRate) != address(0), "IVIR");
         // validate borrow config
         borrowConfig.validBorrowAssetConfig(address(this));
 
@@ -174,6 +173,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         asset = _asset;
         collateralAsset = _collateralAsset;
         borrowIndex = mantissaOne;
+        interestRate = _interestRate;
 
         initialExchangeRateMantissa = borrowConfig.initialExchangeRateMantissa;
         reserveFactorMantissa = borrowConfig.reserveFactorMantissa;
@@ -285,7 +285,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         accountInterestIndex[msg.sender] = borrowIndex;
         // transfer borrow asset to borrower
         vault.transfer(asset, address(this), msg.sender, amountOfSharesToBorrow);
-        
+
         emit Borrow(msg.sender, _amountToBorrow);
     }
 
@@ -379,7 +379,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         // ensure the vault pair has enough borrow asset balance
         require(vault.balanceOf(asset, address(this)) >= vars.amount, "NOT_ENOUGH_BALANCE");
-
+        // reverts if the user doesn't have enough balance
         wrapperBorrowedAsset.burn(msg.sender, vars.burnTokens);
         // transfer
         vault.transfer(asset, address(this), _to, vars.amount);
@@ -578,15 +578,11 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // require the availible value of the collateral locked in this contract the user has
         // is greater than or equal to the amount being withdrawn
         require(maxAmount >= amount, "EXCEEDS_ALLOWED");
-        // require the user has locked up enough collateral to withdraw this amount
-        require(wrappedCollateralAsset.balanceOf(msg.sender) >= amount, "EXCEEDS_BALANCE");
-
         // subtract withdrawn amount from amount stored
-        // collateralBalance[msg.sender] = collateralBalance[msg.sender] - amount;
+        // reverts if the user doesn't have enough balance
         wrappedCollateralAsset.burn(msg.sender, amount);
         // transfer them their token
-        vault.transfer(collateralAsset, address(this), msg.sender, _amount);
-
+        vault.transfer(collateralAsset, address(this), msg.sender, amount);
         emit WithdrawCollateral(msg.sender, amount);
     }
 

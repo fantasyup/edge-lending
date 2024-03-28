@@ -6,6 +6,7 @@ import {
     JumpRateModelV2,
     LendingPair as BLendingPair,
     LendingPair,
+    LendingPairFactory,
     LendingPairHelper,
     MockFlashBorrower,
     MockPriceOracle,
@@ -33,7 +34,8 @@ import {
   getInterestRateModelDeployment,
   getPriceOracleAggregatorDeployment,
   deployMockFlashBorrower,
-  deployMockVault
+  deployMockVault,
+  getLendingPairFactoryDeployment
 } from "../helpers/contracts";
 import { EthereumAddress, IAssetDetails } from "../helpers/types";
 import { signVaultApproveContractMessage } from "../helpers/message";
@@ -53,7 +55,7 @@ export async function depositInVault(
 
 export async function makeLendingPairTestSuiteVars(
         price?: BigNumber
-    ): Promise<Pick<TestVars, 'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair' | 'LendingPairHelper'>> {
+    ): Promise<Pick<TestVars, 'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair' | 'LendingPairHelper' | 'LendingPairFactory'>> {
     return {
         Vault: await getVaultDeployment(),
         PriceOracleAggregator: await getPriceOracleAggregatorDeployment(),
@@ -62,7 +64,8 @@ export async function makeLendingPairTestSuiteVars(
         DebtToken: await getDebtTokenDeployment(),
         InterestRateModel: await getInterestRateModelDeployment(),
         LendingPair: await getLendingPairDeployment(),
-        LendingPairHelper: await getLendingPairHelperDeployment()
+        LendingPairHelper: await getLendingPairHelperDeployment(),
+        LendingPairFactory: await getLendingPairFactoryDeployment()
     }
 }
 
@@ -107,7 +110,7 @@ export interface TestVars {
     BorrowAssetMockPriceOracle: MockPriceOracle,
     CollateralAssetMockPriceOracle: MockPriceOracle,
     FlashBorrower: MockFlashBorrower,
-
+    LendingPairFactory: LendingPairFactory,
 }
 
 const testVars: TestVars = {
@@ -127,6 +130,7 @@ const testVars: TestVars = {
     LendingPair: {} as LendingPair,
     blackSmithTeam: {} as IAccount,
     FlashBorrower: {} as MockFlashBorrower,
+    LendingPairFactory: {} as LendingPairFactory
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
@@ -257,6 +261,106 @@ export function LendingPairHelpers(
           }
     }
 }
+  
+export async function setupLendingPair(
+    lendingPair: LendingPair,
+    CollateralAsset: MockToken,
+    BorrowAsset: MockToken,
+    BorrowAssetDepositWrapperToken: WrapperToken,
+    CollateralWrapperToken: WrapperToken,
+    DebtWrapperToken: DebtToken
+  ) {
+    // collateral wrapper token
+    await initializeWrapperTokens(
+      lendingPair.address,
+      CollateralWrapperToken,
+      CollateralAsset.address
+    )
+  
+    // borrow wrapper token
+    await initializeWrapperTokens(
+      lendingPair.address,
+      BorrowAssetDepositWrapperToken,
+      BorrowAsset.address
+    )
+    
+    // debt token
+    await initializeWrapperTokens(
+      lendingPair.address,
+      DebtWrapperToken,
+      BorrowAsset.address
+    )
+  }
+  
+export interface LendingPairInitVars {
+    initialExchangeRateMantissa: BigNumber,
+    reserveFactorMantissa: BigNumber,
+    collateralFactor: BigNumber,
+    liquidationFee: BigNumber,
+    account: IAccount,
+    accountsToApproveInVault?: IAccount[]
+}
+
+export async function setupAndInitLendingPair(
+    {
+      Vault,
+      LendingPair,
+      BorrowAsset,
+      CollateralAsset,
+      BorrowWrapperToken,
+      CollateralWrapperToken,
+      DebtToken,
+      PriceOracleAggregator,
+      BorrowAssetMockPriceOracle,
+      CollateralAssetMockPriceOracle,
+      InterestRateModel,
+      blackSmithTeam
+    } : TestVars,
+    {
+        initialExchangeRateMantissa,
+        reserveFactorMantissa,
+        collateralFactor,
+        liquidationFee,
+        account,
+        accountsToApproveInVault
+    }: LendingPairInitVars
+  ) {
+    await setupLendingPair(
+      LendingPair,
+      CollateralAsset,
+      BorrowAsset,
+      BorrowWrapperToken,
+      CollateralWrapperToken,
+      DebtToken
+    )
+  
+    await LendingPair.initialize(
+      "Test",
+      "TST",
+      BorrowAsset.address,
+      CollateralAsset.address,
+      {
+        initialExchangeRateMantissa: initialExchangeRateMantissa,
+        reserveFactorMantissa,
+        collateralFactor,
+        wrappedBorrowAsset: BorrowWrapperToken.address,
+        liquidationFee,
+        debtToken: DebtToken.address
+      },
+      CollateralWrapperToken.address,
+      InterestRateModel.address,
+      account.address
+    );
+  
+    const helper = LendingPairHelpers(Vault, LendingPair, BorrowAsset, CollateralAsset, PriceOracleAggregator, blackSmithTeam)
+    await helper.addPriceOracleForAsset(CollateralAsset, CollateralAssetMockPriceOracle);
+    await helper.addPriceOracleForAsset(BorrowAsset, BorrowAssetMockPriceOracle);
+  
+    accountsToApproveInVault && await Promise.all(accountsToApproveInVault?.map(account => helper.approveLendingPairInVault(account, true)))
+  
+    return helper
+  }
+  
 
 
 // export class LendingPairTestSuiteVars {

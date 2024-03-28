@@ -26,7 +26,6 @@ const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnv
   const feeWithdrawalAddr = blackSmithTeam
   /// @TODO update to share
   const feeshare = BigNumber.from(10).pow(18)
-  const interestRateModel = await get(ContractId.JumpRateModelV2)
 
   await deploy(ContractId.LendingPair, {
     from: deployer,
@@ -35,7 +34,6 @@ const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnv
       oracle.address,
       feeWithdrawalAddr,
       feeshare,
-      interestRateModel.address
     ],
     log: true,
     libraries: {

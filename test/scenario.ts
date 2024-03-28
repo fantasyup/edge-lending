@@ -33,7 +33,7 @@ runTestSuite("scenarios", (vars: TestVars) => {
         for (let i = 0 ; i < decimalPlaces.length; i++ ) {
           // resets the contract state
           await deployments.fixture();
-          
+
           const BorrowTokenDecimalPlaces = decimalPlaces[i][0];
           const CollateralTokenDecimalPlaces = decimalPlaces[i][1];
           const {
@@ -89,6 +89,7 @@ runTestSuite("scenarios", (vars: TestVars) => {
               debtToken: newDebtWrapperToken.address,
             },
             newCollateralWrapperToken.address,
+            InterestRateModel.address,
             admin.address
           );
 

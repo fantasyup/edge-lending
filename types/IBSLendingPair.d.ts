@@ -32,7 +32,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     "depositBorrowAsset(address,uint256)": FunctionFragment;
     "depositCollateral(address,uint256)": FunctionFragment;
     "getMaxWithdrawAllowed(address)": FunctionFragment;
-    "initialize(string,string,address,address,tuple,address,address)": FunctionFragment;
+    "initialize(string,string,address,address,tuple,address,address,address)": FunctionFragment;
     "oracle()": FunctionFragment;
     "redeem(address,uint256)": FunctionFragment;
   };
@@ -90,6 +90,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
         liquidationFee: BigNumberish;
         debtToken: string;
       },
+      string,
       string,
       string
     ]
@@ -321,11 +322,12 @@ export class IBSLendingPair extends Contract {
         debtToken: string;
       },
       _wrappedCollateralAsset: string,
+      _interestRate: string,
       _pauseGuardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address,address)"(
       _name: string,
       _symbol: string,
       _asset: string,
@@ -339,6 +341,7 @@ export class IBSLendingPair extends Contract {
         debtToken: string;
       },
       _wrappedCollateralAsset: string,
+      _interestRate: string,
       _pauseGuardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -464,11 +467,12 @@ export class IBSLendingPair extends Contract {
       debtToken: string;
     },
     _wrappedCollateralAsset: string,
+    _interestRate: string,
     _pauseGuardian: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+  "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address,address)"(
     _name: string,
     _symbol: string,
     _asset: string,
@@ -482,6 +486,7 @@ export class IBSLendingPair extends Contract {
       debtToken: string;
     },
     _wrappedCollateralAsset: string,
+    _interestRate: string,
     _pauseGuardian: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -607,11 +612,12 @@ export class IBSLendingPair extends Contract {
         debtToken: string;
       },
       _wrappedCollateralAsset: string,
+      _interestRate: string,
       _pauseGuardian: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address,address)"(
       _name: string,
       _symbol: string,
       _asset: string,
@@ -625,6 +631,7 @@ export class IBSLendingPair extends Contract {
         debtToken: string;
       },
       _wrappedCollateralAsset: string,
+      _interestRate: string,
       _pauseGuardian: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -909,11 +916,12 @@ export class IBSLendingPair extends Contract {
         debtToken: string;
       },
       _wrappedCollateralAsset: string,
+      _interestRate: string,
       _pauseGuardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address,address)"(
       _name: string,
       _symbol: string,
       _asset: string,
@@ -927,6 +935,7 @@ export class IBSLendingPair extends Contract {
         debtToken: string;
       },
       _wrappedCollateralAsset: string,
+      _interestRate: string,
       _pauseGuardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1055,11 +1064,12 @@ export class IBSLendingPair extends Contract {
         debtToken: string;
       },
       _wrappedCollateralAsset: string,
+      _interestRate: string,
       _pauseGuardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address)"(
+    "initialize(string,string,address,address,(uint256,uint256,uint256,address,uint256,address),address,address,address)"(
       _name: string,
       _symbol: string,
       _asset: string,
@@ -1073,6 +1083,7 @@ export class IBSLendingPair extends Contract {
         debtToken: string;
       },
       _wrappedCollateralAsset: string,
+      _interestRate: string,
       _pauseGuardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

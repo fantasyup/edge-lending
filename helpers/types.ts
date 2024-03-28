@@ -36,4 +36,11 @@ export interface IApproveMessageData {
     contract: EthereumAddress
 }
 
+export interface IDelegateBorrowMessageData {
+    from: EthereumAddress,
+    to: EthereumAddress,
+    amount: number,
+    nonce: number
+}
+
 export type EthereumAddress = string;

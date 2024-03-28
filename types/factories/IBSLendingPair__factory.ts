@@ -620,6 +620,11 @@ const _abi = [
         type: "address",
       },
       {
+        internalType: "contract IInterestRateModel",
+        name: "_interestRate",
+        type: "address",
+      },
+      {
         internalType: "address",
         name: "_pauseGuardian",
         type: "address",

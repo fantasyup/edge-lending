@@ -1,5 +1,5 @@
 import { ethers, utils } from 'ethers'
-import { IApproveMessageData, IAssetDetails } from './types'
+import { IApproveMessageData, IAssetDetails, IDelegateBorrowMessageData } from './types'
 import { ecsign } from "ethereumjs-util"
 import { MockToken } from '../types'
 
@@ -10,6 +10,10 @@ const PERMIT_TYPEHASH = keccak256(
 )
 const VAULT_APPROVAL_TYPEHASH = keccak256(
 	toUtf8Bytes('VaultAccessApproval(bytes32 warning,address user,address contract,bool approved,uint256 nonce)')
+)
+
+const DELEGATE_BORROW_TYPE_HASH = keccak256(
+    toUtf8Bytes('BorrowDelegate(bytes32 warning,address user,address contract,uint amount,uint256 nonce)')
 )
 
 export function getDomainSeparator(name: string, version: string, tokenAddress: string, chainId: number) {
@@ -76,6 +80,10 @@ export function getVaultSignApproveContractMessage(vaultDetails: IAssetDetails, 
 			]
 		)
 	)
+}
+
+export function getDebtTokenDelegateBorrowMessage(vaultDetails: IAssetDetails, data: IDelegateBorrowMessageData) {
+
 }
 
 export async function signVaultApproveContractMessage(
