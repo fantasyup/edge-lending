@@ -13,7 +13,7 @@ const VAULT_APPROVAL_TYPEHASH = keccak256(
 )
 
 const DELEGATE_BORROW_TYPE_HASH = keccak256(
-    toUtf8Bytes('BorrowDelegate(bytes32 warning,address user,address contract,uint amount,uint256 nonce)')
+    toUtf8Bytes('BorrowDelegate(bytes32 warning,address from,address to,uint amount,uint256 nonce)')
 )
 
 export function getDomainSeparator(name: string, version: string, tokenAddress: string, chainId: number) {
@@ -82,8 +82,26 @@ export function getVaultSignApproveContractMessage(vaultDetails: IAssetDetails, 
 	)
 }
 
-export function getDebtTokenDelegateBorrowMessage(vaultDetails: IAssetDetails, data: IDelegateBorrowMessageData) {
-
+export function getDebtTokenDelegateBorrowMessage(debtTokenDetails: IAssetDetails, data: IDelegateBorrowMessageData) {
+    const DOMAIN_SEPARATOR = getDomainSeparator(debtTokenDetails.name, debtTokenDetails.version, debtTokenDetails.address, debtTokenDetails.chainId)
+    const warning =  keccak256(toUtf8Bytes(`You are delegating borrow to user, read more here: https://edge.finance/delegate`))
+    
+    return keccak256(
+		solidityPack(
+			['bytes1', 'bytes1', 'bytes32', 'bytes32'],
+			[
+				'0x19',
+				'0x01',
+				DOMAIN_SEPARATOR,
+				keccak256(
+					defaultAbiCoder.encode(
+						['bytes32', 'bytes32', 'address', 'address', 'uint256', 'uint256'],
+						[DELEGATE_BORROW_TYPE_HASH, warning, data.from, data.to, data.amount, data.nonce]
+					)
+				)
+			]
+		)
+	)
 }
 
 export async function signVaultApproveContractMessage(
@@ -93,6 +111,21 @@ export async function signVaultApproveContractMessage(
 ): Promise<{ v: number, r: Buffer, s: Buffer }> {
     const data = getVaultSignApproveContractMessage(vaultDetails, messageData)
 
+    const { v, r, s } = ecsign(
+        Buffer.from(data.slice(2), 'hex'),
+        Buffer.from(privateKey.slice(2), 'hex')
+    )
+
+    return { v, r, s }
+}
+
+export async function signDebtTokenBorrowDelegateMessage(
+    privateKey: string,
+    vaultDetails: IAssetDetails, 
+    messageData: IDelegateBorrowMessageData
+): Promise<{ v: number, r: Buffer, s: Buffer }> {
+    const data = getDebtTokenDelegateBorrowMessage(vaultDetails, messageData)
+    console.log({ data })
     const { v, r, s } = ecsign(
         Buffer.from(data.slice(2), 'hex'),
         Buffer.from(privateKey.slice(2), 'hex')

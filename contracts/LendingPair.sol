@@ -258,13 +258,13 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         require(_debtOwner != address(0), "INVALID_DEBT_OWNER");
         // save on sload
         uint8 __borrowAssetUnderlyingDecimal = _borrowAssetUnderlyingDecimal;
-        uint256 borrowedTotalWithInterest = borrowBalanceCurrent(msg.sender);
+        uint256 borrowedTotalWithInterest = borrowBalanceCurrent(_debtOwner);
         uint256 currentBorrowAssetPrice = oracle.getPriceInUSD(asset);
         uint256 borrowedTotalInUSDNormalized =
             normalize(borrowedTotalWithInterest, __borrowAssetUnderlyingDecimal) *
                 currentBorrowAssetPrice;
         uint256 borrowLimitInUSDNormalized =
-            normalize(getBorrowLimit(msg.sender), _collateralAssetUnderlyingDecimal) *
+            normalize(getBorrowLimit(_debtOwner), _collateralAssetUnderlyingDecimal) *
                 getPriceOfCollateral();
         uint256 borrowAmountAllowedInUSDNormalized =
             borrowLimitInUSDNormalized - borrowedTotalInUSDNormalized;
@@ -282,8 +282,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // mint debt tokens to _debtOwner account
         debtToken.mint(_debtOwner, msg.sender, _amountToBorrow);
         // set interest index
-        accountInterestIndex[msg.sender] = borrowIndex;
+        accountInterestIndex[_debtOwner] = borrowIndex;
         // transfer borrow asset to borrower
+                    console.logString("go to min5t");
+
         vault.transfer(asset, address(this), msg.sender, amountOfSharesToBorrow);
 
         emit Borrow(msg.sender, _amountToBorrow);

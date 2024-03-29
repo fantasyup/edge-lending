@@ -38,7 +38,7 @@ import {
   getLendingPairFactoryDeployment
 } from "../helpers/contracts";
 import { EthereumAddress, IAssetDetails } from "../helpers/types";
-import { signVaultApproveContractMessage } from "../helpers/message";
+import { signDebtTokenBorrowDelegateMessage, signVaultApproveContractMessage } from "../helpers/message";
 import { assert } from "chai";
 
 export async function depositInVault(
@@ -188,7 +188,7 @@ export function LendingPairHelpers(
             address: vault.address,
             chainId: (await ethers.provider.getNetwork()).chainId,
             version: await vault.version()
-        };
+        }
         const nonce = (await vault.userApprovalNonce(account.address)).toNumber()
         const { v, r, s } = await signVaultApproveContractMessage(
             account.privateKey,
@@ -211,8 +211,39 @@ export function LendingPairHelpers(
         )
     }
 
+    const delegateBorrowWithSignedMessage = async(debtToken: DebtToken, from: IAccount, to: IAccount, amount: number) => {
+        const debtTokenDetails = { 
+            name: await debtToken.name(),
+            address: debtToken.address,
+            chainId: (await ethers.provider.getNetwork()).chainId,
+            version: '1'
+        }
+
+        const nonce = (await debtToken.userBorrowAllowanceNonce(from.address)).toNumber()
+        const { v, r, s } = await signDebtTokenBorrowDelegateMessage(
+            from.privateKey,
+            debtTokenDetails,
+            {
+                from: from.address,
+                to: to.address,
+                amount,
+                nonce
+            }
+        )
+
+        return await debtToken.connect(from.signer).delegateBorrowWithSignedMessage(
+            from.address,
+            to.address,
+            amount,
+            v,
+            r,
+            s
+        )
+    }
+
     return {
         approveInVault,
+        delegateBorrowWithSignedMessage,
         addPriceOracleForAsset: async(
             asset: MockToken,
             priceOracle: MockPriceOracle

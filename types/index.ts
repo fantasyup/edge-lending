@@ -44,6 +44,7 @@ export type { UUPSProxy } from "./UUPSProxy";
 export type { Ownable } from "./Ownable";
 export type { Vault } from "./Vault";
 export type { VaultBase } from "./VaultBase";
+export type { VaultStorageV1 } from "./VaultStorageV1";
 export type { VaultFactory } from "./VaultFactory";
 export type { WrapperToken } from "./WrapperToken";
 
@@ -90,5 +91,6 @@ export { UUPSProxy__factory } from "./factories/UUPSProxy__factory";
 export { Ownable__factory } from "./factories/Ownable__factory";
 export { Vault__factory } from "./factories/Vault__factory";
 export { VaultBase__factory } from "./factories/VaultBase__factory";
+export { VaultStorageV1__factory } from "./factories/VaultStorageV1__factory";
 export { VaultFactory__factory } from "./factories/VaultFactory__factory";
 export { WrapperToken__factory } from "./factories/WrapperToken__factory";

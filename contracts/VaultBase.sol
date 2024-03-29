@@ -7,34 +7,11 @@ import {UUPSProxiableAndPausable} from "./upgradability/UUPSProxiableAndPausable
 import "./interfaces/IBSVault.sol";
 import "hardhat/console.sol";
 
-abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
-    /// @dev vault approval message digest
-    bytes32 internal constant _VAULT_APPROVAL_SIGNATURE_TYPE_HASH =
-        keccak256(
-            "VaultAccessApproval(bytes32 warning,address user,address contract,bool approved,uint256 nonce)"
-        );
-
-    /// @dev EIP712 type hash
-    bytes32 private constant _EIP712_TYPE_HASH =
-        keccak256(
-            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        );
-    
-    /// @dev ERC3156 constant for flashloan callback success
-    bytes32 internal constant FLASHLOAN_CALLBACK_SUCCESS =
-        keccak256("ERC3156FlashBorrower.onFlashLoan");
-    
-    /// @notice max flashlaon rate 10%
-    uint256 public constant MAX_FLASHLOAN_RATE = 1 * 10**17;
-    bytes32 internal immutable _HASHED_NAME;
-    bytes32 internal immutable _HASHED_VERSION;
-    bytes32 private immutable _CACHED_DOMAIN_SEPARATOR;
-    uint256 private immutable _CACHED_CHAIN_ID;
-
-    /// @notice name
+abstract contract VaultStorageV1 is IBSVault {
+    /// @notice vault name
     string public name;
 
-    /// @notice version
+    /// @notice vault version
     string public version;
 
     /// @notice the flashloan rate to charge for flash loans
@@ -57,6 +34,32 @@ abstract contract VaultBase is UUPSProxiableAndPausable, IBSVault {
 
     /// @notice mapping of user to approval nonce
     mapping(address => uint256) public userApprovalNonce;
+}
+
+abstract contract VaultBase is UUPSProxiableAndPausable, VaultStorageV1  {
+    /// @dev vault approval message digest
+    bytes32 internal constant _VAULT_APPROVAL_SIGNATURE_TYPE_HASH =
+        keccak256(
+            "VaultAccessApproval(bytes32 warning,address user,address contract,bool approved,uint256 nonce)"
+        );
+
+    /// @dev EIP712 type hash
+    bytes32 private constant _EIP712_TYPE_HASH =
+        keccak256(
+            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        );
+    
+    /// @dev ERC3156 constant for flashloan callback success
+    bytes32 internal constant FLASHLOAN_CALLBACK_SUCCESS =
+        keccak256("ERC3156FlashBorrower.onFlashLoan");
+    
+    /// @notice max flashlaon rate 10%
+    uint256 public constant MAX_FLASHLOAN_RATE = 1 * 10**17;
+
+    bytes32 internal immutable _HASHED_NAME;
+    bytes32 internal immutable _HASHED_VERSION;
+    bytes32 private immutable _CACHED_DOMAIN_SEPARATOR;
+    uint256 private immutable _CACHED_CHAIN_ID;
 
     constructor(string memory _name, string memory _version) {
         name = _name;

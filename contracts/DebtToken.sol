@@ -17,7 +17,7 @@ contract DebtToken is WrapperToken, IDebtToken {
     /// @dev debt token delegate borrow message digest
     bytes32 internal constant _DEBT_BORROW_DELEGATE_SIGNATURE_TYPE_HASH =
         keccak256(
-            "BorrowDelegate(bytes32 warning,address user,address contract,uint amount,uint256 nonce)"
+            "BorrowDelegate(bytes32 warning,address from,address to,uint amount,uint256 nonce)"
         );
 
     /// @dev user delegated borrow allowances
@@ -116,7 +116,6 @@ contract DebtToken is WrapperToken, IDebtToken {
                         abi.encode(
                             _DEBT_BORROW_DELEGATE_SIGNATURE_TYPE_HASH,
                             keccak256(
-                                // solhint-disable-next-line
                                 "You are delegating borrow to user, read more here: https://edge.finance/delegate"
                             ),
                             _from,
@@ -127,7 +126,7 @@ contract DebtToken is WrapperToken, IDebtToken {
                     )
                 )
             );
-
+        
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress == _from, "INVALID_SIGNATURE");
 
@@ -136,7 +135,6 @@ contract DebtToken is WrapperToken, IDebtToken {
 
     function _decreaseBorrowAllowance(address _from, address _to, uint256 _amount) internal {
         _borrowAllowances[_from][_to] =  _borrowAllowances[_from][_to] - _amount;
-        emit DelegateBorrow(_from, _to, _amount, block.timestamp);
     }
     
     /// @notice used to increase the debt of the system
