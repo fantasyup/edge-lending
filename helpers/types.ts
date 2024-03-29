@@ -19,7 +19,8 @@ export enum ContractId {
     CollateralWrapperToken = 'CollateralWrapperToken',
     MockChainlinkUSDAdapter = 'MockChainlinkUSDAdapter',
     VaultStorageLayoutTester = 'VaultStorageLayoutTester',
-    SafeERC20 = 'SafeERC20'
+    SafeERC20 = 'SafeERC20',
+    VaultFactory = 'VaultFactory'
 }
 
 export interface IAssetDetails {

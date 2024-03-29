@@ -65,9 +65,6 @@ runTestSuite("Borrow Delegation", (vars: TestVars) => {
 
         // alice cannot borrow more than the borrow
         // allowance frank gave her
-        await expect(LendingPair.connect(alice.signer).borrow(100, frank.address)).to.revertedWith('')
-
-        
+        await expect(LendingPair.connect(alice.signer).borrow(100, frank.address)).to.revertedWith('')        
     })
-
 })

@@ -14,17 +14,12 @@ import {
     MockVault,
     Vault as BVault,
     Vault,
+    VaultFactory,
     WrapperToken,
 } from "../types";
 import { 
-    deployCollateralWrapperToken,
-    deployDebtToken,
-  deployInterestRateModel,
-//   deployLendingPair,
   deployMockPriceOracle,
   deployMockToken,
-  deployVault,
-  deployWrappedToken,
   getCollateralWrapperDeployment,
   getVaultDeployment,
   getDebtTokenDeployment,
@@ -35,9 +30,10 @@ import {
   getPriceOracleAggregatorDeployment,
   deployMockFlashBorrower,
   deployMockVault,
-  getLendingPairFactoryDeployment
+  getLendingPairFactoryDeployment,
+  getVaultFactoryDeployment
 } from "../helpers/contracts";
-import { EthereumAddress, IAssetDetails } from "../helpers/types";
+import { EthereumAddress } from "../helpers/types";
 import { signDebtTokenBorrowDelegateMessage, signVaultApproveContractMessage } from "../helpers/message";
 import { assert } from "chai";
 
@@ -55,7 +51,10 @@ export async function depositInVault(
 
 export async function makeLendingPairTestSuiteVars(
         price?: BigNumber
-    ): Promise<Pick<TestVars, 'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair' | 'LendingPairHelper' | 'LendingPairFactory'>> {
+    ): Promise<Pick<
+        TestVars,
+        'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair' | 'LendingPairHelper' | 'LendingPairFactory' | 'VaultFactory'
+    >> {
     return {
         Vault: await getVaultDeployment(),
         PriceOracleAggregator: await getPriceOracleAggregatorDeployment(),
@@ -65,7 +64,8 @@ export async function makeLendingPairTestSuiteVars(
         InterestRateModel: await getInterestRateModelDeployment(),
         LendingPair: await getLendingPairDeployment(),
         LendingPairHelper: await getLendingPairHelperDeployment(),
-        LendingPairFactory: await getLendingPairFactoryDeployment()
+        LendingPairFactory: await getLendingPairFactoryDeployment(),
+        VaultFactory: await getVaultFactoryDeployment()
     }
 }
 
@@ -111,6 +111,7 @@ export interface TestVars {
     CollateralAssetMockPriceOracle: MockPriceOracle,
     FlashBorrower: MockFlashBorrower,
     LendingPairFactory: LendingPairFactory,
+    VaultFactory: VaultFactory,
 }
 
 const testVars: TestVars = {
@@ -130,7 +131,8 @@ const testVars: TestVars = {
     LendingPair: {} as LendingPair,
     blackSmithTeam: {} as IAccount,
     FlashBorrower: {} as MockFlashBorrower,
-    LendingPairFactory: {} as LendingPairFactory
+    LendingPairFactory: {} as LendingPairFactory,
+    VaultFactory: {} as VaultFactory
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
@@ -392,53 +394,3 @@ export async function setupAndInitLendingPair(
     return helper
   }
   
-
-
-// export class LendingPairTestSuiteVars {
-//     Vault: BVault;
-//     LendingPair: BLendingPair;
-//     BorrowAsset: MockToken;
-//     CollateralAsset: MockToken
-
-//     constructor(
-//         vault: BVault,
-//         lendingPair: BLendingPair,
-//         borrowAsset: MockToken,
-//         collateralAsset: MockToken
-//     ) {
-//         this.Vault = vault
-//         this.LendingPair = lendingPair
-//         this.BorrowAsset = borrowAsset
-//         this.CollateralAsset = collateralAsset
-//     }
-
-//     depositBorrowAsset = async(
-//         lendingPair: BLendingPair,
-//         account: string,
-//         amountToDeposit: number
-//     )  => {
-//         const signer = await ethers.getSigner(account)
-        
-//         await depositInVault(this.Vault, this.BorrowAsset, signer, amountToDeposit)
-//         // approve 
-//         await this.Vault.connect(signer).approveContract(lendingPair.address, true);
-//         const userShareBalance = await (await this.Vault.balanceOf(this.BorrowAsset.address, account)).toNumber()
-        
-//         return await this.LendingPair.connect(signer).depositBorrowAsset(account, userShareBalance)
-//     }
-      
-//     depositCollateralAsset = async (
-//         lendingPair: BLendingPair,
-//         account: string,
-//         amountToDeposit: number
-//     ) => {
-//         const signer = await ethers.getSigner(account)
-      
-//         await depositInVault(this.Vault, this.CollateralAsset, signer, amountToDeposit)
-//         // approve 
-//         await this.Vault.connect(signer).approveContract(lendingPair.address, true);
-//         return await this.LendingPair.connect(signer).depositCollateral(account, amountToDeposit)
-//     }
-// }
-
-

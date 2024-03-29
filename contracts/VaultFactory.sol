@@ -19,7 +19,7 @@ contract VaultFactory {
 
     /// @notice modifier to allow only the owner to call a function
     modifier onlyOwner {
-        require(msg.sender == owner, "ONLY_ADMIN");
+        require(msg.sender == owner, "ONLY_OWNER");
         _;
     }
 
@@ -45,6 +45,7 @@ contract VaultFactory {
     /// @param _vaultOwner address allowed to perform vault `admin` functions
     function createUpgradableVault(uint256 _flashLoanRate, address _vaultOwner)
         external
+        onlyOwner
         returns (address proxy)
     {
         UUPSProxy uupsProxy = new UUPSProxy();
@@ -54,6 +55,7 @@ contract VaultFactory {
         
         // initiailize vault & validates the input properties
         IBSVault(proxy).initialize(_flashLoanRate, _vaultOwner);
+
         emit NewVault(proxy, block.timestamp);
     }
 }

@@ -284,8 +284,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // set interest index
         accountInterestIndex[_debtOwner] = borrowIndex;
         // transfer borrow asset to borrower
-                    console.logString("go to min5t");
-
         vault.transfer(asset, address(this), msg.sender, amountOfSharesToBorrow);
 
         emit Borrow(msg.sender, _amountToBorrow);

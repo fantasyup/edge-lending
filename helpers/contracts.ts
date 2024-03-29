@@ -13,7 +13,7 @@ import {
     MockLendingPair,
     MockPriceOracle,
     MockToken,
-    MockVault, PriceOracleAggregator, UUPSProxy, VaultStorageLayoutTester, WrapperToken 
+    MockVault, PriceOracleAggregator, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken 
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
@@ -107,6 +107,12 @@ export const getPriceOracleAggregatorDeployment = async(): Promise<IPriceOracleA
     )) as IPriceOracleAggregator
 }
 
+export const getVaultFactoryDeployment = async(): Promise<VaultFactory> =>{
+    return (await ethers.getContractAt(
+        ContractId.VaultFactory,
+        (await deployments.fixture(ContractId.VaultFactory))[ContractId.VaultFactory].address
+    )) as VaultFactory
+}
 
 // getLendingPairDeployment
 export const deployMockToken = async(decimals ?: number) => {
@@ -226,9 +232,3 @@ export const deployLendingPairFactory = async(
         borrowAssetWrapperLogic
     ])
 }
-
-// minimal proxy contract
-export const deployERC1167LendingPair = async() => {
-
-}
-
