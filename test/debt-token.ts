@@ -26,12 +26,12 @@ describe("DebtToken", async function () {
     })
 
     it("mint", async function() {
-        await DebtToken.mint(admin, 1000)
+        await DebtToken["mint(address,address,uint256)"](admin, admin, 1000)
     })
 
     it("mint - fails if not owner", async function() {
         await expect(
-            DebtToken.connect(await ethers.getSigner(bob)).mint(admin, 1000)
+            DebtToken.connect(await ethers.getSigner(bob))["mint(address,address,uint256)"](admin, admin, 1000)
         ).to.be.reverted
     })
 

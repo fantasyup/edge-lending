@@ -4,7 +4,7 @@ export enum ContractId {
     LendingPair = 'LendingPair',
     LendingPairFactory = 'LendingPairFactory',
     Control = 'Control',
-    WrapperToken = 'WrapperToken',
+    WrapperToken = 'BorrowWrapperToken',
     UUPSProxy = 'UUPSProxy',
     MockFlashBorrower = 'MockFlashBorrower',
     MockLendingPair = 'MockLendingPair',
@@ -42,6 +42,11 @@ export interface IDelegateBorrowMessageData {
     to: EthereumAddress,
     amount: number,
     nonce: number
+}
+
+export enum LendingPairActions {
+    Deposit = 0,
+    Borrow = 1,
 }
 
 export type EthereumAddress = string;

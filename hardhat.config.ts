@@ -59,5 +59,8 @@ export default {
     enabled: true,
     // gasPrice: 110,
     // currency: 'USD',
+  },
+  mocha: {
+    timeout: 9000000
   }
 };

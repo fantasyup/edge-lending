@@ -13,13 +13,14 @@ import {
   LendingPair,
   Vault,
 } from "../types";
-import { advanceNBlocks, IAccount, LendingPairHelpers, makeLendingPairTestSuiteVars, runTestSuite, TestVars } from "./lib";
+import { LendingPairActions } from "../helpers/types"
+import { advanceNBlocks, IAccount, LendingPairHelpers, makeLendingPairTestSuiteVars, runTestSuite, setupAndInitLendingPair, TestVars } from "./lib";
 // flash loan rate
 const flashLoanRate = ethers.utils.parseUnits("0.05", 18)
 const BASE = ethers.utils.parseUnits("1", 18)
 
-const initialExchangeRateMantissa = "1000000000000000000"
-const reserveFactorMantissa = "500000000000000000"
+const initialExchangeRateMantissa =  BigNumber.from("1000000000000000000")
+const reserveFactorMantissa =  BigNumber.from("500000000000000000")
   // 150%
 const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
 // 0.005%
@@ -70,63 +71,15 @@ async function setupLendingPair(
   )
 }
 
-async function setupAndInitLendingPair(
-  {
-    Vault,
-    LendingPair,
-    BorrowAsset,
-    CollateralAsset,
-    BorrowWrapperToken,
-    CollateralWrapperToken,
-    DebtToken,
-    PriceOracleAggregator,
-    BorrowAssetMockPriceOracle,
-    CollateralAssetMockPriceOracle,
-    InterestRateModel,
-    blackSmithTeam
-  } : TestVars,
-  account: IAccount,
-  accountsToApproveInVault?: IAccount[]
-) {
-  await setupLendingPair(
-    LendingPair,
-    CollateralAsset,
-    BorrowAsset,
-    BorrowWrapperToken,
-    CollateralWrapperToken,
-    DebtToken
-  )
-
-  await LendingPair.initialize(
-    "Test",
-    "TST",
-    BorrowAsset.address,
-    CollateralAsset.address,
-    {
-      initialExchangeRateMantissa: initialExchangeRateMantissa,
-      reserveFactorMantissa,
-      collateralFactor,
-      wrappedBorrowAsset: BorrowWrapperToken.address,
-      liquidationFee,
-      debtToken: DebtToken.address
-    },
-    CollateralWrapperToken.address,
-    InterestRateModel.address,
-    account.address
-  );
-
-  const helper = LendingPairHelpers(Vault, LendingPair, BorrowAsset, CollateralAsset, PriceOracleAggregator, blackSmithTeam)
-  await helper.addPriceOracleForAsset(CollateralAsset, CollateralAssetMockPriceOracle);
-  await helper.addPriceOracleForAsset(BorrowAsset, BorrowAssetMockPriceOracle);
-
-  accountsToApproveInVault && await Promise.all(accountsToApproveInVault?.map(account => helper.approveLendingPairInVault(account, true)))
-
-  return helper
+const defaultLendingPairInitVars = {
+  initialExchangeRateMantissa,
+  reserveFactorMantissa,
+  collateralFactor,
+  liquidationFee,
 }
 
-
 runTestSuite("LendingPair", (vars: TestVars) => {
-  it("initialize", async function () {
+  it("initialize", async () => {
     const {
       Vault,
       BorrowWrapperToken,
@@ -148,6 +101,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       CollateralWrapperToken,
       DebtToken
     )
+    console.log(LendingPair.address)
 
     await LendingPair.initialize(
       "Test",
@@ -169,7 +123,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
   });
 
-  it('depositBorrowAsset - fails without enough vault balance', async() => {
+  it('depositBorrowAsset - fails without enough vault balance', async () => {
     const {
       Vault,
       BorrowWrapperToken,
@@ -211,7 +165,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
     const helper = await setupAndInitLendingPair(
       vars,
-      admin
+      {...defaultLendingPairInitVars, account: admin }
     )
 
     await expect(
@@ -258,7 +212,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
     const helper = await setupAndInitLendingPair(
       vars,
-      admin
+      {...defaultLendingPairInitVars, account: admin}
     )
 
     await helper.approveLendingPairInVault(bob, true)
@@ -300,7 +254,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     ).to.eq(amountToDeposit * 2)
   })
 
-  it("borrow - fails when you try to borrow more than allowed", async function() {
+  it("borrow - fails when you try to borrow more than allowed", async () => {
     const {
       LendingPair,
       accounts: [admin, frank],
@@ -308,8 +262,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [frank, admin]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin]}      
     )
 
     await helper.depositCollateralAsset(frank, 100)
@@ -320,7 +273,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
   })
 
-  it("borrow - fails when you try to borrow more than cash available in vault", async function() {
+  it("borrow - fails when you try to borrow more than cash available in vault", async () => {
     const {
       LendingPair,
       accounts: [admin, frank, alice],
@@ -328,8 +281,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [frank, alice]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, alice]}      
     )
 
     // deposit 1,000,000
@@ -353,7 +305,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
     const helper = await setupAndInitLendingPair(
       vars,
-      admin
+      {...defaultLendingPairInitVars, account: admin}      
     )
 
     await helper.approveLendingPairInVault(frank, true)
@@ -412,8 +364,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     const { LendingPair, CollateralWrapperToken, accounts: [admin,  frank, bob]} = vars
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [admin, frank, bob]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, bob]}      
     )
 
     await helper.approveLendingPairInVault(bob, true)
@@ -439,12 +390,11 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
   })
 
-  it('withdrawCollateral', async function() {
+  it('withdrawCollateral', async () => {
     const { Vault, LendingPair, CollateralWrapperToken, CollateralAsset, BorrowAsset, accounts: [admin, bob, james]} = vars
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [admin, james, bob]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [james, admin, bob]}      
     )
 
     // const jamesSigner = await ethers.getSigner(james)
@@ -500,15 +450,14 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     expect((await Vault.balanceOf(CollateralAsset.address, james.address)).toNumber()).to.eq(amountToDeposit)
   })
   
-  it("repay - fails if you are trying to pay more than owed", async function() {
+  it("repay - fails if you are trying to pay more than owed", async () => {
     const {
       LendingPair,
       accounts: [admin, frank,],
     } = vars
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [admin, frank]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin]}      
     )
 
     // frank has no borrows
@@ -521,8 +470,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     const { Vault, LendingPair, DebtToken,BorrowAsset, accounts: [admin, bob, frank]} = vars
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [admin, frank, bob]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, bob]}      
     )
 
     // deposit collateral
@@ -577,12 +525,11 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     expect((await DebtToken.balanceOf(frank.address)).toNumber()).to.eq(0)
   })
 
-  it("redeem - fails if you are trying to redeem more than your account", async function() {
+  it("redeem - fails if you are trying to redeem more than your account", async () => {
     const { LendingPair, BorrowWrapperToken, accounts: [admin, bob, frank]} = vars
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [admin, frank, bob]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, bob]}      
     )
 
     const currentWrapperTokenBalance = await (await BorrowWrapperToken.balanceOf(admin.address)).toNumber();
@@ -597,8 +544,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     const { Vault, LendingPair, DebtToken, BorrowWrapperToken ,BorrowAsset, accounts: [admin, bob, frank]} = vars
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [admin, frank, bob]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, bob]}      
     )
 
     await helper.depositBorrowAsset(admin, amountToDeposit)
@@ -648,12 +594,11 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     expect(updatedUserVaultBalance - userVaultBalance >= currentWrapperTokenBalance).true
   })
 
-  it("liquidate - cannot liquidate self", async function() {
+  it("liquidate - cannot liquidate self", async () => {
     const { LendingPair, accounts: [admin, bob, frank]} = vars
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [admin, frank, bob]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, bob]}      
     )
     
     await expect(
@@ -662,12 +607,11 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
    })
 
-  it("liquidate & withdrawFees - correctly", async function() {
+  it("liquidate & withdrawFees - correctly", async () => {
     const { Vault, LendingPair, DebtToken, BorrowAssetMockPriceOracle, CollateralWrapperToken, BorrowAsset, CollateralAsset, accounts: [admin, james, frank]} = vars
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [admin, frank, james]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, james]}      
     )
 
     // deposit collateral
@@ -723,17 +667,80 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     expect(newTeamVaultBalance).to.eq(teamVaultBalance + feesToWithdraw)
   })
 
-  it("withdrawFees - fails without enough balance", async function() {
+  it("withdrawFees - fails without enough balance", async () => {
     const { Vault, LendingPair, accounts: [admin, james, frank]} = vars
     const helper = await setupAndInitLendingPair(
       vars,
-      admin,
-      [admin, frank, james]
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, james]}
     )
 
     await expect(
       LendingPair.withdrawFees(10000000)
     ).to.be.revertedWith("NOT_ENOUGH_BALANCE")
+  })
+
+  it("pause", async () => {
+    const { LendingPair, accounts: [admin, james, frank]} = vars
+    const helper = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, james]}
+    )
+  
+    await expect(
+      LendingPair.connect(james.signer).pause(LendingPairActions.Deposit)
+    ).to.be.reverted
+    
+    await expect(
+      LendingPair.pause(LendingPairActions.Deposit)
+    ).to.not.be.reverted
+
+    await expect(
+      helper.depositBorrowAsset(admin, 1000)
+    ).to.be.revertedWith('PAUSED')
+
+    await expect(
+      helper.depositCollateralAsset(admin, 1000)
+    ).to.be.revertedWith('PAUSED')
+
+    await expect(
+      LendingPair.pause(LendingPairActions.Borrow)
+    ).to.not.be.reverted
+
+    await expect(
+      LendingPair.borrow(10, admin.address)
+    ).to.be.revertedWith('PAUSED')
+  })
+
+  it("unpause", async () => {
+    const { LendingPair, accounts: [admin, james, frank]} = vars
+    const helper = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, james]}
+    )
+    
+    // pause
+    await LendingPair.pause(LendingPairActions.Deposit)
+
+    // unpause
+    await LendingPair.unpause(LendingPairActions.Deposit)
+
+    await expect(
+      helper.depositBorrowAsset(admin, 1000)
+    ).to.not.be.reverted
+
+    await expect(
+      helper.depositCollateralAsset(james, 1000)
+    ).to.not.be.reverted
+
+    // borrow
+    await LendingPair.pause(LendingPairActions.Borrow)
+    // unpause borrow
+    await LendingPair.unpause(LendingPairActions.Borrow)
+
+    await expect(
+      LendingPair.connect(james.signer).borrow(10, james.address)
+    ).to.not.be.reverted
+
   })
 
   // describe("lending pair - dependent actions", async function() {

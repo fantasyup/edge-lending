@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-import "./WrapperToken.sol";
+import {WrapperTokenBase} from "./WrapperToken.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IDebtToken.sol";
+import "./token/ERC20Permit.sol";
+import "./token/IERC20Details.sol";
 import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,7 +13,11 @@ import "hardhat/console.sol";
 /// @author @samparsky
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-contract DebtToken is WrapperToken, IDebtToken {
+contract DebtToken is IDebtToken, WrapperTokenBase {
+    /// @dev debt token version
+    uint256 constant public VERSION = 0x1;
+
+    /// @dev for introspection
     bool constant isDebtToken = true;
 
     /// @dev debt token delegate borrow message digest
@@ -32,7 +38,7 @@ contract DebtToken is WrapperToken, IDebtToken {
         address _underlying,
         string memory _tokenName,
         string memory _tokenSymbol
-    ) external override(WrapperToken, IBSWrapperTokenBase) initializer {
+    ) external override(IBSWrapperTokenBase) initializer {
         require(__owner != address(0), "INVALID_OWNER");
 
         _owner = __owner;
@@ -47,7 +53,7 @@ contract DebtToken is WrapperToken, IDebtToken {
     }
 
     /// @dev calculates the debt balance of account
-    function balanceOf(address _account) public view override(ERC20, IERC20) returns (uint256) {
+    function balanceOf(address _account) public view override(IERC20, ERC20) returns (uint256) {
         return IBSLendingPair(_owner).borrowBalancePrior(_account);
     }
 
@@ -64,6 +70,10 @@ contract DebtToken is WrapperToken, IDebtToken {
         _mint(_debtOwner, _amount);
     }
 
+    function owner() external view override returns (address) {
+        return _owner;
+    }
+
     /**
      * @notice burn is an only owner function that allows the owner to burn  tokens from an input account
      * @param _from is the address where the tokens will be burnt
@@ -71,7 +81,7 @@ contract DebtToken is WrapperToken, IDebtToken {
      **/
     function burn(address _from, uint256 _amount)
         external
-        override(IBSWrapperTokenBase, WrapperToken)
+        override(IBSWrapperTokenBase)
         onlyLendingPair
     {
         _balances[_from] = balanceOf(_from) - _amount;

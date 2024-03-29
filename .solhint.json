@@ -1,4 +1,4 @@
 {
-  "extends": "solhint:default",
+  "extends": "solhintc:default",
   "plugins": ["prettier"]
 }

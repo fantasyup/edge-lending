@@ -7,7 +7,6 @@ import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./token/IERC20Details.sol";
 import "hardhat/console.sol";
-
 import "./util/Initializable.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,24 +16,26 @@ import "./util/Initializable.sol";
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-contract WrapperToken is ERC20Permit, IBSWrapperToken, Initializable {
-    
-    /// @dev wrapper token version
-    uint256 constant public VERSION = 0x1;
 
+abstract contract WrapperTokenBase is ERC20Permit, Initializable {
     /// @dev underlying wrapper token
     address public underlying;
 
     /// @dev the LendingPair is the "owner" for WrapperTokens
     address internal _owner;
 
-    /**
-     * @dev Throws if called by any account other than the owner.
+     /**
+     * @dev Throws if called by any account other than the lendingpair.
      */
     modifier onlyLendingPair() {
         require(address(_owner) == msg.sender, "ONLY_LENDING_PAIR");
         _;
     }
+}
+
+contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
+    /// @dev wrapper token version
+    uint256 constant public VERSION = 0x1;
 
     /// @notice
     function initialize(

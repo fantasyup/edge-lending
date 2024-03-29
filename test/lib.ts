@@ -136,7 +136,7 @@ const testVars: TestVars = {
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
-    describe(title, () => {
+    describe(title, function() {
         before(async () => {
             // we manually derive the signers address using the mnemonic
             // defined in the hardhat config
@@ -158,17 +158,22 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
             testVars.blackSmithTeam  = testVars.accounts.find(x => x.address.toLowerCase() === blackSmithTeam.toLowerCase()) as IAccount
             // do this here because of some unusual race condition
             // in the deployments code
-            testVars.BorrowAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
-            testVars.CollateralAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
-            testVars.BorrowAsset = await deployMockToken()
-            testVars.CollateralAsset = await deployMockToken()
-            testVars.FlashBorrower = await deployMockFlashBorrower()
-            testVars.MockVault = await deployMockVault()
         })
 
         beforeEach(async () => {
-            await deployments.fixture();
-            Object.assign(testVars, await makeLendingPairTestSuiteVars())
+            const setupTest = deployments.createFixture(async ({deployments, getNamedAccounts, ethers}, options) => {
+                await deployments.fixture(); // ensure you start from a fresh deployments
+                testVars.BorrowAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
+                testVars.CollateralAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
+                testVars.BorrowAsset = await deployMockToken()
+                testVars.CollateralAsset = await deployMockToken()
+                testVars.FlashBorrower = await deployMockFlashBorrower()
+                testVars.MockVault = await deployMockVault()
+            });
+
+            await setupTest()
+            const vars = await makeLendingPairTestSuiteVars()
+            Object.assign(testVars, vars)
         })
         
         tests(testVars)
@@ -347,7 +352,7 @@ export async function setupAndInitLendingPair(
       BorrowAssetMockPriceOracle,
       CollateralAssetMockPriceOracle,
       InterestRateModel,
-      blackSmithTeam
+      blackSmithTeam,
     } : TestVars,
     {
         initialExchangeRateMantissa,

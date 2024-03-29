@@ -127,7 +127,7 @@ runTestSuite("Vault", (vars: TestVars) => {
 
   })
 
-  it('approveContract - fails invalid to / fails with wrong signature ', async function() {
+  it('approveContract - fails invalid to / fails with wrong signature ', async () => {
     const { Vault, accounts: [admin,  bob]} = vars
     const vaultDetails = { 
       name: await Vault.name(),
@@ -169,7 +169,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     )).to.be.revertedWith("INVALID_SIGNATURE")
   })
 
-  it('approveContract', async function() {
+  it('approveContract', async() => {
     const { Vault, BorrowAsset, LendingPair, PriceOracleAggregator, accounts: [admin,  bob]} = vars
     const lendingPairHelpers = LendingPairHelpers(Vault, LendingPair, BorrowAsset, BorrowAsset, PriceOracleAggregator, admin)
     
@@ -214,7 +214,7 @@ runTestSuite("Vault", (vars: TestVars) => {
   
   })
 
-  it("deposit fails with invalid `to` address", async function () {
+  it("deposit fails with invalid `to` address", async () => {
     const { Vault, BorrowAsset, accounts: [admin,  bob]} = vars
     await initializeVault(Vault, admin)
     await expect(
@@ -227,14 +227,15 @@ runTestSuite("Vault", (vars: TestVars) => {
     ).to.be.revertedWith("INVALID_TO_ADDRESS");
   });
 
-  it("deposit - correctly with correct user balance", async function () {
+  it("deposit - correctly with correct user balance", async () => {
     const { Vault, BorrowAsset, accounts: [admin,  bob]} = vars
     await initializeVault(Vault, admin)
     // set balance
     await BorrowAsset.setBalanceTo(admin.address, amountToDeposit);
     // approve Vault to take 100
     await BorrowAsset.approve(Vault.address, amountToDeposit);
-    expect(
+
+    await expect(
       await Vault.deposit(BorrowAsset.address, admin.address, admin.address, amountToDeposit)
     )
       .to.emit(Vault, "Deposit")
@@ -255,7 +256,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     );
   });
 
-  it("deposit fails with incorrect approve deposit", async function () {
+  it("deposit fails with incorrect approve deposit", async () => {
     const { Vault, BorrowAsset, accounts: [admin]} = vars
     await initializeVault(Vault, admin)
 
@@ -264,7 +265,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     ).to.be.reverted;
   });
 
-  it("transfer - correctly & fails with invalid `to` address", async function () {
+  it("transfer - correctly & fails with invalid `to` address", async () => {
     const { Vault, BorrowAsset, accounts: [admin,  bob]} = vars
     await initializeVault(Vault, admin)
     // set balance
@@ -305,7 +306,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     );
   });
 
-  it("maxFlashLoan", async function () {
+  it("maxFlashLoan", async () => {
     const { Vault, BorrowAsset } = vars
     const currentTotals = (
       await Vault.totals(BorrowAsset.address)
@@ -315,7 +316,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     ).eq(currentTotals);
   });
 
-  it("flashFee", async function () {
+  it("flashFee", async () => {
     const { Vault, BorrowAsset, accounts: [admin] } = vars
     await initializeVault(Vault, admin)
 
@@ -330,7 +331,7 @@ runTestSuite("Vault", (vars: TestVars) => {
 
   });
 
-  it("flashLoan - correctly", async function () {
+  it("flashLoan - correctly", async () => {
     const { Vault, BorrowAsset, FlashBorrower, accounts: [admin] } = vars
     await initializeVault(Vault, admin)
 
@@ -390,7 +391,7 @@ runTestSuite("Vault", (vars: TestVars) => {
       );
   });
 
-  it("withdraw fails with invalid `to` address", async function () {
+  it("withdraw fails with invalid `to` address", async  () => {
     const { Vault, BorrowAsset, accounts: [admin] } = vars
     await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin])
     await expect(
@@ -403,7 +404,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     ).to.be.revertedWith("INVALID_TO_ADDRESS");
   });
 
-  it("user cannot withdraw more than balance", async function () {
+  it("user cannot withdraw more than balance", async () => {
     const { Vault, BorrowAsset, accounts: [admin] } = vars
     await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin])
     await expect(
@@ -411,7 +412,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     ).to.be.reverted;
   });
 
-  it("withdraw - correctly", async function () {
+  it("withdraw - correctly", async () => {
     const { Vault, BorrowAsset, accounts: [admin] } = vars
     await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin])
 
@@ -427,7 +428,7 @@ runTestSuite("Vault", (vars: TestVars) => {
       currentBalance
     );
     await expect(
-      await Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance)
+      Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance)
     )
       .to.emit(Vault, "Withdraw")
       .withArgs(
@@ -447,7 +448,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     );
   });
 
-  it("updateFlashloanRate", async function () {
+  it("updateFlashloanRate", async () => {
     const { Vault, BorrowAsset, accounts: [admin, bob] } = vars
     await initializeVault(Vault, admin)
 
@@ -460,7 +461,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     expect(await Vault.flashLoanRate()).to.eq(newFlashLoanRate);
   });
 
-  it("transferToNewOwner & acceptOwnership", async function () {
+  it("transferToNewOwner & acceptOwnership", async () => {
     const { Vault, accounts: [admin, bob, alice] } = vars
     await initializeVault(Vault, admin)
 
@@ -473,7 +474,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     ).to.be.revertedWith("INVALID_NEW_OWNER");
     
     await expect(
-      await Vault.transferToNewOwner(alice.address)
+      Vault.transferToNewOwner(alice.address)
     ).to.emit(Vault, 'TransferControl');
 
     expect(await Vault.newOwner()).to.eq(alice.address);
@@ -481,14 +482,14 @@ runTestSuite("Vault", (vars: TestVars) => {
 
     // alice accepts ownership
     await expect(
-      await Vault.connect(alice.signer).acceptOwnership()
+      Vault.connect(alice.signer).acceptOwnership()
     ).to.emit(Vault, 'OwnershipAccepted')
 
     expect(await Vault.newOwner()).to.eq(ethers.constants.AddressZero);
     expect(await Vault.owner()).to.eq(alice.address)
   });
 
-  it("toShare/toUnderlying - convert to appropriate shares & underlying", async function() {
+  it("toShare/toUnderlying - convert to appropriate shares & underlying", async () => {
     const { Vault, BorrowAsset, accounts: [admin, bob, alice] } = vars
 
     const adminAmountToDeposit = 1000

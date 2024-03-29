@@ -47,74 +47,73 @@ export const deployVault = async() => {
 export const getVaultDeployment = async(): Promise<Vault> =>{
     return (await ethers.getContractAt(
         ContractId.Vault,
-        (await deployments.fixture(ContractId.Vault))[ContractId.Vault].address
+        (await deployments.get(ContractId.Vault)).address
     )) as Vault
 }
 
 export const getCollateralWrapperDeployment = async(): Promise<WrapperToken> =>{
     return (await ethers.getContractAt(
         ContractId.CollateralWrapperToken,
-        (await deployments.fixture(ContractId.CollateralWrapperToken))[ContractId.CollateralWrapperToken].address
+        (await deployments.get(ContractId.CollateralWrapperToken)).address
     )) as WrapperToken
 }
 
 export const getBorrowWrapperDeployment = async(): Promise<WrapperToken> =>{
     return (await ethers.getContractAt(
         ContractId.WrapperToken,
-        (await deployments.fixture(ContractId.WrapperToken))[ContractId.WrapperToken].address
+        (await deployments.get(ContractId.WrapperToken)).address
     )) as WrapperToken
 }
 
 export const getDebtTokenDeployment = async(): Promise<DebtToken> =>{
     return (await ethers.getContractAt(
         ContractId.DebtToken,
-        (await deployments.fixture(ContractId.DebtToken))[ContractId.DebtToken].address
+        (await deployments.get(ContractId.DebtToken)).address
     )) as DebtToken
 }
 
 export const getLendingPairHelperDeployment = async(): Promise<LendingPairHelper> =>{
     return (await ethers.getContractAt(
         ContractId.LendingPairHelper,
-        (await deployments.fixture(ContractId.LendingPairHelper))[ContractId.LendingPairHelper].address
+        (await deployments.get(ContractId.LendingPairHelper)).address
     )) as LendingPairHelper
 }
 
 export const getLendingPairDeployment = async(): Promise<LendingPair> =>{
     return (await ethers.getContractAt(
         ContractId.LendingPair,
-        (await deployments.fixture(ContractId.LendingPair))[ContractId.LendingPair].address
+        (await deployments.get(ContractId.LendingPair)).address
     )) as LendingPair
 }
 
 export const getLendingPairFactoryDeployment = async(): Promise<LendingPairFactory> =>{
     return (await ethers.getContractAt(
         ContractId.LendingPairFactory,
-        (await deployments.fixture(ContractId.LendingPairFactory))[ContractId.LendingPairFactory].address
+        (await deployments.get(ContractId.LendingPairFactory)).address
     )) as LendingPairFactory
 }
 
 export const getInterestRateModelDeployment = async(): Promise<JumpRateModelV2> =>{
     return (await ethers.getContractAt(
         ContractId.JumpRateModelV2,
-        (await deployments.fixture(ContractId.JumpRateModelV2))[ContractId.JumpRateModelV2].address
+        (await deployments.get(ContractId.JumpRateModelV2)).address
     )) as JumpRateModelV2
 }
 
 export const getPriceOracleAggregatorDeployment = async(): Promise<IPriceOracleAggregator> =>{
     return (await ethers.getContractAt(
         ContractId.PriceOracleAggregator,
-        (await deployments.fixture(ContractId.PriceOracleAggregator))[ContractId.PriceOracleAggregator].address
+        (await deployments.get(ContractId.PriceOracleAggregator)).address
     )) as IPriceOracleAggregator
 }
 
 export const getVaultFactoryDeployment = async(): Promise<VaultFactory> =>{
     return (await ethers.getContractAt(
         ContractId.VaultFactory,
-        (await deployments.fixture(ContractId.VaultFactory))[ContractId.VaultFactory].address
+        (await deployments.get(ContractId.VaultFactory)).address
     )) as VaultFactory
 }
 
-// getLendingPairDeployment
 export const deployMockToken = async(decimals ?: number) => {
     return await deployContract<MockToken>(ContractId.MockToken, [decimals || 18])
 }
