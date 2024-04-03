@@ -101,7 +101,6 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       CollateralWrapperToken,
       DebtToken
     )
-    console.log(LendingPair.address)
 
     await LendingPair.initialize(
       "Test",

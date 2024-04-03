@@ -654,7 +654,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /// @dev returns price of collateral in usd
-    function getPriceOfBorrowAsset() public returns (uint256) {
+    function getPriceOfBorrowAsset() external returns (uint256) {
         return oracle.getPriceInUSD(asset);
     }
 
@@ -668,7 +668,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice getTotalBorrowedValueInUSD returns the total borrowed value for an account in USD
     /// @param _account is the account whos borrowed value we are calculating
     /// @dev this function returns newly calculated values
-    function getTotalBorrowedValueInUSD(address _account) public returns (uint256) {
+    function getTotalBorrowedValueInUSD(address _account) external returns (uint256) {
         return getPriceOfToken(asset, borrowBalanceCurrent(_account));
     }
 
@@ -690,7 +690,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @dev this calculation uses current values for calculations
     function getBorrowLimitInUSD(address _account) public returns (uint256) {
         uint256 availibleCollateralValue = getTotalAvailableCollateralValueInUSD(_account);
-
         return calcBorrowLimit(availibleCollateralValue);
     }
 

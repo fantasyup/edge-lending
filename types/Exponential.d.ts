@@ -20,16 +20,16 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ExponentialInterface extends ethers.utils.Interface {
   functions: {
-    "c_0x4a27d295(bytes32)": FunctionFragment;
+    "c_0x595d7340(bytes32)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "c_0x4a27d295",
+    functionFragment: "c_0x595d7340",
     values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "c_0x4a27d295",
+    functionFragment: "c_0x595d7340",
     data: BytesLike
   ): Result;
 
@@ -80,35 +80,35 @@ export class Exponential extends Contract {
   interface: ExponentialInterface;
 
   functions: {
-    c_0x4a27d295(
-      c__0x4a27d295: BytesLike,
+    c_0x595d7340(
+      c__0x595d7340: BytesLike,
       overrides?: CallOverrides
     ): Promise<[void]>;
 
-    "c_0x4a27d295(bytes32)"(
-      c__0x4a27d295: BytesLike,
+    "c_0x595d7340(bytes32)"(
+      c__0x595d7340: BytesLike,
       overrides?: CallOverrides
     ): Promise<[void]>;
   };
 
-  c_0x4a27d295(
-    c__0x4a27d295: BytesLike,
+  c_0x595d7340(
+    c__0x595d7340: BytesLike,
     overrides?: CallOverrides
   ): Promise<void>;
 
-  "c_0x4a27d295(bytes32)"(
-    c__0x4a27d295: BytesLike,
+  "c_0x595d7340(bytes32)"(
+    c__0x595d7340: BytesLike,
     overrides?: CallOverrides
   ): Promise<void>;
 
   callStatic: {
-    c_0x4a27d295(
-      c__0x4a27d295: BytesLike,
+    c_0x595d7340(
+      c__0x595d7340: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "c_0x4a27d295(bytes32)"(
-      c__0x4a27d295: BytesLike,
+    "c_0x595d7340(bytes32)"(
+      c__0x595d7340: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -116,25 +116,25 @@ export class Exponential extends Contract {
   filters: {};
 
   estimateGas: {
-    c_0x4a27d295(
-      c__0x4a27d295: BytesLike,
+    c_0x595d7340(
+      c__0x595d7340: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "c_0x4a27d295(bytes32)"(
-      c__0x4a27d295: BytesLike,
+    "c_0x595d7340(bytes32)"(
+      c__0x595d7340: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    c_0x4a27d295(
-      c__0x4a27d295: BytesLike,
+    c_0x595d7340(
+      c__0x595d7340: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "c_0x4a27d295(bytes32)"(
-      c__0x4a27d295: BytesLike,
+    "c_0x595d7340(bytes32)"(
+      c__0x595d7340: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
