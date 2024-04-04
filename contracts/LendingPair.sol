@@ -142,7 +142,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice Initialize function
     /// @param _name for lending pair
     /// @param _symbol for lending pair
-    /// @param _asset borrow asset
+    /// @param _asset borrow asset  
     /// @param _collateralAsset pair collateral
     /// @param _wrappedCollateralAsset wrapped token minted when depositing collateral asset
     /// @param _pauseGuardian pause guardian address

@@ -1,7 +1,7 @@
 import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
-import { DebtToken as BDebtToken } from "../types";
+import { DebtToken as BDebtToken, MockToken } from "../types";
 import { deployDebtToken, deployMockToken } from "../helpers/contracts";
 
 let accounts: Signer[];
@@ -9,6 +9,7 @@ let accounts: Signer[];
 let admin: string; // account used in deploying
 let bob: string;
 let frank: string;
+let token: MockToken
 let DebtToken: BDebtToken
 
 describe("DebtToken", async function () {
@@ -19,14 +20,18 @@ describe("DebtToken", async function () {
             bob,
             frank,
           ] = await Promise.all(accounts.slice(0, 5).map(x => x.getAddress())))
-          const token = await deployMockToken()
-          DebtToken = await deployDebtToken()
-          // admin owner
-          await DebtToken.initialize(admin, token.address, 'Test', 'TST')
+        token = await deployMockToken()
+        DebtToken = await deployDebtToken()
+        // admin owner
+        await DebtToken.initialize(admin, token.address, 'Test', 'TST')
     })
 
     it("mint", async function() {
         await DebtToken["mint(address,address,uint256)"](admin, admin, 1000)
+    })
+
+    it("underlying", async function() {
+        expect(await DebtToken.underlying()).to.eq(token.address)
     })
 
     it("mint - fails if not owner", async function() {
@@ -34,11 +39,6 @@ describe("DebtToken", async function () {
             DebtToken.connect(await ethers.getSigner(bob))["mint(address,address,uint256)"](admin, admin, 1000)
         ).to.be.reverted
     })
-
-    // @TODO mock
-    // it("burn", async function() {
-    //     await DebtToken.burn(admin, 100)
-    // })
 
     it("burn - fails if not owner", async function() {
         await expect(

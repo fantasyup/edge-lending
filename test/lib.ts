@@ -398,4 +398,18 @@ export async function setupAndInitLendingPair(
   
     return helper
   }
-  
+
+
+const initialExchangeRateMantissa =  BigNumber.from("1000000000000000000")
+const reserveFactorMantissa =  BigNumber.from("500000000000000000")
+// 150%
+const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
+// 0.005%
+const liquidationFee = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
+
+export const defaultLendingPairInitVars = {
+    initialExchangeRateMantissa,
+    reserveFactorMantissa,
+    collateralFactor,
+    liquidationFee,
+}

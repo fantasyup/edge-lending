@@ -14,18 +14,11 @@ import {
   Vault,
 } from "../types";
 import { LendingPairActions } from "../helpers/types"
-import { advanceNBlocks, IAccount, LendingPairHelpers, makeLendingPairTestSuiteVars, runTestSuite, setupAndInitLendingPair, TestVars } from "./lib";
+import { advanceNBlocks, IAccount, LendingPairHelpers, makeLendingPairTestSuiteVars, runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars } from "./lib";
 // flash loan rate
 const flashLoanRate = ethers.utils.parseUnits("0.05", 18)
 const BASE = ethers.utils.parseUnits("1", 18)
 
-const initialExchangeRateMantissa =  BigNumber.from("1000000000000000000")
-const reserveFactorMantissa =  BigNumber.from("500000000000000000")
-  // 150%
-const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
-// 0.005%
-const liquidationFee = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
-// 
 const amountToDeposit = 1000
 
 async function initializeWrapperTokens(
@@ -71,13 +64,6 @@ async function setupLendingPair(
   )
 }
 
-const defaultLendingPairInitVars = {
-  initialExchangeRateMantissa,
-  reserveFactorMantissa,
-  collateralFactor,
-  liquidationFee,
-}
-
 runTestSuite("LendingPair", (vars: TestVars) => {
   it("initialize", async () => {
     const {
@@ -108,11 +94,8 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       BorrowAsset.address,
       CollateralAsset.address,
       {
-        initialExchangeRateMantissa: initialExchangeRateMantissa,
-        reserveFactorMantissa,
-        collateralFactor,
+        ...defaultLendingPairInitVars,
         wrappedBorrowAsset: BorrowWrapperToken.address,
-        liquidationFee,
         debtToken: DebtToken.address
       },
       CollateralWrapperToken.address,
