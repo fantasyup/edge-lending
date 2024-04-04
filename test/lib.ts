@@ -1,6 +1,8 @@
 import { deployments, ethers, getNamedAccounts, waffle } from "hardhat";
 import { BigNumber, Signer, Wallet } from "ethers";
 import {
+    BorrowWrapperToken,
+    CollateralWrapperToken,
     DebtToken,
     IPriceOracleAggregator,
     JumpRateModelV2,
@@ -34,7 +36,7 @@ import {
   getVaultFactoryDeployment
 } from "../helpers/contracts";
 import { EthereumAddress } from "../helpers/types";
-import { signDebtTokenBorrowDelegateMessage, signVaultApproveContractMessage } from "../helpers/message";
+import { signDebtTokenBorrowDelegateMessage, signPermitMessage, signVaultApproveContractMessage } from "../helpers/message";
 import { assert } from "chai";
 
 export async function depositInVault(
@@ -237,7 +239,6 @@ export function LendingPairHelpers(
                 nonce
             }
         )
-
         return await debtToken.connect(from.signer).delegateBorrowWithSignedMessage(
             from.address,
             to.address,
@@ -248,9 +249,42 @@ export function LendingPairHelpers(
         )
     }
 
+    const permit = async(token: BorrowWrapperToken | CollateralWrapperToken, from: IAccount, to: IAccount, amount: number) => {
+        const tokenDetails = {
+            name: await token.name(),
+            address: token.address,
+            chainId: (await ethers.provider.getNetwork()).chainId,
+            version: '1'
+        }
+        const deadline = await (await ethers.provider.getBlock('latest')).timestamp + 200000
+        const nonce = await (await token.nonces(from.address)).toNumber()
+        const { v, r, s } = await signPermitMessage(
+            from.privateKey,
+            tokenDetails,
+            {
+                owner: from.address,
+                spender: to.address,
+                value: BigNumber.from(amount)
+            },
+            nonce,
+            deadline
+        )
+
+        return await token.connect(from.signer).permit(
+            from.address,
+            to.address,
+            amount,
+            deadline,
+            v,
+            r,
+            s
+        )
+    }
+
     return {
         approveInVault,
         delegateBorrowWithSignedMessage,
+        permit,
         addPriceOracleForAsset: async(
             asset: MockToken,
             priceOracle: MockPriceOracle

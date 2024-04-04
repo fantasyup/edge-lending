@@ -52,7 +52,17 @@ runTestSuite("BorrowToken/CollateralToken", (vars) => {
     })
 
     it("permit", async() => {
+        const { BorrowWrapperToken, CollateralWrapperToken, accounts: [admin, bob] } = vars
+
+        const helper = await setupAndInitLendingPair(
+            vars,
+            {...defaultLendingPairInitVars, account: admin }
+        )
         
+        const amountToPermit = 100
+        await expect(helper.permit(BorrowWrapperToken, admin, bob, amountToPermit)).to.not.reverted
+
+        expect((await BorrowWrapperToken.allowance(admin.address, bob.address)).toNumber()).to.eq(amountToPermit)
     })
 
     it('transfer/transferFrom', async() => {

@@ -1,5 +1,5 @@
-import { ethers, utils } from 'ethers'
-import { IApproveMessageData, IAssetDetails, IDelegateBorrowMessageData } from './types'
+import { BigNumber, ethers, utils } from 'ethers'
+import { EthereumAddress, IApproveMessageData, IAssetDetails, IDelegateBorrowMessageData } from './types'
 import { ecsign } from "ethereumjs-util"
 import { MockToken } from '../types'
 
@@ -35,7 +35,13 @@ export function getDomainSeparator(name: string, version: string, tokenAddress: 
 	)
 }
 
-export function getApprovalDigest(token: any, approve: any, nonce: number, deadline: number) {
+interface IPermitApproveData {
+	owner: EthereumAddress,
+	spender: EthereumAddress,
+	value: BigNumber
+}
+
+export function getApprovalDigest(token: IAssetDetails, approve: IPermitApproveData, nonce: number, deadline: number) {
 	const DOMAIN_SEPARATOR = getDomainSeparator(token.name, token.version, token.address, token.chainId)
 
 	return keccak256(
@@ -126,6 +132,23 @@ export async function signDebtTokenBorrowDelegateMessage(
 ): Promise<{ v: number, r: Buffer, s: Buffer }> {
     const data = getDebtTokenDelegateBorrowMessage(vaultDetails, messageData)
     console.log({ data })
+    const { v, r, s } = ecsign(
+        Buffer.from(data.slice(2), 'hex'),
+        Buffer.from(privateKey.slice(2), 'hex')
+    )
+
+    return { v, r, s }
+}
+
+export async function signPermitMessage(
+    privateKey: string,
+    tokenDetails: IAssetDetails, 
+    approve: IPermitApproveData,
+	nonce: number,
+	deadline: number
+): Promise<{ v: number, r: Buffer, s: Buffer }> {
+    const data = getApprovalDigest(tokenDetails, approve, nonce, deadline)
+
     const { v, r, s } = ecsign(
         Buffer.from(data.slice(2), 'hex'),
         Buffer.from(privateKey.slice(2), 'hex')
