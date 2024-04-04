@@ -32,20 +32,21 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
     /// @notice mapping of user to approval nonce
     mapping(address => uint256) public userBorrowAllowanceNonce;
 
-    /// @notice
+    /// @notice initialize
     function initialize(
         address __owner,
         address _underlying,
         string memory _tokenName,
         string memory _tokenSymbol
-    ) external override(IBSWrapperTokenBase) initializer {
-        require(__owner != address(0), "INVALID_OWNER");
+    ) external virtual override initializer {
+        require(__owner != address(0), "invalid owner");
+        require(_underlying != address(0), "invalid underlying");
 
         _owner = __owner;
         uint8 underlyingDecimal = IERC20Details(_underlying).decimals();
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
         initializeERC20Permit(_tokenName);
-        underlying = address(0);
+        underlying = _underlying;
     }
 
     function principal(address _account) external view override returns (uint256) {

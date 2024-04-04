@@ -52,8 +52,7 @@ runTestSuite("BorrowToken/CollateralToken", (vars) => {
     })
 
     it("permit", async() => {
-
-    
+        
     })
 
     it('transfer/transferFrom', async() => {
