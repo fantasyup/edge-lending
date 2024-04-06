@@ -170,6 +170,7 @@ contract LendingPairFactory is Pausable {
                     borrowAssetWrapperImplementation,
                     newLendingPair,
                     address(_borrowVars.borrowAsset),
+                    _lendingPairName,
                     "BOR",
                     salt
                 )
@@ -182,6 +183,7 @@ contract LendingPairFactory is Pausable {
                     collateralWrapperImplementation,
                     newLendingPair,
                     address(_collateralAsset),
+                    _lendingPairName,
                     "COL",
                     salt
                 )
@@ -194,7 +196,8 @@ contract LendingPairFactory is Pausable {
                     debtTokenImplementation,
                     newLendingPair,
                     address(_borrowVars.borrowAsset),
-                    "DEB",
+                    _lendingPairName,
+                    "DEBT",
                     salt
                 )
             );
@@ -226,36 +229,39 @@ contract LendingPairFactory is Pausable {
     }
 
     function initWrapperTokensWithProxy(
-        address implementation,
-        address pair,
-        address assetDetails,
-        string memory symbol,
-        bytes32 salt
+        address _implementation,
+        address _pair,
+        address _underlying,
+        string memory _lendingPairName,
+        string memory _tokenType,
+        bytes32 _salt
     ) internal returns (address wrapper) {
-        wrapper = implementation.cloneDeterministic(salt);
+        wrapper = _implementation.cloneDeterministic(_salt);
 
         initializeWrapperTokens(
-            pair,
+            _pair,
             IBSWrapperToken(wrapper),
-            IERC20Details(assetDetails),
-            symbol
+            IERC20Details(_underlying),
+            _lendingPairName,
+            _tokenType
         );
     }
 
     function initializeWrapperTokens(
         address _pair,
         IBSWrapperToken _wrapperToken,
-        IERC20Details _assetDetails,
+        IERC20Details _underlying,
+        string memory _lendingPairName,
         string memory _tokenType
     ) internal {
-        bytes memory name = abi.encodePacked("BS-");
-        name = abi.encodePacked(name, _tokenType, _assetDetails.name());
-        bytes memory symbol = abi.encodePacked("BS-");
-        symbol = abi.encodePacked(symbol, _assetDetails.symbol());
+        bytes memory name = abi.encodePacked(_lendingPairName);
+        name = abi.encodePacked(name, "-PAIR-", _tokenType);
+        bytes memory symbol = abi.encodePacked(_lendingPairName);
+        symbol = abi.encodePacked(name, _tokenType);
         // initialize wrapperToken
         IBSWrapperToken(_wrapperToken).initialize(
             _pair,
-            address(_assetDetails),
+            address(_underlying),
             string(name),
             string(symbol)
         );

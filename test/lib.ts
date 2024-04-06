@@ -1,8 +1,6 @@
 import { deployments, ethers, getNamedAccounts, waffle } from "hardhat";
 import { BigNumber, Signer, Wallet } from "ethers";
 import {
-    BorrowWrapperToken,
-    CollateralWrapperToken,
     DebtToken,
     IPriceOracleAggregator,
     JumpRateModelV2,
@@ -36,7 +34,11 @@ import {
   getVaultFactoryDeployment
 } from "../helpers/contracts";
 import { EthereumAddress } from "../helpers/types";
-import { signDebtTokenBorrowDelegateMessage, signPermitMessage, signVaultApproveContractMessage } from "../helpers/message";
+import { 
+    signDebtTokenBorrowDelegateMessage,
+    signPermitMessage,
+    signVaultApproveContractMessage
+} from "../helpers/message";
 import { assert } from "chai";
 
 export async function depositInVault(
@@ -249,7 +251,7 @@ export function LendingPairHelpers(
         )
     }
 
-    const permit = async(token: BorrowWrapperToken | CollateralWrapperToken, from: IAccount, to: IAccount, amount: number) => {
+    const permit = async(token: WrapperToken, from: IAccount, to: IAccount, amount: number) => {
         const tokenDetails = {
             name: await token.name(),
             address: token.address,
