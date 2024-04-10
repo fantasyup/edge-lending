@@ -352,8 +352,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _to Address to send the underlying tokens to
     /// @param _amount of wrapper token to redeem
     function redeem(address _to, uint256 _amount) external override {
-        require(_to != address(0), "INVALID_AMOUNT");
-        
+        require(_to != address(0), "INVALID_TO");
+
         RedeemLocalVars memory vars;
 
         // fetch the users current wrapped balance
