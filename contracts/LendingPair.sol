@@ -300,6 +300,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _repayAmount The amount of borrow asset to repay
     /// @param _beneficiary address to repay loan position
     function repay(uint256 _repayAmount, address _beneficiary) public {
+        require(_beneficiary != address(0), "INVALID_BENEFICIARY");
         // create local vars storage
         RepayBorrowLocalVars memory vars;
 
@@ -351,6 +352,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _to Address to send the underlying tokens to
     /// @param _amount of wrapper token to redeem
     function redeem(address _to, uint256 _amount) external override {
+        require(_to != address(0), "INVALID_AMOUNT");
+        
         RedeemLocalVars memory vars;
 
         // fetch the users current wrapped balance
