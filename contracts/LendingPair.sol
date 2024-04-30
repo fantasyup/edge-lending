@@ -72,7 +72,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     uint256 public override borrowIndex;
 
     /// @notice Total amount of reserves of the underlying held in this market
-    uint256 public totalReserves;
+    uint256 public override totalReserves;
 
     /// @dev The amount of collateral required for a borrow position in 1e18
     uint256 public collateralFactor;
