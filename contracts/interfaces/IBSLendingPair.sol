@@ -167,4 +167,8 @@ interface IBSLendingPair {
     function wrapperBorrowedAsset() external view returns (IBSWrapperToken);
 
     function wrappedCollateralAsset() external view returns (IBSWrapperToken);
+
+    function totalReserves() external view returns(uint256);
+
+    function withdrawFees(uint256 amount) external;
 }

@@ -48,15 +48,19 @@ contract FeeWithdrawal is Ownable {
 
     /**
      * @notice Create a new FeeWithdrawal contract
+     * @param _admin admin
      * @param _edgeToken address of edge token
      * @param _wethAddress WETH address
      * @param _uniswapV2Router Uniswap v2 router address
      */
     constructor(
+        address _admin,
         address _edgeToken,
         address _wethAddress,
         address _uniswapV2Router
     ) {
+        require(_admin != address(0), "INVALID_ADMIN");
+
         require(
             _edgeToken != address(0),
             "FeeWithdrawal: invalid token address"
@@ -74,8 +78,7 @@ contract FeeWithdrawal is Ownable {
         edgeToken = _edgeToken;
         WETH = _wethAddress;
         uniswapRouter = IUniswapV2Router02(_uniswapV2Router);
-
-        admin = msg.sender;
+        admin = _admin;
     }
 
     /// @dev to avoid gas costs we are gonna send the underlying pair's asset as param & compute the amount off-chain
@@ -88,7 +91,7 @@ contract FeeWithdrawal is Ownable {
             _lendingPairs.length > 0,
             "lendingPairs.length"
         );
-        
+
         for (uint256 i = 0; i < _lendingPairs.length; i++) {
             IBSLendingPair pair = _lendingPairs[i];
             

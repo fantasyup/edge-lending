@@ -36,7 +36,8 @@ export enum LendingPairEdgeActions {
     VAULT_DEPOSIT = 6,
     VAULT_WITHDRAW = 7,
     VAULT_TRANSFER = 8,
-    VAULT_APPROVE_CONTRACT = 9
+    VAULT_APPROVE_CONTRACT = 9,
+    FeeWithdrawal = 'FeeWithdrawal'
 }
 
 export interface IAssetDetails {
