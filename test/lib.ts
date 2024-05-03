@@ -184,7 +184,10 @@ export async function deployTestTokensAndMock() {
         CollateralAsset: await deployMockToken(),
         FlashBorrower: await deployMockFlashBorrower(),
         MockVault: await deployMockVault(),
-        MockRewardDistributorManager: await deployMockDistributorManager()   
+        MockRewardDistributorManager: await deployMockDistributorManager()
+        // add EdgeToken
+        // add WETH
+        // 
     }
 }
 

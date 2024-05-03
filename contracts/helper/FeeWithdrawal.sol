@@ -4,16 +4,17 @@ pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "../interfaces/IBSLendingPair.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
+import "../interfaces/IBSLendingPair.sol";
 
 contract FeeWithdrawal is Ownable {
     using SafeERC20 for IERC20;
 
     event LogUpdateAdmin(address newAdmin, uint256 timestamp);
-    event LogRescueFunds(address token, address amount, uint256 timestamp);
+    event LogRescueFunds(address token, uint256 amount, uint256 timestamp);
     event LogTransferToReceiver(address receiver, uint256 amount, uint256 timestamp);
+    event LogWithdrawFees(uint256 totalEdgeReceived, uint256 timestamp);
 
     uint256 constant public VERSION = 0x1;
     
@@ -32,7 +33,7 @@ contract FeeWithdrawal is Ownable {
     /// @notice The admin
     address public admin;
 
-    /// @notice IUniswapRouter from Sushiswap used to swap erc20 fee token into tokenAddress
+    /// @notice IUniswapRouter used to swap erc20 fee token into edgeToken
     IUniswapV2Router02 public uniswapRouter;
 
     modifier onlyAdmin() {
@@ -49,17 +50,23 @@ contract FeeWithdrawal is Ownable {
     /**
      * @notice Create a new FeeWithdrawal contract
      * @param _admin admin
+     * @param _vault vault address
+     * @param _receiver address of the contract to transfer Edge to
      * @param _edgeToken address of edge token
      * @param _wethAddress WETH address
      * @param _uniswapV2Router Uniswap v2 router address
      */
     constructor(
         address _admin,
+        IBSVault _vault,
+        address _receiver,
         address _edgeToken,
         address _wethAddress,
         address _uniswapV2Router
     ) {
         require(_admin != address(0), "INVALID_ADMIN");
+        require(address(_vault) != address(0), "INVALID_VAULT");
+        require(_receiver != address(0), "INVALID_RECEIVER");
 
         require(
             _edgeToken != address(0),
@@ -77,14 +84,18 @@ contract FeeWithdrawal is Ownable {
 
         edgeToken = _edgeToken;
         WETH = _wethAddress;
+        vault = _vault;
+        receiver = _receiver;
         uniswapRouter = IUniswapV2Router02(_uniswapV2Router);
         admin = _admin;
     }
 
     /// @dev to avoid gas costs we are gonna send the underlying pair's asset as param & compute the amount off-chain
-    /// @param 
+    /// @param _lendingPairs lending pair addresses
+    /// @param amountOuts Minimum expected amountOut of the lending pair reserve swap
     function withdrawFeesAndSwap(
         IBSLendingPair[] calldata _lendingPairs,
+        uint256[] calldata amountOuts,
         bool _convert
     ) external onlyEOA {
         require(
@@ -92,21 +103,27 @@ contract FeeWithdrawal is Ownable {
             "lendingPairs.length"
         );
 
+        uint256 totalEdgeReceived = 0;
+
         for (uint256 i = 0; i < _lendingPairs.length; i++) {
             IBSLendingPair pair = _lendingPairs[i];
             
             IERC20 asset = pair.asset();
             uint256 amountToWithdraw = pair.totalReserves();
+
             // withdraw to vault
             pair.withdrawFees(amountToWithdraw);
+
             // withdraw underlying
             vault.withdraw(asset, address(this), address(this), amountToWithdraw);
             
-            uint amountToTrade = asset.balanceOf(address(this));
+            uint256 amountToTrade = asset.balanceOf(address(this));
             if (_convert && address(asset) != edgeToken) {
-                _convertToEdge(address(asset), amountToTrade, 2 ** 256);
+                totalEdgeReceived += _convertToEdge(address(asset), amountToTrade, amountOuts[i]);
             }
         }
+
+        emit LogWithdrawFees(totalEdgeReceived, block.timestamp);
     }
 
     function transferToReceiver() external {
@@ -128,7 +145,7 @@ contract FeeWithdrawal is Ownable {
         emit LogRescueFunds(_token, balance, block.timestamp);
     }
 
-    function getPath(address from) internal returns (address[] memory path) {
+    function getPath(address from) internal view returns (address[] memory path) {
         if(from == WETH) {
             path = new address[](2);
             path[0] = WETH;
@@ -144,7 +161,7 @@ contract FeeWithdrawal is Ownable {
     function _convertToEdge(
         address from,
         uint256 amount,
-        uint256 deadline
+        uint256 amountOut
     ) private returns (uint256) {
         address[] memory path = getPath(from);
         
@@ -153,10 +170,10 @@ contract FeeWithdrawal is Ownable {
         uint256[] memory amounts =
             uniswapRouter.swapExactTokensForTokens(
                 amount,
-                uint256(0),
+                amountOut,
                 path,
                 address(this),
-                deadline
+                10 ** 64 
             );
 
         return amounts[amounts.length - 1];

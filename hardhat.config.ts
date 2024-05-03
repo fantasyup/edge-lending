@@ -7,6 +7,7 @@ import "solidity-coverage"
 import "hardhat-tracer"
 import "hardhat-deploy"
 import 'hardhat-deploy-ethers'
+import { ethers } from 'ethers';
 // import "hardhat-gas-reporter"
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -53,6 +54,8 @@ export default {
     deployer: 0,
     // @TODO replace with proper address
     blackSmithTeam: 1,
+    // @TODO replace with proper address
+    stakingContract: '0xc2edad668740f1aa35e4d8f227fb8e17dca888cd'
 
   },
   gasReporter: {

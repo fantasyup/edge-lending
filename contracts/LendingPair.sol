@@ -607,7 +607,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice withdrawFees to the feeWithdrawalAddr
     /// @param _toWithdraw is the amount of a reservers being withdrawn
     /// @dev this function can be called by anyone
-    function withdrawFees(uint256 _toWithdraw) external {
+    function withdrawFees(uint256 _toWithdraw) external override {
         require(totalReserves >= _toWithdraw, "NOT_ENOUGH_BALANCE");
 
         totalReserves = totalReserves - _toWithdraw;
