@@ -8,6 +8,7 @@ import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "../interfaces/IBSLendingPair.sol";
 
+// @TODO make it upgradable
 contract FeeWithdrawal is Ownable {
     using SafeERC20 for IERC20;
 
