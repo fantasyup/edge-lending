@@ -154,8 +154,9 @@ contract LendingPairFactory is Pausable {
         BorrowLocalVars calldata _borrowVars
     ) external whenNotPaused returns (address newLendingPair) {
         require(_pauseGuardian != address(0), "INVALID_GUARDIAN");
-        require(address(_collateralAsset) != address(0), "INVALID_ASSET");
-        
+        require(address(_collateralAsset) != address(0), "INVALID_C_ASSET");
+        require(address(_borrowVars.borrowAsset) != address(0), "INVALID_B_ASSET");
+
         require(
             validInterestRateModels[address(_borrowVars.interestRateModel)] == true,
             "INVALID_INTEREST_MODEL"

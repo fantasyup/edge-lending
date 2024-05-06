@@ -74,17 +74,14 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice Total amount of reserves of the underlying held in this market
     uint256 public totalReserves;
 
-    /// @dev The amount of collateral required for a borrow position
+    /// @dev The amount of collateral required for a borrow position in 1e18
     uint256 public collateralFactor;
-
-    /// @dev collateral factor precision
-    uint256 private constant COLLATERAL_FACTOR_PRECSIION = 1e18;
 
     /// @notice liquidation fee in 1e18
     uint256 public liquidationFee;
 
     /// @dev liquidation fee precision
-    uint256 private constant LIQUIDATION_FEES_PRECISION = 1e18;
+    uint256 private constant PRECISION = 1e18;
 
     /// @notice the address that can pause borrow & deposits of assets
     address public pauseGuardian;
@@ -164,6 +161,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         require(_wrappedCollateralAsset.owner() == address(this), "IVWC");
         // interest rate model
         require(address(_interestRate) != address(0), "IVIR");
+        // en
+        require(borrowConfig.liquidationFee > 0, "INLF");
         // validate borrow config
         borrowConfig.validBorrowAssetConfig(address(this));
 
@@ -456,7 +455,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice calculateFee is used to calculate the fee earned
     /// @param _amount is a uint representing the full amount earned as interest
     function calculateLiquidationFee(uint256 _amount) public view returns (uint256 fee) {
-        fee = (_amount * liquidationFee) / LIQUIDATION_FEES_PRECISION;
+        fee = (_amount * liquidationFee) / PRECISION;
     }
 
     /// @notice Accrue interest then return the up-to-date exchange rate
@@ -735,13 +734,13 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// based on the input value of their collateral
     /// @param _collateralValueInUSD is the USD value of the users collateral
     function calcBorrowLimit(uint256 _collateralValueInUSD) public view override returns (uint256) {
-        return (_collateralValueInUSD * COLLATERAL_FACTOR_PRECSIION) / collateralFactor;
+        return (_collateralValueInUSD * PRECISION) / collateralFactor;
     }
 
     /// @notice calcCollateralRequired returns the amount of collateral needed for an input borrow value
     /// @param _borrowAmount is the input borrow amount
     function calcCollateralRequired(uint256 _borrowAmount) public view returns (uint256) {
-        return (_borrowAmount * collateralFactor) / COLLATERAL_FACTOR_PRECSIION;
+        return (_borrowAmount * collateralFactor) / PRECISION;
     }
 
     /// @notice getBorrowLimit returns the borrow limit for an account
@@ -781,7 +780,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             // liquidation fee
             uint256 totalLiquidationFee = calculateLiquidationFee(borrowedTotalWithInterest);
             uint256 protocolFeeShareValue =
-                (totalLiquidationFee * protocolLiquidationFeeShare) / LIQUIDATION_FEES_PRECISION;
+                (totalLiquidationFee * protocolLiquidationFeeShare) / PRECISION;
 
             _repayLiquidatingLoan(
                 _borrower,
