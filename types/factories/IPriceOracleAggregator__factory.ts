@@ -22,6 +22,25 @@ export class IPriceOracleAggregator__factory {
 
 const _abi = [
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "contract IERC20",
+        name: "token",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "contract IOracle",
+        name: "oracle",
+        type: "address",
+      },
+    ],
+    name: "UpdateOracle",
+    type: "event",
+  },
+  {
     inputs: [
       {
         internalType: "contract IERC20",

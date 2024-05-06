@@ -21,8 +21,8 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
   functions: {
+    "admin()": FunctionFragment;
     "assetToOracle(address)": FunctionFragment;
-    "blackSmithTeam()": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
     "getPriceInUSD(address)": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
@@ -31,13 +31,10 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
     "viewPriceInUSD(address)": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "assetToOracle",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "blackSmithTeam",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getCodeAddress",
@@ -61,12 +58,9 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
 
+  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "assetToOracle",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "blackSmithTeam",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -144,16 +138,16 @@ export class PriceOracleAggregator extends Contract {
   interface: PriceOracleAggregatorInterface;
 
   functions: {
+    admin(overrides?: CallOverrides): Promise<[string]>;
+
+    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+
     assetToOracle(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
     "assetToOracle(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    blackSmithTeam(overrides?: CallOverrides): Promise<[string]>;
-
-    "blackSmithTeam()"(overrides?: CallOverrides): Promise<[string]>;
 
     getCodeAddress(
       overrides?: CallOverrides
@@ -210,16 +204,16 @@ export class PriceOracleAggregator extends Contract {
     ): Promise<[BigNumber]>;
   };
 
+  admin(overrides?: CallOverrides): Promise<string>;
+
+  "admin()"(overrides?: CallOverrides): Promise<string>;
+
   assetToOracle(arg0: string, overrides?: CallOverrides): Promise<string>;
 
   "assetToOracle(address)"(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<string>;
-
-  blackSmithTeam(overrides?: CallOverrides): Promise<string>;
-
-  "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
   getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -269,16 +263,16 @@ export class PriceOracleAggregator extends Contract {
   ): Promise<BigNumber>;
 
   callStatic: {
+    admin(overrides?: CallOverrides): Promise<string>;
+
+    "admin()"(overrides?: CallOverrides): Promise<string>;
+
     assetToOracle(arg0: string, overrides?: CallOverrides): Promise<string>;
 
     "assetToOracle(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    blackSmithTeam(overrides?: CallOverrides): Promise<string>;
-
-    "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
     getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -344,16 +338,16 @@ export class PriceOracleAggregator extends Contract {
   };
 
   estimateGas: {
+    admin(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     assetToOracle(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "assetToOracle(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    blackSmithTeam(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "blackSmithTeam()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -407,6 +401,10 @@ export class PriceOracleAggregator extends Contract {
   };
 
   populateTransaction: {
+    admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     assetToOracle(
       arg0: string,
       overrides?: CallOverrides
@@ -414,12 +412,6 @@ export class PriceOracleAggregator extends Contract {
 
     "assetToOracle(address)"(
       arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    blackSmithTeam(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "blackSmithTeam()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

@@ -7,7 +7,7 @@ import "../interfaces/IPriceOracleAggregator.sol";
 import "../interfaces/IOracle.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-/// @title DataTypes
+/// @title PriceOracleAggregator
 /// @author @samparsky
 /// @notice aggregator of price oracle for assets in LendingPairs
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,25 +15,25 @@ import "../interfaces/IOracle.sol";
 contract PriceOracleAggregator is UUPSProxiable, IPriceOracleAggregator {
 
     /// @dev control allowed to update price oracle
-    address public blackSmithTeam;
+    address public admin;
 
     /// @notice token to the oracle address
     mapping(IERC20 => IOracle) public assetToOracle;
 
 
-    modifier onlyBlackSmithTeam() {
-        require(msg.sender == blackSmithTeam, "ONLY_TEAM");
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "ONLY_ADMIN");
         _;
     }
 
-    constructor(address _blackSmithTeam) {
-        blackSmithTeam = _blackSmithTeam;
+    constructor(address _admin) {
+        admin = _admin;
     }
 
     /// @notice adds oracle for an asset e.g. ETH
     /// @param _asset the oracle for the asset
     /// @param _oracle the oracle address
-    function updateOracleForAsset(IERC20 _asset, IOracle _oracle) external override onlyBlackSmithTeam {
+    function updateOracleForAsset(IERC20 _asset, IOracle _oracle) external override onlyAdmin {
         require(address(_asset) != address(0), "INVALID_ASSET");
         require(address(_oracle) != address(0), "INVALID_ORACLE");
         assetToOracle[_asset] = _oracle;
@@ -58,7 +58,7 @@ contract PriceOracleAggregator is UUPSProxiable, IPriceOracleAggregator {
         return keccak256("org.edge.contracts.edgevault.priceoralceaggregator");
     }
 
-    function updateCode(address newAddress) external override onlyBlackSmithTeam {
+    function updateCode(address newAddress) external override onlyAdmin {
         _updateCodeAddress(newAddress);
     }
 }
