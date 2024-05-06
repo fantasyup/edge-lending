@@ -2,6 +2,7 @@
 pragma solidity 0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { UUPSProxiable } from "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IPriceOracleAggregator.sol";
 import "../interfaces/IOracle.sol";
 
@@ -11,7 +12,7 @@ import "../interfaces/IOracle.sol";
 /// @notice aggregator of price oracle for assets in LendingPairs
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-contract PriceOracleAggregator is IPriceOracleAggregator {
+contract PriceOracleAggregator is UUPSProxiable, IPriceOracleAggregator {
     /// @dev control allowed to update price oracle
     address public blackSmithTeam;
 
@@ -51,5 +52,13 @@ contract PriceOracleAggregator is IPriceOracleAggregator {
     function viewPriceInUSD(IERC20 _token) external view override returns (uint256) {
         require(address(assetToOracle[_token]) != address(0), "INVALID_ORACLE");
         return assetToOracle[_token].viewPriceInUSD();
+    }
+
+    function proxiableUUID() public pure override returns (bytes32) {
+        return keccak256("org.edge.contracts.edgevault.priceoralceaggregator");
+    }
+
+    function updateCode(address newAddress) external override onlyBlackSmithTeam {
+        _updateCodeAddress(newAddress);
     }
 }
