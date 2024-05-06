@@ -23,7 +23,10 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
   functions: {
     "assetToOracle(address)": FunctionFragment;
     "blackSmithTeam()": FunctionFragment;
+    "getCodeAddress()": FunctionFragment;
     "getPriceInUSD(address)": FunctionFragment;
+    "proxiableUUID()": FunctionFragment;
+    "updateCode(address)": FunctionFragment;
     "updateOracleForAsset(address,address)": FunctionFragment;
     "viewPriceInUSD(address)": FunctionFragment;
   };
@@ -37,9 +40,18 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getCodeAddress",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getPriceInUSD",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "proxiableUUID",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
   encodeFunctionData(
     functionFragment: "updateOracleForAsset",
     values: [string, string]
@@ -58,9 +70,18 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getCodeAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getPriceInUSD",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "proxiableUUID",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "updateOracleForAsset",
     data: BytesLike
@@ -71,9 +92,11 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
+    "CodeUpdated(bytes32,address)": EventFragment;
     "UpdateOracle(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateOracle"): EventFragment;
 }
 
@@ -132,6 +155,14 @@ export class PriceOracleAggregator extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<[string]>;
 
+    getCodeAddress(
+      overrides?: CallOverrides
+    ): Promise<[string] & { codeAddress: string }>;
+
+    "getCodeAddress()"(
+      overrides?: CallOverrides
+    ): Promise<[string] & { codeAddress: string }>;
+
     getPriceInUSD(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -139,6 +170,20 @@ export class PriceOracleAggregator extends Contract {
 
     "getPriceInUSD(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -176,6 +221,10 @@ export class PriceOracleAggregator extends Contract {
 
   "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
+  getCodeAddress(overrides?: CallOverrides): Promise<string>;
+
+  "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
   getPriceInUSD(
     _token: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -183,6 +232,20 @@ export class PriceOracleAggregator extends Contract {
 
   "getPriceInUSD(address)"(
     _token: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+  "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
+
+  updateCode(
+    newAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updateCode(address)"(
+    newAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -217,6 +280,10 @@ export class PriceOracleAggregator extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<string>;
 
+    getCodeAddress(overrides?: CallOverrides): Promise<string>;
+
+    "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
     getPriceInUSD(
       _token: string,
       overrides?: CallOverrides
@@ -226,6 +293,17 @@ export class PriceOracleAggregator extends Contract {
       _token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
+
+    updateCode(newAddress: string, overrides?: CallOverrides): Promise<void>;
+
+    "updateCode(address)"(
+      newAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     updateOracleForAsset(
       _asset: string,
@@ -251,6 +329,14 @@ export class PriceOracleAggregator extends Contract {
   };
 
   filters: {
+    CodeUpdated(
+      uuid: null,
+      codeAddress: null
+    ): TypedEventFilter<
+      [string, string],
+      { uuid: string; codeAddress: string }
+    >;
+
     UpdateOracle(
       token: null,
       oracle: null
@@ -269,6 +355,10 @@ export class PriceOracleAggregator extends Contract {
 
     "blackSmithTeam()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getPriceInUSD(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -276,6 +366,20 @@ export class PriceOracleAggregator extends Contract {
 
     "getPriceInUSD(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -319,6 +423,12 @@ export class PriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getCodeAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getCodeAddress()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getPriceInUSD(
       _token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -326,6 +436,20 @@ export class PriceOracleAggregator extends Contract {
 
     "getPriceInUSD(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

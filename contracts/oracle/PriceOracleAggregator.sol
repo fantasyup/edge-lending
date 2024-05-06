@@ -13,13 +13,13 @@ import "../interfaces/IOracle.sol";
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract PriceOracleAggregator is UUPSProxiable, IPriceOracleAggregator {
+
     /// @dev control allowed to update price oracle
     address public blackSmithTeam;
 
     /// @notice token to the oracle address
     mapping(IERC20 => IOracle) public assetToOracle;
 
-    event UpdateOracle(IERC20 token, IOracle oracle);
 
     modifier onlyBlackSmithTeam() {
         require(msg.sender == blackSmithTeam, "ONLY_TEAM");
