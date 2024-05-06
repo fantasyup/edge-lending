@@ -15,9 +15,6 @@ import {
 } from "../types";
 import { LendingPairActions } from "../helpers/types"
 import { advanceNBlocks, IAccount, LendingPairHelpers, makeLendingPairTestSuiteVars, runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars } from "./lib";
-// flash loan rate
-const flashLoanRate = ethers.utils.parseUnits("0.05", 18)
-const BASE = ethers.utils.parseUnits("1", 18)
 
 const amountToDeposit = 1000
 
@@ -198,6 +195,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     )
 
     await helper.approveLendingPairInVault(bob, true)
+
     // fails without enough vault balance
     await expect(
       LendingPair.connect(bob.signer).depositCollateral(bob.address, amountToDeposit)

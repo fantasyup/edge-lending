@@ -1,14 +1,7 @@
 import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
-import { runTestSuite, setupAndInitLendingPair, TestVars } from "./lib";
-
-const initialExchangeRateMantissa = BigNumber.from("1000000000000000000")
-const reserveFactorMantissa = BigNumber.from("500000000000000000")
-  // 150%
-const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
-// 0.005%
-const liquidationFee = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
+import { runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars } from "./lib";
 
 runTestSuite("Borrow Delegation", (vars: TestVars) => {
     it('borrow delegation', async() => {
@@ -25,10 +18,7 @@ runTestSuite("Borrow Delegation", (vars: TestVars) => {
             vars,
             {
                 account: admin,
-                initialExchangeRateMantissa,
-                reserveFactorMantissa,
-                collateralFactor,
-                liquidationFee,
+                ...defaultLendingPairInitVars,
                 accountsToApproveInVault: [admin, bob, frank]
             }
         )

@@ -72,7 +72,7 @@ contract Vault is VaultBase {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external {
+    ) external override {
         require(_contract != address(0), "INVALID_CONTRACT");
 
         bytes32 digest =

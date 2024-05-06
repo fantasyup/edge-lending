@@ -191,17 +191,19 @@ export function LendingPairHelpers(
     collateralAsset: MockToken,
     oracleAggregator: IPriceOracleAggregator,
     team: IAccount
-) {
+) { 
 
-    const approveInVault = async(account: IAccount, addressToApprove: EthereumAddress, approve: boolean) => {
-        const vaultDetails = { 
-            name: await vault.name(),
-            address: vault.address,
-            chainId: (await ethers.provider.getNetwork()).chainId,
-            version: await vault.version()
-        }
+    const getVaultDetails = async() => ({
+        name: await vault.name(),
+        address: vault.address,
+        chainId: (await ethers.provider.getNetwork()).chainId,
+        version: await vault.version()
+    })
+
+    const approveInVaultMessage = async (account: IAccount, addressToApprove: EthereumAddress, approve: boolean) => {
+        const vaultDetails = await getVaultDetails()
         const nonce = (await vault.userApprovalNonce(account.address)).toNumber()
-        const { v, r, s } = await signVaultApproveContractMessage(
+        return await signVaultApproveContractMessage(
             account.privateKey,
             vaultDetails,
             {
@@ -212,6 +214,9 @@ export function LendingPairHelpers(
             }
         )
 
+    }
+    const approveInVault = async(account: IAccount, addressToApprove: EthereumAddress, approve: boolean) => {
+        const { v, r, s } = await approveInVaultMessage(account, addressToApprove, approve)
         return await vault.connect(account.signer).approveContract(
             account.address,
             addressToApprove,
@@ -283,8 +288,19 @@ export function LendingPairHelpers(
         )
     }
 
+    const setAccountBalance =  async ( account: Signer,
+        asset: MockToken,
+        amountToDeposit: number | BigNumber
+    ) => {
+        const addr = await account.getAddress()
+        await asset.connect(account).setBalanceTo(addr, amountToDeposit)
+        await asset.connect(account).approve(vault.address, amountToDeposit)
+    }
+
     return {
+        getVaultDetails,
         approveInVault,
+        approveInVaultMessage,
         delegateBorrowWithSignedMessage,
         permit,
         addPriceOracleForAsset: async(
@@ -308,9 +324,8 @@ export function LendingPairHelpers(
             asset: MockToken,
             amountToDeposit: number | BigNumber
         ) => {
+            await setAccountBalance(account, asset, amountToDeposit)
             const addr = await account.getAddress()
-            await asset.connect(account).setBalanceTo(addr, amountToDeposit)
-            await asset.connect(account).approve(vault.address, amountToDeposit)
             await (await vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
         },
           
@@ -321,8 +336,7 @@ export function LendingPairHelpers(
         ) => {
             const assetToDeposit = asset ||  borrowAsset
             await depositInVault(vault, assetToDeposit, account.signer, amountToDeposit)
-            const userShareBalance = await (await vault.balanceOf(assetToDeposit.address, account.address))
-            return await lendingPair.connect(account.signer).depositBorrowAsset(account.address, userShareBalance)
+            return await lendingPair.connect(account.signer).depositBorrowAsset(account.address, amountToDeposit)
         },
           
         depositCollateralAsset: async(

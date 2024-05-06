@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IBSVaultInterface extends ethers.utils.Interface {
   functions: {
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
     "flashFee(address,uint256)": FunctionFragment;
@@ -33,6 +34,10 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "approveContract",
+    values: [string, string, boolean, BigNumberish, BytesLike, BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
@@ -74,6 +79,10 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     values: [string, string, string, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "approveContract",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashFee", data: BytesLike): Result;
@@ -156,6 +165,26 @@ export class IBSVault extends Contract {
   interface: IBSVaultInterface;
 
   functions: {
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -293,6 +322,26 @@ export class IBSVault extends Contract {
     ): Promise<ContractTransaction>;
   };
 
+  approveContract(
+    _user: string,
+    _contract: string,
+    _status: boolean,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+    _user: string,
+    _contract: string,
+    _status: boolean,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   balanceOf(
     arg0: string,
     arg1: string,
@@ -427,6 +476,26 @@ export class IBSVault extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -654,6 +723,26 @@ export class IBSVault extends Contract {
   };
 
   estimateGas: {
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -789,6 +878,26 @@ export class IBSVault extends Contract {
   };
 
   populateTransaction: {
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
       arg0: string,
       arg1: string,
