@@ -177,6 +177,37 @@ const _abi = [
         type: "address",
       },
       {
+        indexed: true,
+        internalType: "address",
+        name: "asset",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "collateralAsset",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "pauseGuardian",
+        type: "address",
+      },
+    ],
+    name: "Initialized",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "pair",
+        type: "address",
+      },
+      {
         indexed: false,
         internalType: "uint256",
         name: "accrualBlockNumber",

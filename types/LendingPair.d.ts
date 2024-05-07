@@ -435,6 +435,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "ChangeFeeWithdrawalAddress(address,uint256)": EventFragment;
     "Deposit(address,address,address,address,uint256)": EventFragment;
     "FlashLoan(address,address,address,uint256,uint256)": EventFragment;
+    "Initialized(address,address,address,address)": EventFragment;
     "InterestAccrued(address,uint256,uint256,uint256,uint256)": EventFragment;
     "InterestShortCircuit(uint256)": EventFragment;
     "Liquidate(address,address,address,uint256,address)": EventFragment;
@@ -450,6 +451,7 @@ interface LendingPairInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ChangeFeeWithdrawalAddress"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InterestAccrued"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InterestShortCircuit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Liquidate"): EventFragment;
@@ -1822,6 +1824,21 @@ export class LendingPair extends Contract {
         asset: string;
         amount: BigNumber;
         premium: BigNumber;
+      }
+    >;
+
+    Initialized(
+      pair: string | null,
+      asset: string | null,
+      collateralAsset: string | null,
+      pauseGuardian: null
+    ): TypedEventFilter<
+      [string, string, string, string],
+      {
+        pair: string;
+        asset: string;
+        collateralAsset: string;
+        pauseGuardian: string;
       }
     >;
 

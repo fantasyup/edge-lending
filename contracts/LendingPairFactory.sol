@@ -145,15 +145,6 @@ contract LendingPairFactory is Pausable {
         IDebtToken debtToken;
     }
 
-    // 50%
-    uint256 private constant MINIMUM_COLLATERALFACTOR = 5 * 1e17;
-    // 
-    uint256 private constant MINIMUM_RESERVE_FACTOR = 2 ;
-    //
-    uint256 private constant MINIMUM_LIQUIDATION_FEE = 2;
-    //
-    uint256 private constant MINIMUM_INITIAL_EXCHANGE_RATE = 1000000000000000000;
-
     /// @dev create lending pair with clones
     function createLendingPairWithProxy(
         string memory _lendingPairName,
@@ -165,11 +156,11 @@ contract LendingPairFactory is Pausable {
         require(_pauseGuardian != address(0), "INVALID_GUARDIAN");
         require(address(_collateralAsset) != address(0), "INVALID_C_ASSET");
         require(address(_borrowVars.borrowAsset) != address(0), "INVALID_B_ASSET");
-
         require(
             validInterestRateModels[address(_borrowVars.interestRateModel)] == true,
             "INVALID_INTEREST_MODEL"
         );
+
 
         WrappedAssetLocalVars memory wrappedAssetLocalVars;
         
