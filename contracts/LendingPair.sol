@@ -51,7 +51,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     IPriceOracleAggregator public immutable override oracle;
 
     /// @notice The address to withdraw fees to
-    address public feeWithdrawalAddr;
+    address public immutable feeWithdrawalAddr;
 
     /// @dev borrow asset underlying decimal
     uint8 private _borrowAssetUnderlyingDecimal;
@@ -134,7 +134,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         oracle = _oracle;
         feeWithdrawalAddr = _feeWithdrawalAddr;
         protocolLiquidationFeeShare = _procotolLiquidationFeeShare;
-        borrowIndex = mantissaOne;
     }
 
     /// @notice Initialize function
@@ -173,6 +172,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         asset = _asset;
         collateralAsset = _collateralAsset;
         interestRate = _interestRate;
+        borrowIndex = mantissaOne;
 
         initialExchangeRateMantissa = borrowConfig.initialExchangeRateMantissa;
         reserveFactorMantissa = borrowConfig.reserveFactorMantissa;
@@ -614,17 +614,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         vault.transfer(asset, address(this), feeWithdrawalAddr, _toWithdraw);
 
         emit ReserveWithdraw(feeWithdrawalAddr, _toWithdraw);
-    }
-
-    /// @notice changeFeeWithdrawalAddress
-    /// @param _newAddress new address to withdrawa fees to
-    /// @dev this function can only be called by `feeWithdrawalAddr`
-    function changeFeeWithdrawalAddress(address _newAddress) external {
-        require(_newAddress != address(0), "invalid address");
-        require(msg.sender == feeWithdrawalAddr, "invalid sender");
-
-        feeWithdrawalAddr = _newAddress;
-        emit ChangeFeeWithdrawalAddress(_newAddress, block.timestamp);
     }
 
     ////////////////////////////////
