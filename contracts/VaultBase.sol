@@ -55,7 +55,7 @@ abstract contract VaultBase is VaultStorageV1  {
         keccak256("ERC3156FlashBorrower.onFlashLoan");
     
     /// @notice max flashlaon rate 10%
-    uint256 public constant MAX_FLASHLOAN_RATE = 1 * 10**17;
+    uint256 public constant MAX_FLASHLOAN_RATE = 1e17;
 
     bytes32 internal immutable _HASHED_NAME;
     bytes32 internal immutable _HASHED_VERSION;
