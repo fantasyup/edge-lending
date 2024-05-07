@@ -423,7 +423,6 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "ActionPaused(uint8,uint256)": EventFragment;
     "ActionUnPaused(uint8,uint256)": EventFragment;
     "Borrow(address,uint256)": EventFragment;
-    "ChangeFeeWithdrawalAddress(address,uint256)": EventFragment;
     "Deposit(address,address,address,address,uint256)": EventFragment;
     "FlashLoan(address,address,address,uint256,uint256)": EventFragment;
     "Initialized(address,address,address,address)": EventFragment;
@@ -439,7 +438,6 @@ interface LendingPairInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ActionPaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ActionUnPaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Borrow"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ChangeFeeWithdrawalAddress"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
@@ -1744,14 +1742,6 @@ export class LendingPair extends Contract {
     ): TypedEventFilter<
       [string, BigNumber],
       { borrower: string; amount: BigNumber }
-    >;
-
-    ChangeFeeWithdrawalAddress(
-      newAddr: null,
-      timestamp: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { newAddr: string; timestamp: BigNumber }
     >;
 
     Deposit(

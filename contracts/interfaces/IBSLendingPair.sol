@@ -128,7 +128,6 @@ interface IBSLendingPair {
 
     event ActionPaused(uint8 action, uint256 timestamp);
     event ActionUnPaused(uint8 action, uint256 timestamp);
-    event ChangeFeeWithdrawalAddress(address newAddr, uint256 timestamp);
 
     function initialize(
         string memory _name,

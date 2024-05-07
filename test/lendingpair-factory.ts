@@ -208,14 +208,18 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
         const lendingPair = LendingPair.attach(pairAddress)
 
         // confirm data provided is correct
+        await expect(await lendingPair.name()).eq("demo")
+        await expect(await lendingPair.symbol()).eq("dst")
+        await expect(await lendingPair.interestRate()).eq(modelEv!.args!.ir)
+        await expect(await lendingPair.pauseGuardian()).eq(admin.address)
         await expect(await lendingPair.collateralAsset()).eq(CollateralAsset.address)
         await expect(await lendingPair.asset()).eq(BorrowAsset.address)
         await expect(await lendingPair.vault()).eq(Vault.address)
         await expect(await lendingPair.interestRate()).eq(modelEv!.args!.ir)
         await expect(await (await lendingPair.liquidationFee()).toString()).eq(liquidationFee.toString())
         await expect(await (await lendingPair.collateralFactor()).toString()).eq(collateralFactor.toString())
+        await expect(await (await lendingPair["feeWithdrawalAddr()"]()).toString()).eq(vars.blackSmithTeam.address)
         
-        console.log(await lendingPair.feeWithdrawalAddr())
     })
 
 })
