@@ -185,6 +185,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         _borrowAssetUnderlyingDecimal = IERC20Details(address(asset)).decimals();
         _collateralAssetUnderlyingDecimal = IERC20Details(address(collateralAsset)).decimals();
+
+        emit Initialized(address(this), address(_asset), address(_collateralAsset), _pauseGuardian);
     }
 
     /// @dev pause actions in the lending pair
