@@ -23,6 +23,18 @@ export enum ContractId {
     VaultFactory = 'VaultFactory'
 }
 
+export enum LendingPairEdgeActions {
+    COLLATERAL_DEPOSIT = 1,
+    BORROW_ASSET_DEPOSIT = 2,
+    REPAY = 3,
+    REDEEM = 4,
+    WITHDRAW_COLLATERAL = 5,
+    VAULT_DEPOSIT = 6,
+    VAULT_WITHDRAW = 7,
+    VAULT_TRANSFER = 8,
+    VAULT_APPROVE_CONTRACT = 9
+}
+
 export interface IAssetDetails {
     name: string,
     version: string,

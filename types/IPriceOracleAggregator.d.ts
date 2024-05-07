@@ -52,7 +52,11 @@ interface IPriceOracleAggregatorInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
 
-  events: {};
+  events: {
+    "UpdateOracle(address,address)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "UpdateOracle"): EventFragment;
 }
 
 export class IPriceOracleAggregator extends Contract {
@@ -195,7 +199,12 @@ export class IPriceOracleAggregator extends Contract {
     ): Promise<BigNumber>;
   };
 
-  filters: {};
+  filters: {
+    UpdateOracle(
+      token: null,
+      oracle: null
+    ): TypedEventFilter<[string, string], { token: string; oracle: string }>;
+  };
 
   estimateGas: {
     getPriceInUSD(

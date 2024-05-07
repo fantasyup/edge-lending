@@ -2,12 +2,13 @@
 pragma solidity 0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import {UUPSProxiableAndPausable} from "./upgradability/UUPSProxiableAndPausable.sol";
+import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import { UUPSProxiable } from "./upgradability/UUPSProxiable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./interfaces/IBSVault.sol";
 import "hardhat/console.sol";
 
-abstract contract VaultStorageV1 is IBSVault {
+abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
     /// @notice vault name
     string public name;
 
@@ -36,7 +37,7 @@ abstract contract VaultStorageV1 is IBSVault {
     mapping(address => uint256) public userApprovalNonce;
 }
 
-abstract contract VaultBase is UUPSProxiableAndPausable, VaultStorageV1  {
+abstract contract VaultBase is VaultStorageV1  {
     /// @dev vault approval message digest
     bytes32 internal constant _VAULT_APPROVAL_SIGNATURE_TYPE_HASH =
         keccak256(

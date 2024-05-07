@@ -37,16 +37,16 @@ describe('PriceOracleAggregator', function() {
     })
 
     it("correct team address", async function() {
-        expect(await PriceOracleAggregator.blackSmithTeam()).to.eq(admin)
+        expect(await PriceOracleAggregator.admin()).to.eq(admin)
     })
 
-    it("updateOracleForAsset - fails for non blacksmithteam", async function(){
+    it("updateOracleForAsset - fails for non admin", async function(){
         await expect(
             PriceOracleAggregator.connect(await ethers.getSigner(frank)).updateOracleForAsset(
                 asset.address,
                 bob
             )
-        ).to.revertedWith('ONLY_TEAM')
+        ).to.revertedWith('ONLY_ADMIN')
     })
 
 

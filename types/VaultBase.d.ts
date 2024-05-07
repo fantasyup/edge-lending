@@ -22,6 +22,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface VaultBaseInterface extends ethers.utils.Interface {
   functions: {
     "MAX_FLASHLOAN_RATE()": FunctionFragment;
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
     "flashFee(address,uint256)": FunctionFragment;
@@ -49,6 +50,10 @@ interface VaultBaseInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "MAX_FLASHLOAN_RATE",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "approveContract",
+    values: [string, string, boolean, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
@@ -120,6 +125,10 @@ interface VaultBaseInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "MAX_FLASHLOAN_RATE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "approveContract",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -240,6 +249,26 @@ export class VaultBase extends Contract {
     MAX_FLASHLOAN_RATE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "MAX_FLASHLOAN_RATE()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     balanceOf(
       arg0: string,
@@ -457,6 +486,26 @@ export class VaultBase extends Contract {
 
   "MAX_FLASHLOAN_RATE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  approveContract(
+    _user: string,
+    _contract: string,
+    _status: boolean,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+    _user: string,
+    _contract: string,
+    _status: boolean,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   balanceOf(
     arg0: string,
     arg1: string,
@@ -665,6 +714,26 @@ export class VaultBase extends Contract {
     MAX_FLASHLOAN_RATE(overrides?: CallOverrides): Promise<BigNumber>;
 
     "MAX_FLASHLOAN_RATE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     balanceOf(
       arg0: string,
@@ -977,6 +1046,26 @@ export class VaultBase extends Contract {
 
     "MAX_FLASHLOAN_RATE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -1189,6 +1278,26 @@ export class VaultBase extends Contract {
 
     "MAX_FLASHLOAN_RATE()"(
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     balanceOf(

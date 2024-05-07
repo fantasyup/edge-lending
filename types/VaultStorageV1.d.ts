@@ -21,26 +21,35 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface VaultStorageV1Interface extends ethers.utils.Interface {
   functions: {
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
     "flashFee(address,uint256)": FunctionFragment;
     "flashLoan(address,address,uint256,bytes)": FunctionFragment;
     "flashLoanRate()": FunctionFragment;
+    "getCodeAddress()": FunctionFragment;
     "initialize(uint256,address)": FunctionFragment;
     "maxFlashLoan(address)": FunctionFragment;
     "name()": FunctionFragment;
     "newOwner()": FunctionFragment;
     "owner()": FunctionFragment;
+    "paused()": FunctionFragment;
+    "proxiableUUID()": FunctionFragment;
     "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
     "transfer(address,address,address,uint256)": FunctionFragment;
+    "updateCode(address)": FunctionFragment;
     "userApprovalNonce(address)": FunctionFragment;
     "userApprovedContracts(address,address)": FunctionFragment;
     "version()": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "approveContract",
+    values: [string, string, boolean, BigNumberish, BytesLike, BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
@@ -62,6 +71,10 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getCodeAddress",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "initialize",
     values: [BigNumberish, string]
   ): string;
@@ -72,6 +85,11 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "newOwner", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "proxiableUUID",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "toShare",
     values: [string, BigNumberish, boolean]
@@ -85,6 +103,7 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
     functionFragment: "transfer",
     values: [string, string, string, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
   encodeFunctionData(
     functionFragment: "userApprovalNonce",
     values: [string]
@@ -99,12 +118,20 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
     values: [string, string, string, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "approveContract",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashFee", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "flashLoan", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "flashLoanRate",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCodeAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
@@ -115,6 +142,11 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "newOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "proxiableUUID",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "toUnderlying",
@@ -122,6 +154,7 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "totals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "userApprovalNonce",
     data: BytesLike
@@ -135,21 +168,27 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
 
   events: {
     "Approval(address,address,bool)": EventFragment;
+    "CodeUpdated(bytes32,address)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
     "OwnershipAccepted(address,uint256)": EventFragment;
+    "Paused(address)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
+    "Unpaused(address)": EventFragment;
     "UpdateFlashLoanRate(uint256)": EventFragment;
     "Withdraw(address,address,address,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateFlashLoanRate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
@@ -198,6 +237,26 @@ export class VaultStorageV1 extends Contract {
   interface: VaultStorageV1Interface;
 
   functions: {
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -258,6 +317,14 @@ export class VaultStorageV1 extends Contract {
 
     "flashLoanRate()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    getCodeAddress(
+      overrides?: CallOverrides
+    ): Promise<[string] & { codeAddress: string }>;
+
+    "getCodeAddress()"(
+      overrides?: CallOverrides
+    ): Promise<[string] & { codeAddress: string }>;
+
     initialize(
       _flashLoanRate: BigNumberish,
       _owner: string,
@@ -291,6 +358,14 @@ export class VaultStorageV1 extends Contract {
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
+
+    paused(overrides?: CallOverrides): Promise<[boolean]>;
+
+    "paused()"(overrides?: CallOverrides): Promise<[boolean]>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
 
     toShare(
       token: string,
@@ -341,6 +416,16 @@ export class VaultStorageV1 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updateCode(address)"(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     userApprovalNonce(
       arg0: string,
       overrides?: CallOverrides
@@ -383,6 +468,26 @@ export class VaultStorageV1 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  approveContract(
+    _user: string,
+    _contract: string,
+    _status: boolean,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+    _user: string,
+    _contract: string,
+    _status: boolean,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   balanceOf(
     arg0: string,
@@ -444,6 +549,10 @@ export class VaultStorageV1 extends Contract {
 
   "flashLoanRate()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  getCodeAddress(overrides?: CallOverrides): Promise<string>;
+
+  "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
   initialize(
     _flashLoanRate: BigNumberish,
     _owner: string,
@@ -474,6 +583,14 @@ export class VaultStorageV1 extends Contract {
   owner(overrides?: CallOverrides): Promise<string>;
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
+
+  paused(overrides?: CallOverrides): Promise<boolean>;
+
+  "paused()"(overrides?: CallOverrides): Promise<boolean>;
+
+  proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+  "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
   toShare(
     token: string,
@@ -524,6 +641,16 @@ export class VaultStorageV1 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  updateCode(
+    newAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updateCode(address)"(
+    newAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   userApprovalNonce(
     arg0: string,
     overrides?: CallOverrides
@@ -567,6 +694,26 @@ export class VaultStorageV1 extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -627,6 +774,10 @@ export class VaultStorageV1 extends Contract {
 
     "flashLoanRate()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getCodeAddress(overrides?: CallOverrides): Promise<string>;
+
+    "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
     initialize(
       _flashLoanRate: BigNumberish,
       _owner: string,
@@ -657,6 +808,14 @@ export class VaultStorageV1 extends Contract {
     owner(overrides?: CallOverrides): Promise<string>;
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
+
+    paused(overrides?: CallOverrides): Promise<boolean>;
+
+    "paused()"(overrides?: CallOverrides): Promise<boolean>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
     toShare(
       token: string,
@@ -704,6 +863,13 @@ export class VaultStorageV1 extends Contract {
       _from: string,
       _to: string,
       _shares: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateCode(newAddress: string, overrides?: CallOverrides): Promise<void>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -760,6 +926,14 @@ export class VaultStorageV1 extends Contract {
       { user: string; allowed: string; status: boolean }
     >;
 
+    CodeUpdated(
+      uuid: null,
+      codeAddress: null
+    ): TypedEventFilter<
+      [string, string],
+      { uuid: string; codeAddress: string }
+    >;
+
     Deposit(
       token: string | null,
       from: string | null,
@@ -802,6 +976,8 @@ export class VaultStorageV1 extends Contract {
       { newOwner: string; timestamp: BigNumber }
     >;
 
+    Paused(account: null): TypedEventFilter<[string], { account: string }>;
+
     Transfer(
       token: string | null,
       from: string | null,
@@ -819,6 +995,8 @@ export class VaultStorageV1 extends Contract {
       [string, BigNumber],
       { _newTeam: string; timestamp: BigNumber }
     >;
+
+    Unpaused(account: null): TypedEventFilter<[string], { account: string }>;
 
     UpdateFlashLoanRate(
       newRate: null
@@ -843,6 +1021,26 @@ export class VaultStorageV1 extends Contract {
   };
 
   estimateGas: {
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -903,6 +1101,10 @@ export class VaultStorageV1 extends Contract {
 
     "flashLoanRate()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     initialize(
       _flashLoanRate: BigNumberish,
       _owner: string,
@@ -933,6 +1135,14 @@ export class VaultStorageV1 extends Contract {
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    paused(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "paused()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     toShare(
       token: string,
@@ -983,6 +1193,16 @@ export class VaultStorageV1 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updateCode(address)"(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     userApprovalNonce(
       arg0: string,
       overrides?: CallOverrides
@@ -1027,6 +1247,26 @@ export class VaultStorageV1 extends Contract {
   };
 
   populateTransaction: {
+    approveContract(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "approveContract(address,address,bool,uint8,bytes32,bytes32)"(
+      _user: string,
+      _contract: string,
+      _status: boolean,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
       arg0: string,
       arg1: string,
@@ -1087,6 +1327,12 @@ export class VaultStorageV1 extends Contract {
 
     "flashLoanRate()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getCodeAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getCodeAddress()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     initialize(
       _flashLoanRate: BigNumberish,
       _owner: string,
@@ -1120,6 +1366,14 @@ export class VaultStorageV1 extends Contract {
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "paused()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     toShare(
       token: string,
@@ -1170,6 +1424,16 @@ export class VaultStorageV1 extends Contract {
       _from: string,
       _to: string,
       _shares: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
