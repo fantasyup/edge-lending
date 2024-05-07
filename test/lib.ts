@@ -41,18 +41,6 @@ import {
 } from "../helpers/message";
 import { assert } from "chai";
 
-export async function depositInVault(
-    Vault: BVault,
-    asset: MockToken,
-    account: Signer,
-    amountToDeposit: number | BigNumber
-) {
-    const addr = await account.getAddress()
-    await asset.connect(account).setBalanceTo(addr, amountToDeposit)
-    await asset.connect(account).approve(Vault.address, amountToDeposit)
-    await (await Vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
-}
-
 export async function makeLendingPairTestSuiteVars(
         price?: BigNumber
     ): Promise<Pick<
@@ -297,12 +285,24 @@ export function LendingPairHelpers(
         await asset.connect(account).approve(vault.address, amountToDeposit)
     }
 
+    const depositInVault = async(
+        account: Signer,
+        asset: MockToken,
+        amountToDeposit: number | BigNumber
+    ) => {
+        await setAccountBalance(account, asset, amountToDeposit)
+        const addr = await account.getAddress()
+        await (await vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
+    }
+
     return {
         getVaultDetails,
         approveInVault,
         approveInVaultMessage,
         delegateBorrowWithSignedMessage,
         permit,
+        setAccountBalance,
+        depositInVault,
         addPriceOracleForAsset: async(
             asset: MockToken,
             priceOracle: MockPriceOracle
@@ -318,16 +318,6 @@ export function LendingPairHelpers(
         ) => {
             return approveInVault(account, lendingPair.address, approve)
         },
-
-        depositInVault: async(
-            account: Signer,
-            asset: MockToken,
-            amountToDeposit: number | BigNumber
-        ) => {
-            await setAccountBalance(account, asset, amountToDeposit)
-            const addr = await account.getAddress()
-            await (await vault.connect(account).deposit(asset.address, addr, addr, amountToDeposit)).wait()
-        },
           
         depositBorrowAsset: async (
             account: IAccount,
@@ -335,7 +325,7 @@ export function LendingPairHelpers(
             asset?: MockToken
         ) => {
             const assetToDeposit = asset ||  borrowAsset
-            await depositInVault(vault, assetToDeposit, account.signer, amountToDeposit)
+            await depositInVault(account.signer, assetToDeposit, amountToDeposit)
             return await lendingPair.connect(account.signer).depositBorrowAsset(account.address, amountToDeposit)
         },
           
@@ -344,7 +334,8 @@ export function LendingPairHelpers(
             amountToDeposit: number | BigNumber,
             asset?: MockToken
           ) => {          
-            await depositInVault(vault, asset || collateralAsset, account.signer, amountToDeposit)          
+            // await depositInVault(vault, asset || collateralAsset, account.signer, amountToDeposit)  
+            await depositInVault(account.signer, asset || collateralAsset, amountToDeposit)        
             return await lendingPair.connect(account.signer).depositCollateral(account.address, amountToDeposit)
           }
     }

@@ -145,6 +145,15 @@ contract LendingPairFactory is Pausable {
         IDebtToken debtToken;
     }
 
+    // 50%
+    uint256 private constant MINIMUM_COLLATERALFACTOR = 5 * 1e17;
+    // 
+    uint256 private constant MINIMUM_RESERVE_FACTOR = 2 ;
+    //
+    uint256 private constant MINIMUM_LIQUIDATION_FEE = 2;
+    //
+    uint256 private constant MINIMUM_INITIAL_EXCHANGE_RATE = 1000000000000000000;
+
     /// @dev create lending pair with clones
     function createLendingPairWithProxy(
         string memory _lendingPairName,

@@ -134,6 +134,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         oracle = _oracle;
         feeWithdrawalAddr = _feeWithdrawalAddr;
         protocolLiquidationFeeShare = _procotolLiquidationFeeShare;
+        borrowIndex = mantissaOne;
     }
 
     /// @notice Initialize function
@@ -171,7 +172,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         pauseGuardian = _pauseGuardian;
         asset = _asset;
         collateralAsset = _collateralAsset;
-        borrowIndex = mantissaOne;
         interestRate = _interestRate;
 
         initialExchangeRateMantissa = borrowConfig.initialExchangeRateMantissa;
@@ -303,7 +303,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /// @notice Sender repays their own borrow
-    /// @param _repayAmount The amount of borrow asset to repay
+    /// @param _repayAmount The amount of borrow asset to repay represented in underlying
     /// @param _beneficiary address to repay loan position
     function repay(uint256 _repayAmount, address _beneficiary) public {
         require(_beneficiary != address(0), "INVALID_BENEFICIARY");

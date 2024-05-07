@@ -3,7 +3,6 @@ import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
 import { deployMockToken, deployWrappedToken, getLendingPairDeployment } from "../helpers/contracts";
 import {
-  depositInVault,
   makeLendingPairTestSuiteVars,
   initializeWrapperTokens,
   LendingPairHelpers,

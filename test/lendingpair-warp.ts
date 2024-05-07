@@ -33,10 +33,30 @@ runTestSuite("LendingPair - Edge", (vars: TestVars) => {
         data.push(approveContractData)
 
         // deposit in vault
-        
-        
-        await LendingPair.edge(actions, data)
+        await helper.setAccountBalance(admin.signer, BorrowAsset, 10000)
+        const depositVaultData = defaultAbiCoder.encode(
+            ["address", "address", "uint256"],
+            [BorrowAsset.address, admin.address, 10000]
+        )
+        actions.push(LendingPairEdgeActions.VAULT_DEPOSIT)
+        data.push(depositVaultData)
 
-        
+        // transfer in vault
+        const transferVaultData = defaultAbiCoder.encode(
+            ["address", "address", "uint256"],
+            [BorrowAsset.address, bob.address, 1]
+        )
+        actions.push(LendingPairEdgeActions.VAULT_TRANSFER)
+        data.push(transferVaultData)
+
+        // withdraw in vault
+        const withdrawData = defaultAbiCoder.encode(
+            ["address", "address", "uint256"],
+            [BorrowAsset.address, bob.address, 100]
+        )
+        actions.push(LendingPairEdgeActions.VAULT_WITHDRAW)
+        data.push(withdrawData)
+
+        await LendingPair.edge(actions, data)        
     })
 })
