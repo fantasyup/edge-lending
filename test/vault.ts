@@ -47,6 +47,16 @@ runTestSuite("Vault", (vars: TestVars) => {
     expect(await Vault.owner()).to.eq(admin.address);
   });
 
+  it("version", async () => {
+    const { Vault } = vars
+    expect((await Vault.version()).toString()).to.eq("1");
+  });
+
+  it("name", async () => {
+    const { Vault } = vars
+    expect((await Vault.name()).toString()).to.eq("EdgeVault v1");
+  });
+
   it("proxiableUUID", async () => {
     const { Vault } = vars
     let messageBytes = ethers.utils.toUtf8Bytes(

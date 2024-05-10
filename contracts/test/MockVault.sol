@@ -5,7 +5,7 @@ import "../Vault.sol";
 import "./MockToken.sol";
 
 contract MockVault is Vault {
-    constructor() Vault("edge", "1") {}
+    constructor() Vault() {}
 
     function addProfit(MockToken _token, uint256 _amount) external {
         // increase the underlying amount

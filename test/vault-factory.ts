@@ -50,5 +50,8 @@ runTestSuite("Vault Factory", (vars: TestVars) => {
             await (await Vault.attach(addr)["flashLoanRate()"]()).toString()
         ).to.be.eq(flashLoanRate.toString())
 
+        expect((await Vault.name()).toString()).to.eq("EdgeVault v1");
+        expect((await Vault.version()).toString()).to.eq("1");
+
     })
 })

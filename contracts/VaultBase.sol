@@ -9,12 +9,6 @@ import "./interfaces/IBSVault.sol";
 import "hardhat/console.sol";
 
 abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
-    /// @notice vault name
-    string public name;
-
-    /// @notice vault version
-    string public version;
-
     /// @notice the flashloan rate to charge for flash loans
     uint256 public flashLoanRate;
 
@@ -38,6 +32,12 @@ abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
 }
 
 abstract contract VaultBase is VaultStorageV1  {
+    /// @notice vault name
+    string public constant name = "EdgeVault v1";
+
+    /// @notice vault version
+    string public constant version = "1";
+
     /// @dev vault approval message digest
     bytes32 internal constant _VAULT_APPROVAL_SIGNATURE_TYPE_HASH =
         keccak256(
@@ -62,12 +62,9 @@ abstract contract VaultBase is VaultStorageV1  {
     bytes32 private immutable _CACHED_DOMAIN_SEPARATOR;
     uint256 private immutable _CACHED_CHAIN_ID;
 
-    constructor(string memory _name, string memory _version) {
-        name = _name;
-        version = _version;
-
-        bytes32 hashedVersion = keccak256(bytes(_version));
-        bytes32 hashedName = keccak256(bytes(_name));
+    constructor() {
+        bytes32 hashedVersion = keccak256(bytes(version));
+        bytes32 hashedName = keccak256(bytes(name));
 
         _HASHED_NAME = hashedName;
         _HASHED_VERSION = hashedVersion;
