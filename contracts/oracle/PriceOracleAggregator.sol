@@ -15,7 +15,7 @@ import "../interfaces/IOracle.sol";
 contract PriceOracleAggregator is UUPSProxiable, IPriceOracleAggregator {
 
     /// @dev admin allowed to update price oracle
-    address public admin;
+    address public immutable admin;
 
     /// @notice token to the oracle address
     mapping(IERC20 => IOracle) public assetToOracle;
