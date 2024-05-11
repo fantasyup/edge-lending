@@ -27,6 +27,7 @@ contract PriceOracleAggregator is UUPSProxiable, IPriceOracleAggregator {
     }
 
     constructor(address _admin) {
+        require(_admin != address(0), "INVALID_ADMIN");
         admin = _admin;
     }
 
