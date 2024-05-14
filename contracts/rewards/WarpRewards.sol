@@ -14,15 +14,12 @@ import "../interfaces/IEdgeRewards.sol";
 to invoke them when a user burns or transfer
  */
 
-abstract contract IncentivesStorageV1 is UUPSProxiable {
+abstract contract RewardsStorageV1 is UUPSProxiable {
     /// @dev admin 
     address public owner;
 
     /// @dev newAdmin
     address internal newOwner;
-
-    /// @dev list of all distributors
-    IRewardDistributor[] public distributors;
     
     /// @dev approvedistributions
     mapping(IDistributor => bool) public approvedDistributions;
@@ -31,7 +28,7 @@ abstract contract IncentivesStorageV1 is UUPSProxiable {
     mapping(address => IRewardDistributor[]) tokenToDistributors;
 }
 
-contract EdgeRewards is IncentivesStorageV1, IEdgeRewards {
+contract EdgeRewards is RewardsStorageV1, IEdgeRewards {
 
     modifier onlyApprovedDistributors(IRewardDistributor _distributor) {
         require(approvedDistributions[_distributor] == true, "ONLY_APPROVED_DISTRIBUTOR");
@@ -115,7 +112,7 @@ contract EdgeRewards is IncentivesStorageV1, IEdgeRewards {
             }
         }
 
-        emit  RemoveReward(_tokenAddr, _distributor, block.timestamp);
+        emit RemoveReward(_tokenAddr, _distributor, block.timestamp);
     }
 
     function commitOwnerTransfer(address _newOwner) external onlyOwner {
