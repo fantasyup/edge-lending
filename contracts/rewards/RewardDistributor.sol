@@ -2,6 +2,7 @@
 pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IBSLendingPair.sol";
+import "../interfaces/IRewardDistributor.sol";
 
 /**
 - We want people to be able to accrue rewards across 
@@ -65,6 +66,9 @@ abstract contract DistributorStorageV1 {
 
   /// @notice 
   mapping (uint256 => mapping (address => UserInfo)) public userInfo;
+
+  /// @notice token -> pooil id
+  mapping(address => uint256) public tokenPoolIDPair;
   
   /// @dev
   uint256 public totalAllocPoint;
@@ -110,11 +114,50 @@ contract RewardDistributor is DistributorStorageV1 {
     guardian = _guardian;
   }
 
-    struct DistributorConfigVars {
-        bool collateralToken;
-        bool debtToken;
-        bool borrowAssetToken;
+
+    // handles the transfer, burn, mint functions
+  /// @dev deposit
+  function accumulateReward(
+    address _tokenAddr,
+    address _from,
+    address _to,
+    uint256 _balance
+  ) external /*onlyEdgeRewards*/ {
+    // check the from & to addresses if not address
+    // update reward
+    uint256 pid = tokenPoolIDPair[_tokenAddr];
+    // get pool id
+    updatePool(pid);
+
+    if (from != address(0)) {
+      // sub
+      UserInfo storage user = userInfo[pid][_from];
+      if(user.amount > 0 && user.amount <= _balance) {
+        uint256 pendinRewards =
+          (user.amount * pool.accRTKPerShare / 1e12) -  user.rewardDebt;
+        // subtract from balance        
+      }
     }
+
+    if (to != address(0)) {
+      // update this guy
+      UserInfo storage user = userInfo[pid][_to];
+      if(user.amount > 0) {
+        uint256 pendinRewards =
+          (user.amount * pool.accRTKPerShare / 1e12) -  user.rewardDebt;
+      }
+
+      // add to balance
+    }
+
+    emit AccumulateReward(msg.sender, _pid, _amount);
+  }
+
+  struct DistributorConfigVars {
+      bool collateralToken;
+      bool debtToken;
+      bool borrowAssetToken;
+  }
 
   function add(
       uint128 _allocPoint,
@@ -158,7 +201,7 @@ contract RewardDistributor is DistributorStorageV1 {
 
     // get pool id
     // update edgerewards
-    // tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length - 1;
+    tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length - 1;
   }
 
   function set(
@@ -175,8 +218,6 @@ contract RewardDistributor is DistributorStorageV1 {
       poolInfo[_pid].allocPoint = _allocPoint;
   }
   
-
-
   function getMultiplier(uint256 _from, uint256 _to)
     public
     view
@@ -256,14 +297,19 @@ contract RewardDistributor is DistributorStorageV1 {
       pool.lastRewardBlock = block.number;
   }
 
-  function harvest(uint256 pid, address to) public {
+  /// @dev withdraw
+  function withdraw(uint256 _pid, address _to) public {
+    PoolInfo storage pool = poolInfo[_pid];
+    UserInfo storage user = userInfo[_pid][msg.sender];
 
-  }
+    updatePool(_pid);
 
-  // handles the transfer, burn, mint functions
-  function invoke(address from, address to, uint256 balance) external {
-    // check the from & to addresses if not address
-    // update reward
+    uint256 pending = user.amount.mul(pool.accRTKPerShare).div(1e12).sub(user.rewardDebt);
+    safeRTKTransfer(msg.sender, pending);
+    user.rewardDebt = user.amount.mul(pool.accRTKPerShare).div(1e12);
+    
+    emit Withdraw(msg.sender, _pid, _amount);
+
   }
 
   // Safe sushi transfer function, just in case if rounding error causes pool to not have enough SUSHIs.

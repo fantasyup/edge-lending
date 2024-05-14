@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-import "../interfaces/IDistributor.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../interfaces/IRewardDistributor.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../upgradability/UUPSProxiable.sol";
+import "../interfaces/IEdgeRewards.sol";
 
 /**
 
@@ -13,144 +15,132 @@ to invoke them when a user burns or transfer
  */
 
 abstract contract IncentivesStorageV1 is UUPSProxiable {
-    address public admin;
+    /// @dev admin 
+    address public owner;
+
+    /// @dev newAdmin
+    address internal newOwner;
 
     /// @dev list of all distributors
-    IDistributor[] public distributors;
+    IRewardDistributor[] public distributors;
     
-    /// @dev 
+    /// @dev approvedistributions
     mapping(IDistributor => bool) public approvedDistributions;
 
-    /// @dev token address => distributor
-    mapping(address => IDistributor[]) tokenToDistributor;
+    /// @dev receipt token address => distributor
+    mapping(address => IRewardDistributor[]) tokenToDistributors;
 }
 
-contract EdgeRewards is IncentivesStorageV1 {
-    
-    event ApprovedDistribution(
-        IDistributor distributor,
-        uint256 timestamp
-    );
+contract EdgeRewards is IncentivesStorageV1, IEdgeRewards {
 
-    event AddReward
-
-    // create new distributor contract
-    // update alloc points from here
-
-    modifier onlyAdmin {
-        // @TODO
+    modifier onlyApprovedDistributors(IRewardDistributor _distributor) {
+        require(approvedDistributions[_distributor] == true, "ONLY_APPROVED_DISTRIBUTOR");
         _;
     }
 
-    modifier onlyApprovedDistributors {
+    modifier onlyOwner {
+        require(owner == msg.sender, "ONLY_OWNER");
         _;
     }
 
     constructor(
-        address _admin
+        address _owner
     ) {
-        admin = _admin;
+        owner = _owner;
     }
 
-    function handleAction() external {
+    /// @dev loops through distributor contract and updates 
+    /// rewards for the user
+    /// low gas cost is the ultimaate goal
+    function accumulateRewards(
+        address _tokenAddr,
+        address _from,
+        address _to,
+        address _balance
+    ) external {
         // loop through the rewards for 
         // the pair and call 
         // handleAction on it
+        IDistributor[] memory distributors = tokenToDistributors[_tokenAddr];
+        uint256 size = distributors.length;
+
+        if (size == 0) return;
+
+        for(uint256 i = 0; i < size; i++) {
+            distributors[i].accumulateReward(_tokenAddr, _from, _to, _balance);
+        }
+
     }
 
     /// @dev approves a distributor contract for a lending pair
-    function setDistributorStatus(IDistributor _distributor, bool _approve) external onlyAdmin {
+    function setDistributorStatus(IRewardDistributor _distributor, bool _approve) external onlyOwner {
         approvedDistributions[_distributor] = _approve;
         emit ApprovedDistribution(_distributor, block.timestamp);
     }
 
     function addReward(
         address _tokenAddr,
-        IDistributor _distributor
+        IRewardDistributor _distributor
     ) external onlyApprovedDistributors {
-        tokenToDistributor[_tokenAddr].push(_distributor);
+        tokenToDistributors[_tokenAddr].push(_distributor);
         emit AddReward(_tokenAddr, _distributor, block.timestamp);
     }
 
-    function removeReward(
-
-    ) external onlyApprovedDistributors {
-
+    struct DistributorConfigVars {
+        bool collateralToken;
+        bool debtToken;
+        bool borrowAssetToken;
     }
 
-    function commitGuardianTransfer() external {
+    function removeReward(
+        address _tokenAddr,
+        IRewardDistributor _distributor
+    ) external onlyOwner {
+        // loop throught and remove
+        IRewardDistributor[] storage distributors = tokenToDistributors[_tokenAddr];
+        uint256 size = distributors[_tokenAddr].length;
 
+        // a hack to rmove
+        if (size == 1) distributors.length = 0;
+
+        if (size > 1) {
+            // remove the item from the array
+            // using the 2 pointer algorithm
+            uint256 j = 0;
+            for (uint256 i = 0; i < size; i++ ) {
+                if (distributors[i] != _tokenAddr) {
+                    distributors[j] = distributors[i];
+                    j += 1;
+                }
+            }
+        }
+
+        emit  RemoveReward(_tokenAddr, _distributor, block.timestamp);
+    }
+
+    function commitOwnerTransfer(address _newOwner) external onlyOwner {
+        require(_newOwner != address(0), "INVALID_NEW_OWNER");
+        newOwner = _newOwner;
+        emit TransferControl(_newOwner, block.timestamp);
     }
 
     function acceptGuardianTransfer() external {
-
+        require(msg.sender == newOwner, "invalid owner");
+        owner = newOwner;
+        newOwner = address(0);
+        emit OwnershipAccepted(newOwner, block.timestamp);
     }
 
-    // function createDistributor(
-    //     address _distributorGuardian,
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // UUPSProxiable
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // ) external {
+    function proxiableUUID() public pure override returns (bytes32) {
+        return keccak256("org.edge.contracts.edgerewards.implementation");
+    }
 
-    // }
+    function updateCode(address newAddress) external override onlyOwner {
+        _updateCodeAddress(newAddress);
+    }
 
-    // function addDistribution(
-    //     IDistributor _distributor
-    // ) external onlyApprovedDistributors {
-
-    // }
-
-    // function setDistribution(
-    //     IDistributor _distributor
-
-    // ) external onlyApprovedDistributors {
-
-    // }
-
-    // struct DistributorConfigVars {
-    //     bool collateralToken;
-    //     bool debtToken;
-    //     bool borrowAssetToken;
-    // }
-
-    // /// @dev adds a distributor contract for a lending pair
-    // function addDistributor(
-    //     IDistributor _distributor,
-    //     IBSLendingPair _lendingPair,
-    //     DistributorConfigVars calldata _vars
-    // ) external onlyAdmin {
-    //     if (_vars.collateralToken == true) {
-    //         pairToDistributor[address(_lendingPair.collateralAsset())].push(_distributor);
-    //     }
-
-    //     if (_vars.debtToken == true) {
-    //         pairToDistributor[address(_lendingPair.debtToken())].push(_distributor);
-    //     }
-
-    //     if (_vars.borrowAssetToken == true) {
-    //         pairToDistributor[address(_lendingPair.borrowAsset())].push(_distributor);
-    //     }
-
-    //     emit AddDistributor(
-    //         _lendingPair,
-    //         _distributor,
-    //         _vars,
-    //         block.timestamp
-    //     );
-    // }
-
-
-    // /// @dev removes a distributor contract for a lending pair
-    // function removeDistributor(
-    //     IDistributor _distributor,
-    //     IBSLendingPair _lendingPair,
-    //     DistributorConfigVars calldata _vars
-    // ) external {
-    //     if (_vars.collateralToken == true) {
-    //         // work on this 
-
-    //     }
-    // }
-
-    /// getters
-    /// 
 }
