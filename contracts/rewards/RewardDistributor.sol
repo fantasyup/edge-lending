@@ -139,7 +139,9 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     address _from,
     address _to,
     uint256 _balance
-  ) external override /*onlyEdgeRewards*/ {
+  ) external override {
+    require(msg.sender == address(rewardDistributorManager), "ONLY_MANAGER");
+    
     // check the from & to addresses if not address
     // update reward
     uint256 pid = tokenPoolIDPair[_tokenAddr];

@@ -10,6 +10,9 @@ import {
 const tag = `DEV-ENVIRONMENT`
 
 const deployDevEnvironment: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+    // do not deploy in production
+    if (process.env.PRODUCTION) return
+    
     const { deployments: { deploy, get }, getNamedAccounts, ethers } = hre;
     const { deployer, blackSmithTeam } = await getNamedAccounts();
     const [ admin, bob, frank ] = await ethers.getSigners()
