@@ -9,7 +9,10 @@ import {
 } from "../helpers/contracts";
 import {
     MockToken, PriceOracleAggregator as BPriceOracleAggregator, 
-    MockChainlinkUSDAdapter as BMockChainlinkUSDAdapter} from "../types";
+    MockChainlinkUSDAdapter as BMockChainlinkUSDAdapter,
+    UUPSProxiable} from "../types";
+import { deployUUPSProxy } from "../helpers/contracts";
+import { ContractId } from "../helpers/types";
 
 // list of accounts
 let accounts: Signer[];
@@ -87,6 +90,14 @@ describe('PriceOracleAggregator', function() {
 
         // get price
         const tx = await (await PriceOracleAggregator.getPriceInUSD(asset.address)).wait()
+    })
+
+    it('price oracle proxy', async function() {
+        const uups = await deployUUPSProxy();
+        await uups.initializeProxy(PriceOracleAggregator.address);
+        expect(
+            await PriceOracleAggregator.attach(uups.address)["admin()"]()
+        ).to.eq(admin)
     })
 
 })

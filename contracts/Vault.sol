@@ -38,7 +38,7 @@ contract Vault is VaultBase {
     }
 
     /// @dev setup a vault
-    constructor(string memory _name, string memory _version) VaultBase(_name, _version) {}
+    constructor() VaultBase() {}
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // UUPSProxiable

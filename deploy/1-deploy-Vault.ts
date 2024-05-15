@@ -8,7 +8,7 @@ const deployVault: DeployFunction = async function (hre: HardhatRuntimeEnvironme
 
   await deploy(ContractId.Vault, {
     from: deployer,
-    args: ["edge", "1"],
+    args: [],
     log: true,
   });
 };

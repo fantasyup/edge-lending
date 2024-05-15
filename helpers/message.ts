@@ -131,7 +131,6 @@ export async function signDebtTokenBorrowDelegateMessage(
     messageData: IDelegateBorrowMessageData
 ): Promise<{ v: number, r: Buffer, s: Buffer }> {
     const data = getDebtTokenDelegateBorrowMessage(vaultDetails, messageData)
-    console.log({ data })
     const { v, r, s } = ecsign(
         Buffer.from(data.slice(2), 'hex'),
         Buffer.from(privateKey.slice(2), 'hex')
