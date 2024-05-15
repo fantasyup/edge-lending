@@ -3,7 +3,7 @@ pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../interfaces/IRewardDistributor.sol";
-import "../interfaces/IEdgeRewards.sol";
+import "../interfaces/IRewardDistributorManager.sol";
 
 /**
 - We want people to be able to accrue rewards across 
@@ -93,7 +93,7 @@ abstract contract RewardDistributorStorageV1 {
 
 contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
   /// @notice onsen
-  IEdgeRewards public immutable edgeRewards;
+  IRewardDistributorManager public immutable rewardDistributorManager;
 
   uint256 constant private SHARE_SCALE = 1e12;
 
@@ -111,8 +111,8 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     _;
   }
 
-  constructor(address _edgeRewards) {
-    edgeRewards = _edgeRewards;
+  constructor(address _rewardDistributorManager) {
+    rewardDistributorManager = IRewardDistributorManager(_rewardDistributorManager);
   }
   
   function initialize(
@@ -246,7 +246,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length - 1;
 
     // notify edge rewards
-    edgeRewards.addReward(_receiptTokenAddr, address(this));
+    rewardDistributorManager.addReward(address(_receiptTokenAddr), IRewardDistributor(address(this)));
   }
 
   function set(
@@ -288,7 +288,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
           accRewardTokenPerShare = calculatePoolReward(pool, totalSupply);
       }
 
-      return ((user.amount * accRewardTokenPerShare) / SHARE_SCALE) - user.rewardDebt;
+      return (((user.amount * accRewardTokenPerShare) / SHARE_SCALE) - user.rewardDebt) + user.pendingReward;
   }
 
   /// @dev return accumulated reward share for the pool
@@ -346,16 +346,19 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
 
   /// @dev withdraw
   function withdraw(uint256 _pid, address _to) public {
+    require(_to != address(0), "INVALID_TO");
+
     PoolInfo storage pool = poolInfo[_pid];
     UserInfo storage user = userInfo[_pid][msg.sender];
 
     updatePool(_pid);
 
-    uint256 pending = user.amount * pool.accRewardTokenPerShare / SHARE_SCALE;
-    uint256 amount =  user.rewardDebt + pending;
-    safeTokenTransfer(msg.sender, amount);
-    user.rewardDebt = 0;
-    
+    uint256 pending = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) - user.rewardDebt;
+    uint256 amount =  user.pendingReward + pending;
+    safeTokenTransfer(_to, amount);
+    user.rewardDebt = user.amount * pool.accRewardTokenPerShare / SHARE_SCALE;
+    user.pendingReward = 0;
+    // @TODO add _to
     emit Withdraw(msg.sender, _pid, amount);
   }
 

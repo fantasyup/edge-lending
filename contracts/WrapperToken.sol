@@ -30,6 +30,19 @@ abstract contract WrapperTokenBase is ERC20Permit, Initializable {
         require(address(_owner) == msg.sender, "ONLY_LENDING_PAIR");
         _;
     }
+
+    function _preMint() internal {
+        /// invoke
+    }
+
+    function _preBurn() internal {
+
+    }
+
+    function _preTransfer() internal {
+
+    }
+    
 }
 
 contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {

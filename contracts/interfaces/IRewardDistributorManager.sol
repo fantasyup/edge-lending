@@ -2,7 +2,7 @@
 pragma solidity 0.8.1;
 import "./IRewardDistributor.sol";
 
-interface IEdgeRewards {
+interface IRewardDistributorManager {
     event ApprovedDistribution(
         IRewardDistributor distributor,
         uint256 timestamp

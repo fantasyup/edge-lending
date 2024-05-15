@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IRewardDistributor.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../upgradability/UUPSProxiable.sol";
-import "../interfaces/IEdgeRewards.sol";
+import "../interfaces/IRewardDistributorManager.sol";
 
 /**
 
@@ -28,7 +28,7 @@ abstract contract RewardsStorageV1 is UUPSProxiable {
     mapping(address => IRewardDistributor[]) tokenToDistributors;
 }
 
-contract EdgeRewards is RewardsStorageV1, IEdgeRewards {
+contract RewardDistributorManager is RewardsStorageV1, IRewardDistributorManager {
 
     modifier onlyApprovedDistributors(IRewardDistributor _distributor) {
         require(approvedDistributions[_distributor] == true, "ONLY_APPROVED_DISTRIBUTOR");
