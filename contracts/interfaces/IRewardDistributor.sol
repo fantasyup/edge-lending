@@ -3,11 +3,15 @@ pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface IRewardDistributor {
+    event Initialized(
+        uint256 timestamp
+    );
+
     function accumulateReward(
         address _tokenAddr,
         address _from,
         address _to,
-        address _balance
+        uint256 _balance
     ) external;
 
     function initialize(

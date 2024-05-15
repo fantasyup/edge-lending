@@ -3,6 +3,7 @@ pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../interfaces/IRewardDistributor.sol";
+import "../interfaces/IEdgeRewards.sol";
 
 /**
 - We want people to be able to accrue rewards across 
@@ -37,7 +38,7 @@ abstract contract RewardDistributorStorageV1 {
   struct PoolInfo {
     IERC20 receiptTokenAddr;
     uint256 lastUpdateTimestamp;
-    uint128 accRewardTokenPerShare;
+    uint256 accRewardTokenPerShare;
     uint128 allocPoint;
   }
 
@@ -56,7 +57,9 @@ abstract contract RewardDistributorStorageV1 {
   //
   struct UserInfo {
     uint256 amount; // the balance of the user
+    uint256 pendingReward;
     uint256 rewardDebt; // Reward debt. See explanation below.
+    uint256 lastUpdateTimestamp;
   }
 
   /// @notice
@@ -80,28 +83,36 @@ abstract contract RewardDistributorStorageV1 {
     /// @notice The start timestamp 
   uint256 public endTimestamp;
 
-  /// @notice onsen
-  address public immutable onsen;
-
   /// @notice resposible for updating the alloc points
   address public guardian;
 
   /// @notice rewardAmountDistributePerSecond scaled in 1e18
   uint256 public rewardAmountDistributePerSecond;
 
-  uint256 constant internal SHARE_SCALE = 1e18;
-
 }
 
 contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
+  /// @notice onsen
+  IEdgeRewards public immutable edgeRewards;
+
+  uint256 constant private SHARE_SCALE = 1e12;
+
+  event Withdraw(address user, uint256 poolId, uint256 amount);
+  event AddDistributor(
+    address lendingPair,
+    address distributor,
+    DistributorConfigVars _vars,
+    uint256 timestamp
+  );
+  event AccumulateReward(address sender, uint256 pid, uint256 amount);
 
   modifier onlyGuardian {
-    require(msg.sender == onsen, "ONLY_ONSEN");
+    require(msg.sender == guardian, "ONLY_GUARDIAN");
     _;
   }
 
-  constructor(address _onsen) {
-    onsen = _onsen;
+  constructor(address _edgeRewards) {
+    edgeRewards = _edgeRewards;
   }
   
   function initialize(
@@ -109,14 +120,14 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     uint256 _amountDistributePerSecond,
     uint256 _startTimestamp,
     address _guardian
-  ) external {
+  ) external override {
     rewardToken = _rewardToken;
     rewardAmountDistributePerSecond = _amountDistributePerSecond;
     startTimestamp = _startTimestamp;
     guardian = _guardian;
 
     emit Initialized(
-      
+      block.timestamp
     );
   }
 
@@ -127,35 +138,43 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     address _from,
     address _to,
     uint256 _balance
-  ) external /*onlyEdgeRewards*/ {
+  ) external override /*onlyEdgeRewards*/ {
     // check the from & to addresses if not address
     // update reward
     uint256 pid = tokenPoolIDPair[_tokenAddr];
     // get pool id
     updatePool(pid);
+    PoolInfo memory pool = poolInfo[pid];
 
-    if (from != address(0)) {
+    if (_from != address(0)) {
       // sub
       UserInfo storage user = userInfo[pid][_from];
       if(user.amount > 0 && user.amount <= _balance) {
-        uint256 pendinRewards =
-          (user.amount * pool.accRTKPerShare / 1e12) -  user.rewardDebt;
-        // subtract from balance        
+        user.pendingReward += ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) - user.rewardDebt;
+        user.amount -= _balance;
+        user.rewardDebt +=
+          (user.amount * pool.accRewardTokenPerShare / SHARE_SCALE);
+        // subtract from balance    
       }
     }
 
-    if (to != address(0)) {
+    if (_to != address(0)) {
       // update this guy
       UserInfo storage user = userInfo[pid][_to];
-      if(user.amount > 0) {
-        uint256 pendinRewards =
-          (user.amount * pool.accRTKPerShare / 1e12) -  user.rewardDebt;
+      if (user.amount > 0) {
+        user.pendingReward += ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) - user.rewardDebt;
       }
-
       // add to balance
+      user.amount += _balance;
+      user.rewardDebt +=
+          (user.amount * pool.accRewardTokenPerShare / SHARE_SCALE);
     }
 
-    emit AccumulateReward(msg.sender, _pid, _amount);
+    emit AccumulateReward(msg.sender, pid, _balance);
+  }
+
+  function calculateUserReward() internal {
+
   }
 
   struct DistributorConfigVars {
@@ -165,7 +184,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
   }
 
   function add(
-      DistributorConfigVars _allocPoints,
+      DistributorConfigVars calldata _allocPoints,
       IBSLendingPair _lendingPair,
       bool _withUpdate
   ) public onlyGuardian {
@@ -179,7 +198,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     if (_allocPoints.collateralTokenAllocPoint > 0) {
       createPool(
         _allocPoints.collateralTokenAllocPoint,
-        address(_lendingPair.collateralAsset()),
+        _lendingPair.collateralAsset(),
         lastUpdateTimestamp
       );
     }
@@ -187,7 +206,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     if (_allocPoints.debtTokenAllocPoint > 0) {
       createPool(
         _allocPoints.debtTokenAllocPoint,
-        address(_lendingPair.debtToken()),
+        _lendingPair.debtToken(),
         lastUpdateTimestamp
       );
     }
@@ -195,22 +214,22 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     if (_allocPoints.borrowAssetTokenAllocPoint > 0) {
       createPool(
         _allocPoints.borrowAssetTokenAllocPoint,
-        address(_lendingPair.borrowAsset()),
+        _lendingPair.asset(),
         lastUpdateTimestamp
       );
     }
 
     emit AddDistributor(
-      _lendingPair,
+      address(_lendingPair),
       address(this),
-      _vars,
+      _allocPoints,
       block.timestamp
     );
   }
 
   function createPool(
     uint128 _allocPoint,
-    address _receiptTokenAddr,
+    IERC20 _receiptTokenAddr,
     uint256 _lastUpdateTimestamp
   ) internal {
     totalAllocPoint = totalAllocPoint + _allocPoint;
@@ -225,26 +244,26 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     );
 
     tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length - 1;
-    
+
+    // notify edge rewards
+    edgeRewards.addReward(_receiptTokenAddr, address(this));
   }
 
   function set(
       uint256 _pid,
-      uint256 _allocPoint,
+      uint128 _allocPoint,
       bool _withUpdate
   ) public onlyGuardian {
       if (_withUpdate) {
           // massUpdatePools();
       }
-      totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(
-          _allocPoint
-      );
+      totalAllocPoint = (totalAllocPoint - poolInfo[_pid].allocPoint) + _allocPoint;
       poolInfo[_pid].allocPoint = _allocPoint;
   }
   
   function getMultiplier(uint256 _from, uint256 _to)
     public
-    view
+    pure
     returns (uint256)
   {
     return _to - _from;
@@ -255,22 +274,38 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
       view
       returns (uint256)
   {
-      PoolInfo storage pool = poolInfo[_pid];
-      UserInfo storage user = userInfo[_pid][_user];
+      PoolInfo memory pool = poolInfo[_pid];
+      UserInfo memory user = userInfo[_pid][_user];
       uint256 accRewardTokenPerShare = pool.accRewardTokenPerShare;
       uint256 totalSupply = pool.receiptTokenAddr.totalSupply();
 
       if (block.timestamp > pool.lastUpdateTimestamp && totalSupply != 0) {
-          uint256 multiplier =
-              getMultiplier(pool.lastUpdateTimestamp, block.timestamp);
-          uint256 tokenReward =
-              (multiplier * rewardAmountDistributePerSecond * pool.allocPoint) / totalAllocPoint;
-          accRewardTokenPerShare = accRewardTokenPerShare + ((tokenReward * SHARE_SCALE) / totalSupply);
+          // uint256 multiplier =
+          //     getMultiplier(pool.lastUpdateTimestamp, block.timestamp);
+          // uint256 tokenReward =
+          //     (multiplier * rewardAmountDistributePerSecond * pool.allocPoint) / totalAllocPoint;
+          // accRewardTokenPerShare = accRewardTokenPerShare + ((tokenReward * SHARE_SCALE) / totalSupply);
+          accRewardTokenPerShare = calculatePoolReward(pool, totalSupply);
       }
 
       return ((user.amount * accRewardTokenPerShare) / SHARE_SCALE) - user.rewardDebt;
   }
 
+  /// @dev return accumulated reward share for the pool
+  function calculatePoolReward(
+    PoolInfo memory pool,
+    uint256 totalSupply
+  ) 
+    internal
+    view
+    returns (uint256 accRewardTokenPerShare)
+  {
+    uint256 multiplier =
+        getMultiplier(pool.lastUpdateTimestamp, block.timestamp);
+    uint256 tokenReward =
+        (multiplier * rewardAmountDistributePerSecond * pool.allocPoint) / totalAllocPoint;
+    accRewardTokenPerShare = accRewardTokenPerShare + ((tokenReward * SHARE_SCALE) / totalSupply);
+  }
 
   /// @notice Update reward vairables for all pools. Be careful of gas spending!
   function massUpdatePools() public {
@@ -286,24 +321,27 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     */
   function updatePool(uint256 _pid) public {
       PoolInfo storage pool = poolInfo[_pid];
-      if (block.number <= pool.lastRewardBlock) {
+      if (block.timestamp <= pool.lastUpdateTimestamp) {
           return;
       }
-      uint256 lpSupply = pool.lpToken.balanceOf(address(this));
-      if (lpSupply == 0) {
-          pool.lastRewardBlock = block.number;
+
+      uint256 totalSupply = pool.receiptTokenAddr.totalSupply();
+
+      if (totalSupply == 0) {
+          pool.lastUpdateTimestamp = block.timestamp;
           return;
       }
-      uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-      uint256 rtkReward =
-          multiplier.mul(rtkPerBlock).mul(pool.allocPoint).div(
-              totalAllocPoint
-          );
-      rtk.mint(address(this), rtkReward);
-      pool.accRTKPerShare = pool.accRTKPerShare.add(
-          rtkReward.mul(1e12).div(lpSupply)
-      );
-      pool.lastRewardBlock = block.number;
+      // uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
+      // uint256 rtkReward =
+      //     multiplier.mul(rtkPerBlock).mul(pool.allocPoint).div(
+      //         totalAllocPoint
+      //     );
+      // rtk.mint(address(this), rtkReward);
+      // pool.accRewardTokenPerShare = pool.accRewardTokenPerShare.add(
+      //     rtkReward.mul(1e12).div(lpSupply)
+      // );
+      pool.accRewardTokenPerShare = calculatePoolReward(pool, totalSupply);
+      pool.lastUpdateTimestamp = block.timestamp;
   }
 
   /// @dev withdraw
@@ -313,21 +351,21 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
 
     updatePool(_pid);
 
-    uint256 pending = user.amount.mul(pool.accRTKPerShare).div(1e12).sub(user.rewardDebt);
-    safeRTKTransfer(msg.sender, pending);
-    user.rewardDebt = user.amount.mul(pool.accRTKPerShare).div(1e12);
+    uint256 pending = user.amount * pool.accRewardTokenPerShare / SHARE_SCALE;
+    uint256 amount =  user.rewardDebt + pending;
+    safeTokenTransfer(msg.sender, amount);
+    user.rewardDebt = 0;
     
-    emit Withdraw(msg.sender, _pid, _amount);
-
+    emit Withdraw(msg.sender, _pid, amount);
   }
 
   // Safe sushi transfer function, just in case if rounding error causes pool to not have enough SUSHIs.
-  function safeSushiTransfer(address _to, uint256 _amount) internal {
-      uint256 sushiBal = sushi.balanceOf(address(this));
-      if (_amount > sushiBal) {
-          sushi.transfer(_to, sushiBal);
+  function safeTokenTransfer(address _to, uint256 _amount) internal {
+      uint256 balance = rewardToken.balanceOf(address(this));
+      if (_amount > balance) {
+          rewardToken.transfer(_to, balance);
       } else {
-          sushi.transfer(_to, _amount);
+          rewardToken.transfer(_to, _amount);
       }
   }
 
