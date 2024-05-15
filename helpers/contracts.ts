@@ -231,3 +231,7 @@ export const deployLendingPairFactory = async(
         borrowAssetWrapperLogic
     ])
 }
+
+export const deployMockDistributorManager = async() => {
+    return await deployContract<LendingPairFactory>(ContractId.MockDistributorManager, [])
+}

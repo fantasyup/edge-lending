@@ -2,7 +2,7 @@
 pragma solidity 0.8.1;
 import "../interfaces/IRewardDistributorManager.sol";
 
-contract MockDistributorManager is IRewardDistributorManager {
+contract MockRewardDistributorManager is IRewardDistributorManager {
 
     function addReward(
         address _tokenAddr,

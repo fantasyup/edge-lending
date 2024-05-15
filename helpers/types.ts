@@ -23,7 +23,8 @@ export enum ContractId {
     VaultFactory = 'VaultFactory',
     RewardDistributorManager = 'RewardDistributorManager',
     RewardDistributor = 'RewardDistributor',
-    RewardDistributorFactory = 'RewardDistributorFactory'
+    RewardDistributorFactory = 'RewardDistributorFactory',
+    MockDistributorManager = 'MockRewardDistributorManager'
 }
 
 export enum LendingPairEdgeActions {

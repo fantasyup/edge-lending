@@ -8,6 +8,7 @@ import {
     LendingPair,
     LendingPairFactory,
     LendingPairHelper,
+    MockDistributorManager,
     MockFlashBorrower,
     MockPriceOracle,
     MockToken,
@@ -31,7 +32,8 @@ import {
   deployMockFlashBorrower,
   deployMockVault,
   getLendingPairFactoryDeployment,
-  getVaultFactoryDeployment
+  getVaultFactoryDeployment,
+  deployMockDistributorManager
 } from "../helpers/contracts";
 import { EthereumAddress } from "../helpers/types";
 import { 
@@ -104,6 +106,7 @@ export interface TestVars {
     FlashBorrower: MockFlashBorrower,
     LendingPairFactory: LendingPairFactory,
     VaultFactory: VaultFactory,
+    MockDistributorManager: MockDistributorManager,
 }
 
 const testVars: TestVars = {
@@ -124,7 +127,8 @@ const testVars: TestVars = {
     blackSmithTeam: {} as IAccount,
     FlashBorrower: {} as MockFlashBorrower,
     LendingPairFactory: {} as LendingPairFactory,
-    VaultFactory: {} as VaultFactory
+    VaultFactory: {} as VaultFactory,
+    MockDistributorManager: {} as MockDistributorManager,
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
@@ -155,12 +159,14 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
         beforeEach(async () => {
             const setupTest = deployments.createFixture(async ({deployments, getNamedAccounts, ethers}, options) => {
                 await deployments.fixture(); // ensure you start from a fresh deployments
-                testVars.BorrowAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
-                testVars.CollateralAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
-                testVars.BorrowAsset = await deployMockToken()
-                testVars.CollateralAsset = await deployMockToken()
-                testVars.FlashBorrower = await deployMockFlashBorrower()
-                testVars.MockVault = await deployMockVault()
+                // testVars.BorrowAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
+                // testVars.CollateralAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
+                // testVars.BorrowAsset = await deployMockToken()
+                // testVars.CollateralAsset = await deployMockToken()
+                // testVars.FlashBorrower = await deployMockFlashBorrower()
+                // testVars.MockVault = await deployMockVault()
+                const vars = await deployTestTokensAndMock()
+                Object.assign(testVars, vars)
             });
 
             await setupTest()
@@ -170,6 +176,18 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
         
         tests(testVars)
     })
+}
+
+export async function deployTestTokensAndMock() {
+    return {
+        BorrowAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
+        CollateralAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
+        BorrowAsset: await deployMockToken(),
+        CollateralAsset: await deployMockToken(),
+        FlashBorrower: await deployMockFlashBorrower(),
+        MockVault: await deployMockVault(),
+        MockDistributorManager: await deployMockDistributorManager()   
+    }
 }
 
 export function LendingPairHelpers(
