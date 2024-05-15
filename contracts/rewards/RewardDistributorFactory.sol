@@ -24,8 +24,12 @@ contract RewardDistributorFactory {
         _;
     }
 
-    constructor(address _owner) {
+    constructor(
+        address _owner,
+        address _distributorImplementation
+    ) {
         owner = _owner;
+        distributorImplementation = _distributorImplementation;
     }
 
     function setDistributorImplementation(address _impl) external onlyOwner {
