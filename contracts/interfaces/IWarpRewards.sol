@@ -1,22 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
-import "./IDistributor.sol";
+import "./IRewardDistributor.sol";
 
 interface IEdgeRewards {
     event ApprovedDistribution(
-        IDistributor distributor,
+        IRewardDistributor distributor,
         uint256 timestamp
     );
 
     event AddReward(
         address tokenAddr,
-        IDistributor distributor,
+        IRewardDistributor distributor,
         uint256 timestamp
     );
 
   event RemoveReward(
         address tokenAddr,
-        IDistributor distributor,
+        IRewardDistributor distributor,
         uint256 timestamp
     );
 
@@ -26,12 +26,12 @@ interface IEdgeRewards {
 
     function addReward(
         address _tokenAddr,
-        IDistributor _distributor
+        IRewardDistributor _distributor
     ) external;
 
     function removeReward(
         address _tokenAddr,
-        IDistributor _distributor
+        IRewardDistributor _distributor
     ) external;
 
 

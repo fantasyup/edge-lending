@@ -22,7 +22,7 @@ abstract contract RewardsStorageV1 is UUPSProxiable {
     address internal newOwner;
     
     /// @dev approvedistributions
-    mapping(IDistributor => bool) public approvedDistributions;
+    mapping(IRewardDistributor => bool) public approvedDistributions;
 
     /// @dev receipt token address => distributor
     mapping(address => IRewardDistributor[]) tokenToDistributors;
@@ -53,12 +53,12 @@ contract EdgeRewards is RewardsStorageV1, IEdgeRewards {
         address _tokenAddr,
         address _from,
         address _to,
-        address _balance
+        uint256 _balance
     ) external {
         // loop through the rewards for 
         // the pair and call 
         // handleAction on it
-        IDistributor[] memory distributors = tokenToDistributors[_tokenAddr];
+        IRewardDistributor[] memory distributors = tokenToDistributors[_tokenAddr];
         uint256 size = distributors.length;
 
         if (size == 0) return;
@@ -78,7 +78,7 @@ contract EdgeRewards is RewardsStorageV1, IEdgeRewards {
     function addReward(
         address _tokenAddr,
         IRewardDistributor _distributor
-    ) external onlyApprovedDistributors {
+    ) external override onlyApprovedDistributors(_distributor) {
         tokenToDistributors[_tokenAddr].push(_distributor);
         emit AddReward(_tokenAddr, _distributor, block.timestamp);
     }
@@ -92,20 +92,19 @@ contract EdgeRewards is RewardsStorageV1, IEdgeRewards {
     function removeReward(
         address _tokenAddr,
         IRewardDistributor _distributor
-    ) external onlyOwner {
+    ) external override onlyOwner {
         // loop throught and remove
         IRewardDistributor[] storage distributors = tokenToDistributors[_tokenAddr];
-        uint256 size = distributors[_tokenAddr].length;
+        uint256 size = tokenToDistributors[_tokenAddr].length;
 
-        // a hack to rmove
-        if (size == 1) distributors.length = 0;
+        if (size == 1) delete distributors[0];
 
         if (size > 1) {
             // remove the item from the array
             // using the 2 pointer algorithm
             uint256 j = 0;
             for (uint256 i = 0; i < size; i++ ) {
-                if (distributors[i] != _tokenAddr) {
+                if (address(distributors[i]) != _tokenAddr) {
                     distributors[j] = distributors[i];
                     j += 1;
                 }
