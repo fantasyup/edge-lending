@@ -40,6 +40,7 @@ export type { RewardDistributorFactory } from "./RewardDistributorFactory";
 export type { RewardDistributorManager } from "./RewardDistributorManager";
 export type { RewardsStorageV1 } from "./RewardsStorageV1";
 export type { MockChainlinkUSDAdapter } from "./MockChainlinkUSDAdapter";
+export type { MockDistributorManager } from "./MockDistributorManager";
 export type { MockFlashBorrower } from "./MockFlashBorrower";
 export type { MockLendingPair } from "./MockLendingPair";
 export type { MockPriceOracle } from "./MockPriceOracle";
@@ -97,6 +98,7 @@ export { RewardDistributorFactory__factory } from "./factories/RewardDistributor
 export { RewardDistributorManager__factory } from "./factories/RewardDistributorManager__factory";
 export { RewardsStorageV1__factory } from "./factories/RewardsStorageV1__factory";
 export { MockChainlinkUSDAdapter__factory } from "./factories/MockChainlinkUSDAdapter__factory";
+export { MockDistributorManager__factory } from "./factories/MockDistributorManager__factory";
 export { MockFlashBorrower__factory } from "./factories/MockFlashBorrower__factory";
 export { MockLendingPair__factory } from "./factories/MockLendingPair__factory";
 export { MockPriceOracle__factory } from "./factories/MockPriceOracle__factory";
