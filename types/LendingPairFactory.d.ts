@@ -32,11 +32,13 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
+    "rewardDistributionManager()": FunctionFragment;
     "unpause()": FunctionFragment;
     "updateBorrowAssetWrapperImpl(address)": FunctionFragment;
     "updateCollateralWrapperImpl(address)": FunctionFragment;
     "updateDebtTokenImpl(address)": FunctionFragment;
     "updatePairImpl(address)": FunctionFragment;
+    "updateRewardManager(address)": FunctionFragment;
     "validInterestRateModels(address)": FunctionFragment;
   };
 
@@ -95,6 +97,10 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "rewardDistributionManager",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "updateBorrowAssetWrapperImpl",
@@ -110,6 +116,10 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "updatePairImpl",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateRewardManager",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -143,6 +153,10 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "rewardDistributionManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "updateBorrowAssetWrapperImpl",
@@ -158,6 +172,10 @@ interface LendingPairFactoryInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "updatePairImpl",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateRewardManager",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -339,6 +357,10 @@ export class LendingPairFactory extends Contract {
 
     "paused()"(overrides?: CallOverrides): Promise<[boolean]>;
 
+    rewardDistributionManager(overrides?: CallOverrides): Promise<[string]>;
+
+    "rewardDistributionManager()"(overrides?: CallOverrides): Promise<[string]>;
+
     unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -384,6 +406,16 @@ export class LendingPairFactory extends Contract {
 
     "updatePairImpl(address)"(
       _newLogicContract: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateRewardManager(
+      _newManager: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updateRewardManager(address)"(
+      _newManager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -509,6 +541,10 @@ export class LendingPairFactory extends Contract {
 
   "paused()"(overrides?: CallOverrides): Promise<boolean>;
 
+  rewardDistributionManager(overrides?: CallOverrides): Promise<string>;
+
+  "rewardDistributionManager()"(overrides?: CallOverrides): Promise<string>;
+
   unpause(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -554,6 +590,16 @@ export class LendingPairFactory extends Contract {
 
   "updatePairImpl(address)"(
     _newLogicContract: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateRewardManager(
+    _newManager: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updateRewardManager(address)"(
+    _newManager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -671,6 +717,10 @@ export class LendingPairFactory extends Contract {
 
     "paused()"(overrides?: CallOverrides): Promise<boolean>;
 
+    rewardDistributionManager(overrides?: CallOverrides): Promise<string>;
+
+    "rewardDistributionManager()"(overrides?: CallOverrides): Promise<string>;
+
     unpause(overrides?: CallOverrides): Promise<void>;
 
     "unpause()"(overrides?: CallOverrides): Promise<void>;
@@ -712,6 +762,16 @@ export class LendingPairFactory extends Contract {
 
     "updatePairImpl(address)"(
       _newLogicContract: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateRewardManager(
+      _newManager: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "updateRewardManager(address)"(
+      _newManager: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -870,6 +930,12 @@ export class LendingPairFactory extends Contract {
 
     "paused()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    rewardDistributionManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "rewardDistributionManager()"(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -915,6 +981,16 @@ export class LendingPairFactory extends Contract {
 
     "updatePairImpl(address)"(
       _newLogicContract: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateRewardManager(
+      _newManager: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updateRewardManager(address)"(
+      _newManager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1056,6 +1132,14 @@ export class LendingPairFactory extends Contract {
 
     "paused()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    rewardDistributionManager(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "rewardDistributionManager()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1101,6 +1185,16 @@ export class LendingPairFactory extends Contract {
 
     "updatePairImpl(address)"(
       _newLogicContract: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateRewardManager(
+      _newManager: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updateRewardManager(address)"(
+      _newManager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

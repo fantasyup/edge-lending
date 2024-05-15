@@ -31,6 +31,7 @@ interface WrapperTokenBaseInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "nonces(address)": FunctionFragment;
     "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
+    "rewardManager()": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -74,6 +75,10 @@ interface WrapperTokenBaseInterface extends ethers.utils.Interface {
       BytesLike
     ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "rewardManager",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -111,6 +116,10 @@ interface WrapperTokenBaseInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "rewardManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -272,6 +281,10 @@ export class WrapperTokenBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    rewardManager(overrides?: CallOverrides): Promise<[string]>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<[string]>;
+
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     "symbol()"(overrides?: CallOverrides): Promise<[string]>;
@@ -407,6 +420,10 @@ export class WrapperTokenBase extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  rewardManager(overrides?: CallOverrides): Promise<string>;
+
+  "rewardManager()"(overrides?: CallOverrides): Promise<string>;
+
   symbol(overrides?: CallOverrides): Promise<string>;
 
   "symbol()"(overrides?: CallOverrides): Promise<string>;
@@ -541,6 +558,10 @@ export class WrapperTokenBase extends Contract {
       s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    rewardManager(overrides?: CallOverrides): Promise<string>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<string>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -698,6 +719,10 @@ export class WrapperTokenBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    rewardManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -841,6 +866,10 @@ export class WrapperTokenBase extends Contract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    rewardManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

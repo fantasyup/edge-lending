@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../util/Initializable.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../interfaces/IRewardDistributor.sol";
 import "../interfaces/IRewardDistributorManager.sol";
@@ -32,7 +33,7 @@ We will update the userInfo on
 - burn
 */
 
-abstract contract RewardDistributorStorageV1 {
+abstract contract RewardDistributorStorageV1 is Initializable {
 
   /// @dev Instruct
   struct PoolInfo {

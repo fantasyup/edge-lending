@@ -7,13 +7,6 @@ import "../interfaces/IBSLendingPair.sol";
 import "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IRewardDistributorManager.sol";
 
-/**
-
-1 distributor contract -> multiple lending pairs
-2 edge onsen needs to keep track of the distributor for a lending pair
-to invoke them when a user burns or transfer
- */
-
 abstract contract RewardsStorageV1 is UUPSProxiable {
     /// @dev admin 
     address public owner;
@@ -50,21 +43,23 @@ contract RewardDistributorManager is RewardsStorageV1, IRewardDistributorManager
     /// rewards for the user
     /// low gas cost is the ultimaate goal
     function accumulateRewards(
-        address _tokenAddr,
         address _from,
         address _to,
         uint256 _balance
-    ) external {
-        // loop through the rewards for 
-        // the pair and call 
-        // handleAction on it
-        IRewardDistributor[] memory distributors = tokenToDistributors[_tokenAddr];
+    ) external override {
+        IRewardDistributor[] memory distributors = tokenToDistributors[msg.sender];
         uint256 size = distributors.length;
 
         if (size == 0) return;
 
+        /*
+        * We need to manage the size of the rewards to prevent
+        * astronomical increase in gas cost
+        *
+        */
+        
         for(uint256 i = 0; i < size; i++) {
-            distributors[i].accumulateReward(_tokenAddr, _from, _to, _balance);
+            distributors[i].accumulateReward(msg.sender, _from, _to, _balance);
         }
 
     }
@@ -81,12 +76,6 @@ contract RewardDistributorManager is RewardsStorageV1, IRewardDistributorManager
     ) external override onlyApprovedDistributors(_distributor) {
         tokenToDistributors[_tokenAddr].push(_distributor);
         emit AddReward(_tokenAddr, _distributor, block.timestamp);
-    }
-
-    struct DistributorConfigVars {
-        bool collateralToken;
-        bool debtToken;
-        bool borrowAssetToken;
     }
 
     function removeReward(
