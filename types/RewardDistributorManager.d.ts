@@ -21,21 +21,23 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface RewardDistributorManagerInterface extends ethers.utils.Interface {
   functions: {
-    "acceptGuardianTransfer()": FunctionFragment;
+    "acceptOwnerTransfer()": FunctionFragment;
     "accumulateRewards(address,address,uint256)": FunctionFragment;
-    "addReward(address,address)": FunctionFragment;
-    "approvedDistributions(address)": FunctionFragment;
+    "activateReward(address)": FunctionFragment;
+    "approvedDistributors(address)": FunctionFragment;
     "commitOwnerTransfer(address)": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
+    "initialize(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "removeReward(address,address)": FunctionFragment;
     "setDistributorStatus(address,bool)": FunctionFragment;
+    "tokenRewardToDistributors(address,uint256)": FunctionFragment;
     "updateCode(address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "acceptGuardianTransfer",
+    functionFragment: "acceptOwnerTransfer",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -43,11 +45,11 @@ interface RewardDistributorManagerInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "addReward",
-    values: [string, string]
+    functionFragment: "activateReward",
+    values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "approvedDistributions",
+    functionFragment: "approvedDistributors",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -58,6 +60,7 @@ interface RewardDistributorManagerInterface extends ethers.utils.Interface {
     functionFragment: "getCodeAddress",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "initialize", values: [string]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "proxiableUUID",
@@ -71,19 +74,26 @@ interface RewardDistributorManagerInterface extends ethers.utils.Interface {
     functionFragment: "setDistributorStatus",
     values: [string, boolean]
   ): string;
+  encodeFunctionData(
+    functionFragment: "tokenRewardToDistributors",
+    values: [string, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
 
   decodeFunctionResult(
-    functionFragment: "acceptGuardianTransfer",
+    functionFragment: "acceptOwnerTransfer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "accumulateRewards",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "addReward", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "approvedDistributions",
+    functionFragment: "activateReward",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "approvedDistributors",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -94,6 +104,7 @@ interface RewardDistributorManagerInterface extends ethers.utils.Interface {
     functionFragment: "getCodeAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "proxiableUUID",
@@ -107,20 +118,26 @@ interface RewardDistributorManagerInterface extends ethers.utils.Interface {
     functionFragment: "setDistributorStatus",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenRewardToDistributors",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
 
   events: {
     "AddReward(address,address,uint256)": EventFragment;
-    "ApprovedDistribution(address,uint256)": EventFragment;
+    "ApprovedDistributor(address,uint256)": EventFragment;
     "CodeUpdated(bytes32,address)": EventFragment;
+    "Initialized(address,uint256)": EventFragment;
     "OwnershipAccepted(address,uint256)": EventFragment;
     "RemoveReward(address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AddReward"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ApprovedDistribution"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ApprovedDistributor"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemoveReward"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
@@ -170,11 +187,11 @@ export class RewardDistributorManager extends Contract {
   interface: RewardDistributorManagerInterface;
 
   functions: {
-    acceptGuardianTransfer(
+    acceptOwnerTransfer(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "acceptGuardianTransfer()"(
+    "acceptOwnerTransfer()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -192,24 +209,22 @@ export class RewardDistributorManager extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    addReward(
+    activateReward(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "addReward(address,address)"(
+    "activateReward(address)"(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    approvedDistributions(
+    approvedDistributors(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "approvedDistributions(address)"(
+    "approvedDistributors(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
@@ -231,6 +246,16 @@ export class RewardDistributorManager extends Contract {
     "getCodeAddress()"(
       overrides?: CallOverrides
     ): Promise<[string] & { codeAddress: string }>;
+
+    initialize(
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "initialize(address)"(
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -264,6 +289,18 @@ export class RewardDistributorManager extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     updateCode(
       newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -275,11 +312,11 @@ export class RewardDistributorManager extends Contract {
     ): Promise<ContractTransaction>;
   };
 
-  acceptGuardianTransfer(
+  acceptOwnerTransfer(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "acceptGuardianTransfer()"(
+  "acceptOwnerTransfer()"(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -297,24 +334,22 @@ export class RewardDistributorManager extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  addReward(
+  activateReward(
     _tokenAddr: string,
-    _distributor: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "addReward(address,address)"(
+  "activateReward(address)"(
     _tokenAddr: string,
-    _distributor: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  approvedDistributions(
+  approvedDistributors(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "approvedDistributions(address)"(
+  "approvedDistributors(address)"(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
@@ -332,6 +367,16 @@ export class RewardDistributorManager extends Contract {
   getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
   "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
+  initialize(
+    _owner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "initialize(address)"(
+    _owner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -365,6 +410,18 @@ export class RewardDistributorManager extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  tokenRewardToDistributors(
+    arg0: string,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "tokenRewardToDistributors(address,uint256)"(
+    arg0: string,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   updateCode(
     newAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -376,9 +433,9 @@ export class RewardDistributorManager extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    acceptGuardianTransfer(overrides?: CallOverrides): Promise<void>;
+    acceptOwnerTransfer(overrides?: CallOverrides): Promise<void>;
 
-    "acceptGuardianTransfer()"(overrides?: CallOverrides): Promise<void>;
+    "acceptOwnerTransfer()"(overrides?: CallOverrides): Promise<void>;
 
     accumulateRewards(
       _from: string,
@@ -394,24 +451,22 @@ export class RewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    addReward(
+    activateReward(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "addReward(address,address)"(
+    "activateReward(address)"(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    approvedDistributions(
+    approvedDistributors(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "approvedDistributions(address)"(
+    "approvedDistributors(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -429,6 +484,13 @@ export class RewardDistributorManager extends Contract {
     getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
+    initialize(_owner: string, overrides?: CallOverrides): Promise<void>;
+
+    "initialize(address)"(
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -462,6 +524,18 @@ export class RewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     updateCode(newAddress: string, overrides?: CallOverrides): Promise<void>;
 
     "updateCode(address)"(
@@ -480,7 +554,7 @@ export class RewardDistributorManager extends Contract {
       { tokenAddr: string; distributor: string; timestamp: BigNumber }
     >;
 
-    ApprovedDistribution(
+    ApprovedDistributor(
       distributor: null,
       timestamp: null
     ): TypedEventFilter<
@@ -494,6 +568,14 @@ export class RewardDistributorManager extends Contract {
     ): TypedEventFilter<
       [string, string],
       { uuid: string; codeAddress: string }
+    >;
+
+    Initialized(
+      owner: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { owner: string; timestamp: BigNumber }
     >;
 
     OwnershipAccepted(
@@ -523,11 +605,11 @@ export class RewardDistributorManager extends Contract {
   };
 
   estimateGas: {
-    acceptGuardianTransfer(
+    acceptOwnerTransfer(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "acceptGuardianTransfer()"(
+    "acceptOwnerTransfer()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -545,24 +627,22 @@ export class RewardDistributorManager extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    addReward(
+    activateReward(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "addReward(address,address)"(
+    "activateReward(address)"(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    approvedDistributions(
+    approvedDistributors(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "approvedDistributions(address)"(
+    "approvedDistributors(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -580,6 +660,16 @@ export class RewardDistributorManager extends Contract {
     getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    initialize(
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "initialize(address)"(
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -613,6 +703,18 @@ export class RewardDistributorManager extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     updateCode(
       newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -625,11 +727,11 @@ export class RewardDistributorManager extends Contract {
   };
 
   populateTransaction: {
-    acceptGuardianTransfer(
+    acceptOwnerTransfer(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "acceptGuardianTransfer()"(
+    "acceptOwnerTransfer()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -647,24 +749,22 @@ export class RewardDistributorManager extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    addReward(
+    activateReward(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "addReward(address,address)"(
+    "activateReward(address)"(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    approvedDistributions(
+    approvedDistributors(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "approvedDistributions(address)"(
+    "approvedDistributors(address)"(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -683,6 +783,16 @@ export class RewardDistributorManager extends Contract {
 
     "getCodeAddress()"(
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    initialize(
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "initialize(address)"(
+      _owner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -715,6 +825,18 @@ export class RewardDistributorManager extends Contract {
       _distributor: string,
       _approve: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     updateCode(

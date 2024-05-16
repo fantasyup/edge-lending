@@ -44,7 +44,8 @@ runTestSuite("scenarios", (vars: TestVars) => {
             CollateralAssetMockPriceOracle,
             Vault,
             InterestRateModel,
-            LendingPair: newLendingPair
+            LendingPair: newLendingPair,
+            MockRewardDistributorManager
           } = vars;
 
           const CollateralTokenDecimal = BigNumber.from(10).pow(CollateralTokenDecimalPlaces);
@@ -57,21 +58,24 @@ runTestSuite("scenarios", (vars: TestVars) => {
           await initializeWrapperTokens(
             newLendingPair.address,
             newBorrowAssetWrapper,
-            BorrowTokenWithDecimals.address
+            BorrowTokenWithDecimals.address,
+            MockRewardDistributorManager.address
           );
 
           // collateral wrapper token
           await initializeWrapperTokens(
             newLendingPair.address,
             newCollateralWrapperToken,
-            CollateralAsset.address
+            CollateralAsset.address,
+            MockRewardDistributorManager.address
           );
 
           // debt token
           await initializeWrapperTokens(
             newLendingPair.address,
             newDebtWrapperToken,
-            BorrowTokenWithDecimals.address
+            BorrowTokenWithDecimals.address,
+            MockRewardDistributorManager.address
           );
 
           await newLendingPair.initialize(

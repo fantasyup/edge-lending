@@ -51,11 +51,10 @@ import { assert } from "chai";
 // 'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair' | 'LendingPairHelper' | 'LendingPairFactory' | 'VaultFactory'
 
 export async function makeLendingPairTestSuiteVars(
-        price?: BigNumber
-    ): Promise<Partial<
-        TestVars
-    >> {
+       testVars: any
+): Promise<TestVars> {
     return {
+        ...testVars,
         Vault: await getVaultDeployment(),
         PriceOracleAggregator: await getPriceOracleAggregatorDeployment(),
         CollateralWrapperToken: await getCollateralWrapperDeployment(),
@@ -172,7 +171,7 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
             });
 
             await setupTest()
-            const vars = await makeLendingPairTestSuiteVars()
+            const vars = await makeLendingPairTestSuiteVars(testVars)
             Object.assign(testVars, vars)
         })
         

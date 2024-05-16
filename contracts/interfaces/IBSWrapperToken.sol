@@ -11,7 +11,9 @@ interface IBSWrapperTokenBase is IERC20 {
         string memory _tokenSymbol,
         IRewardDistributorManager _manager
     ) external;
+
     function burn(address _from, uint256 _amount) external;
+
     function owner() external view returns (address);
 }
 

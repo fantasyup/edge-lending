@@ -19,12 +19,14 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface RewardsStorageV1Interface extends ethers.utils.Interface {
+interface RewardDistirbutorManagerStorageV1Interface
+  extends ethers.utils.Interface {
   functions: {
     "approvedDistributors(address)": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
     "owner()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
+    "tokenRewardToDistributors(address,uint256)": FunctionFragment;
     "updateCode(address)": FunctionFragment;
   };
 
@@ -41,6 +43,10 @@ interface RewardsStorageV1Interface extends ethers.utils.Interface {
     functionFragment: "proxiableUUID",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "tokenRewardToDistributors",
+    values: [string, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
 
   decodeFunctionResult(
@@ -56,6 +62,10 @@ interface RewardsStorageV1Interface extends ethers.utils.Interface {
     functionFragment: "proxiableUUID",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenRewardToDistributors",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
 
   events: {
@@ -65,7 +75,7 @@ interface RewardsStorageV1Interface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
 }
 
-export class RewardsStorageV1 extends Contract {
+export class RewardDistirbutorManagerStorageV1 extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -106,7 +116,7 @@ export class RewardsStorageV1 extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: RewardsStorageV1Interface;
+  interface: RewardDistirbutorManagerStorageV1Interface;
 
   functions: {
     approvedDistributors(
@@ -134,6 +144,18 @@ export class RewardsStorageV1 extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
+
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     updateCode(
       newAddress: string,
@@ -168,6 +190,18 @@ export class RewardsStorageV1 extends Contract {
 
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
+  tokenRewardToDistributors(
+    arg0: string,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "tokenRewardToDistributors(address,uint256)"(
+    arg0: string,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   updateCode(
     newAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -200,6 +234,18 @@ export class RewardsStorageV1 extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
+
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     updateCode(newAddress: string, overrides?: CallOverrides): Promise<void>;
 
@@ -242,6 +288,18 @@ export class RewardsStorageV1 extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     updateCode(
       newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -277,6 +335,18 @@ export class RewardsStorageV1 extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     updateCode(
       newAddress: string,

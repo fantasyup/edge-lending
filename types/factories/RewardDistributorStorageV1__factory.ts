@@ -55,6 +55,25 @@ const _abi = [
         type: "uint256",
       },
     ],
+    name: "pendingRewardActivation",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     name: "poolInfo",
     outputs: [
       {

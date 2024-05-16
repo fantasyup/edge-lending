@@ -62,7 +62,26 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "ApprovedDistribution",
+    name: "ApprovedDistributor",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "Initialized",
     type: "event",
   },
   {
@@ -158,13 +177,8 @@ const _abi = [
         name: "_tokenAddr",
         type: "address",
       },
-      {
-        internalType: "contract IRewardDistributor",
-        name: "_distributor",
-        type: "address",
-      },
     ],
-    name: "addReward",
+    name: "activateReward",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

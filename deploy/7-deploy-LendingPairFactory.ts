@@ -11,7 +11,7 @@ const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRun
     const debtTokenImplementation = await get(ContractId.DebtToken)
     const collateralWrapperImplementation = await get(ContractId.CollateralWrapperToken)
     const borrowWrapperImpl = await get(ContractId.WrapperToken)
-    
+    const rewardDistributorManager = await get(ContractId.RewardDistributorManager)
     // deploy library with deterministic set to true
     const ClonesLib = await deploy('Clones', {
       from: deployer,
@@ -27,7 +27,8 @@ const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRun
         lendingPairImplementation.address,
         collateralWrapperImplementation.address,
         debtTokenImplementation.address,
-        borrowWrapperImpl.address
+        borrowWrapperImpl.address,
+        rewardDistributorManager.address
       ],
       log: true,
       libraries: {

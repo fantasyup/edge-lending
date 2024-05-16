@@ -22,7 +22,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface IRewardDistributorManagerInterface extends ethers.utils.Interface {
   functions: {
     "accumulateRewards(address,address,uint256)": FunctionFragment;
-    "addReward(address,address)": FunctionFragment;
+    "activateReward(address)": FunctionFragment;
     "removeReward(address,address)": FunctionFragment;
   };
 
@@ -31,8 +31,8 @@ interface IRewardDistributorManagerInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "addReward",
-    values: [string, string]
+    functionFragment: "activateReward",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "removeReward",
@@ -43,7 +43,10 @@ interface IRewardDistributorManagerInterface extends ethers.utils.Interface {
     functionFragment: "accumulateRewards",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "addReward", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "activateReward",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "removeReward",
     data: BytesLike
@@ -51,14 +54,16 @@ interface IRewardDistributorManagerInterface extends ethers.utils.Interface {
 
   events: {
     "AddReward(address,address,uint256)": EventFragment;
-    "ApprovedDistribution(address,uint256)": EventFragment;
+    "ApprovedDistributor(address,uint256)": EventFragment;
+    "Initialized(address,uint256)": EventFragment;
     "OwnershipAccepted(address,uint256)": EventFragment;
     "RemoveReward(address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AddReward"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ApprovedDistribution"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ApprovedDistributor"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemoveReward"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
@@ -122,15 +127,13 @@ export class IRewardDistributorManager extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    addReward(
+    activateReward(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "addReward(address,address)"(
+    "activateReward(address)"(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -161,15 +164,13 @@ export class IRewardDistributorManager extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  addReward(
+  activateReward(
     _tokenAddr: string,
-    _distributor: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "addReward(address,address)"(
+  "activateReward(address)"(
     _tokenAddr: string,
-    _distributor: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -200,15 +201,13 @@ export class IRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    addReward(
+    activateReward(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "addReward(address,address)"(
+    "activateReward(address)"(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -235,12 +234,20 @@ export class IRewardDistributorManager extends Contract {
       { tokenAddr: string; distributor: string; timestamp: BigNumber }
     >;
 
-    ApprovedDistribution(
+    ApprovedDistributor(
       distributor: null,
       timestamp: null
     ): TypedEventFilter<
       [string, BigNumber],
       { distributor: string; timestamp: BigNumber }
+    >;
+
+    Initialized(
+      owner: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { owner: string; timestamp: BigNumber }
     >;
 
     OwnershipAccepted(
@@ -284,15 +291,13 @@ export class IRewardDistributorManager extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    addReward(
+    activateReward(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "addReward(address,address)"(
+    "activateReward(address)"(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -324,15 +329,13 @@ export class IRewardDistributorManager extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    addReward(
+    activateReward(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "addReward(address,address)"(
+    "activateReward(address)"(
       _tokenAddr: string,
-      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

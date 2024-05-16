@@ -5,14 +5,18 @@
 import { Contract, Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 
-import type { RewardsStorageV1 } from "../RewardsStorageV1";
+import type { RewardDistirbutorManagerStorageV1 } from "../RewardDistirbutorManagerStorageV1";
 
-export class RewardsStorageV1__factory {
+export class RewardDistirbutorManagerStorageV1__factory {
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): RewardsStorageV1 {
-    return new Contract(address, _abi, signerOrProvider) as RewardsStorageV1;
+  ): RewardDistirbutorManagerStorageV1 {
+    return new Contract(
+      address,
+      _abi,
+      signerOrProvider
+    ) as RewardDistirbutorManagerStorageV1;
   }
 }
 
@@ -89,6 +93,30 @@ const _abi = [
         internalType: "bytes32",
         name: "",
         type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "tokenRewardToDistributors",
+    outputs: [
+      {
+        internalType: "contract IRewardDistributor",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",

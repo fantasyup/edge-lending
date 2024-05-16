@@ -22,3 +22,4 @@ const deployRewardDistributor: DeployFunction = async function (hre: HardhatRunt
 
 export default deployRewardDistributor
 deployRewardDistributor.tags = [`${ContractId.RewardDistributor}`]
+deployRewardDistributor.dependencies = [`${ContractId.RewardDistributorManager}`]

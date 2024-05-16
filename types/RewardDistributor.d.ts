@@ -22,6 +22,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface RewardDistributorInterface extends ethers.utils.Interface {
   functions: {
     "accumulateReward(address,address,address,uint256)": FunctionFragment;
+    "activatePendingRewards()": FunctionFragment;
     "add(tuple,address,bool)": FunctionFragment;
     "emergencyWithdraw(uint256,address)": FunctionFragment;
     "endTimestamp()": FunctionFragment;
@@ -29,6 +30,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     "guardian()": FunctionFragment;
     "initialize(address,uint256,uint256,address)": FunctionFragment;
     "massUpdatePools()": FunctionFragment;
+    "pendingRewardActivation(uint256)": FunctionFragment;
     "pendingRewardToken(uint256,address)": FunctionFragment;
     "poolInfo(uint256)": FunctionFragment;
     "rewardAmountDistributePerSecond()": FunctionFragment;
@@ -46,6 +48,10 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "accumulateReward",
     values: [string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "activatePendingRewards",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "add",
@@ -79,6 +85,10 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "massUpdatePools",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "pendingRewardActivation",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "pendingRewardToken",
@@ -133,6 +143,10 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     functionFragment: "accumulateReward",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "activatePendingRewards",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "add", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "emergencyWithdraw",
@@ -150,6 +164,10 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "massUpdatePools",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "pendingRewardActivation",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -259,6 +277,14 @@ export class RewardDistributor extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    activatePendingRewards(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "activatePendingRewards()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     add(
       _allocPoints: {
         collateralTokenAllocPoint: BigNumberish;
@@ -336,6 +362,16 @@ export class RewardDistributor extends Contract {
     "massUpdatePools()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    pendingRewardActivation(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "pendingRewardActivation(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     pendingRewardToken(
       _pid: BigNumberish,
@@ -486,6 +522,14 @@ export class RewardDistributor extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  activatePendingRewards(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "activatePendingRewards()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   add(
     _allocPoints: {
       collateralTokenAllocPoint: BigNumberish;
@@ -563,6 +607,16 @@ export class RewardDistributor extends Contract {
   "massUpdatePools()"(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  pendingRewardActivation(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "pendingRewardActivation(uint256)"(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   pendingRewardToken(
     _pid: BigNumberish,
@@ -710,6 +764,10 @@ export class RewardDistributor extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    activatePendingRewards(overrides?: CallOverrides): Promise<void>;
+
+    "activatePendingRewards()"(overrides?: CallOverrides): Promise<void>;
+
     add(
       _allocPoints: {
         collateralTokenAllocPoint: BigNumberish;
@@ -783,6 +841,16 @@ export class RewardDistributor extends Contract {
     massUpdatePools(overrides?: CallOverrides): Promise<void>;
 
     "massUpdatePools()"(overrides?: CallOverrides): Promise<void>;
+
+    pendingRewardActivation(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "pendingRewardActivation(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     pendingRewardToken(
       _pid: BigNumberish,
@@ -983,6 +1051,14 @@ export class RewardDistributor extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    activatePendingRewards(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "activatePendingRewards()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     add(
       _allocPoints: {
         collateralTokenAllocPoint: BigNumberish;
@@ -1059,6 +1135,16 @@ export class RewardDistributor extends Contract {
 
     "massUpdatePools()"(
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    pendingRewardActivation(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "pendingRewardActivation(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     pendingRewardToken(
@@ -1180,6 +1266,14 @@ export class RewardDistributor extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    activatePendingRewards(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "activatePendingRewards()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     add(
       _allocPoints: {
         collateralTokenAllocPoint: BigNumberish;
@@ -1256,6 +1350,16 @@ export class RewardDistributor extends Contract {
 
     "massUpdatePools()"(
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    pendingRewardActivation(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "pendingRewardActivation(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     pendingRewardToken(

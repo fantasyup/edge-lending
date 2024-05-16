@@ -22,6 +22,7 @@ interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
   functions: {
     "endTimestamp()": FunctionFragment;
     "guardian()": FunctionFragment;
+    "pendingRewardActivation(uint256)": FunctionFragment;
     "poolInfo(uint256)": FunctionFragment;
     "rewardAmountDistributePerSecond()": FunctionFragment;
     "rewardToken()": FunctionFragment;
@@ -36,6 +37,10 @@ interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "guardian", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "pendingRewardActivation",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "poolInfo",
     values: [BigNumberish]
@@ -70,6 +75,10 @@ interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "guardian", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pendingRewardActivation",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "poolInfo", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "rewardAmountDistributePerSecond",
@@ -147,6 +156,16 @@ export class RewardDistributorStorageV1 extends Contract {
     guardian(overrides?: CallOverrides): Promise<[string]>;
 
     "guardian()"(overrides?: CallOverrides): Promise<[string]>;
+
+    pendingRewardActivation(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "pendingRewardActivation(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     poolInfo(
       arg0: BigNumberish,
@@ -237,6 +256,16 @@ export class RewardDistributorStorageV1 extends Contract {
 
   "guardian()"(overrides?: CallOverrides): Promise<string>;
 
+  pendingRewardActivation(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "pendingRewardActivation(uint256)"(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   poolInfo(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -322,6 +351,16 @@ export class RewardDistributorStorageV1 extends Contract {
     guardian(overrides?: CallOverrides): Promise<string>;
 
     "guardian()"(overrides?: CallOverrides): Promise<string>;
+
+    pendingRewardActivation(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "pendingRewardActivation(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     poolInfo(
       arg0: BigNumberish,
@@ -415,6 +454,16 @@ export class RewardDistributorStorageV1 extends Contract {
 
     "guardian()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    pendingRewardActivation(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "pendingRewardActivation(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     poolInfo(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     "poolInfo(uint256)"(
@@ -473,6 +522,16 @@ export class RewardDistributorStorageV1 extends Contract {
     guardian(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "guardian()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    pendingRewardActivation(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "pendingRewardActivation(uint256)"(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     poolInfo(
       arg0: BigNumberish,

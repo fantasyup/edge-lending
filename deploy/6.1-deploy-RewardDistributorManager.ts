@@ -9,9 +9,7 @@ const deployRewardDistributorManager: DeployFunction = async function (hre: Hard
 
     await deploy(ContractId.RewardDistributorManager, {
         from: deployer,
-        args: [
-          blackSmithTeam,
-        ],
+        args: [],
         log: true,
         libraries: {
         }

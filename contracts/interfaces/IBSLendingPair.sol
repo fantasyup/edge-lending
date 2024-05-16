@@ -9,8 +9,6 @@ import "./IBSVault.sol";
 import "../DataTypes.sol";
 
 interface IBSLendingPair {
-
-    
     event Initialized(
         address indexed pair,
         address indexed asset,

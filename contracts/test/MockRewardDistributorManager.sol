@@ -3,20 +3,16 @@ pragma solidity 0.8.1;
 import "../interfaces/IRewardDistributorManager.sol";
 
 contract MockRewardDistributorManager is IRewardDistributorManager {
-
-    function addReward(
-        address _tokenAddr,
-        IRewardDistributor _distributor
-    ) external pure override{
+    function activateReward(address _tokenAddr) external pure override {
         _tokenAddr;
-        _distributor;
         return;
     }
 
-    function removeReward(
-        address _tokenAddr,
-        IRewardDistributor _distributor
-    ) external pure override {
+    function removeReward(address _tokenAddr, IRewardDistributor _distributor)
+        external
+        pure
+        override
+    {
         _tokenAddr;
         _distributor;
         return;
@@ -32,5 +28,4 @@ contract MockRewardDistributorManager is IRewardDistributorManager {
         _balance;
         return;
     }
-
 }

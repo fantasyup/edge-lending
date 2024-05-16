@@ -24,10 +24,7 @@ contract RewardDistributorFactory {
         _;
     }
 
-    constructor(
-        address _owner,
-        address _distributorImplementation
-    ) {
+    constructor(address _owner, address _distributorImplementation) {
         owner = _owner;
         distributorImplementation = _distributorImplementation;
     }
@@ -44,17 +41,19 @@ contract RewardDistributorFactory {
         uint256 _startTimestamp,
         address _guardian
     ) external {
-        bytes32 salt = keccak256(
-            abi.encode(
-                _rewardToken,
-                _amountDistributePerSecond,
-                _startTimestamp,
-                _guardian,
-                rewardDistributors.length
-            )
-        );
+        bytes32 salt =
+            keccak256(
+                abi.encode(
+                    _rewardToken,
+                    _amountDistributePerSecond,
+                    _startTimestamp,
+                    _guardian,
+                    rewardDistributors.length
+                )
+            );
 
-        IRewardDistributor newDistributor = IRewardDistributor(distributorImplementation.cloneDeterministic(salt));
+        IRewardDistributor newDistributor =
+            IRewardDistributor(distributorImplementation.cloneDeterministic(salt));
         // initialize
         newDistributor.initialize(
             _rewardToken,
@@ -65,5 +64,4 @@ contract RewardDistributorFactory {
 
         emit NewRewardDistributor(address(newDistributor), block.timestamp);
     }
-
 }

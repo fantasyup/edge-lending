@@ -17,8 +17,8 @@ const deployDevEnvironment: DeployFunction = async function (hre: HardhatRuntime
     const { deployer, blackSmithTeam } = await getNamedAccounts();
     const [ admin, bob, frank ] = await ethers.getSigners()
 
-    const vars = await makeLendingPairTestSuiteVars();
     const testEnvVars = await deployTestTokensAndMock()
+    const vars = await makeLendingPairTestSuiteVars(testEnvVars);
 
     await setupLendingPair(
         vars.LendingPair,
@@ -26,7 +26,8 @@ const deployDevEnvironment: DeployFunction = async function (hre: HardhatRuntime
         testEnvVars.BorrowAsset,
         vars.BorrowWrapperToken,
         vars.CollateralWrapperToken,
-        vars.DebtToken
+        vars.DebtToken,
+        vars.MockRewardDistributorManager
     )
 
     // initialize lending pair

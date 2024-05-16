@@ -3,7 +3,7 @@ pragma solidity 0.8.1;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title JumpRateModelV2
-/// @author 
+/// @author
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract JumpRateModelV2 {
@@ -34,7 +34,7 @@ contract JumpRateModelV2 {
 
     /// @dev Maximum borrow rate that can ever be applied per second
     uint256 internal immutable borrowRateMaxMantissa;
-    
+
     /// @notice Construct an interest rate model
     /// @param baseRatePerYear The approximate target base APR, as a mantissa (scaled by 1e18)
     /// @param multiplierPerYear The rate of increase in interest rate wrt utilization (scaled by 1e18)
@@ -71,7 +71,7 @@ contract JumpRateModelV2 {
             blocksPerYear_
         );
     }
-    
+
     /// @notice Update the parameters of the interest rate model (only callable by owner, i.e. Timelock)
     /// @param baseRatePerYear The approximate target base APR, as a mantissa (scaled by 1e18)
     /// @param multiplierPerYear The rate of increase in interest rate wrt utilization (scaled by 1e18)
@@ -98,7 +98,6 @@ contract JumpRateModelV2 {
         );
     }
 
-    
     /// @notice Calculates the utilization rate of the market: `borrows / (cash + borrows - reserves)`
     /// @param cash The amount of cash in the market
     /// @param borrows The amount of borrows in the market
@@ -178,7 +177,6 @@ contract JumpRateModelV2 {
         emit NewInterestParams(baseRatePerBlock, multiplierPerBlock, jumpMultiplierPerBlock, kink);
     }
 
-    
     /// @notice Calculates the current borrow rate per block
     /// @param cash The amount of cash in the market
     /// @param borrows The amount of borrows in the market
