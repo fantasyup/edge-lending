@@ -22,6 +22,7 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
   functions: {
     "accumulateRewards(address,address,uint256)": FunctionFragment;
     "activateReward(address)": FunctionFragment;
+    "proxiableUUID()": FunctionFragment;
     "removeReward(address,address)": FunctionFragment;
   };
 
@@ -34,6 +35,10 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "proxiableUUID",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "removeReward",
     values: [string, string]
   ): string;
@@ -44,6 +49,10 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "activateReward",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "proxiableUUID",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -136,6 +145,10 @@ export class MockRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<[void]>;
 
+    proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
+
     removeReward(
       _tokenAddr: string,
       _distributor: string,
@@ -169,6 +182,10 @@ export class MockRewardDistributorManager extends Contract {
     _tokenAddr: string,
     overrides?: CallOverrides
   ): Promise<void>;
+
+  proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+  "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
   removeReward(
     _tokenAddr: string,
@@ -206,6 +223,10 @@ export class MockRewardDistributorManager extends Contract {
       _tokenAddr: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
     removeReward(
       _tokenAddr: string,
@@ -297,6 +318,10 @@ export class MockRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     removeReward(
       _tokenAddr: string,
       _distributor: string,
@@ -334,6 +359,10 @@ export class MockRewardDistributorManager extends Contract {
       _tokenAddr: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     removeReward(
       _tokenAddr: string,

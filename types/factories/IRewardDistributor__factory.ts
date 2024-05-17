@@ -22,6 +22,30 @@ const _abi = [
     inputs: [
       {
         indexed: false,
+        internalType: "contract IERC20",
+        name: "_rewardToken",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_amountDistributePerSecond",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_startTimestamp",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_guardian",
+        type: "address",
+      },
+      {
+        indexed: false,
         internalType: "uint256",
         name: "timestamp",
         type: "uint256",

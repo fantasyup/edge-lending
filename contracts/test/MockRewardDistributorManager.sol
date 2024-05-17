@@ -28,4 +28,8 @@ contract MockRewardDistributorManager is IRewardDistributorManager {
         _balance;
         return;
     }
+
+    function proxiableUUID() public pure returns (bytes32) {
+        return keccak256("org.edge.contracts.edgerewards.implementation");
+    }
 }

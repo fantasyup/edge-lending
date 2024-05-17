@@ -207,7 +207,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   events: {
     "AccumulateReward(address,uint256,uint256)": EventFragment;
     "AddDistributor(address,address,tuple,uint256)": EventFragment;
-    "Initialized(uint256)": EventFragment;
+    "Initialized(address,uint256,uint256,address,uint256)": EventFragment;
     "Withdraw(address,uint256,uint256)": EventFragment;
   };
 
@@ -1021,8 +1021,21 @@ export class RewardDistributor extends Contract {
     >;
 
     Initialized(
+      _rewardToken: null,
+      _amountDistributePerSecond: null,
+      _startTimestamp: null,
+      _guardian: null,
       timestamp: null
-    ): TypedEventFilter<[BigNumber], { timestamp: BigNumber }>;
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber, string, BigNumber],
+      {
+        _rewardToken: string;
+        _amountDistributePerSecond: BigNumber;
+        _startTimestamp: BigNumber;
+        _guardian: string;
+        timestamp: BigNumber;
+      }
+    >;
 
     Withdraw(
       user: null,

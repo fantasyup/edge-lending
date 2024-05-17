@@ -100,12 +100,14 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
     uint256 private constant SHARE_SCALE = 1e12;
 
     event Withdraw(address user, uint256 poolId, uint256 amount);
+
     event AddDistributor(
         address lendingPair,
         address distributor,
         DistributorConfigVars _vars,
         uint256 timestamp
     );
+
     event AccumulateReward(address sender, uint256 pid, uint256 amount);
 
     modifier onlyGuardian {
@@ -113,26 +115,48 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         _;
     }
 
+    /// @notice create a distributor
+    /// @param _rewardDistributorManager the reward distributor manager address
     constructor(address _rewardDistributorManager) {
+        require(_rewardDistributorManager != address(0), "INVALID_MANAGER");
         rewardDistributorManager = IRewardDistributorManager(_rewardDistributorManager);
     }
 
+    /// @dev intialize 
+    /// @param _rewardToken asset to distribute
+    /// @param _amountDistributePerSecond amount to distributer per second
+    /// @param _startTimestamp time to start distributing
+    /// @param _guardian distributor guardian
     function initialize(
         IERC20 _rewardToken,
         uint256 _amountDistributePerSecond,
         uint256 _startTimestamp,
         address _guardian
-    ) external override {
+    ) external override initializer {
+        require(address(_rewardToken) != address(0), "INVALID_TOKEN");
+        require(_guardian != address(0), "INVALID_GUARDIAN");
+        require(_amountDistributePerSecond > 0, "INVALID_DISTRIBUTE");
+        require(_startTimestamp > 0, "INVALID_TIMESTAMP");
+
         rewardToken = _rewardToken;
         rewardAmountDistributePerSecond = _amountDistributePerSecond;
         startTimestamp = _startTimestamp;
         guardian = _guardian;
 
-        emit Initialized(block.timestamp);
+        emit Initialized(
+            _rewardToken,
+            _amountDistributePerSecond,
+            _startTimestamp,
+            _guardian,
+            block.timestamp
+        );
     }
 
-    // handles the transfer, burn, mint functions
-    /// @dev deposit
+    /// @dev accumulates reward for a depositor
+    /// @param _tokenAddr token to reward
+    /// @param _from sender
+    /// @param _to receipient
+    /// @param _balance amount transferred
     function accumulateReward(
         address _tokenAddr,
         address _from,
@@ -147,6 +171,21 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         // get pool id
         updatePool(pid);
         PoolInfo memory pool = poolInfo[pid];
+
+        /**
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+         */
 
         if (_from != address(0)) {
             // sub
@@ -229,7 +268,6 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         IERC20 _receiptTokenAddr,
         uint256 _lastUpdateTimestamp
     ) internal {
-        /// @TODO ensure the allocPoint is > 0
         totalAllocPoint = totalAllocPoint + _allocPoint;
 
         poolInfo.push(
@@ -242,17 +280,14 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         );
 
         tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length - 1;
-
-        // notify edge rewards
-        // rewardDistributorManager.addReward(address(_receiptTokenAddr));
     }
 
     function activatePendingRewards() external {
-      for (uint i = 0; i < pendingRewardActivation.length; i++) {
-        rewardDistributorManager.activateReward(pendingRewardActivation[i]);
-      }
-      // reset storage
-      delete pendingRewardActivation;
+        for (uint256 i = 0; i < pendingRewardActivation.length; i++) {
+            rewardDistributorManager.activateReward(pendingRewardActivation[i]);
+        }
+        // reset storage
+        delete pendingRewardActivation;
     }
 
     function set(

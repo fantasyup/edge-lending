@@ -79,10 +79,9 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
             approvedDistributors[IRewardDistributor(msg.sender)] == true,
             "ONLY_APPROVED_DISTRIBUTOR"
         );
-        
+
         /// @TODO check if reward has been activated
 
-        
         /// Note: it's possible for a distributor contract to spam the addReward
         /// function by creating minimal rewards. It's required to constantly monitor the AddReward
         /// event offchain to ensure that the addReward function is not being spammed
@@ -99,7 +98,7 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
     {
         // loop throught and remove
         IRewardDistributor[] storage distributors = tokenRewardToDistributors[_tokenAddr];
-        uint256 size = tokenRewardToDistributors[_tokenAddr].length;
+        uint256 size = distributors.length;
 
         if (size == 1) delete distributors[0];
 
