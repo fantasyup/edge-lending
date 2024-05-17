@@ -226,6 +226,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         emit AddDistribution(address(_lendingPair), address(this), _allocPoints, block.timestamp);
     }
 
+    /// @notice activatePendingRewards Activate pending reward in the manger
     function activatePendingRewards() external {
         for (uint256 i = 0; i < pendingRewardActivation.length; i++) {
             rewardDistributorManager.activateReward(pendingRewardActivation[i]);
@@ -234,6 +235,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         delete pendingRewardActivation;
     }
 
+    /// @notice set update allocation point for a pool
     function set(
         uint256 _pid,
         uint128 _allocPoint,
@@ -249,7 +251,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         emit UpdateDistribution(_pid, _allocPoint, _allocPoint, block.timestamp);
     }
 
-    function getMultiplier(uint256 _from, uint256 _to) public pure returns (uint256) {
+    function getMultiplier(uint256 _from, uint256 _to) internal pure returns (uint256) {
         return _to - _from;
     }
 
