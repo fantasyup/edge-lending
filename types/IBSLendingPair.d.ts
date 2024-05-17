@@ -35,6 +35,8 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     "initialize(string,string,address,address,tuple,address,address,address)": FunctionFragment;
     "oracle()": FunctionFragment;
     "redeem(address,uint256)": FunctionFragment;
+    "wrappedCollateralAsset()": FunctionFragment;
+    "wrapperBorrowedAsset()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -100,6 +102,14 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     functionFragment: "redeem",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "wrappedCollateralAsset",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "wrapperBorrowedAsset",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "accountInterestIndex",
@@ -142,6 +152,14 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "wrappedCollateralAsset",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "wrapperBorrowedAsset",
+    data: BytesLike
+  ): Result;
 
   events: {
     "ActionPaused(uint8,uint256)": EventFragment;
@@ -361,6 +379,14 @@ export class IBSLendingPair extends Contract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    wrappedCollateralAsset(overrides?: CallOverrides): Promise<[string]>;
+
+    "wrappedCollateralAsset()"(overrides?: CallOverrides): Promise<[string]>;
+
+    wrapperBorrowedAsset(overrides?: CallOverrides): Promise<[string]>;
+
+    "wrapperBorrowedAsset()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
   accountInterestIndex(
@@ -507,6 +533,14 @@ export class IBSLendingPair extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  wrappedCollateralAsset(overrides?: CallOverrides): Promise<string>;
+
+  "wrappedCollateralAsset()"(overrides?: CallOverrides): Promise<string>;
+
+  wrapperBorrowedAsset(overrides?: CallOverrides): Promise<string>;
+
+  "wrapperBorrowedAsset()"(overrides?: CallOverrides): Promise<string>;
+
   callStatic: {
     accountInterestIndex(
       arg0: string,
@@ -651,6 +685,14 @@ export class IBSLendingPair extends Contract {
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    wrappedCollateralAsset(overrides?: CallOverrides): Promise<string>;
+
+    "wrappedCollateralAsset()"(overrides?: CallOverrides): Promise<string>;
+
+    wrapperBorrowedAsset(overrides?: CallOverrides): Promise<string>;
+
+    "wrapperBorrowedAsset()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -962,6 +1004,14 @@ export class IBSLendingPair extends Contract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    wrappedCollateralAsset(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "wrappedCollateralAsset()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    wrapperBorrowedAsset(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "wrapperBorrowedAsset()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1109,6 +1159,22 @@ export class IBSLendingPair extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    wrappedCollateralAsset(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "wrappedCollateralAsset()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    wrapperBorrowedAsset(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "wrapperBorrowedAsset()"(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
 }

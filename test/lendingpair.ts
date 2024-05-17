@@ -12,6 +12,7 @@ import {
   DebtToken,
   LendingPair,
   Vault,
+  RewardDistributorManager,
 } from "../types";
 import { LendingPairActions } from "../helpers/types"
 import { advanceNBlocks, IAccount, LendingPairHelpers, makeLendingPairTestSuiteVars, runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars, setupLendingPair } from "./lib";
@@ -74,6 +75,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       DebtToken,
       InterestRateModel,
       MockRewardDistributorManager,
+      RewardDistributorManager,
       accounts: [admin]
     } = vars
 
@@ -84,7 +86,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       BorrowWrapperToken,
       CollateralWrapperToken,
       DebtToken,
-      MockRewardDistributorManager
+      RewardDistributorManager
     )
 
     await LendingPair.initialize(
@@ -115,6 +117,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       LendingPair,
       DebtToken,
       MockRewardDistributorManager,
+      RewardDistributorManager,
       accounts: [admin, bob]
     } = vars
 
@@ -125,7 +128,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       BorrowWrapperToken,
       CollateralWrapperToken,
       DebtToken,
-      MockRewardDistributorManager
+      RewardDistributorManager
     )
 
     const lendingPairHelpers = LendingPairHelpers(Vault, LendingPair, BorrowAsset, BorrowAsset, PriceOracleAggregator, admin)

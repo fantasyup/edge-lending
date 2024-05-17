@@ -6,6 +6,7 @@ import "../interfaces/IRewardDistributor.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IRewardDistributorManager.sol";
+import "hardhat/console.sol";
 
 abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable {
     /// @dev admin
@@ -48,6 +49,7 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         IRewardDistributor[] memory distributors = tokenRewardToDistributors[msg.sender];
         uint256 size = distributors.length;
 
+        console.logString("gets here");
         if (size == 0) return;
 
         /*

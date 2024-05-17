@@ -382,7 +382,7 @@ export async function setupLendingPair(
     BorrowAssetDepositWrapperToken: WrapperToken,
     CollateralWrapperToken: WrapperToken,
     DebtWrapperToken: DebtToken,
-    rewardDistributorManager: MockRewardDistributorManager
+    rewardDistributorManager:  RewardDistributorManager
   ) {
     // collateral wrapper token
     await initializeWrapperTokens(
@@ -432,7 +432,8 @@ export async function setupAndInitLendingPair(
       CollateralAssetMockPriceOracle,
       InterestRateModel,
       blackSmithTeam,
-      MockRewardDistributorManager
+      MockRewardDistributorManager,
+      RewardDistributorManager,
     } : TestVars,
     {
         initialExchangeRateMantissa,
@@ -450,7 +451,7 @@ export async function setupAndInitLendingPair(
       BorrowWrapperToken,
       CollateralWrapperToken,
       DebtToken,
-      MockRewardDistributorManager
+      RewardDistributorManager
     )
   
     await LendingPair.initialize(

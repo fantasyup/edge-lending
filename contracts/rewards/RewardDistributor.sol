@@ -5,36 +5,11 @@ import "../util/Initializable.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../interfaces/IRewardDistributor.sol";
 import "../interfaces/IRewardDistributorManager.sol";
-
-/**
-- We want people to be able to accrue rewards across 
-  multiple positions
-
-- We want it to be using one single address that accrues the profit
-
-- We want to be able to update alloc points so we can easily add new
-pools to the network
-
-- We want to be able to 
- */
-
-/**
-- create pool where we deposit x number of tokens
-- with this x number of tokens
-- we allocate specific % to different receipt tokens
-- for user to claim rewards
-- pass address of the pools where you want to claim rewards
-**/
-
-/**
-We will update the userInfo on
-- transfer
-- mint
-- burn
-*/
+import "hardhat/console.sol";
 
 abstract contract RewardDistributorStorageV1 is Initializable {
-    /// @dev Instruct
+    
+    /// @dev PoolInfo
     struct PoolInfo {
         IERC20 receiptTokenAddr;
         uint256 lastUpdateTimestamp;
@@ -47,11 +22,11 @@ abstract contract RewardDistributorStorageV1 is Initializable {
     // We do some fancy math here. Basically, any point in time, the amount of SUSHIs
     // entitled to a user but is pending to be distributed is:
     //
-    //   pending reward = (user.amount * pool.accSushiPerShare) - user.rewardDebt
+    //   pending reward = (user.amount * pool.accRewardTokenPerShare) - user.rewardDebt
     //
     // Whenever a user deposits or withdraws LP tokens to a pool. Here's what happens:
-    //   1. The pool's `accSushiPerShare` (and `lastRewardBlock`) gets updated.
-    //   2. User receives the pending reward sent to his/her address.
+    //   1. The pool's `accRewardTokenPerShare` (and `lastUpdateTimestamp`) gets updated.
+    //   2. User's pending reward gets updated
     //   3. User's `amount` gets updated.
     //   4. User's `rewardDebt` gets updated.
     //
@@ -101,10 +76,17 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
 
     event Withdraw(address user, uint256 poolId, uint256 amount);
 
-    event AddDistributor(
+    event AddDistribution(
         address lendingPair,
         address distributor,
         DistributorConfigVars _vars,
+        uint256 timestamp
+    );
+
+    event UpdateDistribution(
+        uint256 pid,
+        uint256 oldAllocPoint,
+        uint256 newAllocPoint,
         uint256 timestamp
     );
 
@@ -122,7 +104,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         rewardDistributorManager = IRewardDistributorManager(_rewardDistributorManager);
     }
 
-    /// @dev intialize 
+    /// @dev intialize
     /// @param _rewardToken asset to distribute
     /// @param _amountDistributePerSecond amount to distributer per second
     /// @param _startTimestamp time to start distributing
@@ -164,59 +146,36 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         uint256 _balance
     ) external override {
         require(msg.sender == address(rewardDistributorManager), "ONLY_MANAGER");
-
-        // check the from & to addresses if not address
-        // update reward
         uint256 pid = tokenPoolIDPair[_tokenAddr];
-        // get pool id
+
         updatePool(pid);
+
         PoolInfo memory pool = poolInfo[pid];
 
-        /**
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-         */
-
         if (_from != address(0)) {
-            // sub
             UserInfo storage user = userInfo[pid][_from];
-            if (user.amount > 0 && user.amount <= _balance) {
+            if (user.amount > 0 && user.amount >= _balance) {
                 user.pendingReward +=
                     ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) -
                     user.rewardDebt;
                 user.amount -= _balance;
-                user.rewardDebt += ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
-                // subtract from balance
+                user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
             }
         }
 
         if (_to != address(0)) {
-            // update this guy
             UserInfo storage user = userInfo[pid][_to];
             if (user.amount > 0) {
                 user.pendingReward +=
                     ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) -
                     user.rewardDebt;
             }
-            // add to balance
             user.amount += _balance;
-            user.rewardDebt += ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
+            user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
         }
 
         emit AccumulateReward(msg.sender, pid, _balance);
     }
-
-    function calculateUserReward() internal {}
 
     struct DistributorConfigVars {
         uint128 collateralTokenAllocPoint;
@@ -224,11 +183,15 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         uint128 borrowAssetTokenAllocPoint;
     }
 
+    /// @dev Add a distribution param for a lending pair
+    /// @param _allocPoints specifies the allocation points
+    /// @param _lendingPair the lending pair being added
+    /// @param _withUpdate update existing pools
     function add(
         DistributorConfigVars calldata _allocPoints,
         IBSLendingPair _lendingPair,
         bool _withUpdate
-    ) public onlyGuardian {
+    ) external onlyGuardian {
         if (_withUpdate) {
             // massUpdatePools();
         }
@@ -239,7 +202,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         if (_allocPoints.collateralTokenAllocPoint > 0) {
             createPool(
                 _allocPoints.collateralTokenAllocPoint,
-                _lendingPair.collateralAsset(),
+                _lendingPair.wrappedCollateralAsset(),
                 lastUpdateTimestamp
             );
         }
@@ -255,31 +218,12 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         if (_allocPoints.borrowAssetTokenAllocPoint > 0) {
             createPool(
                 _allocPoints.borrowAssetTokenAllocPoint,
-                _lendingPair.asset(),
+                _lendingPair.wrapperBorrowedAsset(),
                 lastUpdateTimestamp
             );
         }
 
-        emit AddDistributor(address(_lendingPair), address(this), _allocPoints, block.timestamp);
-    }
-
-    function createPool(
-        uint128 _allocPoint,
-        IERC20 _receiptTokenAddr,
-        uint256 _lastUpdateTimestamp
-    ) internal {
-        totalAllocPoint = totalAllocPoint + _allocPoint;
-
-        poolInfo.push(
-            PoolInfo({
-                receiptTokenAddr: _receiptTokenAddr,
-                allocPoint: _allocPoint,
-                lastUpdateTimestamp: _lastUpdateTimestamp,
-                accRewardTokenPerShare: 0
-            })
-        );
-
-        tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length - 1;
+        emit AddDistribution(address(_lendingPair), address(this), _allocPoints, block.timestamp);
     }
 
     function activatePendingRewards() external {
@@ -298,8 +242,11 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         if (_withUpdate) {
             // massUpdatePools();
         }
+
         totalAllocPoint = (totalAllocPoint - poolInfo[_pid].allocPoint) + _allocPoint;
         poolInfo[_pid].allocPoint = _allocPoint;
+
+        emit UpdateDistribution(_pid, _allocPoint, _allocPoint, block.timestamp);
     }
 
     function getMultiplier(uint256 _from, uint256 _to) public pure returns (uint256) {
@@ -313,11 +260,6 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         uint256 totalSupply = pool.receiptTokenAddr.totalSupply();
 
         if (block.timestamp > pool.lastUpdateTimestamp && totalSupply != 0) {
-            // uint256 multiplier =
-            //     getMultiplier(pool.lastUpdateTimestamp, block.timestamp);
-            // uint256 tokenReward =
-            //     (multiplier * rewardAmountDistributePerSecond * pool.allocPoint) / totalAllocPoint;
-            // accRewardTokenPerShare = accRewardTokenPerShare + ((tokenReward * SHARE_SCALE) / totalSupply);
             accRewardTokenPerShare = calculatePoolReward(pool, totalSupply);
         }
 
@@ -336,7 +278,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         uint256 tokenReward =
             (multiplier * rewardAmountDistributePerSecond * pool.allocPoint) / totalAllocPoint;
         accRewardTokenPerShare =
-            accRewardTokenPerShare +
+            pool.accRewardTokenPerShare +
             ((tokenReward * SHARE_SCALE) / totalSupply);
     }
 
@@ -348,31 +290,20 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         }
     }
 
-    /**
-     * @notice Update reward variables of the given pool to be up-to-date.
-     * @param _pid pool id
-     */
+    /// Update reward variables of the given pool to be up-to-date.
+    /// @param _pid pool id
     function updatePool(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
         if (block.timestamp <= pool.lastUpdateTimestamp) {
             return;
         }
-
         uint256 totalSupply = pool.receiptTokenAddr.totalSupply();
 
         if (totalSupply == 0) {
             pool.lastUpdateTimestamp = block.timestamp;
             return;
         }
-        // uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-        // uint256 rtkReward =
-        //     multiplier.mul(rtkPerBlock).mul(pool.allocPoint).div(
-        //         totalAllocPoint
-        //     );
-        // rtk.mint(address(this), rtkReward);
-        // pool.accRewardTokenPerShare = pool.accRewardTokenPerShare.add(
-        //     rtkReward.mul(1e12).div(lpSupply)
-        // );
+
         pool.accRewardTokenPerShare = calculatePoolReward(pool, totalSupply);
         pool.lastUpdateTimestamp = block.timestamp;
     }
@@ -404,6 +335,27 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         } else {
             rewardToken.transfer(_to, _amount);
         }
+    }
+
+    function createPool(
+        uint128 _allocPoint,
+        IERC20 _receiptTokenAddr,
+        uint256 _lastUpdateTimestamp
+    ) internal {
+        require(address(_receiptTokenAddr) != address(0), "invalid_addr");
+        totalAllocPoint = totalAllocPoint + _allocPoint;
+
+        poolInfo.push(
+            PoolInfo({
+                receiptTokenAddr: _receiptTokenAddr,
+                allocPoint: _allocPoint,
+                lastUpdateTimestamp: _lastUpdateTimestamp,
+                accRewardTokenPerShare: 0
+            })
+        );
+
+        tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length - 1;
+        pendingRewardActivation.push(address(_receiptTokenAddr));
     }
 
     /// allows the creator to withdraw some of the funds???

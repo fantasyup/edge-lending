@@ -7,7 +7,7 @@ import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./token/IERC20Details.sol";
 import "./util/Initializable.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title WrapperToken
@@ -39,6 +39,7 @@ abstract contract WrapperTokenBase is ERC20Permit, Initializable {
 
     function _rewardHook(address _from, address _to, uint256 _amount) internal {
         /// invoke
+        console.logString("here1");
         rewardManager.accumulateRewards(_from, _to, _amount);
     }
 }
@@ -72,6 +73,8 @@ contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
     @param _amount is the amount of token they will receive
     **/
     function mint(address _to, uint256 _amount) external virtual override onlyLendingPair {
+                console.logString("here2");
+
         _mint(_to, _amount);
         _rewardHook(address(0), _to, _amount);
     }

@@ -150,11 +150,6 @@ interface IBSLendingPair {
 
     function getMaxWithdrawAllowed(address account) external returns (uint256);
 
-    // function borrowBalancePrior(address account)
-    //     external
-    //     view
-    //     returns(uint256, uint256);
-
     function oracle() external view returns (IPriceOracleAggregator);
 
     function collateralAsset() external view returns (IERC20);
@@ -168,4 +163,8 @@ interface IBSLendingPair {
     function debtToken() external view returns (IDebtToken);
 
     function borrowBalancePrior(address _account) external view returns (uint256);
+
+    function wrapperBorrowedAsset() external view returns (IBSWrapperToken);
+
+    function wrappedCollateralAsset() external view returns (IBSWrapperToken);
 }

@@ -54,6 +54,7 @@ contract RewardDistributorFactory {
 
         IRewardDistributor newDistributor =
             IRewardDistributor(distributorImplementation.cloneDeterministic(salt));
+
         // initialize
         newDistributor.initialize(
             _rewardToken,

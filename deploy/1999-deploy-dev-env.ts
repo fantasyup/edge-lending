@@ -11,7 +11,7 @@ const tag = `DEV-ENVIRONMENT`
 
 const deployDevEnvironment: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     // do not deploy in production
-    if (process.env.PRODUCTION) return
+    if (!process.env.DEPLOY_DEV_ENV) return
     
     const { deployments: { deploy, get }, getNamedAccounts, ethers } = hre;
     const { deployer, blackSmithTeam } = await getNamedAccounts();
@@ -27,7 +27,7 @@ const deployDevEnvironment: DeployFunction = async function (hre: HardhatRuntime
         vars.BorrowWrapperToken,
         vars.CollateralWrapperToken,
         vars.DebtToken,
-        vars.MockRewardDistributorManager
+        vars.RewardDistributorManager
     )
 
     // initialize lending pair
