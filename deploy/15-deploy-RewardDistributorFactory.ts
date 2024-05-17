@@ -7,12 +7,13 @@ const deployRewardDistributorFactory: DeployFunction = async function (hre: Hard
     const { deployments: { deploy, get }, getNamedAccounts } = hre;
     const { deployer, blackSmithTeam } = await getNamedAccounts();
 
+    const owner = process.env.PRODUCTION ? blackSmithTeam : deployer
     const managerImplementation = await get(ContractId.RewardDistributor)
 
     await deploy(ContractId.RewardDistributorFactory, {
         from: deployer,
         args: [
-            blackSmithTeam,
+            owner,
             managerImplementation.address,
         ],
         log: true,

@@ -1,17 +1,9 @@
 import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
-import { runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars, advanceNBlocks } from "../lib";
+import { runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars, advanceNBlocks, currentTimestamp } from "../lib";
 import { deployMockDistributorManager, deployUUPSProxy } from "../../helpers/contracts";
 import { ContractId } from "../../helpers/types";
-
-function currentTimestamp() {
-    return Math.floor(Date.now() / 1000)
-}
-
-async function setupRewardDistributor() {
-
-}
 
 runTestSuite("RewardDistributor", (vars: TestVars) => {
   it('initialize', async () => {
@@ -212,7 +204,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
     ).to.eq(0)
 
-    
+
 
     // check balance
 

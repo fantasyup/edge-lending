@@ -51,13 +51,9 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
 
         console.logString("gets here");
         if (size == 0) return;
-
-        /*
-         * We need to manage the size of the rewards to prevent
-         * astronomical increase in gas cost
-         *
-         */
-
+        
+        /// We need to manage the size of the rewards to prevent
+        /// astronomical increase in gas cost
         for (uint256 i = 0; i < size; i++) {
             distributors[i].accumulateReward(msg.sender, _from, _to, _balance);
         }
