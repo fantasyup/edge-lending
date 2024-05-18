@@ -19,7 +19,7 @@ abstract contract RewardDistributorStorageV1 is Initializable {
 
     /// @dev
     //
-    // We do some fancy math here. Basically, any point in time, the amount of SUSHIs
+    // We do some fancy math here. Basically, any point in time, the amount of reward tokens
     // entitled to a user but is pending to be distributed is:
     //
     //   pending reward = (user.amount * pool.accRewardTokenPerShare) - user.rewardDebt
@@ -193,7 +193,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         bool _withUpdate
     ) external onlyGuardian {
         if (_withUpdate) {
-            // massUpdatePools();
+            massUpdatePools();
         }
 
         uint256 lastUpdateTimestamp =
@@ -242,7 +242,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         bool _withUpdate
     ) public onlyGuardian {
         if (_withUpdate) {
-            // massUpdatePools();
+            massUpdatePools();
         }
 
         totalAllocPoint = (totalAllocPoint - poolInfo[_pid].allocPoint) + _allocPoint;

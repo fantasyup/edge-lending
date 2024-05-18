@@ -49,7 +49,6 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         IRewardDistributor[] memory distributors = tokenRewardToDistributors[msg.sender];
         uint256 size = distributors.length;
 
-        console.logString("gets here");
         if (size == 0) return;
         
         /// We need to manage the size of the rewards to prevent
