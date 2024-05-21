@@ -167,7 +167,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     await advanceNBlocks(10)
     
     const pending = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
-    console.log({ pending})
+    // console.log({ pending})
 
 
     // split advance and check pending
@@ -181,13 +181,13 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     await advanceNBlocks(10)
 
     const bobPending = await (await RewardDistributor.pendingRewardToken(0, bob.address)).toNumber()
-    console.log({ bobPending })
+    // console.log({ bobPending })
 
     const kylePendingT = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
-    console.log({ kylePendingT })
+    // console.log({ kylePendingT })
 
     const kylePending = await (await RewardDistributor.userInfo(0, kyle.address))
-    console.log(kylePending.amount.toNumber(), ' ',  kylePending.pendingReward.toNumber())
+    // console.log(kylePending.amount.toNumber(), ' ',  kylePending.pendingReward.toNumber())
 
 
 //    console.log((await wrappedCollateralAsset.balanceOf(kyle.address)).toString())

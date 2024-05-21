@@ -38,9 +38,10 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         emit Initialized(_owner, block.timestamp);
     }
 
-    /// @dev loops through distributor contract and updates
-    /// rewards for the user
-    /// low gas cost is the ultimaate goal
+    /// @dev Accumulates rewards for users
+    /// @param _from user address
+    /// @param _to user address
+    /// @param _balance amount being transferred
     function accumulateRewards(
         address _from,
         address _to,
@@ -77,8 +78,6 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
             "ONLY_APPROVED_DISTRIBUTOR"
         );
 
-        /// @TODO check if reward has been activated
-
         /// Note: it's possible for a distributor contract to spam the addReward
         /// function by creating minimal rewards. It's required to constantly monitor the AddReward
         /// event offchain to ensure that the addReward function is not being spammed
@@ -88,6 +87,9 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         emit AddReward(_tokenAddr, IRewardDistributor(msg.sender), block.timestamp);
     }
 
+    /// @dev Remove  a reward distributor
+    /// @param _tokenAddr address of the receipt token
+    /// @param _distributor distributor contract
     function removeReward(address _tokenAddr, IRewardDistributor _distributor)
         external
         override
