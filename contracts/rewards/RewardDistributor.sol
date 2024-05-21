@@ -292,7 +292,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         }
     }
 
-    /// Update reward variables of the given pool to be up-to-date.
+    /// @notice Update reward variables of the given pool to be up-to-date.
     /// @param _pid pool id
     function updatePool(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
@@ -310,7 +310,9 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         pool.lastUpdateTimestamp = block.timestamp;
     }
 
-    /// @dev withdraw
+    /// @dev user to withdraw accumulated rewards from a pool
+    /// @param _pid pool id
+    /// @param _to address to transfer rewards to
     function withdraw(uint256 _pid, address _to) public {
         require(_to != address(0), "INVALID_TO");
 
@@ -329,7 +331,7 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         emit Withdraw(msg.sender, _pid, amount);
     }
 
-    // Safe sushi transfer function, just in case if rounding error causes pool to not have enough SUSHIs.
+    // Safe token transfer function, just in case if rounding error causes pool to not have enough tokens
     function safeTokenTransfer(address _to, uint256 _amount) internal {
         uint256 balance = rewardToken.balanceOf(address(this));
         if (_amount > balance) {

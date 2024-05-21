@@ -26,7 +26,6 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     "add(tuple,address,bool)": FunctionFragment;
     "emergencyWithdraw(uint256,address)": FunctionFragment;
     "endTimestamp()": FunctionFragment;
-    "getMultiplier(uint256,uint256)": FunctionFragment;
     "guardian()": FunctionFragment;
     "initialize(address,uint256,uint256,address)": FunctionFragment;
     "massUpdatePools()": FunctionFragment;
@@ -72,10 +71,6 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "endTimestamp",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMultiplier",
-    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "guardian", values?: undefined): string;
   encodeFunctionData(
@@ -154,10 +149,6 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "endTimestamp",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getMultiplier",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "guardian", data: BytesLike): Result;
@@ -324,18 +315,6 @@ export class RewardDistributor extends Contract {
     endTimestamp(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    getMultiplier(
-      _from: BigNumberish,
-      _to: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "getMultiplier(uint256,uint256)"(
-      _from: BigNumberish,
-      _to: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     guardian(overrides?: CallOverrides): Promise<[string]>;
 
@@ -570,18 +549,6 @@ export class RewardDistributor extends Contract {
 
   "endTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getMultiplier(
-    _from: BigNumberish,
-    _to: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  "getMultiplier(uint256,uint256)"(
-    _from: BigNumberish,
-    _to: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   guardian(overrides?: CallOverrides): Promise<string>;
 
   "guardian()"(overrides?: CallOverrides): Promise<string>;
@@ -807,18 +774,6 @@ export class RewardDistributor extends Contract {
     endTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getMultiplier(
-      _from: BigNumberish,
-      _to: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "getMultiplier(uint256,uint256)"(
-      _from: BigNumberish,
-      _to: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     guardian(overrides?: CallOverrides): Promise<string>;
 
@@ -1127,18 +1082,6 @@ export class RewardDistributor extends Contract {
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getMultiplier(
-      _from: BigNumberish,
-      _to: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "getMultiplier(uint256,uint256)"(
-      _from: BigNumberish,
-      _to: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     guardian(overrides?: CallOverrides): Promise<BigNumber>;
 
     "guardian()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1341,18 +1284,6 @@ export class RewardDistributor extends Contract {
     endTimestamp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getMultiplier(
-      _from: BigNumberish,
-      _to: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getMultiplier(uint256,uint256)"(
-      _from: BigNumberish,
-      _to: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     guardian(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

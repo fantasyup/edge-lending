@@ -94,7 +94,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     expect(await (await RewardDistributor["totalAllocPoint()"]()).toNumber()).to.eq(totalAllocPoints())
   })
 
-  it.only('reward calculation', async () => {
+  it('reward calculation', async () => {
     const {
         LendingPair,
         RewardDistributor,

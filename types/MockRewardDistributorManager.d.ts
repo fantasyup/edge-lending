@@ -11,6 +11,7 @@ import {
   PopulatedTransaction,
   Contract,
   ContractTransaction,
+  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -22,8 +23,10 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
   functions: {
     "accumulateRewards(address,address,uint256)": FunctionFragment;
     "activateReward(address)": FunctionFragment;
+    "getCodeAddress()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "removeReward(address,address)": FunctionFragment;
+    "updateCode(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -35,6 +38,10 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "getCodeAddress",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "proxiableUUID",
     values?: undefined
   ): string;
@@ -42,6 +49,7 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
     functionFragment: "removeReward",
     values: [string, string]
   ): string;
+  encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
 
   decodeFunctionResult(
     functionFragment: "accumulateRewards",
@@ -52,6 +60,10 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getCodeAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "proxiableUUID",
     data: BytesLike
   ): Result;
@@ -59,10 +71,12 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
     functionFragment: "removeReward",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
 
   events: {
     "AddReward(address,address,uint256)": EventFragment;
     "ApprovedDistributor(address,uint256)": EventFragment;
+    "CodeUpdated(bytes32,address)": EventFragment;
     "Initialized(address,uint256)": EventFragment;
     "OwnershipAccepted(address,uint256)": EventFragment;
     "RemoveReward(address,address,uint256)": EventFragment;
@@ -71,6 +85,7 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "AddReward"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovedDistributor"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemoveReward"): EventFragment;
@@ -145,6 +160,14 @@ export class MockRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<[void]>;
 
+    getCodeAddress(
+      overrides?: CallOverrides
+    ): Promise<[string] & { codeAddress: string }>;
+
+    "getCodeAddress()"(
+      overrides?: CallOverrides
+    ): Promise<[string] & { codeAddress: string }>;
+
     proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
@@ -160,6 +183,16 @@ export class MockRewardDistributorManager extends Contract {
       _distributor: string,
       overrides?: CallOverrides
     ): Promise<[void]>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updateCode(address)"(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   accumulateRewards(
@@ -183,6 +216,10 @@ export class MockRewardDistributorManager extends Contract {
     overrides?: CallOverrides
   ): Promise<void>;
 
+  getCodeAddress(overrides?: CallOverrides): Promise<string>;
+
+  "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
   proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
@@ -198,6 +235,16 @@ export class MockRewardDistributorManager extends Contract {
     _distributor: string,
     overrides?: CallOverrides
   ): Promise<void>;
+
+  updateCode(
+    newAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updateCode(address)"(
+    newAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   callStatic: {
     accumulateRewards(
@@ -224,6 +271,10 @@ export class MockRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    getCodeAddress(overrides?: CallOverrides): Promise<string>;
+
+    "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
     proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
@@ -237,6 +288,13 @@ export class MockRewardDistributorManager extends Contract {
     "removeReward(address,address)"(
       _tokenAddr: string,
       _distributor: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateCode(newAddress: string, overrides?: CallOverrides): Promise<void>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -257,6 +315,14 @@ export class MockRewardDistributorManager extends Contract {
     ): TypedEventFilter<
       [string, BigNumber],
       { distributor: string; timestamp: BigNumber }
+    >;
+
+    CodeUpdated(
+      uuid: null,
+      codeAddress: null
+    ): TypedEventFilter<
+      [string, string],
+      { uuid: string; codeAddress: string }
     >;
 
     Initialized(
@@ -318,6 +384,10 @@ export class MockRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -332,6 +402,16 @@ export class MockRewardDistributorManager extends Contract {
       _tokenAddr: string,
       _distributor: string,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updateCode(address)"(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
@@ -360,6 +440,12 @@ export class MockRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getCodeAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getCodeAddress()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -374,6 +460,16 @@ export class MockRewardDistributorManager extends Contract {
       _tokenAddr: string,
       _distributor: string,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updateCode(address)"(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

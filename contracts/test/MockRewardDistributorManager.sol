@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 import "../interfaces/IRewardDistributorManager.sol";
+import "../upgradability/UUPSProxiable.sol";
 
-contract MockRewardDistributorManager is IRewardDistributorManager {
+contract MockRewardDistributorManager is UUPSProxiable, IRewardDistributorManager {
     function activateReward(address _tokenAddr) external pure override {
         _tokenAddr;
         return;
@@ -29,7 +30,12 @@ contract MockRewardDistributorManager is IRewardDistributorManager {
         return;
     }
 
-    function proxiableUUID() public pure returns (bytes32) {
+    function proxiableUUID() public pure override returns (bytes32) {
         return keccak256("org.edge.contracts.edgerewards.implementation");
     }
+    
+    function updateCode(address newAddress) external override {
+         _updateCodeAddress(newAddress);
+    }
+
 }
