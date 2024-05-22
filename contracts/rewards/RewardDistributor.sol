@@ -8,7 +8,6 @@ import "../interfaces/IRewardDistributorManager.sol";
 import "hardhat/console.sol";
 
 abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializable {
-    
     /// @dev PoolInfo
     struct PoolInfo {
         IERC20 receiptTokenAddr;
@@ -73,11 +72,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
     uint256 private constant SHARE_SCALE = 1e12;
 
-    event Withdraw(
-        address indexed user,
-        uint256 indexed poolId, 
-        uint256 amount
-    );
+    event Withdraw(address indexed user, uint256 indexed poolId, uint256 amount);
 
     event AddDistribution(
         address indexed lendingPair,

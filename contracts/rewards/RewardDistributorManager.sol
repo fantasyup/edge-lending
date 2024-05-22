@@ -41,10 +41,7 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
     /// @dev Accumulates rewards for users
     /// @param _from user address
     /// @param _to user address
-    function accumulateRewards(
-        address _from,
-        address _to
-    ) external override {
+    function accumulateRewards(address _from, address _to) external override {
         IRewardDistributor[] memory distributors = tokenRewardToDistributors[msg.sender];
         uint256 size = distributors.length;
 

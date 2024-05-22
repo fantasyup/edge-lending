@@ -19,10 +19,7 @@ contract MockRewardDistributorManager is UUPSProxiable, IRewardDistributorManage
         return;
     }
 
-    function accumulateRewards(
-        address _from,
-        address _to
-    ) external pure override {
+    function accumulateRewards(address _from, address _to) external pure override {
         _from;
         _to;
         return;
