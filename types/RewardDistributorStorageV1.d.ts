@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
   functions: {
-    "accumulateReward(address,address,address)": FunctionFragment;
+    "accumulateReward(address,address)": FunctionFragment;
     "endTimestamp()": FunctionFragment;
     "guardian()": FunctionFragment;
     "initialize(address,uint256,uint256,address)": FunctionFragment;
@@ -37,7 +37,7 @@ interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "accumulateReward",
-    values: [string, string, string]
+    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "endTimestamp",
@@ -171,15 +171,13 @@ export class RewardDistributorStorageV1 extends Contract {
   functions: {
     accumulateReward(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "accumulateReward(address,address,address)"(
+    "accumulateReward(address,address)"(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -298,15 +296,13 @@ export class RewardDistributorStorageV1 extends Contract {
 
   accumulateReward(
     _tokenAddr: string,
-    _from: string,
-    _to: string,
+    _user: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "accumulateReward(address,address,address)"(
+  "accumulateReward(address,address)"(
     _tokenAddr: string,
-    _from: string,
-    _to: string,
+    _user: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -422,15 +418,13 @@ export class RewardDistributorStorageV1 extends Contract {
   callStatic: {
     accumulateReward(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "accumulateReward(address,address,address)"(
+    "accumulateReward(address,address)"(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -569,15 +563,13 @@ export class RewardDistributorStorageV1 extends Contract {
   estimateGas: {
     accumulateReward(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "accumulateReward(address,address,address)"(
+    "accumulateReward(address,address)"(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -668,15 +660,13 @@ export class RewardDistributorStorageV1 extends Contract {
   populateTransaction: {
     accumulateReward(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "accumulateReward(address,address,address)"(
+    "accumulateReward(address,address)"(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

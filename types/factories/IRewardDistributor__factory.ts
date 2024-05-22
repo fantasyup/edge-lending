@@ -63,12 +63,7 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "_from",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_to",
+        name: "_user",
         type: "address",
       },
     ],

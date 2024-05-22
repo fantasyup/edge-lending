@@ -91,8 +91,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     event AccumulateReward(
         address indexed receiptToken,
         uint256 indexed pid,
-        address from,
-        address to
+        address user
     );
 
     modifier onlyGuardian {
@@ -139,12 +138,10 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
     /// @dev accumulates reward for a depositor
     /// @param _tokenAddr token to reward
-    /// @param _from sender
-    /// @param _to receipient
+    /// @param _user user to accumulate reward for
     function accumulateReward(
         address _tokenAddr,
-        address _from,
-        address _to
+        address _user
     ) external override {
         require(_tokenAddr != address(0), "INVALID_ADDR");
 
@@ -154,30 +151,18 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
         PoolInfo memory pool = poolInfo[pid];
 
-        if (_from != address(0)) {
-            UserInfo storage user = userInfo[pid][_from];
-
+        if (_user != address(0)) {
+            UserInfo storage user = userInfo[pid][_user];
             if (user.amount > 0) {
                 user.pendingReward +=
                     ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) -
                     user.rewardDebt;
             }
-            user.amount = IERC20(_tokenAddr).balanceOf(_from);
+            user.amount = IERC20(_tokenAddr).balanceOf(_user);
             user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
         }
 
-        if (_to != address(0)) {
-            UserInfo storage user = userInfo[pid][_to];
-            if (user.amount > 0) {
-                user.pendingReward +=
-                    ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) -
-                    user.rewardDebt;
-            }
-            user.amount = IERC20(_tokenAddr).balanceOf(_to);
-            user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
-        }
-
-        emit AccumulateReward(_tokenAddr, pid, _from, _to);
+        emit AccumulateReward(_tokenAddr, pid, _user);
     }
 
     struct DistributorConfigVars {

@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface RewardDistributorInterface extends ethers.utils.Interface {
   functions: {
-    "accumulateReward(address,address,address)": FunctionFragment;
+    "accumulateReward(address,address)": FunctionFragment;
     "activatePendingRewards()": FunctionFragment;
     "add(tuple,address,bool)": FunctionFragment;
     "endTimestamp()": FunctionFragment;
@@ -45,7 +45,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "accumulateReward",
-    values: [string, string, string]
+    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "activatePendingRewards",
@@ -187,7 +187,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "AccumulateReward(address,uint256,address,address)": EventFragment;
+    "AccumulateReward(address,uint256,address)": EventFragment;
     "AddDistribution(address,address,tuple,uint256)": EventFragment;
     "Initialized(address,uint256,uint256,address,uint256)": EventFragment;
     "UpdateDistribution(uint256,uint256,uint256,uint256)": EventFragment;
@@ -247,15 +247,13 @@ export class RewardDistributor extends Contract {
   functions: {
     accumulateReward(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "accumulateReward(address,address,address)"(
+    "accumulateReward(address,address)"(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -464,15 +462,13 @@ export class RewardDistributor extends Contract {
 
   accumulateReward(
     _tokenAddr: string,
-    _from: string,
-    _to: string,
+    _user: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "accumulateReward(address,address,address)"(
+  "accumulateReward(address,address)"(
     _tokenAddr: string,
-    _from: string,
-    _to: string,
+    _user: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -678,15 +674,13 @@ export class RewardDistributor extends Contract {
   callStatic: {
     accumulateReward(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "accumulateReward(address,address,address)"(
+    "accumulateReward(address,address)"(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -886,11 +880,10 @@ export class RewardDistributor extends Contract {
     AccumulateReward(
       receiptToken: string | null,
       pid: BigNumberish | null,
-      from: null,
-      to: null
+      user: null
     ): TypedEventFilter<
-      [string, BigNumber, string, string],
-      { receiptToken: string; pid: BigNumber; from: string; to: string }
+      [string, BigNumber, string],
+      { receiptToken: string; pid: BigNumber; user: string }
     >;
 
     AddDistribution(
@@ -966,15 +959,13 @@ export class RewardDistributor extends Contract {
   estimateGas: {
     accumulateReward(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "accumulateReward(address,address,address)"(
+    "accumulateReward(address,address)"(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1155,15 +1146,13 @@ export class RewardDistributor extends Contract {
   populateTransaction: {
     accumulateReward(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "accumulateReward(address,address,address)"(
+    "accumulateReward(address,address)"(
       _tokenAddr: string,
-      _from: string,
-      _to: string,
+      _user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

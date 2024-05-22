@@ -50,7 +50,8 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         /// We need to manage the size of the rewards to prevent
         /// astronomical increase in gas cost
         for (uint256 i = 0; i < size; i++) {
-            distributors[i].accumulateReward(msg.sender, _from, _to);
+            distributors[i].accumulateReward(msg.sender, _from);
+            distributors[i].accumulateReward(msg.sender, _to);
         }
     }
 
