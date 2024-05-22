@@ -34,13 +34,14 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     "delegateBorrowWithSignedMessage(address,address,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "increaseTotalDebt(uint256)": FunctionFragment;
-    "initialize(address,address,string,string)": FunctionFragment;
+    "initialize(address,address,string,string,address)": FunctionFragment;
     "mint(address,address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "nonces(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "principal(address)": FunctionFragment;
+    "rewardManager()": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -94,7 +95,7 @@ interface DebtTokenInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string, string]
+    values: [string, string, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -116,6 +117,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(functionFragment: "principal", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "rewardManager",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -179,6 +184,10 @@ interface DebtTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "principal", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "rewardManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -391,14 +400,16 @@ export class DebtToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -462,6 +473,10 @@ export class DebtToken extends Contract {
       _account: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    rewardManager(overrides?: CallOverrides): Promise<[string]>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<[string]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
@@ -650,14 +665,16 @@ export class DebtToken extends Contract {
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
+    _manager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,string,string)"(
+  "initialize(address,address,string,string,address)"(
     __owner: string,
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
+    _manager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -718,6 +735,10 @@ export class DebtToken extends Contract {
     _account: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  rewardManager(overrides?: CallOverrides): Promise<string>;
+
+  "rewardManager()"(overrides?: CallOverrides): Promise<string>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -906,14 +927,16 @@ export class DebtToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -974,6 +997,10 @@ export class DebtToken extends Contract {
       _account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    rewardManager(overrides?: CallOverrides): Promise<string>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<string>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -1193,14 +1220,16 @@ export class DebtToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1261,6 +1290,10 @@ export class DebtToken extends Contract {
       _account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    rewardManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1455,14 +1488,16 @@ export class DebtToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1529,6 +1564,10 @@ export class DebtToken extends Contract {
       _account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    rewardManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

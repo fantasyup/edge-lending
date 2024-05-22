@@ -2,11 +2,12 @@
 pragma solidity 0.8.1;
 
 import "./token/ERC20Permit.sol";
+import "./interfaces/IRewardDistributorManager.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./token/IERC20Details.sol";
 import "./util/Initializable.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title WrapperToken
@@ -17,11 +18,16 @@ import "./util/Initializable.sol";
 
 
 abstract contract WrapperTokenBase is ERC20Permit, Initializable {
+
+    /// @dev reward distributor Manager
+    IRewardDistributorManager public rewardManager;
+
     /// @dev underlying wrapper token
     address public underlying;
 
     /// @dev the LendingPair is the "owner" for WrapperTokens
     address internal _owner;
+
 
      /**
      * @dev Throws if called by any account other than the lendingpair.
@@ -29,6 +35,12 @@ abstract contract WrapperTokenBase is ERC20Permit, Initializable {
     modifier onlyLendingPair() {
         require(address(_owner) == msg.sender, "ONLY_LENDING_PAIR");
         _;
+    }
+
+    function _rewardHook(address _from, address _to, uint256 _amount) internal {
+        /// invoke
+        console.logString("here1");
+        rewardManager.accumulateRewards(_from, _to, _amount);
     }
 }
 
@@ -41,7 +53,8 @@ contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
         address __owner,
         address _underlying,
         string memory _tokenName,
-        string memory _tokenSymbol
+        string memory _tokenSymbol,
+        IRewardDistributorManager _manager
     ) external virtual override initializer {
         require(__owner != address(0), "invalid owner");
         require(_underlying != address(0), "invalid underlying");
@@ -51,6 +64,7 @@ contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
         initializeERC20Permit(_tokenName);
         underlying = _underlying;
+        rewardManager = _manager;
     }
 
     /**
@@ -59,7 +73,10 @@ contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
     @param _amount is the amount of token they will receive
     **/
     function mint(address _to, uint256 _amount) external virtual override onlyLendingPair {
+                console.logString("here2");
+
         _mint(_to, _amount);
+        _rewardHook(address(0), _to, _amount);
     }
 
     /**
@@ -70,9 +87,19 @@ contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
      **/
     function burn(address _from, uint256 _amount) external virtual override onlyLendingPair {
         _burn(_from, _amount);
+        _rewardHook(_from, address(0), _amount);
     }
 
     function owner() external view override returns (address) {
         return _owner;
+    }
+
+     function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal override {
+        super._transfer(sender, recipient, amount);
+        _rewardHook(sender, recipient, amount);
     }
 }

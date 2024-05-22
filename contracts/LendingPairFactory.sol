@@ -8,6 +8,8 @@ import "./interfaces/IInterestRateModel.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./interfaces/IDebtToken.sol";
+import "./interfaces/IRewardDistributorManager.sol";
+
 import "./interest/JumpRateModelV2.sol";
 import "./token/IERC20Details.sol";
 import "./DataTypes.sol";
@@ -21,6 +23,7 @@ contract LendingPairFactory is Pausable {
     address public collateralWrapperImplementation;
     address public debtTokenImplementation;
     address public borrowAssetWrapperImplementation;
+    address public rewardDistributionManager;
 
     address[] public allPairs;
 
@@ -41,19 +44,22 @@ contract LendingPairFactory is Pausable {
         address _pairLogic,
         address _collateralWrapperLogic,
         address _debtTokenLogic,
-        address _borrowAssetWrapperLogic
+        address _borrowAssetWrapperLogic,
+        address _rewardDistributionManager
     ) {
         require(_owner != address(0), "invalid owner");
         require(_pairLogic != address(0), "invalid pair logic");
         require(_collateralWrapperLogic != address(0), "invalid collateral wrapper logic");
         require(_debtTokenLogic != address(0), "invalid debt logic");
         require(_borrowAssetWrapperLogic != address(0), "invalid borrow asset logic");
+        require(_rewardDistributionManager != address(0), "invalid reward manager logic");
 
         owner = _owner;
         lendingPairImplementation = _pairLogic;
         collateralWrapperImplementation = _collateralWrapperLogic;
         debtTokenImplementation = _debtTokenLogic;
         borrowAssetWrapperImplementation = _borrowAssetWrapperLogic;
+        rewardDistributionManager = _rewardDistributionManager;
     }
 
     /// @notice pause
@@ -88,6 +94,12 @@ contract LendingPairFactory is Pausable {
         require(_newLogicContract != address(0), "INVALID_CONTRACT");
         borrowAssetWrapperImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
+    }
+    
+    function updateRewardManager(address _newManager) external onlyOwner {
+        require(_newManager != address(0), "INVALID_CONTRACT");
+        rewardDistributionManager = _newManager;
+        emit LogicContractUpdated(_newManager);
     }
 
     struct NewLendingVaultIRLocalVars {
@@ -267,7 +279,8 @@ contract LendingPairFactory is Pausable {
             _pair,
             address(_underlying),
             string(name),
-            string(symbol)
+            string(symbol),
+            IRewardDistributorManager(rewardDistributionManager)
         );
     }
 }

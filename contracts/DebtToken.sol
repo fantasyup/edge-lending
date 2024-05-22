@@ -37,7 +37,8 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
         address __owner,
         address _underlying,
         string memory _tokenName,
-        string memory _tokenSymbol
+        string memory _tokenSymbol,
+        IRewardDistributorManager _manager
     ) external virtual override initializer {
         require(__owner != address(0), "invalid owner");
         require(_underlying != address(0), "invalid underlying");
@@ -47,6 +48,7 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
         initializeERC20Permit(_tokenName);
         underlying = _underlying;
+        rewardManager = _manager;
     }
 
     function principal(address _account) external view override returns (uint256) {
@@ -69,6 +71,7 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
             _decreaseBorrowAllowance(_debtOwner, _to, _amount);
         }
         _mint(_debtOwner, _amount);
+        _rewardHook(address(0), _debtOwner, _amount);
     }
 
     function owner() external view override returns (address) {
@@ -91,6 +94,7 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
         } else {
             _totalSupply -= _amount;
         }
+        _rewardHook(_from, address(0), _amount);
     }
 
     function borrowAllowance(address _from, address _to) external view returns(uint256) {

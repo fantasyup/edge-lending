@@ -93,10 +93,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     IERC20 public override collateralAsset;
 
     /// @notice The wrapper token for the borrow asset
-    IBSWrapperToken public wrapperBorrowedAsset;
+    IBSWrapperToken public override wrapperBorrowedAsset;
 
-    /// @notice The wrapper token for the borrow asset
-    IBSWrapperToken public wrappedCollateralAsset;
+    /// @notice The wrapper token for the collateral asset
+    IBSWrapperToken public override wrappedCollateralAsset;
 
     /// @notice The wrapper token for debt
     IDebtToken public override debtToken;

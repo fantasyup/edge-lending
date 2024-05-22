@@ -678,4 +678,30 @@ const _abi = [
     stateMutability: "nonpayable",
     type: "function",
   },
+  {
+    inputs: [],
+    name: "wrappedCollateralAsset",
+    outputs: [
+      {
+        internalType: "contract IBSWrapperToken",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "wrapperBorrowedAsset",
+    outputs: [
+      {
+        internalType: "contract IBSWrapperToken",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
 ];

@@ -12,54 +12,12 @@ import {
   DebtToken,
   LendingPair,
   Vault,
+  RewardDistributorManager,
 } from "../types";
 import { LendingPairActions } from "../helpers/types"
-import { advanceNBlocks, IAccount, LendingPairHelpers, makeLendingPairTestSuiteVars, runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars } from "./lib";
+import { advanceNBlocks, IAccount, LendingPairHelpers, makeLendingPairTestSuiteVars, runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars, setupLendingPair } from "./lib";
 
 const amountToDeposit = 1000
-
-async function initializeWrapperTokens(
-  owner: string,
-  wrapperToken: WrapperToken | DebtToken,
-  underlying: string
-) {
-  await wrapperToken.initialize(
-    owner,
-    underlying,
-    "DEMO",
-    "DMO"
-  )
-}
-
-async function setupLendingPair(
-  lendingPair: LendingPair,
-  CollateralAsset: MockToken,
-  BorrowAsset: MockToken,
-  BorrowAssetDepositWrapperToken: WrapperToken,
-  CollateralWrapperToken: WrapperToken,
-  DebtWrapperToken: DebtToken
-) {
-  // collateral wrapper token
-  await initializeWrapperTokens(
-    lendingPair.address,
-    CollateralWrapperToken,
-    CollateralAsset.address
-  )
-
-  // borrow wrapper token
-  await initializeWrapperTokens(
-    lendingPair.address,
-    BorrowAssetDepositWrapperToken,
-    BorrowAsset.address
-  )
-  
-  // debt token
-  await initializeWrapperTokens(
-    lendingPair.address,
-    DebtWrapperToken,
-    BorrowAsset.address
-  )
-}
 
 runTestSuite("LendingPair", (vars: TestVars) => {
   it("initialize", async () => {
@@ -73,6 +31,8 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       LendingPair,
       DebtToken,
       InterestRateModel,
+      MockRewardDistributorManager,
+      RewardDistributorManager,
       accounts: [admin]
     } = vars
 
@@ -82,7 +42,8 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       BorrowAsset,
       BorrowWrapperToken,
       CollateralWrapperToken,
-      DebtToken
+      DebtToken,
+      RewardDistributorManager
     )
 
     await LendingPair.initialize(
@@ -112,6 +73,8 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       CollateralWrapperToken,
       LendingPair,
       DebtToken,
+      MockRewardDistributorManager,
+      RewardDistributorManager,
       accounts: [admin, bob]
     } = vars
 
@@ -121,7 +84,8 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       BorrowAsset,
       BorrowWrapperToken,
       CollateralWrapperToken,
-      DebtToken
+      DebtToken,
+      RewardDistributorManager
     )
 
     const lendingPairHelpers = LendingPairHelpers(Vault, LendingPair, BorrowAsset, BorrowAsset, PriceOracleAggregator, admin)

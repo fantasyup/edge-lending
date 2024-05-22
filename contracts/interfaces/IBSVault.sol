@@ -59,6 +59,7 @@ interface IBSVault is IERC3156FlashLender {
     // ************** //
 
     function initialize(uint256 _flashLoanRate, address _owner) external;
+
     function approveContract(
         address _user,
         address _contract,

@@ -13,7 +13,7 @@ import {
     MockLendingPair,
     MockPriceOracle,
     MockToken,
-    MockVault, PriceOracleAggregator, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken 
+    MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken 
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
@@ -112,6 +112,27 @@ export const getVaultFactoryDeployment = async(): Promise<VaultFactory> =>{
         ContractId.VaultFactory,
         (await deployments.get(ContractId.VaultFactory)).address
     )) as VaultFactory
+}
+
+export const getRewardDistributorDeployment = async(): Promise<RewardDistributor> => {
+    return (await ethers.getContractAt(
+        ContractId.RewardDistributor,
+        (await deployments.get(ContractId.RewardDistributor)).address
+    )) as RewardDistributor
+}
+
+export const getRewardDistributorFactoryDeployment = async(): Promise<RewardDistributorFactory> => {
+    return (await ethers.getContractAt(
+        ContractId.RewardDistributorFactory,
+        (await deployments.get(ContractId.RewardDistributorFactory)).address
+    )) as RewardDistributorFactory
+}
+
+export const getRewardDistributorManagerDeployment = async(): Promise<RewardDistributorManager> => {
+    return (await ethers.getContractAt(
+        ContractId.RewardDistributorManager,
+        (await deployments.get(ContractId.RewardDistributorManager)).address
+    )) as RewardDistributorManager
 }
 
 export const deployMockToken = async(decimals ?: number) => {
@@ -230,4 +251,8 @@ export const deployLendingPairFactory = async(
         debtTokenLogic,
         borrowAssetWrapperLogic
     ])
+}
+
+export const deployMockDistributorManager = async() => {
+    return await deployContract<LendingPairFactory>(ContractId.MockDistributorManager, [])
 }

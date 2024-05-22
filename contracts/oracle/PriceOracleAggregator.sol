@@ -2,7 +2,7 @@
 pragma solidity 0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { UUPSProxiable } from "../upgradability/UUPSProxiable.sol";
+import {UUPSProxiable} from "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IPriceOracleAggregator.sol";
 import "../interfaces/IOracle.sol";
 
@@ -13,13 +13,11 @@ import "../interfaces/IOracle.sol";
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract PriceOracleAggregator is UUPSProxiable, IPriceOracleAggregator {
-
     /// @dev admin allowed to update price oracle
     address public immutable admin;
 
     /// @notice token to the oracle address
     mapping(IERC20 => IOracle) public assetToOracle;
-
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "ONLY_ADMIN");

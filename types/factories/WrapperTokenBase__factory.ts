@@ -285,6 +285,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "rewardManager",
+    outputs: [
+      {
+        internalType: "contract IRewardDistributorManager",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "symbol",
     outputs: [
       {
