@@ -98,7 +98,7 @@ runTestSuite("RewardDistributorManager", (vars: TestVars) => {
 
     })
 
-    it.only('proxiableUUID & updateCode', async() => {
+    it('proxiableUUID & updateCode', async() => {
         const {
             RewardDistributorManager,
             accounts: [ admin, bob ]

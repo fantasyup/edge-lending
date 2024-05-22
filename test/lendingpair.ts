@@ -19,49 +19,6 @@ import { advanceNBlocks, IAccount, LendingPairHelpers, makeLendingPairTestSuiteV
 
 const amountToDeposit = 1000
 
-// async function initializeWrapperTokens(
-//   owner: string,
-//   wrapperToken: WrapperToken | DebtToken,
-//   underlying: string
-// ) {
-//   await wrapperToken.initialize(
-//     owner,
-//     underlying,
-//     "DEMO",
-//     "DMO"
-//   )
-// }
-
-// async function setupLendingPair(
-//   lendingPair: LendingPair,
-//   CollateralAsset: MockToken,
-//   BorrowAsset: MockToken,
-//   BorrowAssetDepositWrapperToken: WrapperToken,
-//   CollateralWrapperToken: WrapperToken,
-//   DebtWrapperToken: DebtToken
-// ) {
-//   // collateral wrapper token
-//   await initializeWrapperTokens(
-//     lendingPair.address,
-//     CollateralWrapperToken,
-//     CollateralAsset.address
-//   )
-
-//   // borrow wrapper token
-//   await initializeWrapperTokens(
-//     lendingPair.address,
-//     BorrowAssetDepositWrapperToken,
-//     BorrowAsset.address
-//   )
-  
-//   // debt token
-//   await initializeWrapperTokens(
-//     lendingPair.address,
-//     DebtWrapperToken,
-//     BorrowAsset.address
-//   )
-// }
-
 runTestSuite("LendingPair", (vars: TestVars) => {
   it("initialize", async () => {
     const {

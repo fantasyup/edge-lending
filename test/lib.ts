@@ -153,19 +153,11 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
             const { blackSmithTeam } = await getNamedAccounts()
             // address used in performing admin actions in InterestRateModel
             testVars.blackSmithTeam  = testVars.accounts.find(x => x.address.toLowerCase() === blackSmithTeam.toLowerCase()) as IAccount
-            // do this here because of some unusual race condition
-            // in the deployments code
         })
 
         beforeEach(async () => {
             const setupTest = deployments.createFixture(async ({deployments, getNamedAccounts, ethers}, options) => {
                 await deployments.fixture(); // ensure you start from a fresh deployments
-                // testVars.BorrowAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
-                // testVars.CollateralAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
-                // testVars.BorrowAsset = await deployMockToken()
-                // testVars.CollateralAsset = await deployMockToken()
-                // testVars.FlashBorrower = await deployMockFlashBorrower()
-                // testVars.MockVault = await deployMockVault()
                 const vars = await deployTestTokensAndMock()
                 Object.assign(testVars, vars)
             });

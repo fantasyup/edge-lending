@@ -24,7 +24,6 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     "accumulateReward(address,address,address,uint256)": FunctionFragment;
     "activatePendingRewards()": FunctionFragment;
     "add(tuple,address,bool)": FunctionFragment;
-    "emergencyWithdraw(uint256,address)": FunctionFragment;
     "endTimestamp()": FunctionFragment;
     "guardian()": FunctionFragment;
     "initialize(address,uint256,uint256,address)": FunctionFragment;
@@ -63,10 +62,6 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
       string,
       boolean
     ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "emergencyWithdraw",
-    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "endTimestamp",
@@ -143,10 +138,6 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "add", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "emergencyWithdraw",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "endTimestamp",
     data: BytesLike
@@ -300,18 +291,6 @@ export class RewardDistributor extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    emergencyWithdraw(
-      pid: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "emergencyWithdraw(uint256,address)"(
-      pid: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     endTimestamp(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -453,11 +432,10 @@ export class RewardDistributor extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
-        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -466,11 +444,10 @@ export class RewardDistributor extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
-        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -530,18 +507,6 @@ export class RewardDistributor extends Contract {
     },
     _lendingPair: string,
     _withUpdate: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  emergencyWithdraw(
-    pid: BigNumberish,
-    to: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "emergencyWithdraw(uint256,address)"(
-    pid: BigNumberish,
-    to: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -683,11 +648,10 @@ export class RewardDistributor extends Contract {
     arg1: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber] & {
       amount: BigNumber;
       pendingReward: BigNumber;
       rewardDebt: BigNumber;
-      lastUpdateTimestamp: BigNumber;
     }
   >;
 
@@ -696,11 +660,10 @@ export class RewardDistributor extends Contract {
     arg1: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber] & {
       amount: BigNumber;
       pendingReward: BigNumber;
       rewardDebt: BigNumber;
-      lastUpdateTimestamp: BigNumber;
     }
   >;
 
@@ -756,18 +719,6 @@ export class RewardDistributor extends Contract {
       },
       _lendingPair: string,
       _withUpdate: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    emergencyWithdraw(
-      pid: BigNumberish,
-      to: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "emergencyWithdraw(uint256,address)"(
-      pid: BigNumberish,
-      to: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -905,11 +856,10 @@ export class RewardDistributor extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
-        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -918,11 +868,10 @@ export class RewardDistributor extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
-        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -1063,18 +1012,6 @@ export class RewardDistributor extends Contract {
       },
       _lendingPair: string,
       _withUpdate: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    emergencyWithdraw(
-      pid: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "emergencyWithdraw(uint256,address)"(
-      pid: BigNumberish,
-      to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1266,18 +1203,6 @@ export class RewardDistributor extends Contract {
       },
       _lendingPair: string,
       _withUpdate: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    emergencyWithdraw(
-      pid: BigNumberish,
-      to: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "emergencyWithdraw(uint256,address)"(
-      pid: BigNumberish,
-      to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
