@@ -68,7 +68,7 @@ abstract contract RewardDistributorStorageV1 is Initializable {
 }
 
 contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
-    /// @notice onsen
+    /// @notice manager
     IRewardDistributorManager public immutable rewardDistributorManager;
 
     uint256 private constant SHARE_SCALE = 1e12;
