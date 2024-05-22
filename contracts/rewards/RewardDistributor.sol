@@ -34,7 +34,6 @@ abstract contract RewardDistributorStorageV1 is Initializable {
         uint256 amount; // the balance of the user
         uint256 pendingReward;
         uint256 rewardDebt; // Reward debt. See explanation below.
-        uint256 lastUpdateTimestamp;
     }
 
     /// @notice
@@ -362,6 +361,4 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         pendingRewardActivation.push(address(_receiptTokenAddr));
     }
 
-    /// allows the creator to withdraw some of the funds???
-    function emergencyWithdraw(uint256 pid, address to) public {}
 }

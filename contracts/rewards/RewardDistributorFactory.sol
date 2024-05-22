@@ -10,7 +10,7 @@ contract RewardDistributorFactory {
     event NewImpl(address pairLogic, uint256 timestamp);
     event NewRewardDistributor(address distributor, uint256 timestamp);
 
-    ///@dev owner
+    /// @dev owner
     address public owner;
 
     /// @dev implementation
