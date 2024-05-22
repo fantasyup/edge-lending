@@ -71,7 +71,7 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
             _decreaseBorrowAllowance(_debtOwner, _to, _amount);
         }
         _mint(_debtOwner, _amount);
-        _rewardHook(address(0), _debtOwner, _amount);
+        _rewardHook(address(0), _debtOwner);
     }
 
     function owner() external view override returns (address) {
@@ -94,7 +94,7 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
         } else {
             _totalSupply -= _amount;
         }
-        _rewardHook(_from, address(0), _amount);
+        _rewardHook(_from, address(0));
     }
 
     function borrowAllowance(address _from, address _to) external view returns(uint256) {

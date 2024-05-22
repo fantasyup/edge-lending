@@ -7,7 +7,7 @@ import "../interfaces/IRewardDistributor.sol";
 import "../interfaces/IRewardDistributorManager.sol";
 import "hardhat/console.sol";
 
-abstract contract RewardDistributorStorageV1 is Initializable {
+abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializable {
     /// @dev PoolInfo
     struct PoolInfo {
         IERC20 receiptTokenAddr;
@@ -38,13 +38,13 @@ abstract contract RewardDistributorStorageV1 is Initializable {
     /// @notice
     IERC20 public rewardToken;
 
-    /// @notice
+    /// @notice poolInfo
     PoolInfo[] public poolInfo;
 
-    /// @notice
+    /// @notice userInfo
     mapping(uint256 => mapping(address => UserInfo)) public userInfo;
 
-    /// @notice pendingActivation
+    /// @notice queue for receipt tokens awaiting activation
     address[] public pendingRewardActivation;
 
     /// @notice token -> pooil id
@@ -66,29 +66,33 @@ abstract contract RewardDistributorStorageV1 is Initializable {
     uint256 public rewardAmountDistributePerSecond;
 }
 
-contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
+contract RewardDistributor is RewardDistributorStorageV1 {
     /// @notice manager
     IRewardDistributorManager public immutable rewardDistributorManager;
 
     uint256 private constant SHARE_SCALE = 1e12;
 
-    event Withdraw(address user, uint256 poolId, uint256 amount);
+    event Withdraw(address indexed user, uint256 indexed poolId, uint256 amount);
 
     event AddDistribution(
-        address lendingPair,
-        address distributor,
-        DistributorConfigVars _vars,
+        address indexed lendingPair,
+        address indexed distributor,
+        DistributorConfigVars vars,
         uint256 timestamp
     );
 
     event UpdateDistribution(
-        uint256 pid,
+        uint256 indexed pid,
         uint256 oldAllocPoint,
         uint256 newAllocPoint,
         uint256 timestamp
     );
 
-    event AccumulateReward(address sender, uint256 pid, uint256 amount);
+    event AccumulateReward(
+        address indexed receiptToken,
+        uint256 indexed pid,
+        address user
+    );
 
     modifier onlyGuardian {
         require(msg.sender == guardian, "ONLY_GUARDIAN");
@@ -134,45 +138,31 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
 
     /// @dev accumulates reward for a depositor
     /// @param _tokenAddr token to reward
-    /// @param _from sender
-    /// @param _to receipient
-    /// @param _balance amount transferred
+    /// @param _user user to accumulate reward for
     function accumulateReward(
         address _tokenAddr,
-        address _from,
-        address _to,
-        uint256 _balance
+        address _user
     ) external override {
-        require(msg.sender == address(rewardDistributorManager), "ONLY_MANAGER");
+        require(_tokenAddr != address(0), "INVALID_ADDR");
+
         uint256 pid = tokenPoolIDPair[_tokenAddr];
 
         updatePool(pid);
 
         PoolInfo memory pool = poolInfo[pid];
 
-        if (_from != address(0)) {
-            UserInfo storage user = userInfo[pid][_from];
-            if (user.amount > 0 && user.amount >= _balance) {
-                user.pendingReward +=
-                    ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) -
-                    user.rewardDebt;
-                user.amount -= _balance;
-                user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
-            }
-        }
-
-        if (_to != address(0)) {
-            UserInfo storage user = userInfo[pid][_to];
+        if (_user != address(0)) {
+            UserInfo storage user = userInfo[pid][_user];
             if (user.amount > 0) {
                 user.pendingReward +=
                     ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) -
                     user.rewardDebt;
             }
-            user.amount += _balance;
+            user.amount = IERC20(_tokenAddr).balanceOf(_user);
             user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
         }
 
-        emit AccumulateReward(msg.sender, pid, _balance);
+        emit AccumulateReward(_tokenAddr, pid, _user);
     }
 
     struct DistributorConfigVars {

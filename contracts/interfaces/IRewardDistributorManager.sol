@@ -20,9 +20,5 @@ interface IRewardDistributorManager {
 
     function removeReward(address _tokenAddr, IRewardDistributor _distributor) external;
 
-    function accumulateRewards(
-        address _from,
-        address _to,
-        uint256 _balance
-    ) external;
+    function accumulateRewards(address _from, address _to) external;
 }

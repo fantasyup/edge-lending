@@ -63,18 +63,8 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "_from",
+        name: "_user",
         type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_to",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_balance",
-        type: "uint256",
       },
     ],
     name: "accumulateReward",

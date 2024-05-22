@@ -22,7 +22,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface RewardDistributorManagerInterface extends ethers.utils.Interface {
   functions: {
     "acceptOwnerTransfer()": FunctionFragment;
-    "accumulateRewards(address,address,uint256)": FunctionFragment;
+    "accumulateRewards(address,address)": FunctionFragment;
     "activateReward(address)": FunctionFragment;
     "approvedDistributors(address)": FunctionFragment;
     "commitOwnerTransfer(address)": FunctionFragment;
@@ -42,7 +42,7 @@ interface RewardDistributorManagerInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "accumulateRewards",
-    values: [string, string, BigNumberish]
+    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "activateReward",
@@ -198,14 +198,12 @@ export class RewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "accumulateRewards(address,address,uint256)"(
+    "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -323,14 +321,12 @@ export class RewardDistributorManager extends Contract {
   accumulateRewards(
     _from: string,
     _to: string,
-    _balance: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "accumulateRewards(address,address,uint256)"(
+  "accumulateRewards(address,address)"(
     _from: string,
     _to: string,
-    _balance: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -440,14 +436,12 @@ export class RewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "accumulateRewards(address,address,uint256)"(
+    "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -616,14 +610,12 @@ export class RewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "accumulateRewards(address,address,uint256)"(
+    "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -738,14 +730,12 @@ export class RewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "accumulateRewards(address,address,uint256)"(
+    "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
