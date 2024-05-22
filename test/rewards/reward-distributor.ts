@@ -23,7 +23,6 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
       )
     ).to.emit(RewardDistributor, 'Initialized')
 
-
   })
 
   it('add & set', async () => {
@@ -79,7 +78,6 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     const totalAllocPoints = () => Object.values(allocPoints).reduce((a, b) => a + b, 0)
     expect((await RewardDistributor.totalAllocPoint()).toNumber()).to.eq(totalAllocPoints())
     
-
     // set
     allocPoints.collateralTokenAllocPoint = 10
 
@@ -188,9 +186,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
     const kylePending = await (await RewardDistributor.userInfo(0, kyle.address))
     // console.log(kylePending.amount.toNumber(), ' ',  kylePending.pendingReward.toNumber())
-
-
-//    console.log((await wrappedCollateralAsset.balanceOf(kyle.address)).toString())
+    // console.log((await wrappedCollateralAsset.balanceOf(kyle.address)).toString())
 
     // kyle withdraws
     await expect(
@@ -203,14 +199,6 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     expect(
         (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
     ).to.eq(0)
-
-
-
-    // check balance
-
-
-    
-
 
   })
 
