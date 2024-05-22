@@ -22,7 +22,6 @@ interface IRewardDistributorManager {
 
     function accumulateRewards(
         address _from,
-        address _to,
-        uint256 _balance
+        address _to
     ) external;
 }

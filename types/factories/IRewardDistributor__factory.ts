@@ -71,11 +71,6 @@ const _abi = [
         name: "_to",
         type: "address",
       },
-      {
-        internalType: "uint256",
-        name: "_balance",
-        type: "uint256",
-      },
     ],
     name: "accumulateReward",
     outputs: [],

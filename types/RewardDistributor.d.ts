@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface RewardDistributorInterface extends ethers.utils.Interface {
   functions: {
-    "accumulateReward(address,address,address,uint256)": FunctionFragment;
+    "accumulateReward(address,address,address)": FunctionFragment;
     "activatePendingRewards()": FunctionFragment;
     "add(tuple,address,bool)": FunctionFragment;
     "endTimestamp()": FunctionFragment;
@@ -45,7 +45,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "accumulateReward",
-    values: [string, string, string, BigNumberish]
+    values: [string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "activatePendingRewards",
@@ -187,7 +187,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "AccumulateReward(address,uint256,uint256)": EventFragment;
+    "AccumulateReward(address,uint256,address,address)": EventFragment;
     "AddDistribution(address,address,tuple,uint256)": EventFragment;
     "Initialized(address,uint256,uint256,address,uint256)": EventFragment;
     "UpdateDistribution(uint256,uint256,uint256,uint256)": EventFragment;
@@ -249,15 +249,13 @@ export class RewardDistributor extends Contract {
       _tokenAddr: string,
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "accumulateReward(address,address,address,uint256)"(
+    "accumulateReward(address,address,address)"(
       _tokenAddr: string,
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -468,15 +466,13 @@ export class RewardDistributor extends Contract {
     _tokenAddr: string,
     _from: string,
     _to: string,
-    _balance: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "accumulateReward(address,address,address,uint256)"(
+  "accumulateReward(address,address,address)"(
     _tokenAddr: string,
     _from: string,
     _to: string,
-    _balance: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -684,15 +680,13 @@ export class RewardDistributor extends Contract {
       _tokenAddr: string,
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "accumulateReward(address,address,address,uint256)"(
+    "accumulateReward(address,address,address)"(
       _tokenAddr: string,
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -890,18 +884,19 @@ export class RewardDistributor extends Contract {
 
   filters: {
     AccumulateReward(
-      sender: null,
-      pid: null,
-      amount: null
+      receiptToken: string | null,
+      pid: BigNumberish | null,
+      from: null,
+      to: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { sender: string; pid: BigNumber; amount: BigNumber }
+      [string, BigNumber, string, string],
+      { receiptToken: string; pid: BigNumber; from: string; to: string }
     >;
 
     AddDistribution(
-      lendingPair: null,
-      distributor: null,
-      _vars: null,
+      lendingPair: string | null,
+      distributor: string | null,
+      vars: null,
       timestamp: null
     ): TypedEventFilter<
       [
@@ -917,7 +912,7 @@ export class RewardDistributor extends Contract {
       {
         lendingPair: string;
         distributor: string;
-        _vars: [BigNumber, BigNumber, BigNumber] & {
+        vars: [BigNumber, BigNumber, BigNumber] & {
           collateralTokenAllocPoint: BigNumber;
           debtTokenAllocPoint: BigNumber;
           borrowAssetTokenAllocPoint: BigNumber;
@@ -944,7 +939,7 @@ export class RewardDistributor extends Contract {
     >;
 
     UpdateDistribution(
-      pid: null,
+      pid: BigNumberish | null,
       oldAllocPoint: null,
       newAllocPoint: null,
       timestamp: null
@@ -959,8 +954,8 @@ export class RewardDistributor extends Contract {
     >;
 
     Withdraw(
-      user: null,
-      poolId: null,
+      user: string | null,
+      poolId: BigNumberish | null,
       amount: null
     ): TypedEventFilter<
       [string, BigNumber, BigNumber],
@@ -973,15 +968,13 @@ export class RewardDistributor extends Contract {
       _tokenAddr: string,
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "accumulateReward(address,address,address,uint256)"(
+    "accumulateReward(address,address,address)"(
       _tokenAddr: string,
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1164,15 +1157,13 @@ export class RewardDistributor extends Contract {
       _tokenAddr: string,
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "accumulateReward(address,address,address,uint256)"(
+    "accumulateReward(address,address,address)"(
       _tokenAddr: string,
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

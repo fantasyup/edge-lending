@@ -14,8 +14,7 @@ interface IRewardDistributor {
     function accumulateReward(
         address _tokenAddr,
         address _from,
-        address _to,
-        uint256 _balance
+        address _to
     ) external;
 
     function initialize(

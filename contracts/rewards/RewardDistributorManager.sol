@@ -41,11 +41,9 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
     /// @dev Accumulates rewards for users
     /// @param _from user address
     /// @param _to user address
-    /// @param _balance amount being transferred
     function accumulateRewards(
         address _from,
-        address _to,
-        uint256 _balance
+        address _to
     ) external override {
         IRewardDistributor[] memory distributors = tokenRewardToDistributors[msg.sender];
         uint256 size = distributors.length;
@@ -55,7 +53,7 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         /// We need to manage the size of the rewards to prevent
         /// astronomical increase in gas cost
         for (uint256 i = 0; i < size; i++) {
-            distributors[i].accumulateReward(msg.sender, _from, _to, _balance);
+            distributors[i].accumulateReward(msg.sender, _from, _to);
         }
     }
 

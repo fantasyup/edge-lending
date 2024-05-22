@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
   functions: {
-    "accumulateRewards(address,address,uint256)": FunctionFragment;
+    "accumulateRewards(address,address)": FunctionFragment;
     "activateReward(address)": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
@@ -31,7 +31,7 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "accumulateRewards",
-    values: [string, string, BigNumberish]
+    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "activateReward",
@@ -139,14 +139,12 @@ export class MockRewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[void]>;
 
-    "accumulateRewards(address,address,uint256)"(
+    "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[void]>;
 
@@ -198,14 +196,12 @@ export class MockRewardDistributorManager extends Contract {
   accumulateRewards(
     _from: string,
     _to: string,
-    _balance: BigNumberish,
     overrides?: CallOverrides
   ): Promise<void>;
 
-  "accumulateRewards(address,address,uint256)"(
+  "accumulateRewards(address,address)"(
     _from: string,
     _to: string,
-    _balance: BigNumberish,
     overrides?: CallOverrides
   ): Promise<void>;
 
@@ -250,14 +246,12 @@ export class MockRewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "accumulateRewards(address,address,uint256)"(
+    "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -363,14 +357,12 @@ export class MockRewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "accumulateRewards(address,address,uint256)"(
+    "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -419,14 +411,12 @@ export class MockRewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "accumulateRewards(address,address,uint256)"(
+    "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      _balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
