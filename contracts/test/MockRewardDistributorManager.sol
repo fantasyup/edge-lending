@@ -33,9 +33,8 @@ contract MockRewardDistributorManager is UUPSProxiable, IRewardDistributorManage
     function proxiableUUID() public pure override returns (bytes32) {
         return keccak256("org.edge.contracts.edgerewards.implementation");
     }
-    
-    function updateCode(address newAddress) external override {
-         _updateCodeAddress(newAddress);
-    }
 
+    function updateCode(address newAddress) external override {
+        _updateCodeAddress(newAddress);
+    }
 }

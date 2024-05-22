@@ -20,3 +20,5 @@ jobs:
         run: |
           npm install --no-lockfile
           npm run prettier:solidity
+          npx hardhat test
+          

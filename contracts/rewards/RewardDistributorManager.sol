@@ -51,7 +51,7 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         uint256 size = distributors.length;
 
         if (size == 0) return;
-        
+
         /// We need to manage the size of the rewards to prevent
         /// astronomical increase in gas cost
         for (uint256 i = 0; i < size; i++) {

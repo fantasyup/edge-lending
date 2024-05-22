@@ -8,7 +8,6 @@ import "../interfaces/IRewardDistributorManager.sol";
 import "hardhat/console.sol";
 
 abstract contract RewardDistributorStorageV1 is Initializable {
-    
     /// @dev PoolInfo
     struct PoolInfo {
         IERC20 receiptTokenAddr;
@@ -360,5 +359,4 @@ contract RewardDistributor is RewardDistributorStorageV1, IRewardDistributor {
         tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length - 1;
         pendingRewardActivation.push(address(_receiptTokenAddr));
     }
-
 }
