@@ -25,6 +25,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     "activatePendingRewards()": FunctionFragment;
     "add(tuple,address,bool)": FunctionFragment;
     "endTimestamp()": FunctionFragment;
+    "getTokenPoolID(address)": FunctionFragment;
     "guardian()": FunctionFragment;
     "initialize(address,uint256,uint256,uint256,address)": FunctionFragment;
     "massUpdatePools()": FunctionFragment;
@@ -36,7 +37,6 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     "rewardToken()": FunctionFragment;
     "set(uint256,uint128,bool)": FunctionFragment;
     "startTimestamp()": FunctionFragment;
-    "tokenPoolIDPair(address)": FunctionFragment;
     "totalAllocPoint()": FunctionFragment;
     "updatePool(uint256)": FunctionFragment;
     "userInfo(uint256,address)": FunctionFragment;
@@ -66,6 +66,10 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "endTimestamp",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTokenPoolID",
+    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "guardian", values?: undefined): string;
   encodeFunctionData(
@@ -109,10 +113,6 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "tokenPoolIDPair",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "totalAllocPoint",
     values?: undefined
   ): string;
@@ -140,6 +140,10 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "add", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "endTimestamp",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTokenPoolID",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "guardian", data: BytesLike): Result;
@@ -172,10 +176,6 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "set", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "startTimestamp",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenPoolIDPair",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -291,6 +291,16 @@ export class RewardDistributor extends Contract {
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    getTokenPoolID(
+      _receiptTokenAddr: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { poolId: BigNumber }>;
+
+    "getTokenPoolID(address)"(
+      _receiptTokenAddr: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { poolId: BigNumber }>;
+
     guardian(overrides?: CallOverrides): Promise<[string]>;
 
     "guardian()"(overrides?: CallOverrides): Promise<[string]>;
@@ -401,16 +411,6 @@ export class RewardDistributor extends Contract {
 
     "startTimestamp()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    tokenPoolIDPair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "tokenPoolIDPair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     totalAllocPoint(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "totalAllocPoint()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -507,6 +507,16 @@ export class RewardDistributor extends Contract {
   endTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
   "endTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getTokenPoolID(
+    _receiptTokenAddr: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "getTokenPoolID(address)"(
+    _receiptTokenAddr: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   guardian(overrides?: CallOverrides): Promise<string>;
 
@@ -618,13 +628,6 @@ export class RewardDistributor extends Contract {
 
   "startTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  tokenPoolIDPair(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  "tokenPoolIDPair(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   totalAllocPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
   "totalAllocPoint()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -717,6 +720,16 @@ export class RewardDistributor extends Contract {
     endTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTokenPoolID(
+      _receiptTokenAddr: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getTokenPoolID(address)"(
+      _receiptTokenAddr: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     guardian(overrides?: CallOverrides): Promise<string>;
 
@@ -823,16 +836,6 @@ export class RewardDistributor extends Contract {
     startTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     "startTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    tokenPoolIDPair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "tokenPoolIDPair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     totalAllocPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1019,6 +1022,16 @@ export class RewardDistributor extends Contract {
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getTokenPoolID(
+      _receiptTokenAddr: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getTokenPoolID(address)"(
+      _receiptTokenAddr: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     guardian(overrides?: CallOverrides): Promise<BigNumber>;
 
     "guardian()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1112,16 +1125,6 @@ export class RewardDistributor extends Contract {
 
     "startTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    tokenPoolIDPair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "tokenPoolIDPair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     totalAllocPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
     "totalAllocPoint()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1207,6 +1210,16 @@ export class RewardDistributor extends Contract {
     endTimestamp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getTokenPoolID(
+      _receiptTokenAddr: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getTokenPoolID(address)"(
+      _receiptTokenAddr: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     guardian(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1307,16 +1320,6 @@ export class RewardDistributor extends Contract {
     startTimestamp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "startTimestamp()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    tokenPoolIDPair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "tokenPoolIDPair(address)"(
-      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

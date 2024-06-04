@@ -26,7 +26,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
   })
 
-  it.only('add & set', async () => {
+  it('add & set', async () => {
     const {
         LendingPair,
         RewardDistributor,
@@ -81,9 +81,9 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         await (await RewardDistributor.poolInfo(2)).allocPoint.toNumber()
     ).to.eq(1)
 
-    expect(await RewardDistributor.tokenPoolIDPair(await LendingPair.wrappedCollateralAsset())).to.eq(0)
-    expect(await RewardDistributor.tokenPoolIDPair(await LendingPair.debtToken())).to.eq(1)
-    expect(await RewardDistributor.tokenPoolIDPair(await LendingPair.wrapperBorrowedAsset())).to.eq(2)
+    expect(await RewardDistributor.getTokenPoolID(await LendingPair.wrappedCollateralAsset())).to.eq(0)
+    expect(await RewardDistributor.getTokenPoolID(await LendingPair.debtToken())).to.eq(1)
+    expect(await RewardDistributor.getTokenPoolID(await LendingPair.wrapperBorrowedAsset())).to.eq(2)
     
     const totalAllocPoints = () => Object.values(allocPoints).reduce((a, b) => a + b, 0)
     expect((await RewardDistributor.totalAllocPoint()).toNumber()).to.eq(totalAllocPoints())
@@ -102,7 +102,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     expect(await (await RewardDistributor["totalAllocPoint()"]()).toNumber()).to.eq(totalAllocPoints())
   })
 
-  it.only('reward calculation', async () => {
+  it('reward calculation', async () => {
     const {
         LendingPair,
         RewardDistributor,

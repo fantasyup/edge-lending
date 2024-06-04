@@ -47,8 +47,8 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
     /// @notice queue for receipt tokens awaiting activation
     address[] public pendingRewardActivation;
 
-    /// @notice token -> pooil id
-    mapping(address => uint256) public tokenPoolIDPair;
+    /// @dev token -> pool id
+    mapping(address => uint256) internal tokenPoolIDPair;
 
     /// @dev totalAllocPoint
     uint256 public totalAllocPoint;
@@ -157,7 +157,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         require(_tokenAddr != address(0), "INVALID_ADDR");
         if (block.timestamp > endTimestamp) return;
 
-        uint256 pid = tokenPoolIDPair[_tokenAddr];
+        uint256 pid = getTokenPoolID(_tokenAddr);
 
         updatePool(pid);
 
@@ -346,6 +346,10 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         }
     }
 
+    function getTokenPoolID(address _receiptTokenAddr) public view returns (uint256 poolId){
+        poolId = tokenPoolIDPair[address(_receiptTokenAddr)] - 1;
+    }
+
     function createPool(
         uint128 _allocPoint,
         IERC20 _receiptTokenAddr,
@@ -365,7 +369,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
             })
         );
 
-        tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length - 1;
+        tokenPoolIDPair[address(_receiptTokenAddr)] = poolInfo.length;
         pendingRewardActivation.push(address(_receiptTokenAddr));
     }
 }
