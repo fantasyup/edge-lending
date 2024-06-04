@@ -12,10 +12,7 @@ interface IRewardDistributor {
         uint256 timestamp
     );
 
-    function accumulateReward(
-        address _tokenAddr,
-        address _user
-    ) external;
+    function accumulateReward(address _tokenAddr, address _user) external;
 
     function initialize(
         IERC20 _rewardToken,

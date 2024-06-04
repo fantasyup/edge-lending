@@ -94,11 +94,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         uint256 timestamp
     );
 
-    event AccumulateReward(
-        address indexed receiptToken,
-        uint256 indexed pid,
-        address user
-    );
+    event AccumulateReward(address indexed receiptToken, uint256 indexed pid, address user);
 
     modifier onlyGuardian {
         require(msg.sender == guardian, "ONLY_GUARDIAN");
@@ -150,10 +146,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @dev accumulates reward for a depositor
     /// @param _tokenAddr token to reward
     /// @param _user user to accumulate reward for
-    function accumulateReward(
-        address _tokenAddr,
-        address _user
-    ) external override {
+    function accumulateReward(address _tokenAddr, address _user) external override {
         require(_tokenAddr != address(0), "INVALID_ADDR");
         if (block.timestamp > endTimestamp) return;
 
@@ -332,7 +325,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         safeTokenTransfer(_to, amount);
         user.rewardDebt = (user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE;
         user.pendingReward = 0;
-        
+
         emit Withdraw(address(this), msg.sender, _pid, _to, amount);
     }
 
@@ -346,7 +339,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         }
     }
 
-    function getTokenPoolID(address _receiptTokenAddr) public view returns (uint256 poolId){
+    function getTokenPoolID(address _receiptTokenAddr) public view returns (uint256 poolId) {
         poolId = tokenPoolIDPair[address(_receiptTokenAddr)] - 1;
     }
 

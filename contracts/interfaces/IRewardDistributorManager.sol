@@ -13,6 +13,8 @@ interface IRewardDistributorManager {
     event OwnershipAccepted(address newOwner, uint256 timestamp);
 
     function activateReward(address _tokenAddr) external;
+
     function removeReward(address _tokenAddr, IRewardDistributor _distributor) external;
+
     function accumulateRewards(address _from, address _to) external;
 }
