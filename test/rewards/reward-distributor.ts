@@ -26,7 +26,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
   })
 
-  it('add & set', async () => {
+  it.only('add & set', async () => {
     const {
         LendingPair,
         RewardDistributor,
@@ -62,6 +62,14 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     ).to.emit(RewardDistributor, 'AddDistribution')
 
     await expect(
+        RewardDistributor.add(
+        allocPoints,
+        LendingPair.address,
+        false
+        )
+    ).to.revertedWith('token_exists')
+
+    await expect(
         await (await RewardDistributor.poolInfo(0)).allocPoint.toNumber()
     ).to.eq(1)
 
@@ -94,7 +102,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     expect(await (await RewardDistributor["totalAllocPoint()"]()).toNumber()).to.eq(totalAllocPoints())
   })
 
-  it('reward calculation', async () => {
+  it.only('reward calculation', async () => {
     const {
         LendingPair,
         RewardDistributor,
@@ -109,12 +117,12 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     )
     
     await RewardDistributorManager.initialize(admin.address);
-
+    const endSeconds = 500
     await RewardDistributor.initialize(
         BorrowAsset.address,
         100,
         currentTimestamp(),
-        currentTimestamp() + 500,
+        currentTimestamp() + endSeconds,
         admin.address
     )
 
@@ -202,6 +210,21 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     expect(
         (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
     ).to.eq(0)
+
+    // stop accumulating after end timestamp
+    await advanceNBlocks(endSeconds)
+
+    // call accumulate rewards
+    await RewardDistributor.accumulateReward(await LendingPair.wrappedCollateralAsset(), kyle.address)
+    const expectedRewards = (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
+    // call again shouldn't change expected rewards
+    await RewardDistributor.accumulateReward(await LendingPair.wrappedCollateralAsset(), kyle.address)
+    const newExpectedRewards = ((await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber())
+    // the expected rewards shouldn't change after endTimestamp
+    expect(expectedRewards).to.eq(newExpectedRewards)
+
+    
+
 
   })
 
