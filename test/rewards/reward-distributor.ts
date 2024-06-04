@@ -19,6 +19,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         BorrowAsset.address,
         100,
         currentTimestamp(),
+        currentTimestamp() + 120, 
         bob.address
       )
     ).to.emit(RewardDistributor, 'Initialized')
@@ -37,6 +38,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         BorrowAsset.address,
         100,
         currentTimestamp(),
+        currentTimestamp() + 180,
         admin.address
     )
 
@@ -112,6 +114,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         BorrowAsset.address,
         100,
         currentTimestamp(),
+        currentTimestamp() + 500,
         admin.address
     )
 

@@ -39,6 +39,7 @@ contract RewardDistributorFactory {
         IERC20 _rewardToken,
         uint256 _amountDistributePerSecond,
         uint256 _startTimestamp,
+        uint256 _endTimestamp,
         address _guardian
     ) external {
         bytes32 salt =
@@ -60,6 +61,7 @@ contract RewardDistributorFactory {
             _rewardToken,
             _amountDistributePerSecond,
             _startTimestamp,
+            _endTimestamp,
             _guardian
         );
 

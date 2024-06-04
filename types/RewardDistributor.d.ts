@@ -26,7 +26,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     "add(tuple,address,bool)": FunctionFragment;
     "endTimestamp()": FunctionFragment;
     "guardian()": FunctionFragment;
-    "initialize(address,uint256,uint256,address)": FunctionFragment;
+    "initialize(address,uint256,uint256,uint256,address)": FunctionFragment;
     "massUpdatePools()": FunctionFragment;
     "pendingRewardActivation(uint256)": FunctionFragment;
     "pendingRewardToken(uint256,address)": FunctionFragment;
@@ -70,7 +70,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "guardian", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, BigNumberish, BigNumberish, string]
+    values: [string, BigNumberish, BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "massUpdatePools",
@@ -189,9 +189,9 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   events: {
     "AccumulateReward(address,uint256,address)": EventFragment;
     "AddDistribution(address,address,tuple,uint256)": EventFragment;
-    "Initialized(address,uint256,uint256,address,uint256)": EventFragment;
+    "Initialized(address,uint256,uint256,uint256,address,uint256)": EventFragment;
     "UpdateDistribution(uint256,uint256,uint256,uint256)": EventFragment;
-    "Withdraw(address,uint256,uint256)": EventFragment;
+    "Withdraw(address,address,uint256,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AccumulateReward"): EventFragment;
@@ -299,14 +299,16 @@ export class RewardDistributor extends Contract {
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,uint256,uint256,address)"(
+    "initialize(address,uint256,uint256,uint256,address)"(
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -514,14 +516,16 @@ export class RewardDistributor extends Contract {
     _rewardToken: string,
     _amountDistributePerSecond: BigNumberish,
     _startTimestamp: BigNumberish,
+    _endTimestamp: BigNumberish,
     _guardian: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,uint256,uint256,address)"(
+  "initialize(address,uint256,uint256,uint256,address)"(
     _rewardToken: string,
     _amountDistributePerSecond: BigNumberish,
     _startTimestamp: BigNumberish,
+    _endTimestamp: BigNumberish,
     _guardian: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -722,14 +726,16 @@ export class RewardDistributor extends Contract {
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,uint256,uint256,address)"(
+    "initialize(address,uint256,uint256,uint256,address)"(
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -915,17 +921,19 @@ export class RewardDistributor extends Contract {
     >;
 
     Initialized(
-      _rewardToken: null,
+      _rewardToken: string | null,
       _amountDistributePerSecond: null,
       _startTimestamp: null,
+      _endTimestamp: null,
       _guardian: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber, string, BigNumber],
+      [string, BigNumber, BigNumber, BigNumber, string, BigNumber],
       {
         _rewardToken: string;
         _amountDistributePerSecond: BigNumber;
         _startTimestamp: BigNumber;
+        _endTimestamp: BigNumber;
         _guardian: string;
         timestamp: BigNumber;
       }
@@ -947,12 +955,20 @@ export class RewardDistributor extends Contract {
     >;
 
     Withdraw(
+      distributor: string | null,
       user: string | null,
       poolId: BigNumberish | null,
+      _to: null,
       amount: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { user: string; poolId: BigNumber; amount: BigNumber }
+      [string, string, BigNumber, string, BigNumber],
+      {
+        distributor: string;
+        user: string;
+        poolId: BigNumber;
+        _to: string;
+        amount: BigNumber;
+      }
     >;
   };
 
@@ -1011,14 +1027,16 @@ export class RewardDistributor extends Contract {
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,uint256,uint256,address)"(
+    "initialize(address,uint256,uint256,uint256,address)"(
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1198,14 +1216,16 @@ export class RewardDistributor extends Contract {
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,uint256,uint256,address)"(
+    "initialize(address,uint256,uint256,uint256,address)"(
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

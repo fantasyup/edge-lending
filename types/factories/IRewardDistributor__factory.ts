@@ -21,7 +21,7 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         internalType: "contract IERC20",
         name: "_rewardToken",
         type: "address",
@@ -36,6 +36,12 @@ const _abi = [
         indexed: false,
         internalType: "uint256",
         name: "_startTimestamp",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_endTimestamp",
         type: "uint256",
       },
       {
@@ -87,6 +93,11 @@ const _abi = [
       {
         internalType: "uint256",
         name: "_startTimestamp",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_endTimestamp",
         type: "uint256",
       },
       {

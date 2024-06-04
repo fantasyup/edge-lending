@@ -72,7 +72,13 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
     uint256 private constant SHARE_SCALE = 1e12;
 
-    event Withdraw(address indexed user, uint256 indexed poolId, uint256 amount);
+    event Withdraw(
+        address indexed distributor,
+        address indexed user,
+        uint256 indexed poolId,
+        address _to,
+        uint256 amount
+    );
 
     event AddDistribution(
         address indexed lendingPair,
@@ -326,8 +332,8 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         safeTokenTransfer(_to, amount);
         user.rewardDebt = (user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE;
         user.pendingReward = 0;
-        // @TODO add _to
-        emit Withdraw(msg.sender, _pid, amount);
+        
+        emit Withdraw(address(this), msg.sender, _pid, _to, amount);
     }
 
     // Safe token transfer function, just in case if rounding error causes pool to not have enough tokens

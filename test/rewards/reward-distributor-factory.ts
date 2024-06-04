@@ -36,11 +36,13 @@ runTestSuite("RewardDistributorFactory", (vars: TestVars) => {
         } = vars
         
         const startTimestamp = currentTimestamp();
+        const endTimestamp = startTimestamp + 600;
 
         const tx = await(await RewardDistributorFactory.createRewardDistributor(
             BorrowAsset.address,
             10,
             startTimestamp,
+            endTimestamp,
             bob.address
         )).wait()
 
@@ -56,6 +58,9 @@ runTestSuite("RewardDistributorFactory", (vars: TestVars) => {
         expect(
             await (await distributor.startTimestamp()).toNumber()
         ).to.eq(startTimestamp)
+        expect(
+            await (await distributor.endTimestamp()).toNumber()
+        ).to.eq(endTimestamp)
     })
 
 
