@@ -47,7 +47,8 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
     /// @notice queue for receipt tokens awaiting activation
     address[] public pendingRewardActivation;
 
-    /// @dev token -> pool id
+    /// @dev token -> pool id, use the `getTokenPoolID` function
+    /// to get a receipt token pool id
     mapping(address => uint256) internal tokenPoolIDPair;
 
     /// @dev totalAllocPoint
