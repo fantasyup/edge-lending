@@ -56,7 +56,7 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
     /// @notice The start timestamp
     uint256 public startTimestamp;
 
-    /// @notice The start timestamp
+    /// @notice The end timestamp
     uint256 public endTimestamp;
 
     /// @notice resposible for updating the alloc points
@@ -110,27 +110,32 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @param _rewardToken asset to distribute
     /// @param _amountDistributePerSecond amount to distributer per second
     /// @param _startTimestamp time to start distributing
+    /// @param _endTimestamp time to end distributing
     /// @param _guardian distributor guardian
     function initialize(
         IERC20 _rewardToken,
         uint256 _amountDistributePerSecond,
         uint256 _startTimestamp,
+        uint256 _endTimestamp,
         address _guardian
     ) external override initializer {
         require(address(_rewardToken) != address(0), "INVALID_TOKEN");
         require(_guardian != address(0), "INVALID_GUARDIAN");
         require(_amountDistributePerSecond > 0, "INVALID_DISTRIBUTE");
         require(_startTimestamp > 0, "INVALID_TIMESTAMP");
+        require(_endTimestamp > 0, "INVALID_TIMESTAMP");
 
         rewardToken = _rewardToken;
         rewardAmountDistributePerSecond = _amountDistributePerSecond;
         startTimestamp = _startTimestamp;
+        endTimestamp = _endTimestamp;
         guardian = _guardian;
 
         emit Initialized(
             _rewardToken,
             _amountDistributePerSecond,
             _startTimestamp,
+            _endTimestamp,
             _guardian,
             block.timestamp
         );
@@ -144,6 +149,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         address _user
     ) external override {
         require(_tokenAddr != address(0), "INVALID_ADDR");
+        if (block.timestamp > endTimestamp) return;
 
         uint256 pid = tokenPoolIDPair[_tokenAddr];
 
@@ -239,7 +245,8 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         emit UpdateDistribution(_pid, _allocPoint, _allocPoint, block.timestamp);
     }
 
-    function getMultiplier(uint256 _from, uint256 _to) internal pure returns (uint256) {
+    function getMultiplier(uint256 _from, uint256 _to) internal view returns (uint256) {
+        if (_to > endTimestamp) _to = endTimestamp;
         return _to - _from;
     }
 
@@ -264,6 +271,10 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         view
         returns (uint256 accRewardTokenPerShare)
     {
+        if (pool.lastUpdateTimestamp > endTimestamp) {
+            return pool.accRewardTokenPerShare;
+        }
+
         uint256 multiplier = getMultiplier(pool.lastUpdateTimestamp, block.timestamp);
         uint256 tokenReward =
             (multiplier * rewardAmountDistributePerSecond * pool.allocPoint) / totalAllocPoint;
@@ -335,6 +346,8 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         uint256 _lastUpdateTimestamp
     ) internal {
         require(address(_receiptTokenAddr) != address(0), "invalid_addr");
+        require(tokenPoolIDPair[address(_receiptTokenAddr)] == 0, "token_exists");
+
         totalAllocPoint = totalAllocPoint + _allocPoint;
 
         poolInfo.push(

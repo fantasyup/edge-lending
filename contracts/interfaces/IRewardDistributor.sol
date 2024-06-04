@@ -4,9 +4,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface IRewardDistributor {
     event Initialized(
-        IERC20 _rewardToken,
+        IERC20 indexed _rewardToken,
         uint256 _amountDistributePerSecond,
         uint256 _startTimestamp,
+        uint256 _endTimestamp,
         address _guardian,
         uint256 timestamp
     );
@@ -20,6 +21,7 @@ interface IRewardDistributor {
         IERC20 _rewardToken,
         uint256 _amountDistributePerSecond,
         uint256 _startTimestamp,
+        uint256 _endTimestamp,
         address _guardian
     ) external;
 }
