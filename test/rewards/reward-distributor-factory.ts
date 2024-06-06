@@ -61,6 +61,10 @@ runTestSuite("RewardDistributorFactory", (vars: TestVars) => {
         expect(
             await (await distributor.endTimestamp()).toNumber()
         ).to.eq(endTimestamp)
+
+        expect(
+            await (await RewardDistributorFactory.rewardDistributors(0))
+        ).to.eq(tx.events![1]!.args!.distributor)
     })
 
 

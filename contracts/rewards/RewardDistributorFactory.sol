@@ -64,6 +64,8 @@ contract RewardDistributorFactory {
             _endTimestamp,
             _guardian
         );
+        
+        rewardDistributors.push(address(newDistributor));
 
         emit NewRewardDistributor(address(newDistributor), block.timestamp);
     }
