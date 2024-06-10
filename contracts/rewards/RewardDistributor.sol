@@ -149,6 +149,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @param _user user to accumulate reward for
     function accumulateReward(address _tokenAddr, address _user) external override {
         require(_tokenAddr != address(0), "INVALID_ADDR");
+        if(block.timestamp < startTimestamp) return;
         if (block.timestamp > endTimestamp) return;
 
         uint256 pid = getTokenPoolID(_tokenAddr);
