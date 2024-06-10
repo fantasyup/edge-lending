@@ -289,7 +289,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
   })
   
-  it('reward calculation - should allocate previous rewards', async () => {
+  it('reward calculation - should allocate previous pending rewards', async () => {
     const {
         LendingPair,
         RewardDistributor,
@@ -351,6 +351,74 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     const expectedPendingReward = 566
     const kylePendingReward = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
     expect(kylePendingReward).to.eq(expectedPendingReward)
+  })
+
+  it('withdraw calculates the reward and disburses it', async () => {
+    const {
+        LendingPair,
+        RewardDistributor,
+        RewardDistributorManager,
+        BorrowAsset,
+        accounts: [admin, bob, kyle]
+    } = vars
+
+    const helper = await setupAndInitLendingPair(
+        vars,
+        {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [admin, kyle] }
+    )
+    
+    await RewardDistributorManager.initialize(admin.address);
+    const endSeconds = 500
+    await RewardDistributor.initialize(
+        BorrowAsset.address,
+        100,
+        currentTimestamp(),
+        currentTimestamp() + endSeconds,
+        admin.address
+    )
+
+    // credit the reward distributor address with tokens
+    await BorrowAsset.setBalanceTo(RewardDistributor.address, 1_000_000_000);
+
+    const allocPoints = {
+        collateralTokenAllocPoint: 1,
+        debtTokenAllocPoint: 1,
+        borrowAssetTokenAllocPoint: 1
+    }
+
+    await RewardDistributor.add(
+        allocPoints,
+        LendingPair.address,
+        false
+    )
+
+    // approve distributor on manager
+    await RewardDistributorManager["setDistributorStatus(address,bool)"](
+        RewardDistributor.address, 
+        true
+    )
+
+    const amountToDeposit = 1000
+    await helper.depositCollateralAsset(kyle, amountToDeposit)
+
+    // activate rewards
+    await RewardDistributor.activatePendingRewards();
+
+    await advanceNBlocks(10)
+
+    // call withdraw rewards
+    await RewardDistributor.connect(kyle.signer).withdraw(
+        0,
+        kyle.address
+    )
+
+    const expectedPendingReward = 566
+    const balance = await (await BorrowAsset.balanceOf(kyle.address)).toNumber();
+    expect(balance).to.eq(expectedPendingReward)
+
+    const paidOut = (await RewardDistributor.userInfo(0, kyle.address)).totalRewardPaid.toNumber()
+    expect(paidOut).to.eq(expectedPendingReward)
+
   })
 
 })

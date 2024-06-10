@@ -155,34 +155,10 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         if (block.timestamp > endTimestamp) return;
 
         uint256 pid = getTokenPoolID(_tokenAddr);
-
-        updatePool(pid);
-
-        PoolInfo memory pool = poolInfo[pid];
-
-        if (_user != address(0)) {
-            UserInfo storage user = userInfo[pid][_user];
-            uint256 userCurrentBalance = IERC20(_tokenAddr).balanceOf(_user);
-
-            if (user.amount == 0 && user.pendingReward == 0 && user.totalRewardPaid == 0 ) {
-                user.pendingReward +=
-                    ((userCurrentBalance * pool.accRewardTokenPerShare) / SHARE_SCALE) -
-                    user.rewardDebt;
-            }
-
-            if (user.amount > 0) {
-                user.pendingReward += calculatePendingReward(pool, user);
-            }
-
-            user.amount = IERC20(_tokenAddr).balanceOf(_user);
-            user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
-        }
+        // update rewards
+        updateRewards(pid, _user);
 
         emit AccumulateReward(_tokenAddr, pid, _user);
-    }
-
-    function calculatePendingReward(PoolInfo memory _pool, UserInfo memory _user) internal pure returns(uint256 pendingReward) {
-        pendingReward = ((_user.amount * _pool.accRewardTokenPerShare) / SHARE_SCALE) - _user.rewardDebt;
     }
 
     struct DistributorConfigVars {
@@ -333,15 +309,15 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         UserInfo storage user = userInfo[_pid][msg.sender];
 
         updatePool(_pid);
+        updateRewards(_pid, msg.sender);
 
-        uint256 pending = calculatePendingReward(pool, user);
-        uint256 amount = user.pendingReward + pending;
-        safeTokenTransfer(_to, amount);
+        uint256 amountToWithdraw = user.pendingReward;
+        safeTokenTransfer(_to, amountToWithdraw);
         user.rewardDebt = (user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE;
         user.pendingReward = 0;
-        user.totalRewardPaid += amount;
+        user.totalRewardPaid += amountToWithdraw;
 
-        emit Withdraw(address(this), msg.sender, _pid, _to, amount);
+        emit Withdraw(address(this), msg.sender, _pid, _to, amountToWithdraw);
     }
 
     // Safe token transfer function, just in case if rounding error causes pool to not have enough tokens
@@ -356,6 +332,37 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
     function getTokenPoolID(address _receiptTokenAddr) public view returns (uint256 poolId) {
         poolId = tokenPoolIDPair[address(_receiptTokenAddr)] - 1;
+    }
+
+    function calculatePendingReward(PoolInfo memory _pool, UserInfo memory _user) internal pure returns(uint256 pendingReward) {
+        pendingReward = ((_user.amount * _pool.accRewardTokenPerShare) / SHARE_SCALE) - _user.rewardDebt;
+    }
+
+    /// @dev accrue rewards for user
+    /// @param _pid pool id
+    /// @param _user user to update rewards for
+    function updateRewards(uint256 _pid, address _user) internal {
+        updatePool(_pid);
+
+        PoolInfo memory pool = poolInfo[_pid];
+
+        if (_user != address(0)) {
+            UserInfo storage user = userInfo[_pid][_user];
+            uint256 userCurrentBalance = IERC20(pool.receiptTokenAddr).balanceOf(_user);
+
+            if (user.amount == 0 && user.pendingReward == 0 && user.totalRewardPaid == 0 ) {
+                user.pendingReward +=
+                    ((userCurrentBalance * pool.accRewardTokenPerShare) / SHARE_SCALE) -
+                    user.rewardDebt;
+            }
+
+            if (user.amount > 0) {
+                user.pendingReward += calculatePendingReward(pool, user);
+            }
+
+            user.amount = userCurrentBalance;
+            user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
+        }
     }
 
     function createPool(
