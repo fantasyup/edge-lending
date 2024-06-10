@@ -97,6 +97,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     );
 
     event AccumulateReward(address indexed receiptToken, uint256 indexed pid, address user);
+    event WithdrawUnclaimedReward(address indexed distributor, uint256 amount, uint256 timestamp);
 
     modifier onlyGuardian {
         require(msg.sender == guardian, "ONLY_GUARDIAN");
@@ -151,9 +152,6 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @param _user user to accumulate reward for
     function accumulateReward(address _tokenAddr, address _user) external override {
         require(_tokenAddr != address(0), "INVALID_ADDR");
-        if (block.timestamp < startTimestamp) return;
-        if (block.timestamp > endTimestamp) return;
-
         uint256 pid = getTokenPoolID(_tokenAddr);
         // update rewards
         updateRewards(pid, _user);
@@ -320,6 +318,18 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         emit Withdraw(address(this), msg.sender, _pid, _to, amountToWithdraw);
     }
 
+    /// @dev withdraw unclaimed rewards after 60 days of end of distribution period
+    function withdrawUnclaimedRewards(address _to) external onlyGuardian {
+        require(
+            block.timestamp > endTimestamp + 60 days,
+            "NOT_EXPIRED"
+        );
+        uint256 amount = rewardToken.balanceOf(address(this));
+        rewardToken.transfer(_to,amount);
+
+        emit WithdrawUnclaimedReward(address(this), amount, block.timestamp);
+    }
+
     // Safe token transfer function, just in case if rounding error causes pool to not have enough tokens
     function safeTokenTransfer(address _to, uint256 _amount) internal {
         uint256 balance = rewardToken.balanceOf(address(this));
@@ -342,6 +352,9 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @param _pid pool id
     /// @param _user user to update rewards for
     function updateRewards(uint256 _pid, address _user) internal {
+        if (block.timestamp < startTimestamp) return;
+        if (block.timestamp > endTimestamp) return;
+
         updatePool(_pid);
 
         PoolInfo memory pool = poolInfo[_pid];
