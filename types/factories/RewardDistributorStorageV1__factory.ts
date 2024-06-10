@@ -276,6 +276,11 @@ const _abi = [
         name: "rewardDebt",
         type: "uint256",
       },
+      {
+        internalType: "uint256",
+        name: "totalRewardPaid",
+        type: "uint256",
+      },
     ],
     stateMutability: "view",
     type: "function",

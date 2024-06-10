@@ -33,6 +33,7 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
         uint256 amount; // the balance of the user
         uint256 pendingReward;
         uint256 rewardDebt; // Reward debt. See explanation below.
+        uint256 totalRewardPaid;
     }
 
     /// @notice
@@ -125,8 +126,9 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         require(address(_rewardToken) != address(0), "INVALID_TOKEN");
         require(_guardian != address(0), "INVALID_GUARDIAN");
         require(_amountDistributePerSecond > 0, "INVALID_DISTRIBUTE");
-        require(_startTimestamp > 0, "INVALID_TIMESTAMP");
-        require(_endTimestamp > 0, "INVALID_TIMESTAMP");
+        require(_startTimestamp > 0, "INVALID_TIMESTAMP_1");
+        require(_endTimestamp > 0, "INVALID_TIMESTAMP_2");
+        require(_endTimestamp > _startTimestamp, "INVALID_TIMESTAMP_3");
 
         rewardToken = _rewardToken;
         rewardAmountDistributePerSecond = _amountDistributePerSecond;
@@ -149,7 +151,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @param _user user to accumulate reward for
     function accumulateReward(address _tokenAddr, address _user) external override {
         require(_tokenAddr != address(0), "INVALID_ADDR");
-        if(block.timestamp < startTimestamp) return;
+        if (block.timestamp < startTimestamp) return;
         if (block.timestamp > endTimestamp) return;
 
         uint256 pid = getTokenPoolID(_tokenAddr);
@@ -160,16 +162,27 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
         if (_user != address(0)) {
             UserInfo storage user = userInfo[pid][_user];
-            if (user.amount > 0) {
+            uint256 userCurrentBalance = IERC20(_tokenAddr).balanceOf(_user);
+
+            if (user.amount == 0 && user.pendingReward == 0 && user.totalRewardPaid == 0 ) {
                 user.pendingReward +=
-                    ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) -
+                    ((userCurrentBalance * pool.accRewardTokenPerShare) / SHARE_SCALE) -
                     user.rewardDebt;
             }
+
+            if (user.amount > 0) {
+                user.pendingReward += calculatePendingReward(pool, user);
+            }
+
             user.amount = IERC20(_tokenAddr).balanceOf(_user);
             user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
         }
 
         emit AccumulateReward(_tokenAddr, pid, _user);
+    }
+
+    function calculatePendingReward(PoolInfo memory _pool, UserInfo memory _user) internal pure returns(uint256 pendingReward) {
+        pendingReward = ((_user.amount * _pool.accRewardTokenPerShare) / SHARE_SCALE) - _user.rewardDebt;
     }
 
     struct DistributorConfigVars {
@@ -321,12 +334,12 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
         updatePool(_pid);
 
-        uint256 pending =
-            ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE) - user.rewardDebt;
+        uint256 pending = calculatePendingReward(pool, user);
         uint256 amount = user.pendingReward + pending;
         safeTokenTransfer(_to, amount);
         user.rewardDebt = (user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE;
         user.pendingReward = 0;
+        user.totalRewardPaid += amount;
 
         emit Withdraw(address(this), msg.sender, _pid, _to, amount);
     }
