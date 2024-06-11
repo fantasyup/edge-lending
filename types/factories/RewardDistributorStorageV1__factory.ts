@@ -281,6 +281,11 @@ const _abi = [
         name: "totalRewardPaid",
         type: "uint256",
       },
+      {
+        internalType: "uint256",
+        name: "lastUpdateTimestamp",
+        type: "uint256",
+      },
     ],
     stateMutability: "view",
     type: "function",

@@ -34,6 +34,7 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
         uint256 pendingReward;
         uint256 rewardDebt; // Reward debt. See explanation below.
         uint256 totalRewardPaid;
+        uint256 lastUpdateTimestamp;
     }
 
     /// @notice
@@ -153,7 +154,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     function accumulateReward(address _tokenAddr, address _user) external override {
         require(_tokenAddr != address(0), "INVALID_ADDR");
         uint256 pid = getTokenPoolID(_tokenAddr);
-        // update rewards
+        // update user rewards
         updateRewards(pid, _user);
 
         emit AccumulateReward(_tokenAddr, pid, _user);
@@ -294,7 +295,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         }
 
         pool.accRewardTokenPerShare = calculatePoolReward(pool, totalSupply);
-        pool.lastUpdateTimestamp = block.timestamp;
+        pool.lastUpdateTimestamp = block.timestamp > endTimestamp ? endTimestamp : block.timestamp;
     }
 
     /// @dev user to withdraw accumulated rewards from a pool
@@ -306,7 +307,6 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
 
-        updatePool(_pid);
         updateRewards(_pid, msg.sender);
 
         uint256 amountToWithdraw = user.pendingReward;
@@ -352,9 +352,8 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @param _pid pool id
     /// @param _user user to update rewards for
     function updateRewards(uint256 _pid, address _user) internal {
-        if (block.timestamp < startTimestamp) return;
-        if (block.timestamp > endTimestamp) return;
-
+        if (block.timestamp < startTimestamp) return;       
+        // update the pool
         updatePool(_pid);
 
         PoolInfo memory pool = poolInfo[_pid];
@@ -363,18 +362,24 @@ contract RewardDistributor is RewardDistributorStorageV1 {
             UserInfo storage user = userInfo[_pid][_user];
             uint256 userCurrentBalance = IERC20(pool.receiptTokenAddr).balanceOf(_user);
 
-            if (user.amount == 0 && user.pendingReward == 0 && user.totalRewardPaid == 0 ) {
+            if (
+                user.amount == 0 && 
+                user.pendingReward == 0 && 
+                user.totalRewardPaid == 0 && 
+                block.timestamp < endTimestamp
+            ) {
                 user.pendingReward +=
                     ((userCurrentBalance * pool.accRewardTokenPerShare) / SHARE_SCALE) -
                     user.rewardDebt;
             }
 
-            if (user.amount > 0) {
+            if (user.amount > 0 && user.lastUpdateTimestamp < endTimestamp) {
                 user.pendingReward += calculatePendingReward(pool, user);
+                user.amount = userCurrentBalance;
+                user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
             }
-
-            user.amount = userCurrentBalance;
-            user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
+            
+            user.lastUpdateTimestamp = block.timestamp;
         }
     }
 

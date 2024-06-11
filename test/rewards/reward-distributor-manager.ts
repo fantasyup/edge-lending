@@ -57,6 +57,10 @@ runTestSuite("RewardDistributorManager", (vars: TestVars) => {
             await RewardDistributorManager.connect(bob.signer).activateReward(admin.address)
         ).to.emit(RewardDistributorManager, 'AddReward')
 
+        await expect(
+            RewardDistributorManager.connect(bob.signer).activateReward(admin.address)
+        ).to.be.revertedWith("DISTRIBUTOR_EXISTS")
+
         expect((await RewardDistributorManager.tokenRewardToDistributors(
             admin.address, 0
         ))).to.eq(bob.address)
@@ -66,17 +70,32 @@ runTestSuite("RewardDistributorManager", (vars: TestVars) => {
         const {
             RewardDistributorManager,
             RewardDistributor,
-            accounts: [ admin, bob ]
+            accounts: [ admin, bob, kyle, peter ]
         } = vars
 
         await RewardDistributorManager.initialize(admin.address);
-        await RewardDistributorManager.setDistributorStatus(bob.address, true)
-        await RewardDistributorManager.connect(bob.signer).activateReward(admin.address)
+        
+        const distributors = [bob, kyle, peter];
+        
+        await Promise.all(distributors.map(async(user) => {
+            await RewardDistributorManager.setDistributorStatus(user.address, true)
+            await RewardDistributorManager.connect(user.signer).activateReward(admin.address)
+            await RewardDistributorManager.setDistributorStatus(user.address, true)
+        }))
+        
+        expect(
+            await RewardDistributorManager.tokenRewardToDistributors(admin.address, 2)
+        ).to.eq(distributors[2].address)
+
         await expect(
             await RewardDistributorManager.removeReward(admin.address, bob.address)
         ).to.emit(RewardDistributorManager, 'RemoveReward')
-
-        // @TODO include test with loop
+        
+        // should revert on accessing uninitialized
+        await expect(
+            RewardDistributorManager.tokenRewardToDistributors(admin.address, 2)
+        ).to.be.reverted
+        
     })
 
     it('acceptOwnerTransfer & commitOwnerTransfer', async () => {

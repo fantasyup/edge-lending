@@ -41,6 +41,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     "updatePool(uint256)": FunctionFragment;
     "userInfo(uint256,address)": FunctionFragment;
     "withdraw(uint256,address)": FunctionFragment;
+    "withdrawUnclaimedRewards(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -128,6 +129,10 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     functionFragment: "withdraw",
     values: [BigNumberish, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawUnclaimedRewards",
+    values: [string]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "accumulateReward",
@@ -185,6 +190,10 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "updatePool", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "userInfo", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawUnclaimedRewards",
+    data: BytesLike
+  ): Result;
 
   events: {
     "AccumulateReward(address,uint256,address)": EventFragment;
@@ -192,6 +201,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
     "Initialized(address,uint256,uint256,uint256,address,uint256)": EventFragment;
     "UpdateDistribution(uint256,uint256,uint256,uint256)": EventFragment;
     "Withdraw(address,address,uint256,address,uint256)": EventFragment;
+    "WithdrawUnclaimedReward(address,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AccumulateReward"): EventFragment;
@@ -199,6 +209,7 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateDistribution"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WithdrawUnclaimedReward"): EventFragment;
 }
 
 export class RewardDistributor extends Contract {
@@ -430,11 +441,12 @@ export class RewardDistributor extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
         totalRewardPaid: BigNumber;
+        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -443,11 +455,12 @@ export class RewardDistributor extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
         totalRewardPaid: BigNumber;
+        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -459,6 +472,16 @@ export class RewardDistributor extends Contract {
 
     "withdraw(uint256,address)"(
       _pid: BigNumberish,
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    withdrawUnclaimedRewards(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "withdrawUnclaimedRewards(address)"(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -649,11 +672,12 @@ export class RewardDistributor extends Contract {
     arg1: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
       amount: BigNumber;
       pendingReward: BigNumber;
       rewardDebt: BigNumber;
       totalRewardPaid: BigNumber;
+      lastUpdateTimestamp: BigNumber;
     }
   >;
 
@@ -662,11 +686,12 @@ export class RewardDistributor extends Contract {
     arg1: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
       amount: BigNumber;
       pendingReward: BigNumber;
       rewardDebt: BigNumber;
       totalRewardPaid: BigNumber;
+      lastUpdateTimestamp: BigNumber;
     }
   >;
 
@@ -678,6 +703,16 @@ export class RewardDistributor extends Contract {
 
   "withdraw(uint256,address)"(
     _pid: BigNumberish,
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  withdrawUnclaimedRewards(
+    _to: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "withdrawUnclaimedRewards(address)"(
     _to: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -857,11 +892,12 @@ export class RewardDistributor extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
         totalRewardPaid: BigNumber;
+        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -870,11 +906,12 @@ export class RewardDistributor extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
         totalRewardPaid: BigNumber;
+        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -886,6 +923,16 @@ export class RewardDistributor extends Contract {
 
     "withdraw(uint256,address)"(
       _pid: BigNumberish,
+      _to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    withdrawUnclaimedRewards(
+      _to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "withdrawUnclaimedRewards(address)"(
       _to: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -978,6 +1025,15 @@ export class RewardDistributor extends Contract {
         _to: string;
         amount: BigNumber;
       }
+    >;
+
+    WithdrawUnclaimedReward(
+      distributor: string | null,
+      amount: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber],
+      { distributor: string; amount: BigNumber; timestamp: BigNumber }
     >;
   };
 
@@ -1165,6 +1221,16 @@ export class RewardDistributor extends Contract {
 
     "withdraw(uint256,address)"(
       _pid: BigNumberish,
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    withdrawUnclaimedRewards(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "withdrawUnclaimedRewards(address)"(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1365,6 +1431,16 @@ export class RewardDistributor extends Contract {
 
     "withdraw(uint256,address)"(
       _pid: BigNumberish,
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdrawUnclaimedRewards(
+      _to: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "withdrawUnclaimedRewards(address)"(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
