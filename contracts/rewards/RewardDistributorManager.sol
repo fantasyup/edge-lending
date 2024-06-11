@@ -87,7 +87,7 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         /// by a partner. We could periodically set an inactive distributor status to
         /// false
         distributors.push(IRewardDistributor(msg.sender));
-        
+
         emit AddReward(_tokenAddr, IRewardDistributor(msg.sender), block.timestamp);
     }
 
@@ -105,14 +105,17 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         int256 rewardIndex = findRewardDistributor(distributors, _distributor);
         if (rewardIndex == -1) return;
 
-        distributors[uint(rewardIndex)] = distributors[size - 1];
+        distributors[uint256(rewardIndex)] = distributors[size - 1];
         // used pop instead of delete because pop reduces array length
         distributors.pop();
 
         emit RemoveReward(_tokenAddr, _distributor, block.timestamp);
     }
 
-    function findRewardDistributor(IRewardDistributor[] memory distributors, IRewardDistributor _distributor) internal pure returns (int256 index) {
+    function findRewardDistributor(
+        IRewardDistributor[] memory distributors,
+        IRewardDistributor _distributor
+    ) internal pure returns (int256 index) {
         index = -1;
         uint256 size = distributors.length;
         for (uint256 i = 0; i < size; i++) {

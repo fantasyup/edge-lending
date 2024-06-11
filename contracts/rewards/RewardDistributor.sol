@@ -75,6 +75,13 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
     uint256 private constant SHARE_SCALE = 1e12;
 
+    /// @dev grace period for user to claim rewards after endTimestamp
+    uint256 private constant WITHDRAW_GRACE_PERIOD = 30 days;
+
+    /// @dev period after end timestamp which unclaimed rewards can
+    /// be withdrawn by the guardian
+    uint256 private constant UNCLAIMED_WITHDRAW_PERIOD = 90 days;
+
     event Withdraw(
         address indexed distributor,
         address indexed user,
@@ -98,6 +105,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     );
 
     event AccumulateReward(address indexed receiptToken, uint256 indexed pid, address user);
+
     event WithdrawUnclaimedReward(address indexed distributor, uint256 amount, uint256 timestamp);
 
     modifier onlyGuardian {
@@ -320,12 +328,9 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
     /// @dev withdraw unclaimed rewards after 60 days of end of distribution period
     function withdrawUnclaimedRewards(address _to) external onlyGuardian {
-        require(
-            block.timestamp > endTimestamp + 60 days,
-            "NOT_EXPIRED"
-        );
+        require(block.timestamp > endTimestamp + 60 days, "NOT_EXPIRED");
         uint256 amount = rewardToken.balanceOf(address(this));
-        rewardToken.transfer(_to,amount);
+        rewardToken.transfer(_to, amount);
 
         emit WithdrawUnclaimedReward(address(this), amount, block.timestamp);
     }
@@ -344,15 +349,21 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         poolId = tokenPoolIDPair[address(_receiptTokenAddr)] - 1;
     }
 
-    function calculatePendingReward(PoolInfo memory _pool, UserInfo memory _user) internal pure returns(uint256 pendingReward) {
-        pendingReward = ((_user.amount * _pool.accRewardTokenPerShare) / SHARE_SCALE) - _user.rewardDebt;
+    function calculatePendingReward(PoolInfo memory _pool, UserInfo memory _user)
+        internal
+        pure
+        returns (uint256 pendingReward)
+    {
+        pendingReward =
+            ((_user.amount * _pool.accRewardTokenPerShare) / SHARE_SCALE) -
+            _user.rewardDebt;
     }
 
     /// @dev accrue rewards for user
     /// @param _pid pool id
     /// @param _user user to update rewards for
     function updateRewards(uint256 _pid, address _user) internal {
-        if (block.timestamp < startTimestamp) return;       
+        if (block.timestamp < startTimestamp) return;
         // update the pool
         updatePool(_pid);
 
@@ -363,10 +374,10 @@ contract RewardDistributor is RewardDistributorStorageV1 {
             uint256 userCurrentBalance = IERC20(pool.receiptTokenAddr).balanceOf(_user);
 
             if (
-                user.amount == 0 && 
-                user.pendingReward == 0 && 
-                user.totalRewardPaid == 0 && 
-                block.timestamp < endTimestamp
+                user.amount == 0 &&
+                user.pendingReward == 0 &&
+                user.totalRewardPaid == 0 &&
+                block.timestamp < endTimestamp + WITHDRAW_GRACE_PERIOD
             ) {
                 user.pendingReward +=
                     ((userCurrentBalance * pool.accRewardTokenPerShare) / SHARE_SCALE) -
@@ -378,7 +389,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
                 user.amount = userCurrentBalance;
                 user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
             }
-            
+
             user.lastUpdateTimestamp = block.timestamp;
         }
     }
