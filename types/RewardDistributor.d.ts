@@ -197,14 +197,16 @@ interface RewardDistributorInterface extends ethers.utils.Interface {
 
   events: {
     "AccumulateReward(address,uint256,address)": EventFragment;
+    "ActivateReward(address,uint256)": EventFragment;
     "AddDistribution(address,address,tuple,uint256)": EventFragment;
     "Initialized(address,uint256,uint256,uint256,address,uint256)": EventFragment;
-    "UpdateDistribution(uint256,uint256,uint256,uint256)": EventFragment;
+    "UpdateDistribution(uint256,uint256,uint256)": EventFragment;
     "Withdraw(address,address,uint256,address,uint256)": EventFragment;
     "WithdrawUnclaimedReward(address,uint256,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AccumulateReward"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ActivateReward"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AddDistribution"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateDistribution"): EventFragment;
@@ -948,6 +950,14 @@ export class RewardDistributor extends Contract {
       { receiptToken: string; pid: BigNumber; user: string }
     >;
 
+    ActivateReward(
+      distributor: string | null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { distributor: string; timestamp: BigNumber }
+    >;
+
     AddDistribution(
       lendingPair: string | null,
       distributor: string | null,
@@ -997,17 +1007,11 @@ export class RewardDistributor extends Contract {
 
     UpdateDistribution(
       pid: BigNumberish | null,
-      oldAllocPoint: null,
       newAllocPoint: null,
       timestamp: null
     ): TypedEventFilter<
-      [BigNumber, BigNumber, BigNumber, BigNumber],
-      {
-        pid: BigNumber;
-        oldAllocPoint: BigNumber;
-        newAllocPoint: BigNumber;
-        timestamp: BigNumber;
-      }
+      [BigNumber, BigNumber, BigNumber],
+      { pid: BigNumber; newAllocPoint: BigNumber; timestamp: BigNumber }
     >;
 
     Withdraw(

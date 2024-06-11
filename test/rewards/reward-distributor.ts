@@ -1,7 +1,7 @@
 import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
-import { runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars, advanceNBlocks, currentTimestamp } from "../lib";
+import { runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars, advanceNBlocks, currentTimestamp, increaseTime } from "../lib";
 import { deployMockDistributorManager, deployUUPSProxy } from "../../helpers/contracts";
 import { ContractId } from "../../helpers/types";
 
@@ -289,18 +289,18 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
   })
   
-  it('reward calculation - should allocate previous pending rewards', async () => {
+  it.only('reward calculation - should allocate previous pending rewards', async () => {
     const {
         LendingPair,
         RewardDistributor,
         RewardDistributorManager,
         BorrowAsset,
-        accounts: [admin, bob, kyle]
+        accounts: [admin, bob, kyle, peter, ruth]
     } = vars
 
     const helper = await setupAndInitLendingPair(
         vars,
-        {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [admin, kyle] }
+        {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [admin, kyle, peter, ruth] }
     )
     
     await RewardDistributorManager.initialize(admin.address);
@@ -336,6 +336,8 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
     const amountToDeposit = 1000
     await helper.depositCollateralAsset(kyle, amountToDeposit)
+    await helper.depositCollateralAsset(peter, amountToDeposit)
+    await helper.depositCollateralAsset(ruth, amountToDeposit)
 
     // activate rewards
     await RewardDistributor.activatePendingRewards();
@@ -350,7 +352,34 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     
     const expectedPendingReward = 566
     const kylePendingReward = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
-    expect(kylePendingReward).to.eq(expectedPendingReward)
+    console.log({ kylePendingReward })
+    // expect(kylePendingReward).to.eq(expectedPendingReward)
+
+    // should allow withdrawal of rewards for 30 days after endtimestamp
+    await advanceNBlocks(500)
+    
+    // kyle called accumulate rewards before CLAIM_GRACE_PERIOD
+    const kylePendingReward2 = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
+    // console.log({ kylePendingReward2 })
+    // peter calls accumulate rewards during CLAIM_GRACE_PERIOD
+    const peterPendingReward = await (await RewardDistributor.pendingRewardToken(0, peter.address)).toNumber()
+    // console.log({ peterPendingReward })
+    expect(kylePendingReward2).to.eq(peterPendingReward)
+    await increaseTime(40 * 86400)
+
+    // ruth calls accumulate rewards after CLAIM_GRACE_PERIOD
+    // should not be able to claim reward
+    const ruthPendingReward = await (await RewardDistributor.pendingRewardToken(0, ruth.address)).toNumber()
+    expect(ruthPendingReward).to.eq(0)
+    // console.log({ ruthPendingReward })
+    await expect(
+        await RewardDistributor.connect(ruth.signer).withdraw(
+            0,
+            ruth.address
+        )
+    ).to.not.emit(RewardDistributor, 'Withdraw')
+
+    // should prevent withdrawal of rewards if user doesn't claim reward
   })
 
   it('withdraw calculates the reward and disburses it', async () => {

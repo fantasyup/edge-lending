@@ -8,7 +8,7 @@ import "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IRewardDistributorManager.sol";
 import "hardhat/console.sol";
 
-abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable {
+abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable, IRewardDistributorManager {
     /// @dev admin
     address public owner;
 
@@ -22,7 +22,7 @@ abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable {
     mapping(address => IRewardDistributor[]) public tokenRewardToDistributors;
 }
 
-contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardDistributorManager {
+contract RewardDistributorManager is RewardDistirbutorManagerStorageV1 {
     modifier onlyOwner {
         require(owner == msg.sender, "ONLY_OWNER");
         _;

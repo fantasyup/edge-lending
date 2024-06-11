@@ -77,6 +77,11 @@ export async function advanceNBlocks(n: number) {
     }
 }
 
+export async function increaseTime(duration: number) {
+    await ethers.provider.send("evm_increaseTime", [duration]);
+    await ethers.provider.send('evm_mine', [])
+}
+
 export interface IAccount {
     address: EthereumAddress,
     signer: Signer,
