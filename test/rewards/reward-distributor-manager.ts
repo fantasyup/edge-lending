@@ -76,7 +76,7 @@ runTestSuite("RewardDistributorManager", (vars: TestVars) => {
         await RewardDistributorManager.initialize(admin.address);
         
         const distributors = [bob, kyle, peter];
-        
+
         await Promise.all(distributors.map(async(user) => {
             await RewardDistributorManager.setDistributorStatus(user.address, true)
             await RewardDistributorManager.connect(user.signer).activateReward(admin.address)
@@ -95,6 +95,13 @@ runTestSuite("RewardDistributorManager", (vars: TestVars) => {
         await expect(
             RewardDistributorManager.tokenRewardToDistributors(admin.address, 2)
         ).to.be.reverted
+        // check to ensure the bob was removed
+        expect(
+            await RewardDistributorManager.tokenRewardToDistributors(admin.address, 0)
+        ).to.eq(peter.address)
+        expect(
+            await RewardDistributorManager.tokenRewardToDistributors(admin.address, 1)
+        ).to.eq(kyle.address)
         
     })
 

@@ -273,7 +273,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         view
         returns (uint256 accRewardTokenPerShare)
     {
-        if (pool.lastUpdateTimestamp > endTimestamp) {
+        if (pool.lastUpdateTimestamp >= endTimestamp) {
             return pool.accRewardTokenPerShare;
         }
 

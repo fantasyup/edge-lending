@@ -5,6 +5,8 @@ import { runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInit
 import { deployMockDistributorManager, deployUUPSProxy } from "../../helpers/contracts";
 import { ContractId } from "../../helpers/types";
 
+const ONE_DAY_IN_SECONDS = 86400
+
 runTestSuite("RewardDistributor", (vars: TestVars) => {
   it('initialize', async () => {
       const {
@@ -289,7 +291,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
   })
   
-  it.only('reward calculation - should allocate previous pending rewards', async () => {
+  it('reward calculation - should allocate previous pending rewards', async () => {
     const {
         LendingPair,
         RewardDistributor,
@@ -365,7 +367,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     const peterPendingReward = await (await RewardDistributor.pendingRewardToken(0, peter.address)).toNumber()
     // console.log({ peterPendingReward })
     expect(kylePendingReward2).to.eq(peterPendingReward)
-    await increaseTime(40 * 86400)
+    await increaseTime(40 * ONE_DAY_IN_SECONDS)
 
     // ruth calls accumulate rewards after CLAIM_GRACE_PERIOD
     // should not be able to claim reward
