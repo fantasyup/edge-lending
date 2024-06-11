@@ -278,11 +278,6 @@ const _abi = [
       },
       {
         internalType: "uint256",
-        name: "totalRewardPaid",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
         name: "lastUpdateTimestamp",
         type: "uint256",
       },

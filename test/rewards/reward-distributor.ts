@@ -291,7 +291,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
   })
   
-  it('reward calculation - should allocate previous pending rewards', async () => {
+  it('withdrawUnclaimedRewards & reward calculation - should allocate previous pending rewards', async () => {
     const {
         LendingPair,
         RewardDistributor,
@@ -373,7 +373,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     // should not be able to claim reward
     const ruthPendingReward = await (await RewardDistributor.pendingRewardToken(0, ruth.address)).toNumber()
     expect(ruthPendingReward).to.eq(0)
-    // console.log({ ruthPendingReward })
+    // should prevent withdrawal of rewards if user doesn't claim reward
     await expect(
         await RewardDistributor.connect(ruth.signer).withdraw(
             0,
@@ -381,7 +381,17 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         )
     ).to.not.emit(RewardDistributor, 'Withdraw')
 
-    // should prevent withdrawal of rewards if user doesn't claim reward
+    await expect(
+        RewardDistributor.withdrawUnclaimedRewards(admin.address)
+    ).to.be.revertedWith("REWARD_PERIOD_ACTIVE")
+
+    await increaseTime(60 * ONE_DAY_IN_SECONDS)
+
+    // withdraw grace period expired
+    await expect(
+        await RewardDistributor.withdrawUnclaimedRewards(admin.address)
+    ).to.emit(RewardDistributor, 'WithdrawUnclaimedReward')
+
   })
 
   it('withdraw calculates the reward and disburses it', async () => {
@@ -443,12 +453,13 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         kyle.address
     )
 
-    const expectedPendingReward = 566
-    const balance = await (await BorrowAsset.balanceOf(kyle.address)).toNumber();
-    expect(balance).to.eq(expectedPendingReward)
+    const expectedPendingRewardPaid = 566
 
-    const paidOut = (await RewardDistributor.userInfo(0, kyle.address)).totalRewardPaid.toNumber()
-    expect(paidOut).to.eq(expectedPendingReward)
+    const balance = await (await BorrowAsset.balanceOf(kyle.address)).toNumber();
+    expect(balance).to.eq(expectedPendingRewardPaid)
+
+    const paidOut = (await RewardDistributor.userInfo(0, kyle.address)).rewardDebt.toNumber()
+    expect(paidOut).to.eq(expectedPendingRewardPaid)
 
   })
 

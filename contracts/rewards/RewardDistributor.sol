@@ -33,7 +33,6 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
         uint256 amount; // the balance of the user
         uint256 pendingReward; // pending user reward to be withdrawn
         uint256 rewardDebt; // Reward debt
-        uint256 totalRewardPaid; // total reward user has withdrawn
         uint256 lastUpdateTimestamp; // last time user accumulated rewards
     }
 
@@ -79,7 +78,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     uint256 private constant CLAIM_REWARD_GRACE_PERIOD = 30 days;
 
     /// @dev period for users to withdraw rewards before it can be
-    /// re-claimed by the guardian
+    /// re-claimed by the guardian to prevent funds being locked in contract
     uint256 private constant WITHDRAW_REWARD_GRACE_PERIOD = 90 days;
 
     event Withdraw(
@@ -160,8 +159,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         require(_tokenAddr != address(0), "INVALID_ADDR");
         uint256 pid = getTokenPoolID(_tokenAddr);
 
-        // update pool and distribute user rewards
-        updatePoolAndDistributeRewards(pid, _user);
+        updatePoolAndDistributeUserReward(pid, _user);
 
         emit AccumulateReward(_tokenAddr, pid, _user);
     }
@@ -319,22 +317,22 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
         UserInfo storage user = userInfo[_pid][msg.sender];
 
-        updatePoolAndDistributeRewards(_pid, msg.sender);
+        updatePoolAndDistributeUserReward(_pid, msg.sender);
 
         uint256 amountToWithdraw = user.pendingReward;
+        if (amountToWithdraw == 0) return;
+
         // set pending reward to 0
         user.pendingReward = 0;
-        user.totalRewardPaid += amountToWithdraw;
-
-        if (amountToWithdraw == 0) return;
         safeTokenTransfer(_to, amountToWithdraw);
 
         emit Withdraw(address(this), msg.sender, _pid, _to, amountToWithdraw);
     }
 
     /// @dev withdraw unclaimed rewards after 60 days of end of distribution period
+    /// @param _to address to withdraw to
     function withdrawUnclaimedRewards(address _to) external onlyGuardian {
-        require(block.timestamp > endTimestamp + WITHDRAW_REWARD_GRACE_PERIOD, "REWARD_ACTIVE");
+        require(block.timestamp > endTimestamp + WITHDRAW_REWARD_GRACE_PERIOD, "REWARD_PERIOD_ACTIVE");
         uint256 amount = rewardToken.balanceOf(address(this));
         rewardToken.transfer(_to, amount);
 
@@ -369,7 +367,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         if (
             _userInfo.amount == 0 &&
             _userInfo.pendingReward == 0 &&
-            _userInfo.totalRewardPaid == 0 &&
+            _userInfo.rewardDebt == 0 &&
             block.timestamp < endTimestamp + CLAIM_REWARD_GRACE_PERIOD
         ) {
             amount = _receiptTokenAddr.balanceOf(_user);
@@ -378,10 +376,10 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         pendingReward = ((amount * _accRewardTokenPerShare) / SHARE_SCALE) - _userInfo.rewardDebt;
     }
 
-    /// @dev accrue rewards for user
+    /// @dev update pool and accrue rewards for user
     /// @param _pid pool id
     /// @param _user user to update rewards for
-    function updatePoolAndDistributeRewards(uint256 _pid, address _user) internal {
+    function updatePoolAndDistributeUserReward(uint256 _pid, address _user) internal {
         if (block.timestamp < startTimestamp) return;
 
         // update the pool
