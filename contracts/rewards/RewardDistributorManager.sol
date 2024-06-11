@@ -121,6 +121,7 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1 {
         for (uint256 i = 0; i < size; i++) {
             if (address(distributors[i]) == address(_distributor)) {
                 index = int256(i);
+                break;
             }
         }
     }

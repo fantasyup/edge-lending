@@ -329,7 +329,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         emit Withdraw(address(this), msg.sender, _pid, _to, amountToWithdraw);
     }
 
-    /// @dev withdraw unclaimed rewards after 60 days of end of distribution period
+    /// @dev withdraw unclaimed rewards
     /// @param _to address to withdraw to
     function withdrawUnclaimedRewards(address _to) external onlyGuardian {
         require(block.timestamp > endTimestamp + WITHDRAW_REWARD_GRACE_PERIOD, "REWARD_PERIOD_ACTIVE");
