@@ -36,6 +36,9 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
         uint256 lastUpdateTimestamp; // last time user accumulated rewards
     }
 
+    /// @notice reward distributor name
+    string public name;
+
     /// @notice reward token to be distributed to users
     IERC20 public rewardToken;
 
@@ -59,7 +62,7 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
     uint256 public startTimestamp;
 
     /// @notice end timestamp for distribution to end
-    uint256 public endTimestamp;
+    uint256 public override endTimestamp;
 
     /// @notice responsible for updating reward distribution
     address public guardian;
@@ -69,6 +72,7 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
 }
 
 contract RewardDistributor is RewardDistributorStorageV1 {
+
     /// @notice manager
     IRewardDistributorManager public immutable rewardDistributorManager;
 
@@ -123,6 +127,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @param _endTimestamp time to end distributing
     /// @param _guardian distributor guardian
     function initialize(
+        string calldata _name,
         IERC20 _rewardToken,
         uint256 _amountDistributePerSecond,
         uint256 _startTimestamp,
@@ -136,6 +141,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         require(_endTimestamp > 0, "INVALID_TIMESTAMP_2");
         require(_endTimestamp > _startTimestamp, "INVALID_TIMESTAMP_3");
 
+        name =  _name;
         rewardToken = _rewardToken;
         rewardAmountDistributePerSecond = _amountDistributePerSecond;
         startTimestamp = _startTimestamp;
@@ -168,6 +174,12 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         uint128 collateralTokenAllocPoint;
         uint128 debtTokenAllocPoint;
         uint128 borrowAssetTokenAllocPoint;
+    }
+
+    function addAndActivate(
+
+    ) external {
+
     }
 
     /// @dev Add a distribution param for a lending pair

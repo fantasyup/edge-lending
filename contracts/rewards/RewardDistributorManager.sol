@@ -105,6 +105,11 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1 {
         int256 rewardIndex = findRewardDistributor(distributors, _distributor);
         if (rewardIndex == -1) return;
 
+        require(
+            block.timestamp > distributors[uint256(rewardIndex)].endTimestamp(),
+            "REWARD_STILL_ACTIVE"
+        );
+
         distributors[uint256(rewardIndex)] = distributors[size - 1];
         // used pop instead of delete because pop reduces array length
         distributors.pop();

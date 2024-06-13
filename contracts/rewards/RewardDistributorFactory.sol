@@ -36,6 +36,7 @@ contract RewardDistributorFactory {
     }
 
     function createRewardDistributor(
+        string calldata _name,
         IERC20 _rewardToken,
         uint256 _amountDistributePerSecond,
         uint256 _startTimestamp,
@@ -58,6 +59,7 @@ contract RewardDistributorFactory {
 
         // initialize
         newDistributor.initialize(
+            _name,
             _rewardToken,
             _amountDistributePerSecond,
             _startTimestamp,
