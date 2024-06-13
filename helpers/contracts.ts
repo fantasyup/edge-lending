@@ -18,7 +18,6 @@ import {
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
 import { MockChainlinkUSDAdapter } from "../types/MockChainlinkUSDAdapter";
-import { VaultStorageLayout } from "../types/VaultStorageLayout";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
