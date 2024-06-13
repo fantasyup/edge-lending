@@ -79,7 +79,25 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "endTimestamp",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
       {
         internalType: "contract IERC20",
         name: "_rewardToken",

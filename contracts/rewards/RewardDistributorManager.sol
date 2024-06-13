@@ -81,11 +81,6 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1 {
             "DISTRIBUTOR_EXISTS"
         );
 
-        /// Note: it's possible for a distributor contract to spam the addReward
-        /// function by creating minimal rewards. It's required to constantly monitor the AddReward
-        /// event offchain to ensure that the addReward function is not being spammed
-        /// by a partner. We could periodically set an inactive distributor status to
-        /// false
         distributors.push(IRewardDistributor(msg.sender));
 
         emit AddReward(_tokenAddr, IRewardDistributor(msg.sender), block.timestamp);
@@ -104,11 +99,6 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1 {
 
         int256 rewardIndex = findRewardDistributor(distributors, _distributor);
         if (rewardIndex == -1) return;
-
-        require(
-            block.timestamp > distributors[uint256(rewardIndex)].endTimestamp(),
-            "REWARD_STILL_ACTIVE"
-        );
 
         distributors[uint256(rewardIndex)] = distributors[size - 1];
         // used pop instead of delete because pop reduces array length

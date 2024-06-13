@@ -39,6 +39,9 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
     /// @notice reward distributor name
     string public name;
 
+    /// @dev bool to check if rewarddistributor is activate
+    bool public activated;
+
     /// @notice reward token to be distributed to users
     IERC20 public rewardToken;
 
@@ -72,7 +75,6 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
 }
 
 contract RewardDistributor is RewardDistributorStorageV1 {
-
     /// @notice manager
     IRewardDistributorManager public immutable rewardDistributorManager;
 
@@ -108,6 +110,8 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
     event ActivateReward(address indexed distributor, uint256 timestamp);
 
+    event UpdateEndTimestamp(address indexed distributor, uint256 newTimestamp, uint256 timestamp);
+
     modifier onlyGuardian {
         require(msg.sender == guardian, "ONLY_GUARDIAN");
         _;
@@ -118,6 +122,17 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     constructor(address _rewardDistributorManager) {
         require(_rewardDistributorManager != address(0), "INVALID_MANAGER");
         rewardDistributorManager = IRewardDistributorManager(_rewardDistributorManager);
+    }
+
+    /// @dev accumulates reward for a depositor
+    /// @param _tokenAddr token to reward
+    /// @param _user user to accumulate reward for
+    function accumulateReward(address _tokenAddr, address _user) external override {
+        require(_tokenAddr != address(0), "INVALID_ADDR");
+        uint256 pid = getTokenPoolID(_tokenAddr);
+
+        updatePoolAndDistributeUserReward(pid, _user);
+        emit AccumulateReward(_tokenAddr, pid, _user);
     }
 
     /// @dev intialize
@@ -141,7 +156,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         require(_endTimestamp > 0, "INVALID_TIMESTAMP_2");
         require(_endTimestamp > _startTimestamp, "INVALID_TIMESTAMP_3");
 
-        name =  _name;
+        name = _name;
         rewardToken = _rewardToken;
         rewardAmountDistributePerSecond = _amountDistributePerSecond;
         startTimestamp = _startTimestamp;
@@ -158,67 +173,44 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         );
     }
 
-    /// @dev accumulates reward for a depositor
-    /// @param _tokenAddr token to reward
-    /// @param _user user to accumulate reward for
-    function accumulateReward(address _tokenAddr, address _user) external override {
-        require(_tokenAddr != address(0), "INVALID_ADDR");
-        uint256 pid = getTokenPoolID(_tokenAddr);
-
-        updatePoolAndDistributeUserReward(pid, _user);
-
-        emit AccumulateReward(_tokenAddr, pid, _user);
-    }
-
     struct DistributorConfigVars {
         uint128 collateralTokenAllocPoint;
         uint128 debtTokenAllocPoint;
         uint128 borrowAssetTokenAllocPoint;
     }
 
-    function addAndActivate(
-
-    ) external {
-
-    }
-
     /// @dev Add a distribution param for a lending pair
     /// @param _allocPoints specifies the allocation points
     /// @param _lendingPair the lending pair being added
-    /// @param _withUpdate update existing pools
     function add(
         DistributorConfigVars calldata _allocPoints,
-        IBSLendingPair _lendingPair,
-        bool _withUpdate
-    ) external onlyGuardian {
-        if (_withUpdate) {
-            massUpdatePools();
-        }
+        IBSLendingPair _lendingPair
+    )
+        external
+        onlyGuardian
+    {
+        uint256 _startTimestamp = startTimestamp;
 
-        uint256 lastUpdateTimestamp =
-            block.timestamp > startTimestamp ? block.timestamp : startTimestamp;
+        // guardian can not add more once distribution starts
+        require(block.timestamp < _startTimestamp, "DISTRIBUTION_STARTED");
 
         if (_allocPoints.collateralTokenAllocPoint > 0) {
             createPool(
                 _allocPoints.collateralTokenAllocPoint,
                 _lendingPair.wrappedCollateralAsset(),
-                lastUpdateTimestamp
+                _startTimestamp
             );
         }
 
         if (_allocPoints.debtTokenAllocPoint > 0) {
-            createPool(
-                _allocPoints.debtTokenAllocPoint,
-                _lendingPair.debtToken(),
-                lastUpdateTimestamp
-            );
+            createPool(_allocPoints.debtTokenAllocPoint, _lendingPair.debtToken(), _startTimestamp);
         }
 
         if (_allocPoints.borrowAssetTokenAllocPoint > 0) {
             createPool(
                 _allocPoints.borrowAssetTokenAllocPoint,
                 _lendingPair.wrapperBorrowedAsset(),
-                lastUpdateTimestamp
+                _startTimestamp
             );
         }
 
@@ -233,6 +225,9 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
         // reset storage
         delete pendingRewardActivation;
+
+        // set activated to true
+        if(!activated) activated = true;
 
         emit ActivateReward(address(this), block.timestamp);
     }
@@ -269,12 +264,8 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         }
 
         return
-            calculatePendingReward(
-                pool.receiptTokenAddr,
-                accRewardTokenPerShare,
-                user,
-                _user
-            ) + user.pendingReward;
+            calculatePendingReward(pool.receiptTokenAddr, accRewardTokenPerShare, user, _user) +
+            user.pendingReward;
     }
 
     /// @dev return accumulated reward share for the pool
@@ -324,7 +315,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @dev user to withdraw accumulated rewards from a pool
     /// @param _pid pool id
     /// @param _to address to transfer rewards to
-    function withdraw(uint256 _pid, address _to) public {
+    function withdraw(uint256 _pid, address _to) external {
         require(_to != address(0), "INVALID_TO");
 
         UserInfo storage user = userInfo[_pid][msg.sender];
@@ -341,10 +332,22 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         emit Withdraw(address(this), msg.sender, _pid, _to, amountToWithdraw);
     }
 
+    /// @dev update the end timestamp
+    /// @param _newEndTimestamp new end timestamp
+    function updateEndTimestamp(uint256 _newEndTimestamp) external onlyGuardian {
+        require(block.timestamp < endTimestamp && _newEndTimestamp > endTimestamp, "INVALID_TIMESTAMP");
+        endTimestamp = _newEndTimestamp;
+
+        emit UpdateEndTimestamp(address(this), _newEndTimestamp, block.timestamp);
+    }
+
     /// @dev withdraw unclaimed rewards
     /// @param _to address to withdraw to
     function withdrawUnclaimedRewards(address _to) external onlyGuardian {
-        require(block.timestamp > endTimestamp + WITHDRAW_REWARD_GRACE_PERIOD, "REWARD_PERIOD_ACTIVE");
+        require(
+            block.timestamp > endTimestamp + WITHDRAW_REWARD_GRACE_PERIOD,
+            "REWARD_PERIOD_ACTIVE"
+        );
         uint256 amount = rewardToken.balanceOf(address(this));
         rewardToken.transfer(_to, amount);
 
@@ -371,7 +374,6 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         UserInfo memory _userInfo,
         address _user
     ) internal view returns (uint256 pendingReward) {
-
         if (_userInfo.lastUpdateTimestamp > endTimestamp) return 0;
 
         uint256 amount = _userInfo.amount;
@@ -392,7 +394,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @param _pid pool id
     /// @param _user user to update rewards for
     function updatePoolAndDistributeUserReward(uint256 _pid, address _user) internal {
-        if (block.timestamp < startTimestamp) return;
+        if (activated == false || block.timestamp < startTimestamp) return;
 
         // update the pool
         updatePool(_pid);

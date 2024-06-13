@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface RewardDistributorFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createRewardDistributor(address,uint256,uint256,uint256,address)": FunctionFragment;
+    "createRewardDistributor(string,address,uint256,uint256,uint256,address)": FunctionFragment;
     "distributorImplementation()": FunctionFragment;
     "owner()": FunctionFragment;
     "rewardDistributors(uint256)": FunctionFragment;
@@ -30,7 +30,7 @@ interface RewardDistributorFactoryInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "createRewardDistributor",
-    values: [string, BigNumberish, BigNumberish, BigNumberish, string]
+    values: [string, string, BigNumberish, BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "distributorImplementation",
@@ -118,6 +118,7 @@ export class RewardDistributorFactory extends Contract {
 
   functions: {
     createRewardDistributor(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
@@ -126,7 +127,8 @@ export class RewardDistributorFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createRewardDistributor(address,uint256,uint256,uint256,address)"(
+    "createRewardDistributor(string,address,uint256,uint256,uint256,address)"(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
@@ -165,6 +167,7 @@ export class RewardDistributorFactory extends Contract {
   };
 
   createRewardDistributor(
+    _name: string,
     _rewardToken: string,
     _amountDistributePerSecond: BigNumberish,
     _startTimestamp: BigNumberish,
@@ -173,7 +176,8 @@ export class RewardDistributorFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createRewardDistributor(address,uint256,uint256,uint256,address)"(
+  "createRewardDistributor(string,address,uint256,uint256,uint256,address)"(
+    _name: string,
     _rewardToken: string,
     _amountDistributePerSecond: BigNumberish,
     _startTimestamp: BigNumberish,
@@ -212,6 +216,7 @@ export class RewardDistributorFactory extends Contract {
 
   callStatic: {
     createRewardDistributor(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
@@ -220,7 +225,8 @@ export class RewardDistributorFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "createRewardDistributor(address,uint256,uint256,uint256,address)"(
+    "createRewardDistributor(string,address,uint256,uint256,uint256,address)"(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
@@ -278,6 +284,7 @@ export class RewardDistributorFactory extends Contract {
 
   estimateGas: {
     createRewardDistributor(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
@@ -286,7 +293,8 @@ export class RewardDistributorFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createRewardDistributor(address,uint256,uint256,uint256,address)"(
+    "createRewardDistributor(string,address,uint256,uint256,uint256,address)"(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
@@ -328,6 +336,7 @@ export class RewardDistributorFactory extends Contract {
 
   populateTransaction: {
     createRewardDistributor(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
@@ -336,7 +345,8 @@ export class RewardDistributorFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createRewardDistributor(address,uint256,uint256,uint256,address)"(
+    "createRewardDistributor(string,address,uint256,uint256,uint256,address)"(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,

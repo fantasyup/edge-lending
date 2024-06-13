@@ -35,10 +35,11 @@ runTestSuite("RewardDistributorFactory", (vars: TestVars) => {
             accounts: [admin, bob]
         } = vars
         
-        const startTimestamp = currentTimestamp();
+        const startTimestamp = await currentTimestamp();
         const endTimestamp = startTimestamp + 600;
 
         const tx = await(await RewardDistributorFactory.createRewardDistributor(
+            "uniswap",
             BorrowAsset.address,
             10,
             startTimestamp,

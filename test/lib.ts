@@ -493,6 +493,7 @@ export const defaultLendingPairInitVars = {
     liquidationFee,
 }
 
-export function currentTimestamp() {
-    return Math.floor(Date.now() / 1000)
+export async function currentTimestamp() {
+    const block = await (ethers.getDefaultProvider()).getBlock('latest')
+    return block.timestamp
 }

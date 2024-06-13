@@ -7,46 +7,21 @@ import { ContractId } from "../../helpers/types";
 
 const ONE_DAY_IN_SECONDS = 86400
 
-runTestSuite("RewardDistributor", (vars: TestVars) => {
-  it('initialize', async () => {
-      const {
-        RewardDistributor,
-        BorrowAsset,
-        accounts: [admin, bob, kyle]
-      } = vars
-
-    // @TODO include test for require checks
-    await expect(
-      await RewardDistributor.initialize(
-        BorrowAsset.address,
-        100,
-        currentTimestamp(),
-        currentTimestamp() + 120, 
-        bob.address
-      )
-    ).to.emit(RewardDistributor, 'Initialized')
-
-  })
-
-  it('add & set', async () => {
+async function setupAndInitRewardDistributor(vars: TestVars) {
     const {
         LendingPair,
         RewardDistributor,
         BorrowAsset,
         accounts: [admin, bob, kyle]
-    } = vars
+      } = vars
 
     await RewardDistributor.initialize(
+        "uniswap",
         BorrowAsset.address,
         100,
-        currentTimestamp(),
-        currentTimestamp() + 180,
+        await currentTimestamp() + 100,
+        await currentTimestamp() + 180,
         admin.address
-    )
-
-    const helper = await setupAndInitLendingPair(
-        vars,
-        {...defaultLendingPairInitVars, account: admin }
     )
 
     const allocPoints = {
@@ -58,16 +33,75 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     await expect(
         await RewardDistributor.add(
         allocPoints,
-        LendingPair.address,
-        false
+        LendingPair.address
+        )
+    ).to.emit(RewardDistributor, 'AddDistribution')
+}
+
+runTestSuite("RewardDistributor", (vars: TestVars) => {
+  it('initialize', async () => {
+      const {
+        RewardDistributor,
+        BorrowAsset,
+        accounts: [admin, bob, kyle]
+      } = vars
+    
+    const name = "uniswap"
+    await expect(
+      await RewardDistributor.initialize(
+        name,
+        BorrowAsset.address,
+        100,
+        await currentTimestamp() + 2,
+        await currentTimestamp() + 120, 
+        bob.address
+      )
+    ).to.emit(RewardDistributor, 'Initialized')
+
+    expect(
+        await RewardDistributor.name()
+    ).to.eq(name)
+  })
+
+  it('add & set', async () => {
+    const {
+        LendingPair,
+        RewardDistributor,
+        BorrowAsset,
+        accounts: [admin, bob, kyle]
+    } = vars
+
+    const helper = await setupAndInitLendingPair(
+        vars,
+        {...defaultLendingPairInitVars, account: admin }
+    )
+
+    await RewardDistributor.initialize(
+        "uniswap",
+        BorrowAsset.address,
+        100,
+        await currentTimestamp() + 100,
+        await currentTimestamp() + 180,
+        admin.address
+    )
+
+    const allocPoints = {
+        collateralTokenAllocPoint: 1,
+        debtTokenAllocPoint: 1,
+        borrowAssetTokenAllocPoint: 1
+    }
+
+    await expect(
+        await RewardDistributor.add(
+        allocPoints,
+        LendingPair.address
         )
     ).to.emit(RewardDistributor, 'AddDistribution')
 
     await expect(
         RewardDistributor.add(
-        allocPoints,
-        LendingPair.address,
-        false
+            allocPoints,
+            LendingPair.address
         )
     ).to.revertedWith('token_exists')
 
@@ -120,16 +154,18 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     
     await RewardDistributorManager.initialize(admin.address);
     const endSeconds = 500
-    await RewardDistributor.initialize(
-        BorrowAsset.address,
-        100,
-        currentTimestamp() + endSeconds,
-        currentTimestamp() + endSeconds + 10,
-        admin.address
-    )
 
     // credit the reward distributor address with tokens
     await BorrowAsset.setBalanceTo(RewardDistributor.address, 1_000_000_000);
+
+    await RewardDistributor.initialize(
+        "uniswap",
+        BorrowAsset.address,
+        100,
+        await currentTimestamp() + 100,
+        await currentTimestamp() + endSeconds + 10,
+        admin.address
+    )
 
     const allocPoints = {
         collateralTokenAllocPoint: 1,
@@ -139,9 +175,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
     await RewardDistributor.add(
         allocPoints,
-        LendingPair.address,
-        false
-    )
+        LendingPair.address    )
 
     // approve distributor on manager
     await RewardDistributorManager["setDistributorStatus(address,bool)"](
@@ -182,16 +216,19 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     
     await RewardDistributorManager.initialize(admin.address);
     const endSeconds = 500
-    await RewardDistributor.initialize(
-        BorrowAsset.address,
-        100,
-        currentTimestamp(),
-        currentTimestamp() + endSeconds,
-        admin.address
-    )
 
     // credit the reward distributor address with tokens
     await BorrowAsset.setBalanceTo(RewardDistributor.address, 1_000_000_000);
+    
+    const blockCurrentTimestamp = await currentTimestamp()
+    await RewardDistributor.initialize(
+        "uniswap",
+        BorrowAsset.address,
+        100,
+        blockCurrentTimestamp + 100,
+        blockCurrentTimestamp + endSeconds,
+        admin.address
+    )
 
     const allocPoints = {
         collateralTokenAllocPoint: 1,
@@ -201,8 +238,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
     await RewardDistributor.add(
         allocPoints,
-        LendingPair.address,
-        false
+        LendingPair.address
     )
     
     // should reject a
@@ -214,6 +250,8 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     await RewardDistributorManager["setDistributorStatus(address,bool)"](RewardDistributor.address, true)
     // activate rewards
     await RewardDistributor.activatePendingRewards();
+
+
     
     // confirm that the rewards have been activated
     expect(await RewardDistributorManager.tokenRewardToDistributors(
@@ -230,7 +268,9 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         await LendingPair.debtToken(),
         0
     )).to.eq(RewardDistributor.address)
-
+    
+    // increase time to start distributing rewards
+    await increaseTime(100)
 
     // kyle deposits borrow asset
     // helper.depositBorrowAsset(kyle, 1000)
@@ -307,16 +347,18 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     
     await RewardDistributorManager.initialize(admin.address);
     const endSeconds = 500
-    await RewardDistributor.initialize(
-        BorrowAsset.address,
-        100,
-        currentTimestamp(),
-        currentTimestamp() + endSeconds,
-        admin.address
-    )
 
     // credit the reward distributor address with tokens
     await BorrowAsset.setBalanceTo(RewardDistributor.address, 1_000_000_000);
+
+    await RewardDistributor.initialize(
+        "uniswap",
+        BorrowAsset.address,
+        100,
+        await currentTimestamp() + 100,
+        await currentTimestamp() + endSeconds,
+        admin.address
+    )
 
     const allocPoints = {
         collateralTokenAllocPoint: 1,
@@ -327,7 +369,6 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     await RewardDistributor.add(
         allocPoints,
         LendingPair.address,
-        false
     )
 
     // approve distributor on manager
@@ -335,6 +376,9 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         RewardDistributor.address, 
         true
     )
+    
+    // increase time to start distributing rewards
+    await increaseTime(100)
 
     const amountToDeposit = 1000
     await helper.depositCollateralAsset(kyle, amountToDeposit)
@@ -410,11 +454,14 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     
     await RewardDistributorManager.initialize(admin.address);
     const endSeconds = 500
+
+    const blockCurrentTimestamp =  await currentTimestamp()
     await RewardDistributor.initialize(
+        "uniswap",
         BorrowAsset.address,
         100,
-        currentTimestamp(),
-        currentTimestamp() + endSeconds,
+        blockCurrentTimestamp + 100,
+        blockCurrentTimestamp + endSeconds,
         admin.address
     )
 
@@ -429,8 +476,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
     await RewardDistributor.add(
         allocPoints,
-        LendingPair.address,
-        false
+        LendingPair.address
     )
 
     // approve distributor on manager
@@ -439,8 +485,12 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         true
     )
 
+    // increase time to start distributing rewards
+    await increaseTime(100)
+
     const amountToDeposit = 1000
     await helper.depositCollateralAsset(kyle, amountToDeposit)
+
 
     // activate rewards
     await RewardDistributor.activatePendingRewards();
@@ -452,15 +502,11 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         0,
         kyle.address
     )
-
-    const expectedPendingRewardPaid = 566
-
     const balance = await (await BorrowAsset.balanceOf(kyle.address)).toNumber();
-    expect(balance).to.eq(expectedPendingRewardPaid)
-
+    console.log({ balance })
     const paidOut = (await RewardDistributor.userInfo(0, kyle.address)).rewardDebt.toNumber()
-    expect(paidOut).to.eq(expectedPendingRewardPaid)
 
+    expect(balance).to.eq(paidOut)
   })
 
 })

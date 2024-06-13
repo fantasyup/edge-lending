@@ -84,6 +84,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "activated",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "endTimestamp",
     outputs: [
       {
@@ -110,6 +123,11 @@ const _abi = [
   },
   {
     inputs: [
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
       {
         internalType: "contract IERC20",
         name: "_rewardToken",
@@ -139,6 +157,19 @@ const _abi = [
     name: "initialize",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "name",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
