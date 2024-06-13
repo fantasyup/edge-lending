@@ -25,7 +25,7 @@ export enum ContractId {
     RewardDistributor = 'RewardDistributor',
     RewardDistributorFactory = 'RewardDistributorFactory',
     MockDistributorManager = 'MockRewardDistributorManager',
-    FeeWithdrawal = 'FeeWithdrawal'
+    FeeWithdrawal = 'FeeWithdrawal',
 }
 
 export enum LendingPairEdgeActions {

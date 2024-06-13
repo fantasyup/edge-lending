@@ -13,7 +13,8 @@ import {
     MockLendingPair,
     MockPriceOracle,
     MockToken,
-    MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken 
+    MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken,
+    FeeWithdrawal
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
@@ -132,6 +133,13 @@ export const getRewardDistributorManagerDeployment = async(): Promise<RewardDist
         ContractId.RewardDistributorManager,
         (await deployments.get(ContractId.RewardDistributorManager)).address
     )) as RewardDistributorManager
+}
+
+export const getFeeWithdrawalDeployment = async(): Promise<FeeWithdrawal> => {
+    return (await ethers.getContractAt(
+        ContractId.FeeWithdrawal,
+        (await deployments.get(ContractId.FeeWithdrawal)).address
+    )) as FeeWithdrawal
 }
 
 export const deployMockToken = async(decimals ?: number) => {

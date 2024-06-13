@@ -20,6 +20,7 @@ import {
     Vault,
     VaultFactory,
     WrapperToken,
+    FeeWithdrawal,
 } from "../types";
 import { 
   deployMockPriceOracle,
@@ -39,7 +40,8 @@ import {
   deployMockDistributorManager,
   getRewardDistributorDeployment,
   getRewardDistributorFactoryDeployment,
-  getRewardDistributorManagerDeployment
+  getRewardDistributorManagerDeployment,
+  getFeeWithdrawalDeployment
 } from "../helpers/contracts";
 import { EthereumAddress } from "../helpers/types";
 import { 
@@ -67,7 +69,8 @@ export async function makeLendingPairTestSuiteVars(
         VaultFactory: await getVaultFactoryDeployment(),
         RewardDistributor: await getRewardDistributorDeployment(),
         RewardDistributorFactory: await getRewardDistributorFactoryDeployment(),
-        RewardDistributorManager: await getRewardDistributorManagerDeployment()
+        RewardDistributorManager: await getRewardDistributorManagerDeployment(),
+        FeeWithdrawal: await getFeeWithdrawalDeployment(),
     }
 }
 
@@ -110,6 +113,7 @@ export interface TestVars {
     RewardDistributor: RewardDistributor,
     RewardDistributorManager: RewardDistributorManager,
     RewardDistributorFactory: RewardDistributorFactory,
+    FeeWithdrawal: FeeWithdrawal,
 }
 
 const testVars: TestVars = {
@@ -135,6 +139,7 @@ const testVars: TestVars = {
     RewardDistributor: {} as RewardDistributor,
     RewardDistributorManager: {} as RewardDistributorManager,
     RewardDistributorFactory: {} as RewardDistributorFactory,
+    FeeWithdrawal: {} as FeeWithdrawal,
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {

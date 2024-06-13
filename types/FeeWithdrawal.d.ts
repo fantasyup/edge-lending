@@ -24,14 +24,15 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
     "VERSION()": FunctionFragment;
     "WETH()": FunctionFragment;
     "admin()": FunctionFragment;
-    "owner()": FunctionFragment;
+    "getCodeAddress()": FunctionFragment;
+    "initialize(address)": FunctionFragment;
+    "proxiableUUID()": FunctionFragment;
     "receiver()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
     "rescueFunds(address)": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
     "transferToReceiver()": FunctionFragment;
     "uniswapRouter()": FunctionFragment;
     "updateAdmin(address)": FunctionFragment;
+    "updateCode(address)": FunctionFragment;
     "vault()": FunctionFragment;
     "edgeToken()": FunctionFragment;
     "withdrawFeesAndSwap(address[],uint256[],bool)": FunctionFragment;
@@ -40,17 +41,17 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
   encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
   encodeFunctionData(functionFragment: "admin", values?: undefined): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "receiver", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
+    functionFragment: "getCodeAddress",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "rescueFunds", values: [string]): string;
+  encodeFunctionData(functionFragment: "initialize", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [string]
+    functionFragment: "proxiableUUID",
+    values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "receiver", values?: undefined): string;
+  encodeFunctionData(functionFragment: "rescueFunds", values: [string]): string;
   encodeFunctionData(
     functionFragment: "transferToReceiver",
     values?: undefined
@@ -60,6 +61,7 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "updateAdmin", values: [string]): string;
+  encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
   encodeFunctionData(functionFragment: "vault", values?: undefined): string;
   encodeFunctionData(functionFragment: "edgeToken", values?: undefined): string;
   encodeFunctionData(
@@ -70,18 +72,18 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getCodeAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "proxiableUUID",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "receiver", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "rescueFunds",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -96,6 +98,7 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
     functionFragment: "updateAdmin",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "edgeToken", data: BytesLike): Result;
   decodeFunctionResult(
@@ -104,18 +107,18 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
+    "CodeUpdated(bytes32,address)": EventFragment;
     "LogRescueFunds(address,uint256,uint256)": EventFragment;
     "LogTransferToReceiver(address,uint256,uint256)": EventFragment;
     "LogUpdateAdmin(address,uint256)": EventFragment;
     "LogWithdrawFees(uint256,uint256)": EventFragment;
-    "OwnershipTransferred(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogRescueFunds"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogTransferToReceiver"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogUpdateAdmin"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogWithdrawFees"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
 
 export class FeeWithdrawal extends Contract {
@@ -174,21 +177,31 @@ export class FeeWithdrawal extends Contract {
 
     "admin()"(overrides?: CallOverrides): Promise<[string]>;
 
-    owner(overrides?: CallOverrides): Promise<[string]>;
+    getCodeAddress(
+      overrides?: CallOverrides
+    ): Promise<[string] & { codeAddress: string }>;
 
-    "owner()"(overrides?: CallOverrides): Promise<[string]>;
+    "getCodeAddress()"(
+      overrides?: CallOverrides
+    ): Promise<[string] & { codeAddress: string }>;
+
+    initialize(
+      _newAdmin: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "initialize(address)"(
+      _newAdmin: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
 
     receiver(overrides?: CallOverrides): Promise<[string]>;
 
     "receiver()"(overrides?: CallOverrides): Promise<[string]>;
-
-    renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "renounceOwnership()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     rescueFunds(
       _token: string,
@@ -197,16 +210,6 @@ export class FeeWithdrawal extends Contract {
 
     "rescueFunds(address)"(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -229,6 +232,16 @@ export class FeeWithdrawal extends Contract {
 
     "updateAdmin(address)"(
       _newAdmin: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -267,21 +280,27 @@ export class FeeWithdrawal extends Contract {
 
   "admin()"(overrides?: CallOverrides): Promise<string>;
 
-  owner(overrides?: CallOverrides): Promise<string>;
+  getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
-  "owner()"(overrides?: CallOverrides): Promise<string>;
+  "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
+  initialize(
+    _newAdmin: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "initialize(address)"(
+    _newAdmin: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+  "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
   receiver(overrides?: CallOverrides): Promise<string>;
 
   "receiver()"(overrides?: CallOverrides): Promise<string>;
-
-  renounceOwnership(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "renounceOwnership()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   rescueFunds(
     _token: string,
@@ -290,16 +309,6 @@ export class FeeWithdrawal extends Contract {
 
   "rescueFunds(address)"(
     _token: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  transferOwnership(
-    newOwner: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "transferOwnership(address)"(
-    newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -322,6 +331,16 @@ export class FeeWithdrawal extends Contract {
 
   "updateAdmin(address)"(
     _newAdmin: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateCode(
+    newAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updateCode(address)"(
+    newAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -360,32 +379,29 @@ export class FeeWithdrawal extends Contract {
 
     "admin()"(overrides?: CallOverrides): Promise<string>;
 
-    owner(overrides?: CallOverrides): Promise<string>;
+    getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
-    "owner()"(overrides?: CallOverrides): Promise<string>;
+    "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
+    initialize(_newAdmin: string, overrides?: CallOverrides): Promise<void>;
+
+    "initialize(address)"(
+      _newAdmin: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<string>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
     receiver(overrides?: CallOverrides): Promise<string>;
 
     "receiver()"(overrides?: CallOverrides): Promise<string>;
 
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    "renounceOwnership()"(overrides?: CallOverrides): Promise<void>;
-
     rescueFunds(_token: string, overrides?: CallOverrides): Promise<void>;
 
     "rescueFunds(address)"(
       _token: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -401,6 +417,13 @@ export class FeeWithdrawal extends Contract {
 
     "updateAdmin(address)"(
       _newAdmin: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateCode(newAddress: string, overrides?: CallOverrides): Promise<void>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -428,6 +451,14 @@ export class FeeWithdrawal extends Contract {
   };
 
   filters: {
+    CodeUpdated(
+      uuid: null,
+      codeAddress: null
+    ): TypedEventFilter<
+      [string, string],
+      { uuid: string; codeAddress: string }
+    >;
+
     LogRescueFunds(
       token: null,
       amount: null,
@@ -461,14 +492,6 @@ export class FeeWithdrawal extends Contract {
       [BigNumber, BigNumber],
       { totalEdgeReceived: BigNumber; timestamp: BigNumber }
     >;
-
-    OwnershipTransferred(
-      previousOwner: string | null,
-      newOwner: string | null
-    ): TypedEventFilter<
-      [string, string],
-      { previousOwner: string; newOwner: string }
-    >;
   };
 
   estimateGas: {
@@ -484,21 +507,27 @@ export class FeeWithdrawal extends Contract {
 
     "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
+    getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    initialize(
+      _newAdmin: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "initialize(address)"(
+      _newAdmin: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     receiver(overrides?: CallOverrides): Promise<BigNumber>;
 
     "receiver()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "renounceOwnership()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     rescueFunds(
       _token: string,
@@ -507,16 +536,6 @@ export class FeeWithdrawal extends Contract {
 
     "rescueFunds(address)"(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -539,6 +558,16 @@ export class FeeWithdrawal extends Contract {
 
     "updateAdmin(address)"(
       _newAdmin: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -578,21 +607,29 @@ export class FeeWithdrawal extends Contract {
 
     "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getCodeAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "getCodeAddress()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    initialize(
+      _newAdmin: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "initialize(address)"(
+      _newAdmin: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     receiver(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "receiver()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    renounceOwnership(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "renounceOwnership()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     rescueFunds(
       _token: string,
@@ -601,16 +638,6 @@ export class FeeWithdrawal extends Contract {
 
     "rescueFunds(address)"(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "transferOwnership(address)"(
-      newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -633,6 +660,16 @@ export class FeeWithdrawal extends Contract {
 
     "updateAdmin(address)"(
       _newAdmin: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateCode(
+      newAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "updateCode(address)"(
+      newAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

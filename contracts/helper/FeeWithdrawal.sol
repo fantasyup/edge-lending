@@ -2,14 +2,14 @@
 pragma solidity 0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
+import { UUPSProxiable } from "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IBSLendingPair.sol";
 
-// @TODO make it upgradable
-contract FeeWithdrawal is Ownable {
+
+contract FeeWithdrawal is UUPSProxiable {
     using SafeERC20 for IERC20;
 
     event LogUpdateAdmin(address newAdmin, uint256 timestamp);
@@ -180,4 +180,20 @@ contract FeeWithdrawal is Ownable {
         return amounts[amounts.length - 1];
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // UUPSProxiable
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    function initialize(address _newAdmin) external initializer {
+        require(_newAdmin != address(0), "INVALID_ADMIN");
+        admin = _newAdmin;
+    }
+
+    function proxiableUUID() public pure override returns (bytes32) {
+        return keccak256("org.edge.contracts.edgehelper.feewithdrawal");
+    }
+
+    function updateCode(address newAddress) external override onlyAdmin {
+        _updateCodeAddress(newAddress);
+    }
 }
