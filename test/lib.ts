@@ -77,6 +77,11 @@ export async function advanceNBlocks(n: number) {
     }
 }
 
+export async function increaseTime(duration: number) {
+    await ethers.provider.send("evm_increaseTime", [duration]);
+    await ethers.provider.send('evm_mine', [])
+}
+
 export interface IAccount {
     address: EthereumAddress,
     signer: Signer,
@@ -488,6 +493,7 @@ export const defaultLendingPairInitVars = {
     liquidationFee,
 }
 
-export function currentTimestamp() {
-    return Math.floor(Date.now() / 1000)
+export async function currentTimestamp() {
+    const block = await (ethers.getDefaultProvider()).getBlock('latest')
+    return block.timestamp
 }

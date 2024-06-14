@@ -35,12 +35,15 @@ runTestSuite("RewardDistributorFactory", (vars: TestVars) => {
             accounts: [admin, bob]
         } = vars
         
-        const startTimestamp = currentTimestamp();
+        const startTimestamp = await currentTimestamp();
+        const endTimestamp = startTimestamp + 600;
 
         const tx = await(await RewardDistributorFactory.createRewardDistributor(
+            "uniswap",
             BorrowAsset.address,
             10,
             startTimestamp,
+            endTimestamp,
             bob.address
         )).wait()
 
@@ -56,6 +59,13 @@ runTestSuite("RewardDistributorFactory", (vars: TestVars) => {
         expect(
             await (await distributor.startTimestamp()).toNumber()
         ).to.eq(startTimestamp)
+        expect(
+            await (await distributor.endTimestamp()).toNumber()
+        ).to.eq(endTimestamp)
+
+        expect(
+            await (await RewardDistributorFactory.rewardDistributors(0))
+        ).to.eq(tx.events![1]!.args!.distributor)
     })
 
 

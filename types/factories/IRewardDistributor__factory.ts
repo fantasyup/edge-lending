@@ -21,7 +21,7 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         internalType: "contract IERC20",
         name: "_rewardToken",
         type: "address",
@@ -36,6 +36,12 @@ const _abi = [
         indexed: false,
         internalType: "uint256",
         name: "_startTimestamp",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_endTimestamp",
         type: "uint256",
       },
       {
@@ -73,7 +79,25 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "endTimestamp",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
       {
         internalType: "contract IERC20",
         name: "_rewardToken",
@@ -87,6 +111,11 @@ const _abi = [
       {
         internalType: "uint256",
         name: "_startTimestamp",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_endTimestamp",
         type: "uint256",
       },
       {

@@ -22,15 +22,16 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
   functions: {
     "accumulateReward(address,address)": FunctionFragment;
+    "activated()": FunctionFragment;
     "endTimestamp()": FunctionFragment;
     "guardian()": FunctionFragment;
-    "initialize(address,uint256,uint256,address)": FunctionFragment;
+    "initialize(string,address,uint256,uint256,uint256,address)": FunctionFragment;
+    "name()": FunctionFragment;
     "pendingRewardActivation(uint256)": FunctionFragment;
     "poolInfo(uint256)": FunctionFragment;
     "rewardAmountDistributePerSecond()": FunctionFragment;
     "rewardToken()": FunctionFragment;
     "startTimestamp()": FunctionFragment;
-    "tokenPoolIDPair(address)": FunctionFragment;
     "totalAllocPoint()": FunctionFragment;
     "userInfo(uint256,address)": FunctionFragment;
   };
@@ -39,6 +40,7 @@ interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
     functionFragment: "accumulateReward",
     values: [string, string]
   ): string;
+  encodeFunctionData(functionFragment: "activated", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "endTimestamp",
     values?: undefined
@@ -46,8 +48,9 @@ interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "guardian", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, BigNumberish, BigNumberish, string]
+    values: [string, string, BigNumberish, BigNumberish, BigNumberish, string]
   ): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pendingRewardActivation",
     values: [BigNumberish]
@@ -69,10 +72,6 @@ interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "tokenPoolIDPair",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "totalAllocPoint",
     values?: undefined
   ): string;
@@ -85,12 +84,14 @@ interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
     functionFragment: "accumulateReward",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "activated", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "endTimestamp",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "guardian", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pendingRewardActivation",
     data: BytesLike
@@ -109,17 +110,13 @@ interface RewardDistributorStorageV1Interface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "tokenPoolIDPair",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "totalAllocPoint",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "userInfo", data: BytesLike): Result;
 
   events: {
-    "Initialized(address,uint256,uint256,address,uint256)": EventFragment;
+    "Initialized(address,uint256,uint256,uint256,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
@@ -181,6 +178,10 @@ export class RewardDistributorStorageV1 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    activated(overrides?: CallOverrides): Promise<[boolean]>;
+
+    "activated()"(overrides?: CallOverrides): Promise<[boolean]>;
+
     endTimestamp(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -190,20 +191,28 @@ export class RewardDistributorStorageV1 extends Contract {
     "guardian()"(overrides?: CallOverrides): Promise<[string]>;
 
     initialize(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,uint256,uint256,address)"(
+    "initialize(string,address,uint256,uint256,uint256,address)"(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    name(overrides?: CallOverrides): Promise<[string]>;
+
+    "name()"(overrides?: CallOverrides): Promise<[string]>;
 
     pendingRewardActivation(
       arg0: BigNumberish,
@@ -255,16 +264,6 @@ export class RewardDistributorStorageV1 extends Contract {
 
     "startTimestamp()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    tokenPoolIDPair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "tokenPoolIDPair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     totalAllocPoint(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "totalAllocPoint()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -274,10 +273,11 @@ export class RewardDistributorStorageV1 extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
+        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -286,10 +286,11 @@ export class RewardDistributorStorageV1 extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
+        lastUpdateTimestamp: BigNumber;
       }
     >;
   };
@@ -306,6 +307,10 @@ export class RewardDistributorStorageV1 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  activated(overrides?: CallOverrides): Promise<boolean>;
+
+  "activated()"(overrides?: CallOverrides): Promise<boolean>;
+
   endTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
   "endTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -315,20 +320,28 @@ export class RewardDistributorStorageV1 extends Contract {
   "guardian()"(overrides?: CallOverrides): Promise<string>;
 
   initialize(
+    _name: string,
     _rewardToken: string,
     _amountDistributePerSecond: BigNumberish,
     _startTimestamp: BigNumberish,
+    _endTimestamp: BigNumberish,
     _guardian: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,uint256,uint256,address)"(
+  "initialize(string,address,uint256,uint256,uint256,address)"(
+    _name: string,
     _rewardToken: string,
     _amountDistributePerSecond: BigNumberish,
     _startTimestamp: BigNumberish,
+    _endTimestamp: BigNumberish,
     _guardian: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  name(overrides?: CallOverrides): Promise<string>;
+
+  "name()"(overrides?: CallOverrides): Promise<string>;
 
   pendingRewardActivation(
     arg0: BigNumberish,
@@ -380,13 +393,6 @@ export class RewardDistributorStorageV1 extends Contract {
 
   "startTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  tokenPoolIDPair(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  "tokenPoolIDPair(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   totalAllocPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
   "totalAllocPoint()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -396,10 +402,11 @@ export class RewardDistributorStorageV1 extends Contract {
     arg1: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
       amount: BigNumber;
       pendingReward: BigNumber;
       rewardDebt: BigNumber;
+      lastUpdateTimestamp: BigNumber;
     }
   >;
 
@@ -408,10 +415,11 @@ export class RewardDistributorStorageV1 extends Contract {
     arg1: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
       amount: BigNumber;
       pendingReward: BigNumber;
       rewardDebt: BigNumber;
+      lastUpdateTimestamp: BigNumber;
     }
   >;
 
@@ -428,6 +436,10 @@ export class RewardDistributorStorageV1 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    activated(overrides?: CallOverrides): Promise<boolean>;
+
+    "activated()"(overrides?: CallOverrides): Promise<boolean>;
+
     endTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -437,20 +449,28 @@ export class RewardDistributorStorageV1 extends Contract {
     "guardian()"(overrides?: CallOverrides): Promise<string>;
 
     initialize(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,uint256,uint256,address)"(
+    "initialize(string,address,uint256,uint256,uint256,address)"(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    name(overrides?: CallOverrides): Promise<string>;
+
+    "name()"(overrides?: CallOverrides): Promise<string>;
 
     pendingRewardActivation(
       arg0: BigNumberish,
@@ -502,16 +522,6 @@ export class RewardDistributorStorageV1 extends Contract {
 
     "startTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    tokenPoolIDPair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "tokenPoolIDPair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     totalAllocPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
     "totalAllocPoint()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -521,10 +531,11 @@ export class RewardDistributorStorageV1 extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
+        lastUpdateTimestamp: BigNumber;
       }
     >;
 
@@ -533,27 +544,30 @@ export class RewardDistributorStorageV1 extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
         amount: BigNumber;
         pendingReward: BigNumber;
         rewardDebt: BigNumber;
+        lastUpdateTimestamp: BigNumber;
       }
     >;
   };
 
   filters: {
     Initialized(
-      _rewardToken: null,
+      _rewardToken: string | null,
       _amountDistributePerSecond: null,
       _startTimestamp: null,
+      _endTimestamp: null,
       _guardian: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber, BigNumber, string, BigNumber],
+      [string, BigNumber, BigNumber, BigNumber, string, BigNumber],
       {
         _rewardToken: string;
         _amountDistributePerSecond: BigNumber;
         _startTimestamp: BigNumber;
+        _endTimestamp: BigNumber;
         _guardian: string;
         timestamp: BigNumber;
       }
@@ -573,6 +587,10 @@ export class RewardDistributorStorageV1 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    activated(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "activated()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     endTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -582,20 +600,28 @@ export class RewardDistributorStorageV1 extends Contract {
     "guardian()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,uint256,uint256,address)"(
+    "initialize(string,address,uint256,uint256,uint256,address)"(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    name(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     pendingRewardActivation(
       arg0: BigNumberish,
@@ -630,16 +656,6 @@ export class RewardDistributorStorageV1 extends Contract {
 
     "startTimestamp()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    tokenPoolIDPair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "tokenPoolIDPair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     totalAllocPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
     "totalAllocPoint()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -670,6 +686,10 @@ export class RewardDistributorStorageV1 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    activated(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "activated()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     endTimestamp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "endTimestamp()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -679,20 +699,28 @@ export class RewardDistributorStorageV1 extends Contract {
     "guardian()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     initialize(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,uint256,uint256,address)"(
+    "initialize(string,address,uint256,uint256,uint256,address)"(
+      _name: string,
       _rewardToken: string,
       _amountDistributePerSecond: BigNumberish,
       _startTimestamp: BigNumberish,
+      _endTimestamp: BigNumberish,
       _guardian: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pendingRewardActivation(
       arg0: BigNumberish,
@@ -729,16 +757,6 @@ export class RewardDistributorStorageV1 extends Contract {
     startTimestamp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "startTimestamp()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    tokenPoolIDPair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "tokenPoolIDPair(address)"(
-      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

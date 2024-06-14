@@ -25,7 +25,7 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         internalType: "contract IERC20",
         name: "_rewardToken",
         type: "address",
@@ -40,6 +40,12 @@ const _abi = [
         indexed: false,
         internalType: "uint256",
         name: "_startTimestamp",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_endTimestamp",
         type: "uint256",
       },
       {
@@ -78,6 +84,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "activated",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "endTimestamp",
     outputs: [
       {
@@ -105,6 +124,11 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
+      {
         internalType: "contract IERC20",
         name: "_rewardToken",
         type: "address",
@@ -120,6 +144,11 @@ const _abi = [
         type: "uint256",
       },
       {
+        internalType: "uint256",
+        name: "_endTimestamp",
+        type: "uint256",
+      },
+      {
         internalType: "address",
         name: "_guardian",
         type: "address",
@@ -128,6 +157,19 @@ const _abi = [
     name: "initialize",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "name",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -223,25 +265,6 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    name: "tokenPoolIDPair",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "totalAllocPoint",
     outputs: [
@@ -282,6 +305,11 @@ const _abi = [
       {
         internalType: "uint256",
         name: "rewardDebt",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "lastUpdateTimestamp",
         type: "uint256",
       },
     ],

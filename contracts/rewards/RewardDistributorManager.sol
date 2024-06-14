@@ -8,7 +8,7 @@ import "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IRewardDistributorManager.sol";
 import "hardhat/console.sol";
 
-abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable {
+abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable, IRewardDistributorManager {
     /// @dev admin
     address public owner;
 
@@ -22,7 +22,7 @@ abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable {
     mapping(address => IRewardDistributor[]) public tokenRewardToDistributors;
 }
 
-contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardDistributorManager {
+contract RewardDistributorManager is RewardDistirbutorManagerStorageV1 {
     modifier onlyOwner {
         require(owner == msg.sender, "ONLY_OWNER");
         _;
@@ -74,12 +74,15 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
             "ONLY_APPROVED_DISTRIBUTOR"
         );
 
-        /// Note: it's possible for a distributor contract to spam the addReward
-        /// function by creating minimal rewards. It's required to constantly monitor the AddReward
-        /// event offchain to ensure that the addReward function is not being spammed
-        /// by a partner. We could periodically set an inactive distributor status to
-        /// false
-        tokenRewardToDistributors[_tokenAddr].push(IRewardDistributor(msg.sender));
+        IRewardDistributor[] storage distributors = tokenRewardToDistributors[_tokenAddr];
+
+        require(
+            findRewardDistributor(distributors, IRewardDistributor(msg.sender)) == -1,
+            "DISTRIBUTOR_EXISTS"
+        );
+
+        distributors.push(IRewardDistributor(msg.sender));
+
         emit AddReward(_tokenAddr, IRewardDistributor(msg.sender), block.timestamp);
     }
 
@@ -91,25 +94,31 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1, IRewardD
         override
         onlyOwner
     {
-        // loop throught and remove
         IRewardDistributor[] storage distributors = tokenRewardToDistributors[_tokenAddr];
         uint256 size = distributors.length;
 
-        if (size == 1) delete distributors[0];
+        int256 rewardIndex = findRewardDistributor(distributors, _distributor);
+        if (rewardIndex == -1) return;
 
-        if (size > 1) {
-            // remove the item from the array
-            // using the 2 pointer algorithm
-            uint256 j = 0;
-            for (uint256 i = 0; i < size; i++) {
-                if (address(distributors[i]) != _tokenAddr) {
-                    distributors[j] = distributors[i];
-                    j += 1;
-                }
-            }
-        }
+        distributors[uint256(rewardIndex)] = distributors[size - 1];
+        // used pop instead of delete because pop reduces array length
+        distributors.pop();
 
         emit RemoveReward(_tokenAddr, _distributor, block.timestamp);
+    }
+
+    function findRewardDistributor(
+        IRewardDistributor[] memory distributors,
+        IRewardDistributor _distributor
+    ) internal pure returns (int256 index) {
+        index = -1;
+        uint256 size = distributors.length;
+        for (uint256 i = 0; i < size; i++) {
+            if (address(distributors[i]) == address(_distributor)) {
+                index = int256(i);
+                break;
+            }
+        }
     }
 
     function commitOwnerTransfer(address _newOwner) external onlyOwner {
