@@ -136,6 +136,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     ).to.eq(allocPoints.collateralTokenAllocPoint)
 
     expect(await (await RewardDistributor["totalAllocPoint()"]()).toNumber()).to.eq(totalAllocPoints())
+
   })
 
   it('should not accumulate reward if current time < startTimestamp', async () => {
@@ -188,6 +189,8 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
     // activate rewards
     await RewardDistributor.activatePendingRewards();
+    expect(await RewardDistributor.activated()).to.eq(true)
+
     await advanceNBlocks(2)
 
     // call accumulate rewards
@@ -398,7 +401,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     
     const expectedPendingReward = 566
     const kylePendingReward = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
-    console.log({ kylePendingReward })
+    // console.log({ kylePendingReward })
     // expect(kylePendingReward).to.eq(expectedPendingReward)
 
     // should allow withdrawal of rewards for 30 days after endtimestamp
@@ -417,6 +420,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     // should not be able to claim reward
     const ruthPendingReward = await (await RewardDistributor.pendingRewardToken(0, ruth.address)).toNumber()
     expect(ruthPendingReward).to.eq(0)
+
     // should prevent withdrawal of rewards if user doesn't claim reward
     await expect(
         await RewardDistributor.connect(ruth.signer).withdraw(
@@ -503,7 +507,6 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         kyle.address
     )
     const balance = await (await BorrowAsset.balanceOf(kyle.address)).toNumber();
-    console.log({ balance })
     const paidOut = (await RewardDistributor.userInfo(0, kyle.address)).rewardDebt.toNumber()
 
     expect(balance).to.eq(paidOut)
