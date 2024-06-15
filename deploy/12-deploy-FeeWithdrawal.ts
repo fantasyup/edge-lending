@@ -18,8 +18,8 @@ const deployFeeWithdrawal: DeployFunction = async function (hre: HardhatRuntimeE
         from: deployer,
         args: [
             blackSmithTeam,
-            stakingContract,
             vault.address,
+            stakingContract,
             edgeToken,
             weth,
             router

@@ -92,6 +92,7 @@ export interface IAccount {
 }
 export interface TestVars {
     BorrowAsset: MockToken,
+    EdgeToken: MockToken,
     CollateralAsset: MockToken,
     MockVault: MockVault,
     Vault: Vault,
@@ -118,6 +119,7 @@ export interface TestVars {
 
 const testVars: TestVars = {
     BorrowAsset: {} as MockToken,
+    EdgeToken: {} as MockToken,
     CollateralAsset: {} as MockToken,
     MockVault: {} as MockVault,
     Vault: {} as Vault,
@@ -182,14 +184,16 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
 }
 
 export async function deployTestTokensAndMock() {
+    const BorrowAsset = await deployMockToken();
     return {
         BorrowAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
         CollateralAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
-        BorrowAsset: await deployMockToken(),
+        BorrowAsset,
         CollateralAsset: await deployMockToken(),
         FlashBorrower: await deployMockFlashBorrower(),
         MockVault: await deployMockVault(),
-        MockRewardDistributorManager: await deployMockDistributorManager()
+        MockRewardDistributorManager: await deployMockDistributorManager(),
+        EdgeToken: BorrowAsset,
         // add EdgeToken
         // add WETH
         // 

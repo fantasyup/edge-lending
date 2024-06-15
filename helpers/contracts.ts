@@ -14,7 +14,7 @@ import {
     MockPriceOracle,
     MockToken,
     MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken,
-    FeeWithdrawal
+    FeeWithdrawal,
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
@@ -146,15 +146,6 @@ export const deployMockToken = async(decimals ?: number) => {
     return await deployContract<MockToken>(ContractId.MockToken, [decimals || 18])
 }
 
-// export const deployLendingPair = async () => {
-//     const dataTypesLib = await deployDataTypesLib()
-
-//     return await deployContract<LendingPair>(ContractId.LendingPair, [], 
-//     {
-//         DataTypes: dataTypesLib.address
-//     })
-// }
-
 export const deployUUPSProxy = async () => {
     return await deployContract<UUPSProxy>(ContractId.UUPSProxy, [])
 }
@@ -264,3 +255,34 @@ export const deployMockDistributorManager = async() => {
     return await deployContract<LendingPairFactory>(ContractId.MockDistributorManager, [])
 }
 
+export const deployFeeWithdrawl = async (
+    admin: EthereumAddress,
+    vault: EthereumAddress,
+    receiver: EthereumAddress,
+    edgeToken: EthereumAddress,
+    weth: EthereumAddress,
+    uniswapV2Router: EthereumAddress,
+) => {
+    return await deployContract<FeeWithdrawal>(
+        ContractId.FeeWithdrawal,
+        [admin, vault, receiver, edgeToken, weth, uniswapV2Router]
+    );
+}
+
+
+export const deployLendingPair = async (
+    vault: EthereumAddress,
+    oracle: EthereumAddress,
+    feewithdrawalAddr: EthereumAddress,
+    feeShare: BigNumber
+) => {
+    return await deployContract<LendingPair>(
+        ContractId.LendingPair, [
+            vault, oracle, feewithdrawalAddr, feeShare
+        ], 
+        {
+            DataTypes: (await deployContract<DataTypes>('DataTypes', [])).address,
+            // SafeERC20: (await deployContract<SafeERC20>('SafeERC20', [])).address
+        }
+    );
+}
