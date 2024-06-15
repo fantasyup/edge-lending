@@ -7,7 +7,6 @@ import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./token/IERC20Details.sol";
 import "./util/Initializable.sol";
-import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title WrapperToken

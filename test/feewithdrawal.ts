@@ -22,17 +22,17 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
 
         const uups = await deployUUPSProxy();
         await uups.initializeProxy(FeeWithdrawal.address);
-        const proxiedFeeWithdrawl = await ethers.getContractAt(
+        const proxiedFeeWithdrawal = await ethers.getContractAt(
             ContractId.FeeWithdrawal,
             uups.address
         );
-        await proxiedFeeWithdrawl.initialize(
+        await proxiedFeeWithdrawal.initialize(
             admin.address,
             process.env.ROUTER || '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' // router
         );
 
         // check current impl
-        expect(await proxiedFeeWithdrawl.getCodeAddress()).to.eq(FeeWithdrawal.address)
+        expect(await proxiedFeeWithdrawal.getCodeAddress()).to.eq(FeeWithdrawal.address)
 
         // check proxiable UUID string
         let msgBytes = ethers.utils.toUtf8Bytes(
@@ -40,7 +40,7 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
         )
         const hash = ethers.utils.keccak256(msgBytes);
         expect(
-            (await proxiedFeeWithdrawl.proxiableUUID()).toString()
+            (await proxiedFeeWithdrawal.proxiableUUID()).toString()
         ).to.eq(hash.toString());
 
         // check updateCode
@@ -51,8 +51,8 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
             await FeeWithdrawal.WETH()
         ])
 
-        await proxiedFeeWithdrawl.updateCode(newFeeWithdrawl.address)
-        expect(await proxiedFeeWithdrawl.getCodeAddress()).to.eq(newFeeWithdrawl.address);
+        await proxiedFeeWithdrawal.updateCode(newFeeWithdrawl.address)
+        expect(await proxiedFeeWithdrawal.getCodeAddress()).to.eq(newFeeWithdrawl.address);
     })
 
     describe('scenarios', async () => {

@@ -9,7 +9,6 @@ import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IBSWrapperToken.sol";
 import "./interfaces/IDebtToken.sol";
 import "./interfaces/IRewardDistributorManager.sol";
-
 import "./interest/JumpRateModelV2.sol";
 import "./token/IERC20Details.sol";
 import "./DataTypes.sol";

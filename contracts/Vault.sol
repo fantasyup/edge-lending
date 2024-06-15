@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IERC3156FlashBorrower.sol";
 import "./interfaces/IBSLendingPair.sol";
 import "./VaultBase.sol";
-import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///

@@ -1,4 +1,4 @@
-import { deployments, ethers, waffle } from "hardhat";
+import { deployments, ethers, waffle, getNamedAccounts } from "hardhat";
 import { Signer, Contract, BigNumber } from "ethers"
 import { ContractId, EthereumAddress } from "../helpers/types"
 import { Vault } from '../types/Vault'
@@ -37,6 +37,29 @@ export const deployContract = async<ContractType extends Contract>(
     return contract
 }
 
+export const deployAndInitUUPSProxy = async(
+    id: string,
+    implementation: string
+) => {
+    const { deployer } = await getNamedAccounts();
+
+    const tx = await deployments.deploy(id, {
+        contract: ContractId.UUPSProxy,
+        from: deployer,
+        args: [],
+        log: true,
+    })
+  
+      // initialize proxy
+    const uups = await ethers.getContractAt(
+        ContractId.UUPSProxy,
+        tx.address
+    ) as UUPSProxy
+
+    if (tx.newlyDeployed) {
+        await (await uups.initializeProxy(implementation)).wait()
+    }
+}
 export const deployDataTypesLib = async () => {
     return await deployContract<DataTypes>('DataTypes', [])
 }
@@ -140,6 +163,27 @@ export const getFeeWithdrawalDeployment = async(): Promise<FeeWithdrawal> => {
     return (await ethers.getContractAt(
         ContractId.FeeWithdrawal,
         (await deployments.get(ContractId.FeeWithdrawal)).address
+    )) as FeeWithdrawal
+}
+
+export const getPriceOracleAggregatorProxy = async(): Promise<PriceOracleAggregator> => {
+    return (await ethers.getContractAt(
+        ContractId.PriceOracleAggregator,
+        (await deployments.get(ContractId.PriceOracleAggregatorProxy)).address
+    )) as PriceOracleAggregator
+}
+
+export const getVaultProxy = async(): Promise<Vault> => {
+    return (await ethers.getContractAt(
+        ContractId.Vault,
+        (await deployments.get(ContractId.VaultProxy)).address
+    )) as Vault
+}
+
+export const getFeeWithdrawalProxy = async(): Promise<FeeWithdrawal> => {
+    return (await ethers.getContractAt(
+        ContractId.FeeWithdrawal,
+        (await deployments.get(ContractId.FeeWithdrawalProxy)).address
     )) as FeeWithdrawal
 }
 

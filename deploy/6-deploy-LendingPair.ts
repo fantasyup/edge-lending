@@ -2,10 +2,21 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import { ContractId } from "../helpers/types"
 import { BigNumber } from '@ethersproject/bignumber';
+import { Contract } from 'ethers';
 
 const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments: { deploy, get }, getNamedAccounts } = hre;
   const { deployer, blackSmithTeam } = await getNamedAccounts();
+
+  const useProxy = !!process.env.WITH_PROXY
+
+  const vault = useProxy ? await get(ContractId.VaultProxy): await get(ContractId.Vault)
+  // console.log(vault)
+  const oracle = useProxy ? await get(ContractId.PriceOracleAggregatorProxy): await get(ContractId.PriceOracleAggregator)
+  const feeWithdrawalAddr = useProxy ? await get(ContractId.FeeWithdrawalProxy): await get(ContractId.FeeWithdrawal)
+  /// fee share of liquidation fees that goes to the protocol
+  /// 0.005%
+  const liquidationFeeShare = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
 
   // deploy library with deterministic set to true
   const DataTypesLib = await deploy(ContractId.DataTypes, {
@@ -14,35 +25,28 @@ const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnv
     deterministicDeployment: true
   })
 
-  // deploy library with deterministic set to true
-  const SafeERC20Lib = await deploy(ContractId.SafeERC20, {
-    from: deployer,
-    args: [],
-    deterministicDeployment: true
-  })
-
-  const vault = await get(ContractId.Vault)
-  const oracle = await get(ContractId.PriceOracleAggregator)
-  const feeWithdrawalAddr = blackSmithTeam
-  /// @TODO update to share
-  const feeshare = BigNumber.from(10).pow(18)
-
   await deploy(ContractId.LendingPair, {
     from: deployer,
     args: [
       vault.address,
       oracle.address,
-      feeWithdrawalAddr,
-      feeshare,
+      feeWithdrawalAddr.address,
+      liquidationFeeShare,
     ],
     log: true,
+    deterministicDeployment: true,
     libraries: {
       [ContractId.DataTypes]: DataTypesLib.address,
-      [ContractId.SafeERC20]: SafeERC20Lib.address
+      // [ContractId.SafeERC20]: SafeERC20Lib.address
     }
   });
 
 };
 
 export default deployLendingPair
-deployLendingPair.tags = ['LendingPair']
+deployLendingPair.tags = [ContractId.LendingPair]
+deployLendingPair.dependencies = [
+  ContractId.FeeWithdrawal,
+  ContractId.Vault,
+  ContractId.PriceOracleAggregator
+]

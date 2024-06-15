@@ -1,6 +1,7 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import { ContractId } from "../helpers/types"
+import { deployAndInitUUPSProxy } from '../helpers/contracts';
 
 const deployFeeWithdrawal: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployments: { deploy, get }, getNamedAccounts } = hre;
@@ -14,7 +15,7 @@ const deployFeeWithdrawal: DeployFunction = async function (hre: HardhatRuntimeE
     const stakingContract = process.env.STAKING_CONTRACT || '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'
     const vault = await get(ContractId.Vault)
 
-    await deploy(ContractId.FeeWithdrawal, {
+    const feeTx = await deploy(ContractId.FeeWithdrawal, {
         from: deployer,
         args: [
             // blackSmithTeam,
@@ -24,9 +25,17 @@ const deployFeeWithdrawal: DeployFunction = async function (hre: HardhatRuntimeE
             weth,
             // router
         ],
-        log: true
+        log: true,
+        deterministicDeployment: true
     });
+
+     // initialize vault proxy
+  if (process.env.WITH_PROXY) await deployAndInitUUPSProxy(
+        ContractId.FeeWithdrawalProxy,
+        feeTx.address
+    )
+
 }
 
 export default deployFeeWithdrawal
-deployFeeWithdrawal.tags = [`${ContractId.FeeWithdrawal}`]
+deployFeeWithdrawal.tags = [ContractId.FeeWithdrawal]

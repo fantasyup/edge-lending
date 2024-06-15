@@ -28,7 +28,6 @@ abstract contract UUPSProxiable is Initializable {
      *      It is internal, so the derived contract could setup its own permission logic.
      */
     function _updateCodeAddress(address newAddress) internal {
-        // require UUPSProxy.initializeProxy first
         require(UUPSUtils.implementation() != address(0), "UUPSProxiable: not upgradable");
         require(
             proxiableUUID() == UUPSProxiable(newAddress).proxiableUUID(),

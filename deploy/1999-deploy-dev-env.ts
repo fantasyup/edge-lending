@@ -7,7 +7,7 @@ import {
     setupLendingPair
 } from '../test/lib';
 
-const tag = `DEV-ENVIRONMENT`
+const tag = `DEV_ENVIRONMENT`
 
 const deployDevEnvironment: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     // do not deploy in production

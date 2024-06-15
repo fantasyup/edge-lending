@@ -218,7 +218,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
         await expect(await lendingPair.interestRate()).eq(modelEv!.args!.ir)
         await expect(await (await lendingPair.liquidationFee()).toString()).eq(liquidationFee.toString())
         await expect(await (await lendingPair.collateralFactor()).toString()).eq(collateralFactor.toString())
-        await expect(await (await lendingPair["feeWithdrawalAddr()"]()).toString()).eq(vars.blackSmithTeam.address)
+        await expect(await (await lendingPair["feeWithdrawalAddr()"]()).toString()).eq(vars.FeeWithdrawal.address)
         
     })
 

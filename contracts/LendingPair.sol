@@ -297,35 +297,28 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         emit Borrow(msg.sender, _amountToBorrow);
     }
 
-    struct RepayBorrowLocalVars {
-        uint256 repayAmount;
-        uint256 accountBorrows;
-        uint256 accountBorrowsNew;
-        uint256 totalBorrowsNew;
-    }
-
     /// @notice Sender repays their own borrow
     /// @param _repayAmount The amount of borrow asset to repay represented in underlying
     /// @param _beneficiary address to repay loan position
     function repay(uint256 _repayAmount, address _beneficiary) public {
         require(_beneficiary != address(0), "INVALID_BENEFICIARY");
-        // create local vars storage
-        RepayBorrowLocalVars memory vars;
 
         // We fetch the amount the borrower owes, with accumulated interest
-        vars.accountBorrows = borrowBalanceCurrent(_beneficiary);
+        uint256 accountBorrows = borrowBalanceCurrent(_beneficiary);
 
         // require the borrower cant pay more than they owe
-        require(_repayAmount <= vars.accountBorrows, "PAYING_MORE_THAN_OWED");
+        require(_repayAmount <= accountBorrows, "PAYING_MORE_THAN_OWED");
+
+        uint256 repayAmount = 0;
 
         if (_repayAmount == 0) {
-            vars.repayAmount = vars.accountBorrows;
+            repayAmount = accountBorrows;
         } else {
-            vars.repayAmount = _repayAmount;
+            repayAmount = _repayAmount;
         }
 
         // convert repayAmount to share and round up
-        uint256 repayAmountInShares = vault.toShare(asset, vars.repayAmount, true);
+        uint256 repayAmountInShares = vault.toShare(asset, repayAmount, true);
 
         require(
             vault.balanceOf(asset, msg.sender) >= repayAmountInShares,
@@ -337,14 +330,14 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         accountInterestIndex[_beneficiary] = borrowIndex;
 
-        debtToken.burn(_beneficiary, vars.repayAmount);
+        debtToken.burn(_beneficiary, repayAmount);
 
         emit Repay(
             address(this),
             address(asset),
             _beneficiary,
             msg.sender,
-            _repayAmount
+            repayAmount
         );
     }
 

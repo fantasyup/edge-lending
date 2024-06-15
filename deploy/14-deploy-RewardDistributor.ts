@@ -14,9 +14,7 @@ const deployRewardDistributor: DeployFunction = async function (hre: HardhatRunt
         args: [
             managerImplementation.address,
         ],
-        log: true,
-        libraries: {
-        }
+        log: true
     });
 }
 

@@ -1,7 +1,8 @@
 import {HardhatUserConfig} from 'hardhat/types';
 import { task } from "hardhat/config";
 import "hardhat-typechain";
-import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-waffle"
+import "@nomiclabs/hardhat-etherscan"
 import "solidity-coverage"
 // import "hardhat-contract-sizer"
 import "hardhat-tracer"
@@ -20,8 +21,7 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
   }
 });
 
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
+const INFURA_API_KEY = process.env.INFURA_API_KEY || "429eb57532b54560b1d4cc4201724bf0";
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -29,8 +29,22 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
 export default {
   networks: {
     hardhat: {
-      mnemonic: "test test test test test test test test test test test junk"
-    }
+      accounts: {
+        mnemonic: "test test test test test test test test test test test junk"
+      }
+    },
+    kovan: {
+      accounts: {
+        mnemonic: process.env.MNEMONIC || "",
+      },
+      url: `https://kovan.infura.io/v3/${INFURA_API_KEY}`
+    },
+    rinkeby: {
+      accounts: {
+        mnemonic: process.env.MNEMONIC || ""
+      },
+      url: `https://rinkeby.infura.io/v3/${INFURA_API_KEY}`
+    },
   },
   solidity: {
     version: "0.8.1",
@@ -63,7 +77,10 @@ export default {
     // gasPrice: 110,
     // currency: 'USD',
   },
+  etherscan: {
+    apiKey: '3TPDHK79F94RUEIFTJ1EY24ZTKT8AFAMPS'
+  },
   mocha: {
     timeout: 9000000
   }
-};
+} as HardhatUserConfig;

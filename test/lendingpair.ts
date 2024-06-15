@@ -579,19 +579,18 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     const adminCollateralBalanceInVault = (await Vault.balanceOf(CollateralAsset.address, admin.address)).toNumber()
 
     await (await LendingPair.liquidate(james.address)).wait()
-
     // james now has zero debt balance
     expect((await DebtToken.balanceOf(james.address)).toNumber()).to.eq(0)
 
     const updateAdminBalanceInVault = (await Vault.balanceOf(BorrowAsset.address, admin.address)).toNumber()
 
     // expect the liquidator balance to be reduced minimum by
-    //  500 + (0.05 * 500) = 525 (0.05% is liquidation fee)
-    expect(adminBalanceInVault - updateAdminBalanceInVault >= 525).true
+    //  500 + (0.05% * 500) * 0.05% = 501 (0.05% is liquidation fee)
+    expect(adminBalanceInVault - updateAdminBalanceInVault >= 501).true
 
     // expect that lending pair balance increased by liquidated amount
     expect((await Vault.balanceOf(BorrowAsset.address, LendingPair.address)).toNumber()).to.eq(
-      lendingPairBalanceInVault + 525
+      lendingPairBalanceInVault + 501
     )
 
     // expect james collateral to be seized
@@ -603,11 +602,11 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     )
 
     /// WithdrawFees Test case
-    const teamVaultBalance = await (await Vault.balanceOf(BorrowAsset.address, vars.blackSmithTeam.address)).toNumber()
-    const feesToWithdraw = 10
+    const teamVaultBalance = await (await Vault.balanceOf(BorrowAsset.address, vars.FeeWithdrawal.address)).toNumber()
+    const feesToWithdraw = await (await LendingPair.totalReserves()).toNumber()
     await LendingPair.withdrawFees(feesToWithdraw)
 
-    const newTeamVaultBalance =  await (await Vault.balanceOf(BorrowAsset.address, vars.blackSmithTeam.address)).toNumber()
+    const newTeamVaultBalance =  await (await Vault.balanceOf(BorrowAsset.address, vars.FeeWithdrawal.address)).toNumber()
     expect(newTeamVaultBalance).to.eq(teamVaultBalance + feesToWithdraw)
   })
 
