@@ -125,20 +125,19 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
         })
 
         it('rescueFunds', async () => {
-            const { EdgeToken, accounts: [ admin ] } = vars
+            const { EdgeToken, accounts: [ admin, frank ] } = vars
 
             // permission test
-            await expect(FeeWithdrawal.rescueFunds(EdgeToken.address)).to.be.revertedWith('ONLY_ADMIN')
+            await expect(FeeWithdrawal.connect(frank.signer).rescueFunds(EdgeToken.address)).to.be.revertedWith('ONLY_ADMIN')
 
             // logic test
             const originalAdminEdgeBalance = (await EdgeToken.balanceOf(admin.address)).toNumber(); // FeeWithdrawal's edgeToken balance before withdraw
             await FeeWithdrawal.withdrawFees([LendingPair.address]);
             const feeWithdrawalAmount = ( await EdgeToken.balanceOf(FeeWithdrawal.address) ).toNumber(); // withthraw fee amount
-            await FeeWithdrawal.connect(vars.blackSmithTeam.signer).rescueFunds(EdgeToken.address);
+            await FeeWithdrawal.rescueFunds(EdgeToken.address);
 
-            expect((await EdgeToken.balanceOf(vars.blackSmithTeam.address)).toNumber()).to.eq(originalAdminEdgeBalance + feeWithdrawalAmount) // after rescueFunds, admin balance should be increased
+            expect((await EdgeToken.balanceOf(admin.address)).toNumber()).to.eq(originalAdminEdgeBalance + feeWithdrawalAmount) // after rescueFunds, admin balance should be increased
             expect((await EdgeToken.balanceOf(FeeWithdrawal.address)).toNumber()).to.eq(0) // after rescueFunds, FeeWithdrawFee balance should be zero
-
         })
     })
 })
