@@ -15,6 +15,7 @@ import {
     MockToken,
     MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken,
     FeeWithdrawal,
+    MockUniswapV2Router02,
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
@@ -283,4 +284,12 @@ export const deployLendingPair = async (
             // SafeERC20: (await deployContract<SafeERC20>('SafeERC20', [])).address
         }
     );
+}
+
+
+export const deployMockUniswapV2Router02 = async () => {
+    return await deployContract<MockUniswapV2Router02>(
+        ContractId.MockUniswapV2Router02,
+        []
+    )
 }

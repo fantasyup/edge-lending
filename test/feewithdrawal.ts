@@ -3,13 +3,15 @@ import { expect } from "chai";
 import { BigNumber } from "ethers";
 
 import { runTestSuite, TestVars, defaultLendingPairInitVars, setupAndInitLendingPair } from "./lib";
-import { deployUUPSProxy, deployContract, deployFeeWithdrawl, deployLendingPair } from "../helpers/contracts";
+import { deployUUPSProxy, deployContract, deployFeeWithdrawl, deployLendingPair, deployMockUniswapV2Router02 } from "../helpers/contracts";
 import { ContractId } from "../helpers/types";
 import {
     FeeWithdrawal as FeeWithdrawalContract,
     LendingPair as LendingPairContract,
 } from "../types";
 
+
+const amountToDeposit = 1000;
 
 runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
     it('proxiableUUID & updateCode', async () => {
@@ -67,6 +69,10 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
                 accounts: [ admin, james, frank ]
             } = vars
 
+            // deploy MockUniswapV2Router 
+            const mockUniswapV2Router = await deployMockUniswapV2Router02();
+            await EdgeToken.mint(mockUniswapV2Router.address, amountToDeposit);
+
             // deploy new FeeWithdrawl
             FeeWithdrawal = await deployFeeWithdrawl(
                 await vars.FeeWithdrawal.vault(),
@@ -75,11 +81,10 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
                 await vars.FeeWithdrawal.WETH(),
             );
 
-
             // initialize
             await FeeWithdrawal.initialize(
                 admin.address,
-                process.env.ROUTER || '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' // router
+                mockUniswapV2Router.address,
             );
 
             // setup new LendingPair
@@ -88,8 +93,8 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
             // do some borrow, deposit actions
             vars.LendingPair = LendingPair;
             const helper = await setupAndInitLendingPair( vars, { ...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [ frank, admin, james, ] } )
-            await helper.depositCollateralAsset(james, 1000)
-            await helper.depositBorrowAsset(frank, 1000)
+            await helper.depositCollateralAsset(james, amountToDeposit)
+            await helper.depositBorrowAsset(frank, amountToDeposit)
             await LendingPair.connect(james.signer).borrow(500, james.address);  // James borrow 500,  lendingPairBalanceInVault = 500
             await (await BorrowAssetMockPriceOracle.setPrice(BigNumber.from(3000).pow(8))).wait()  // change price && set oracle price to half
             await helper.depositInVault(admin.signer, BorrowAsset, 800)         // liquidator deposits in vault, adminBalanceInVault = 800,
@@ -103,13 +108,29 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
             const beforeLendingPairVaultBalance = (await Vault.balanceOf(await LendingPair.asset(), LendingPair.address) ).toNumber(); // LendingPair vault balance before withdraw
             
             // do withdraw
-            const tx = await ( await FeeWithdrawal.withdrawFees([ LendingPair.address ])).wait();
-
+            await ( await FeeWithdrawal.withdrawFees([ LendingPair.address ])).wait();
             expect((await Vault.balanceOf(await LendingPair.asset(), LendingPair.address)).toNumber() ).to.eq(beforeLendingPairVaultBalance - withdrawAmount);
+        })
 
-            const withdrawFeesValue = tx.events?.find((e: any) => e.event === 'LogWithdrawFees');
+        it('swapFees', async () => {
+            const { Vault, EdgeToken, BorrowAsset } = vars
+
+            // do withdraw
+            const withdrawTx = await ( await FeeWithdrawal.withdrawFees([ LendingPair.address ])).wait();
+            const withdrawFeesValue = withdrawTx.events?.find((e: any) => e.event === 'LogWithdrawFees');
             const totalWithdrawnFees = (withdrawFeesValue!.args!.totalWithdrawnFees).toNumber();
-            console.log('===>totalWithdrawnFees',totalWithdrawnFees)
+
+
+            const swapTx = await ( await FeeWithdrawal.swapFees(
+                [ LendingPair.address ],
+                [ 0 ]
+            )).wait();
+            const swapFessValue = swapTx.events?.find((e: any) => e.event === 'LogWithSwap');
+            const totalEdgeReceived = (swapFessValue!.args!.totalEdgeReceived).toNumber();
+
+            expect(await BorrowAsset.balanceOf(FeeWithdrawal.address)).to.equal(0);
+            expect(await EdgeToken.balanceOf(FeeWithdrawal.address)).to.equal(totalWithdrawnFees);
+            expect(totalWithdrawnFees).to.equal(totalEdgeReceived);
         })
 
         it ('transferToReceiver', async () => {
