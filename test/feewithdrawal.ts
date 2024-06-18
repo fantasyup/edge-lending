@@ -116,7 +116,7 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
             const { EdgeToken } = vars
 
             const beforeFeeWithdrawlWrapBalance = ( await EdgeToken.balanceOf(await FeeWithdrawal.receiver()) ).toNumber(); // FeeWithdrawal's edgeToken balance before withdraw
-            await FeeWithdrawal.withdrawFeesAndSwap([LendingPair.address], [0] ,false);
+            await FeeWithdrawal.withdrawFees([LendingPair.address]);
             const feeAmount = ( await EdgeToken.balanceOf(FeeWithdrawal.address) ).toNumber(); // withthraw fee amount
             await FeeWithdrawal.transferToReceiver();
 
@@ -132,7 +132,7 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
 
             // logic test
             const originalAdminEdgeBalance = (await EdgeToken.balanceOf(admin.address)).toNumber(); // FeeWithdrawal's edgeToken balance before withdraw
-            await FeeWithdrawal.withdrawFeesAndSwap([LendingPair.address], [0] ,false);
+            await FeeWithdrawal.withdrawFees([LendingPair.address]);
             const feeWithdrawalAmount = ( await EdgeToken.balanceOf(FeeWithdrawal.address) ).toNumber(); // withthraw fee amount
             await FeeWithdrawal.connect(vars.blackSmithTeam.signer).rescueFunds(EdgeToken.address);
 
