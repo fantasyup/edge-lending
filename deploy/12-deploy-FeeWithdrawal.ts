@@ -17,12 +17,12 @@ const deployFeeWithdrawal: DeployFunction = async function (hre: HardhatRuntimeE
     await deploy(ContractId.FeeWithdrawal, {
         from: deployer,
         args: [
-            blackSmithTeam,
+            // blackSmithTeam,
             vault.address,
             stakingContract,
             edgeToken,
             weth,
-            router
+            // router
         ],
         log: true
     });

@@ -256,16 +256,14 @@ export const deployMockDistributorManager = async() => {
 }
 
 export const deployFeeWithdrawl = async (
-    admin: EthereumAddress,
     vault: EthereumAddress,
     receiver: EthereumAddress,
     edgeToken: EthereumAddress,
     weth: EthereumAddress,
-    uniswapV2Router: EthereumAddress,
 ) => {
     return await deployContract<FeeWithdrawal>(
         ContractId.FeeWithdrawal,
-        [admin, vault, receiver, edgeToken, weth, uniswapV2Router]
+        [vault, receiver, edgeToken, weth]
     );
 }
 

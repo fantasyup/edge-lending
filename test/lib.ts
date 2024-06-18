@@ -188,13 +188,12 @@ export async function deployTestTokensAndMock() {
     return {
         BorrowAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
         CollateralAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
-        BorrowAsset,
+        BorrowAsset: await deployMockToken(),
         CollateralAsset: await deployMockToken(),
         FlashBorrower: await deployMockFlashBorrower(),
         MockVault: await deployMockVault(),
         MockRewardDistributorManager: await deployMockDistributorManager(),
-        EdgeToken: BorrowAsset,
-        // add EdgeToken
+        EdgeToken: await deployMockToken(),
         // add WETH
         // 
     }

@@ -25,17 +25,18 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
     "WETH()": FunctionFragment;
     "admin()": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
-    "initialize(address)": FunctionFragment;
+    "initialize(address,address)": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "receiver()": FunctionFragment;
     "rescueFunds(address)": FunctionFragment;
+    "swapFees(address[],uint256[])": FunctionFragment;
     "transferToReceiver()": FunctionFragment;
     "uniswapRouter()": FunctionFragment;
     "updateAdmin(address)": FunctionFragment;
     "updateCode(address)": FunctionFragment;
     "vault()": FunctionFragment;
     "edgeToken()": FunctionFragment;
-    "withdrawFeesAndSwap(address[],uint256[],bool)": FunctionFragment;
+    "withdrawFees(address[])": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
@@ -45,13 +46,20 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
     functionFragment: "getCodeAddress",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "initialize", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [string, string]
+  ): string;
   encodeFunctionData(
     functionFragment: "proxiableUUID",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "receiver", values?: undefined): string;
   encodeFunctionData(functionFragment: "rescueFunds", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "swapFees",
+    values: [string[], BigNumberish[]]
+  ): string;
   encodeFunctionData(
     functionFragment: "transferToReceiver",
     values?: undefined
@@ -65,8 +73,8 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "vault", values?: undefined): string;
   encodeFunctionData(functionFragment: "edgeToken", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "withdrawFeesAndSwap",
-    values: [string[], BigNumberish[], boolean]
+    functionFragment: "withdrawFees",
+    values: [string[]]
   ): string;
 
   decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
@@ -86,6 +94,7 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
     functionFragment: "rescueFunds",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "swapFees", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferToReceiver",
     data: BytesLike
@@ -102,7 +111,7 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "edgeToken", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "withdrawFeesAndSwap",
+    functionFragment: "withdrawFees",
     data: BytesLike
   ): Result;
 
@@ -111,6 +120,7 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
     "LogRescueFunds(address,uint256,uint256)": EventFragment;
     "LogTransferToReceiver(address,uint256,uint256)": EventFragment;
     "LogUpdateAdmin(address,uint256)": EventFragment;
+    "LogWithSwap(uint256,uint256)": EventFragment;
     "LogWithdrawFees(uint256,uint256)": EventFragment;
   };
 
@@ -118,6 +128,7 @@ interface FeeWithdrawalInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "LogRescueFunds"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogTransferToReceiver"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogUpdateAdmin"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "LogWithSwap"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogWithdrawFees"): EventFragment;
 }
 
@@ -186,12 +197,14 @@ export class FeeWithdrawal extends Contract {
     ): Promise<[string] & { codeAddress: string }>;
 
     initialize(
-      _newAdmin: string,
+      _admin: string,
+      _uniswapV2Router: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address)"(
-      _newAdmin: string,
+    "initialize(address,address)"(
+      _admin: string,
+      _uniswapV2Router: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -210,6 +223,18 @@ export class FeeWithdrawal extends Contract {
 
     "rescueFunds(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    swapFees(
+      _lendingPairs: string[],
+      amountOuts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "swapFees(address[],uint256[])"(
+      _lendingPairs: string[],
+      amountOuts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -253,17 +278,13 @@ export class FeeWithdrawal extends Contract {
 
     "edgeToken()"(overrides?: CallOverrides): Promise<[string]>;
 
-    withdrawFeesAndSwap(
+    withdrawFees(
       _lendingPairs: string[],
-      amountOuts: BigNumberish[],
-      _convert: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "withdrawFeesAndSwap(address[],uint256[],bool)"(
+    "withdrawFees(address[])"(
       _lendingPairs: string[],
-      amountOuts: BigNumberish[],
-      _convert: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -285,12 +306,14 @@ export class FeeWithdrawal extends Contract {
   "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
 
   initialize(
-    _newAdmin: string,
+    _admin: string,
+    _uniswapV2Router: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address)"(
-    _newAdmin: string,
+  "initialize(address,address)"(
+    _admin: string,
+    _uniswapV2Router: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -309,6 +332,18 @@ export class FeeWithdrawal extends Contract {
 
   "rescueFunds(address)"(
     _token: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  swapFees(
+    _lendingPairs: string[],
+    amountOuts: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "swapFees(address[],uint256[])"(
+    _lendingPairs: string[],
+    amountOuts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -352,17 +387,13 @@ export class FeeWithdrawal extends Contract {
 
   "edgeToken()"(overrides?: CallOverrides): Promise<string>;
 
-  withdrawFeesAndSwap(
+  withdrawFees(
     _lendingPairs: string[],
-    amountOuts: BigNumberish[],
-    _convert: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "withdrawFeesAndSwap(address[],uint256[],bool)"(
+  "withdrawFees(address[])"(
     _lendingPairs: string[],
-    amountOuts: BigNumberish[],
-    _convert: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -383,10 +414,15 @@ export class FeeWithdrawal extends Contract {
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
 
-    initialize(_newAdmin: string, overrides?: CallOverrides): Promise<void>;
+    initialize(
+      _admin: string,
+      _uniswapV2Router: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    "initialize(address)"(
-      _newAdmin: string,
+    "initialize(address,address)"(
+      _admin: string,
+      _uniswapV2Router: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -402,6 +438,18 @@ export class FeeWithdrawal extends Contract {
 
     "rescueFunds(address)"(
       _token: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    swapFees(
+      _lendingPairs: string[],
+      amountOuts: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "swapFees(address[],uint256[])"(
+      _lendingPairs: string[],
+      amountOuts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -435,17 +483,13 @@ export class FeeWithdrawal extends Contract {
 
     "edgeToken()"(overrides?: CallOverrides): Promise<string>;
 
-    withdrawFeesAndSwap(
+    withdrawFees(
       _lendingPairs: string[],
-      amountOuts: BigNumberish[],
-      _convert: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "withdrawFeesAndSwap(address[],uint256[],bool)"(
+    "withdrawFees(address[])"(
       _lendingPairs: string[],
-      amountOuts: BigNumberish[],
-      _convert: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -485,12 +529,20 @@ export class FeeWithdrawal extends Contract {
       { newAdmin: string; timestamp: BigNumber }
     >;
 
-    LogWithdrawFees(
+    LogWithSwap(
       totalEdgeReceived: null,
       timestamp: null
     ): TypedEventFilter<
       [BigNumber, BigNumber],
       { totalEdgeReceived: BigNumber; timestamp: BigNumber }
+    >;
+
+    LogWithdrawFees(
+      totalWithdrawnFees: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { totalWithdrawnFees: BigNumber; timestamp: BigNumber }
     >;
   };
 
@@ -512,12 +564,14 @@ export class FeeWithdrawal extends Contract {
     "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
-      _newAdmin: string,
+      _admin: string,
+      _uniswapV2Router: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address)"(
-      _newAdmin: string,
+    "initialize(address,address)"(
+      _admin: string,
+      _uniswapV2Router: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -536,6 +590,18 @@ export class FeeWithdrawal extends Contract {
 
     "rescueFunds(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    swapFees(
+      _lendingPairs: string[],
+      amountOuts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "swapFees(address[],uint256[])"(
+      _lendingPairs: string[],
+      amountOuts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -579,17 +645,13 @@ export class FeeWithdrawal extends Contract {
 
     "edgeToken()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    withdrawFeesAndSwap(
+    withdrawFees(
       _lendingPairs: string[],
-      amountOuts: BigNumberish[],
-      _convert: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "withdrawFeesAndSwap(address[],uint256[],bool)"(
+    "withdrawFees(address[])"(
       _lendingPairs: string[],
-      amountOuts: BigNumberish[],
-      _convert: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -614,12 +676,14 @@ export class FeeWithdrawal extends Contract {
     ): Promise<PopulatedTransaction>;
 
     initialize(
-      _newAdmin: string,
+      _admin: string,
+      _uniswapV2Router: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address)"(
-      _newAdmin: string,
+    "initialize(address,address)"(
+      _admin: string,
+      _uniswapV2Router: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -638,6 +702,18 @@ export class FeeWithdrawal extends Contract {
 
     "rescueFunds(address)"(
       _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    swapFees(
+      _lendingPairs: string[],
+      amountOuts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "swapFees(address[],uint256[])"(
+      _lendingPairs: string[],
+      amountOuts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -681,17 +757,13 @@ export class FeeWithdrawal extends Contract {
 
     "edgeToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    withdrawFeesAndSwap(
+    withdrawFees(
       _lendingPairs: string[],
-      amountOuts: BigNumberish[],
-      _convert: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "withdrawFeesAndSwap(address[],uint256[],bool)"(
+    "withdrawFees(address[])"(
       _lendingPairs: string[],
-      amountOuts: BigNumberish[],
-      _convert: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
