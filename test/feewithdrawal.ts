@@ -113,18 +113,18 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
         })
 
         it('swapFees', async () => {
-            const { EdgeToken, BorrowAsset } = vars
+            const { EdgeToken, BorrowAsset, accounts: [admin, frank] } = vars
 
             // do withdraw
             const withdrawTx = await ( await FeeWithdrawal.withdrawFees([ LendingPair.address ])).wait();
             const withdrawFeesValue = withdrawTx.events?.find((e: any) => e.event === 'LogWithdrawFees');
             const totalWithdrawnFees = (withdrawFeesValue!.args!.totalWithdrawnFees).toNumber();
 
+            await expect(
+                FeeWithdrawal.connect(frank.signer).swapFees( [ await LendingPair.asset() ], [ 0 ])
+            ).to.be.revertedWith('ONLY_ADMIN')
 
-            const swapTx = await ( await FeeWithdrawal.swapFees(
-                [ await LendingPair.asset() ],
-                [ 0 ]
-            )).wait();
+            const swapTx = await ( await FeeWithdrawal.swapFees( [ await LendingPair.asset() ], [ 0 ])).wait();
             const swapFessValue = swapTx.events?.find((e: any) => e.event === 'LogWithSwap');
             const totalEdgeReceived = (swapFessValue!.args!.totalEdgeReceived).toNumber();
 

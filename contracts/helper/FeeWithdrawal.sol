@@ -115,7 +115,7 @@ contract FeeWithdrawal is UUPSProxiable {
     function swapFees(
         IERC20[] calldata _assets,
         uint256[] calldata amountOuts
-    ) external onlyEOA {
+    ) external onlyAdmin {
         require(_assets.length > 0, "assets.length");
 
         uint256 totalEdgeReceived = 0;
