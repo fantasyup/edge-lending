@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { BigNumber } from "ethers";
 
 import { runTestSuite, TestVars, defaultLendingPairInitVars, setupAndInitLendingPair } from "./lib";
-import { deployUUPSProxy, deployContract, deployFeeWithdrawl, deployLendingPair, deployMockUniswapV2Router02 } from "../helpers/contracts";
+import { deployUUPSProxy, deployContract, deployFeeWithdrawal, deployLendingPair, deployMockUniswapV2Router02 } from "../helpers/contracts";
 import { ContractId } from "../helpers/types";
 import {
     FeeWithdrawal as FeeWithdrawalContract,
@@ -55,7 +55,7 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
         expect(await proxiedFeeWithdrawl.getCodeAddress()).to.eq(newFeeWithdrawl.address);
     })
 
-    describe('senariose', async () => {
+    describe('scenarios', async () => {
         let LendingPair: LendingPairContract;
         let FeeWithdrawal: FeeWithdrawalContract;
 
@@ -74,7 +74,7 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
             await EdgeToken.mint(mockUniswapV2Router.address, amountToDeposit);
 
             // deploy new FeeWithdrawl
-            FeeWithdrawal = await deployFeeWithdrawl(
+            FeeWithdrawal = await deployFeeWithdrawal(
                 await vars.FeeWithdrawal.vault(),
                 await vars.FeeWithdrawal.receiver(),
                 EdgeToken.address,
@@ -113,7 +113,7 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
         })
 
         it('swapFees', async () => {
-            const { Vault, EdgeToken, BorrowAsset } = vars
+            const { EdgeToken, BorrowAsset } = vars
 
             // do withdraw
             const withdrawTx = await ( await FeeWithdrawal.withdrawFees([ LendingPair.address ])).wait();
@@ -122,7 +122,7 @@ runTestSuite("FeeWithdrawal", async (vars: TestVars) => {
 
 
             const swapTx = await ( await FeeWithdrawal.swapFees(
-                [ LendingPair.address ],
+                [ await LendingPair.asset() ],
                 [ 0 ]
             )).wait();
             const swapFessValue = swapTx.events?.find((e: any) => e.event === 'LogWithSwap');

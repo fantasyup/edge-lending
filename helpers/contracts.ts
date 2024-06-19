@@ -256,7 +256,7 @@ export const deployMockDistributorManager = async() => {
     return await deployContract<LendingPairFactory>(ContractId.MockDistributorManager, [])
 }
 
-export const deployFeeWithdrawl = async (
+export const deployFeeWithdrawal = async (
     vault: EthereumAddress,
     receiver: EthereumAddress,
     edgeToken: EthereumAddress,

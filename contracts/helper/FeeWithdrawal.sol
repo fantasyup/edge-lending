@@ -110,22 +110,18 @@ contract FeeWithdrawal is UUPSProxiable {
     }
 
     /// @dev swap Fees with edgeToken
-    /// @param _lendingPairs lending pair addresses
+    /// @param _assets assets to be swaped
     /// @param amountOuts Minimum expected amountOut of the lending pair reserve swap
     function swapFees(
-        IBSLendingPair[] calldata _lendingPairs,
+        IERC20[] calldata _assets,
         uint256[] calldata amountOuts
     ) external onlyEOA {
-        require(
-            _lendingPairs.length > 0,
-            "lendingPairs.length"
-        );
+        require(_assets.length > 0, "assets.length");
 
         uint256 totalEdgeReceived = 0;
 
-        for (uint256 i = 0; i < _lendingPairs.length; i++) {
-            IBSLendingPair pair = _lendingPairs[i];
-            IERC20 asset = pair.asset();
+        for (uint256 i = 0; i < _assets.length; i++) {
+            IERC20 asset = _assets[i];
             
             uint256 amountToTrade = asset.balanceOf(address(this));
 

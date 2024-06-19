@@ -227,13 +227,13 @@ export class FeeWithdrawal extends Contract {
     ): Promise<ContractTransaction>;
 
     swapFees(
-      _lendingPairs: string[],
+      _assets: string[],
       amountOuts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "swapFees(address[],uint256[])"(
-      _lendingPairs: string[],
+      _assets: string[],
       amountOuts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -336,13 +336,13 @@ export class FeeWithdrawal extends Contract {
   ): Promise<ContractTransaction>;
 
   swapFees(
-    _lendingPairs: string[],
+    _assets: string[],
     amountOuts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "swapFees(address[],uint256[])"(
-    _lendingPairs: string[],
+    _assets: string[],
     amountOuts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -442,13 +442,13 @@ export class FeeWithdrawal extends Contract {
     ): Promise<void>;
 
     swapFees(
-      _lendingPairs: string[],
+      _assets: string[],
       amountOuts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
 
     "swapFees(address[],uint256[])"(
-      _lendingPairs: string[],
+      _assets: string[],
       amountOuts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -594,13 +594,13 @@ export class FeeWithdrawal extends Contract {
     ): Promise<BigNumber>;
 
     swapFees(
-      _lendingPairs: string[],
+      _assets: string[],
       amountOuts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "swapFees(address[],uint256[])"(
-      _lendingPairs: string[],
+      _assets: string[],
       amountOuts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -706,13 +706,13 @@ export class FeeWithdrawal extends Contract {
     ): Promise<PopulatedTransaction>;
 
     swapFees(
-      _lendingPairs: string[],
+      _assets: string[],
       amountOuts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "swapFees(address[],uint256[])"(
-      _lendingPairs: string[],
+      _assets: string[],
       amountOuts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
