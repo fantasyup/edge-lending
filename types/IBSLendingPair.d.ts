@@ -35,6 +35,8 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     "initialize(string,string,address,address,tuple,address,address,address)": FunctionFragment;
     "oracle()": FunctionFragment;
     "redeem(address,uint256)": FunctionFragment;
+    "totalReserves()": FunctionFragment;
+    "withdrawFees(uint256)": FunctionFragment;
     "wrappedCollateralAsset()": FunctionFragment;
     "wrapperBorrowedAsset()": FunctionFragment;
   };
@@ -103,6 +105,14 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "totalReserves",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawFees",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "wrappedCollateralAsset",
     values?: undefined
   ): string;
@@ -152,6 +162,14 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalReserves",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawFees",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "wrappedCollateralAsset",
     data: BytesLike
@@ -380,6 +398,20 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    totalReserves(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "totalReserves()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    withdrawFees(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "withdrawFees(uint256)"(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     wrappedCollateralAsset(overrides?: CallOverrides): Promise<[string]>;
 
     "wrappedCollateralAsset()"(overrides?: CallOverrides): Promise<[string]>;
@@ -533,6 +565,20 @@ export class IBSLendingPair extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  totalReserves(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "totalReserves()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  withdrawFees(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "withdrawFees(uint256)"(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   wrappedCollateralAsset(overrides?: CallOverrides): Promise<string>;
 
   "wrappedCollateralAsset()"(overrides?: CallOverrides): Promise<string>;
@@ -683,6 +729,20 @@ export class IBSLendingPair extends Contract {
     "redeem(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    totalReserves(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "totalReserves()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    withdrawFees(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "withdrawFees(uint256)"(
+      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1005,6 +1065,20 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    totalReserves(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "totalReserves()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    withdrawFees(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "withdrawFees(uint256)"(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     wrappedCollateralAsset(overrides?: CallOverrides): Promise<BigNumber>;
 
     "wrappedCollateralAsset()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1158,6 +1232,20 @@ export class IBSLendingPair extends Contract {
     "redeem(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    totalReserves(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "totalReserves()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    withdrawFees(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "withdrawFees(uint256)"(
+      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

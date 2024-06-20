@@ -72,7 +72,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     uint256 public override borrowIndex;
 
     /// @notice Total amount of reserves of the underlying held in this market
-    uint256 public totalReserves;
+    uint256 public override totalReserves;
 
     /// @dev The amount of collateral required for a borrow position in 1e18
     uint256 public collateralFactor;
@@ -607,7 +607,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice withdrawFees to the feeWithdrawalAddr
     /// @param _toWithdraw is the amount of a reservers being withdrawn
     /// @dev this function can be called by anyone
-    function withdrawFees(uint256 _toWithdraw) external {
+    function withdrawFees(uint256 _toWithdraw) external override {
         require(totalReserves >= _toWithdraw, "NOT_ENOUGH_BALANCE");
 
         totalReserves = totalReserves - _toWithdraw;

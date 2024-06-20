@@ -13,12 +13,13 @@ import {
     MockLendingPair,
     MockPriceOracle,
     MockToken,
-    MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken 
+    MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken,
+    FeeWithdrawal,
+    MockUniswapV2Router02,
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
 import { MockChainlinkUSDAdapter } from "../types/MockChainlinkUSDAdapter";
-import { VaultStorageLayout } from "../types/VaultStorageLayout";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
@@ -135,18 +136,16 @@ export const getRewardDistributorManagerDeployment = async(): Promise<RewardDist
     )) as RewardDistributorManager
 }
 
+export const getFeeWithdrawalDeployment = async(): Promise<FeeWithdrawal> => {
+    return (await ethers.getContractAt(
+        ContractId.FeeWithdrawal,
+        (await deployments.get(ContractId.FeeWithdrawal)).address
+    )) as FeeWithdrawal
+}
+
 export const deployMockToken = async(decimals ?: number) => {
     return await deployContract<MockToken>(ContractId.MockToken, [decimals || 18])
 }
-
-// export const deployLendingPair = async () => {
-//     const dataTypesLib = await deployDataTypesLib()
-
-//     return await deployContract<LendingPair>(ContractId.LendingPair, [], 
-//     {
-//         DataTypes: dataTypesLib.address
-//     })
-// }
 
 export const deployUUPSProxy = async () => {
     return await deployContract<UUPSProxy>(ContractId.UUPSProxy, [])
@@ -257,3 +256,40 @@ export const deployMockDistributorManager = async() => {
     return await deployContract<LendingPairFactory>(ContractId.MockDistributorManager, [])
 }
 
+export const deployFeeWithdrawal = async (
+    vault: EthereumAddress,
+    receiver: EthereumAddress,
+    edgeToken: EthereumAddress,
+    weth: EthereumAddress,
+) => {
+    return await deployContract<FeeWithdrawal>(
+        ContractId.FeeWithdrawal,
+        [vault, receiver, edgeToken, weth]
+    );
+}
+
+
+export const deployLendingPair = async (
+    vault: EthereumAddress,
+    oracle: EthereumAddress,
+    feewithdrawalAddr: EthereumAddress,
+    feeShare: BigNumber
+) => {
+    return await deployContract<LendingPair>(
+        ContractId.LendingPair, [
+            vault, oracle, feewithdrawalAddr, feeShare
+        ], 
+        {
+            DataTypes: (await deployContract<DataTypes>('DataTypes', [])).address,
+            // SafeERC20: (await deployContract<SafeERC20>('SafeERC20', [])).address
+        }
+    );
+}
+
+
+export const deployMockUniswapV2Router02 = async () => {
+    return await deployContract<MockUniswapV2Router02>(
+        ContractId.MockUniswapV2Router02,
+        []
+    )
+}

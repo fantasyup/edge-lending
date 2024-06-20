@@ -19,25 +19,25 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface BSTokenUpgradeableProxyBaseInterface extends ethers.utils.Interface {
+interface MockUniswapV2Router02Interface extends ethers.utils.Interface {
   functions: {
-    "initializeProxy(address)": FunctionFragment;
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "initializeProxy",
-    values: [string]
+    functionFragment: "swapExactTokensForTokens",
+    values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "initializeProxy",
+    functionFragment: "swapExactTokensForTokens",
     data: BytesLike
   ): Result;
 
   events: {};
 }
 
-export class BSTokenUpgradeableProxyBase extends Contract {
+export class MockUniswapV2Router02 extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -78,64 +78,104 @@ export class BSTokenUpgradeableProxyBase extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: BSTokenUpgradeableProxyBaseInterface;
+  interface: MockUniswapV2Router02Interface;
 
   functions: {
-    initializeProxy(
-      initialAddress: string,
+    swapExactTokensForTokens(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initializeProxy(address)"(
-      initialAddress: string,
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  initializeProxy(
-    initialAddress: string,
+  swapExactTokensForTokens(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    path: string[],
+    to: string,
+    deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initializeProxy(address)"(
-    initialAddress: string,
+  "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    path: string[],
+    to: string,
+    deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    initializeProxy(
-      initialAddress: string,
+    swapExactTokensForTokens(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber[]>;
 
-    "initializeProxy(address)"(
-      initialAddress: string,
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber[]>;
   };
 
   filters: {};
 
   estimateGas: {
-    initializeProxy(
-      initialAddress: string,
+    swapExactTokensForTokens(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initializeProxy(address)"(
-      initialAddress: string,
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    initializeProxy(
-      initialAddress: string,
+    swapExactTokensForTokens(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initializeProxy(address)"(
-      initialAddress: string,
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

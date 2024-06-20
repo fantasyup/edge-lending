@@ -20,6 +20,7 @@ import {
     Vault,
     VaultFactory,
     WrapperToken,
+    FeeWithdrawal,
 } from "../types";
 import { 
   deployMockPriceOracle,
@@ -39,7 +40,8 @@ import {
   deployMockDistributorManager,
   getRewardDistributorDeployment,
   getRewardDistributorFactoryDeployment,
-  getRewardDistributorManagerDeployment
+  getRewardDistributorManagerDeployment,
+  getFeeWithdrawalDeployment
 } from "../helpers/contracts";
 import { EthereumAddress } from "../helpers/types";
 import { 
@@ -67,7 +69,8 @@ export async function makeLendingPairTestSuiteVars(
         VaultFactory: await getVaultFactoryDeployment(),
         RewardDistributor: await getRewardDistributorDeployment(),
         RewardDistributorFactory: await getRewardDistributorFactoryDeployment(),
-        RewardDistributorManager: await getRewardDistributorManagerDeployment()
+        RewardDistributorManager: await getRewardDistributorManagerDeployment(),
+        FeeWithdrawal: await getFeeWithdrawalDeployment(),
     }
 }
 
@@ -89,6 +92,7 @@ export interface IAccount {
 }
 export interface TestVars {
     BorrowAsset: MockToken,
+    EdgeToken: MockToken,
     CollateralAsset: MockToken,
     MockVault: MockVault,
     Vault: Vault,
@@ -110,10 +114,12 @@ export interface TestVars {
     RewardDistributor: RewardDistributor,
     RewardDistributorManager: RewardDistributorManager,
     RewardDistributorFactory: RewardDistributorFactory,
+    FeeWithdrawal: FeeWithdrawal,
 }
 
 const testVars: TestVars = {
     BorrowAsset: {} as MockToken,
+    EdgeToken: {} as MockToken,
     CollateralAsset: {} as MockToken,
     MockVault: {} as MockVault,
     Vault: {} as Vault,
@@ -135,6 +141,7 @@ const testVars: TestVars = {
     RewardDistributor: {} as RewardDistributor,
     RewardDistributorManager: {} as RewardDistributorManager,
     RewardDistributorFactory: {} as RewardDistributorFactory,
+    FeeWithdrawal: {} as FeeWithdrawal,
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
@@ -177,6 +184,7 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
 }
 
 export async function deployTestTokensAndMock() {
+    const BorrowAsset = await deployMockToken();
     return {
         BorrowAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
         CollateralAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
@@ -184,7 +192,10 @@ export async function deployTestTokensAndMock() {
         CollateralAsset: await deployMockToken(),
         FlashBorrower: await deployMockFlashBorrower(),
         MockVault: await deployMockVault(),
-        MockRewardDistributorManager: await deployMockDistributorManager()   
+        MockRewardDistributorManager: await deployMockDistributorManager(),
+        EdgeToken: await deployMockToken(),
+        // add WETH
+        // 
     }
 }
 

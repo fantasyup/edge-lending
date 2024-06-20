@@ -19,34 +19,25 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface IPriceOracleInterface extends ethers.utils.Interface {
+interface MockFeeWithdrawUniswapRouterInterface extends ethers.utils.Interface {
   functions: {
-    "getPriceInUSD(address)": FunctionFragment;
-    "viewPriceInUSD(address)": FunctionFragment;
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getPriceInUSD",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "viewPriceInUSD",
-    values: [string]
+    functionFragment: "swapExactTokensForTokens",
+    values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getPriceInUSD",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "swapExactTokensForTokens",
     data: BytesLike
   ): Result;
 
   events: {};
 }
 
-export class IPriceOracle extends Contract {
+export class MockFeeWithdrawUniswapRouter extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -87,112 +78,105 @@ export class IPriceOracle extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: IPriceOracleInterface;
+  interface: MockFeeWithdrawUniswapRouterInterface;
 
   functions: {
-    getPriceInUSD(
-      _token: string,
+    swapExactTokensForTokens(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "getPriceInUSD(address)"(
-      _token: string,
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    viewPriceInUSD(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    "viewPriceInUSD(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
   };
 
-  getPriceInUSD(
-    _token: string,
+  swapExactTokensForTokens(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    path: string[],
+    to: string,
+    deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "getPriceInUSD(address)"(
-    _token: string,
+  "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    path: string[],
+    to: string,
+    deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  viewPriceInUSD(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  "viewPriceInUSD(address)"(
-    _token: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   callStatic: {
-    getPriceInUSD(
-      _token: string,
+    swapExactTokensForTokens(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<void>;
 
-    "getPriceInUSD(address)"(
-      _token: string,
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    viewPriceInUSD(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "viewPriceInUSD(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
-    getPriceInUSD(
-      _token: string,
+    swapExactTokensForTokens(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "getPriceInUSD(address)"(
-      _token: string,
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    viewPriceInUSD(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "viewPriceInUSD(address)"(
-      _token: string,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getPriceInUSD(
-      _token: string,
+    swapExactTokensForTokens(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "getPriceInUSD(address)"(
-      _token: string,
+    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      path: string[],
+      to: string,
+      deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    viewPriceInUSD(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "viewPriceInUSD(address)"(
-      _token: string,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
 }
