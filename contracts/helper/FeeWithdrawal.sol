@@ -5,9 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
-import { UUPSProxiable } from "../upgradability/UUPSProxiable.sol";
+import {UUPSProxiable} from "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IBSLendingPair.sol";
-
 
 contract FeeWithdrawal is UUPSProxiable {
     using SafeERC20 for IERC20;
@@ -18,9 +17,9 @@ contract FeeWithdrawal is UUPSProxiable {
     event LogWithdrawFees(uint256 totalWithdrawnFees, uint256 timestamp);
     event LogWithSwap(uint256 totalEdgeReceived, uint256 timestamp);
 
-    uint256 constant public VERSION = 0x1;
-    
-    /// @notice The address to transfer the swapped EDGE to 
+    uint256 public constant VERSION = 0x1;
+
+    /// @notice The address to transfer the swapped EDGE to
     address public immutable receiver;
 
     /// @notice vault address
@@ -65,15 +64,9 @@ contract FeeWithdrawal is UUPSProxiable {
         require(address(_vault) != address(0), "INVALID_VAULT");
         require(_receiver != address(0), "INVALID_RECEIVER");
 
-        require(
-            _edgeToken != address(0),
-            "FeeWithdrawal: invalid token address"
-        );
-        
-        require(
-            _wethAddress != address(0),
-            "FeeWithdrawal: invalid weth address"
-        );
+        require(_edgeToken != address(0), "FeeWithdrawal: invalid token address");
+
+        require(_wethAddress != address(0), "FeeWithdrawal: invalid weth address");
 
         edgeToken = _edgeToken;
         WETH = _wethAddress;
@@ -84,16 +77,13 @@ contract FeeWithdrawal is UUPSProxiable {
     /// @dev to avoid gas costs we are gonna send the underlying pair's asset as param & compute the amount off-chain
     /// @param _lendingPairs lending pair addresses
     function withdrawFees(IBSLendingPair[] calldata _lendingPairs) external onlyEOA {
-        require(
-            _lendingPairs.length > 0,
-            "lendingPairs.length"
-        );
+        require(_lendingPairs.length > 0, "lendingPairs.length");
 
         uint256 totalWithdrawnFees = 0;
 
         for (uint256 i = 0; i < _lendingPairs.length; i++) {
             IBSLendingPair pair = _lendingPairs[i];
-            
+
             IERC20 asset = pair.asset();
             uint256 amountToWithdraw = pair.totalReserves();
 
@@ -112,23 +102,20 @@ contract FeeWithdrawal is UUPSProxiable {
     /// @dev swap Fees with edgeToken
     /// @param _assets assets to be swaped
     /// @param amountOuts Minimum expected amountOut of the lending pair reserve swap
-    function swapFees(
-        IERC20[] calldata _assets,
-        uint256[] calldata amountOuts
-    ) external onlyAdmin {
+    function swapFees(IERC20[] calldata _assets, uint256[] calldata amountOuts) external onlyAdmin {
         require(_assets.length > 0, "assets.length");
 
         uint256 totalEdgeReceived = 0;
 
         for (uint256 i = 0; i < _assets.length; i++) {
             IERC20 asset = _assets[i];
-            
+
             uint256 amountToTrade = asset.balanceOf(address(this));
 
             if (address(asset) != edgeToken) {
                 totalEdgeReceived += _convertToEdge(address(asset), amountToTrade, amountOuts[i]);
             } else {
-                totalEdgeReceived += amountToTrade;                
+                totalEdgeReceived += amountToTrade;
             }
         }
 
@@ -141,7 +128,7 @@ contract FeeWithdrawal is UUPSProxiable {
 
         emit LogTransferToReceiver(receiver, amount, block.timestamp);
     }
-    
+
     function updateAdmin(address _newAdmin) external onlyAdmin {
         require(_newAdmin != address(0), "INVALID_ADMIN");
         admin = _newAdmin;
@@ -155,7 +142,7 @@ contract FeeWithdrawal is UUPSProxiable {
     }
 
     function getPath(address from) internal view returns (address[] memory path) {
-        if(from == WETH) {
+        if (from == WETH) {
             path = new address[](2);
             path[0] = WETH;
             path[1] = edgeToken;
@@ -173,17 +160,11 @@ contract FeeWithdrawal is UUPSProxiable {
         uint256 amountOut
     ) private returns (uint256) {
         address[] memory path = getPath(from);
-        
+
         IERC20(from).safeIncreaseAllowance(address(uniswapRouter), amount);
 
         uint256[] memory amounts =
-            uniswapRouter.swapExactTokensForTokens(
-                amount,
-                amountOut,
-                path,
-                address(this),
-                10 ** 64 
-            );
+            uniswapRouter.swapExactTokensForTokens(amount, amountOut, path, address(this), 10**64);
 
         return amounts[amounts.length - 1];
     }
@@ -196,10 +177,7 @@ contract FeeWithdrawal is UUPSProxiable {
         require(_admin != address(0), "INVALID_ADMIN");
         admin = _admin;
 
-        require(
-            _uniswapV2Router != address(0),
-            "FeeWithdrawal: invalid router address"
-        );
+        require(_uniswapV2Router != address(0), "FeeWithdrawal: invalid router address");
         uniswapRouter = IUniswapV2Router02(_uniswapV2Router);
     }
 

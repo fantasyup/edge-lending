@@ -273,10 +273,9 @@ export class RewardDistributorStorageV1 extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amount: BigNumber;
+      [BigNumber, BigNumber, BigNumber] & {
+        lastAccRewardTokenPerShare: BigNumber;
         pendingReward: BigNumber;
-        rewardDebt: BigNumber;
         lastUpdateTimestamp: BigNumber;
       }
     >;
@@ -286,10 +285,9 @@ export class RewardDistributorStorageV1 extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amount: BigNumber;
+      [BigNumber, BigNumber, BigNumber] & {
+        lastAccRewardTokenPerShare: BigNumber;
         pendingReward: BigNumber;
-        rewardDebt: BigNumber;
         lastUpdateTimestamp: BigNumber;
       }
     >;
@@ -402,10 +400,9 @@ export class RewardDistributorStorageV1 extends Contract {
     arg1: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      amount: BigNumber;
+    [BigNumber, BigNumber, BigNumber] & {
+      lastAccRewardTokenPerShare: BigNumber;
       pendingReward: BigNumber;
-      rewardDebt: BigNumber;
       lastUpdateTimestamp: BigNumber;
     }
   >;
@@ -415,10 +412,9 @@ export class RewardDistributorStorageV1 extends Contract {
     arg1: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      amount: BigNumber;
+    [BigNumber, BigNumber, BigNumber] & {
+      lastAccRewardTokenPerShare: BigNumber;
       pendingReward: BigNumber;
-      rewardDebt: BigNumber;
       lastUpdateTimestamp: BigNumber;
     }
   >;
@@ -531,10 +527,9 @@ export class RewardDistributorStorageV1 extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amount: BigNumber;
+      [BigNumber, BigNumber, BigNumber] & {
+        lastAccRewardTokenPerShare: BigNumber;
         pendingReward: BigNumber;
-        rewardDebt: BigNumber;
         lastUpdateTimestamp: BigNumber;
       }
     >;
@@ -544,10 +539,9 @@ export class RewardDistributorStorageV1 extends Contract {
       arg1: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        amount: BigNumber;
+      [BigNumber, BigNumber, BigNumber] & {
+        lastAccRewardTokenPerShare: BigNumber;
         pendingReward: BigNumber;
-        rewardDebt: BigNumber;
         lastUpdateTimestamp: BigNumber;
       }
     >;

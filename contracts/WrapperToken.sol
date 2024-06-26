@@ -71,8 +71,8 @@ contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
     @param _amount is the amount of token they will receive
     **/
     function mint(address _to, uint256 _amount) external virtual override onlyLendingPair {
-        _mint(_to, _amount);
         _rewardHook(address(0), _to);
+        _mint(_to, _amount);
     }
 
     /**
@@ -82,8 +82,8 @@ contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
      * @param _amount is the amount of token to be burnt
      **/
     function burn(address _from, uint256 _amount) external virtual override onlyLendingPair {
-        _burn(_from, _amount);
         _rewardHook(_from, address(0));
+        _burn(_from, _amount);
     }
 
     function owner() external view override returns (address) {
@@ -95,7 +95,7 @@ contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
         address recipient,
         uint256 amount
     ) internal override {
-        super._transfer(sender, recipient, amount);
         _rewardHook(sender, recipient);
+        super._transfer(sender, recipient, amount);
     }
 }
