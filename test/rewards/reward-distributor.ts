@@ -286,14 +286,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     )
     
     const pending = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
-    // console.log(`kkkk ${await currentTimestamp()}`)
     const time = await currentTimestamp() - timeToStartDistribution
-    // console.log(time)
-    // console.log(await currentTimestamp())
-    // console.log({ pending })
-    // console.log((time * DISTRIBUTION_PER_SECOND) / 3)
-    // expect(pending).to.eq(366)
-
 
     // split advance and check pending
     const wrappedCollateralAsset = await ethers.getContractAt(
@@ -306,17 +299,10 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     await increaseTime(10)
 
     const bobPending = await (await RewardDistributor.pendingRewardToken(0, bob.address)).toNumber()
-    console.log({ bobPending })
-
     const kylePendingT = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
-    console.log({ kylePendingT })
-
-    // console.log({ kylePendingT })
 
     const kylePending = await (await RewardDistributor.userInfo(0, kyle.address))
-    // console.log(kylePending.amount.toNumber(), ' ',  kylePending.pendingReward.toNumber())
-    // console.log((await wrappedCollateralAsset.balanceOf(kyle.address)).toString())
-
+   
     // kyle withdraws
     await expect(
         await RewardDistributor.connect(kyle.signer).withdraw(0, kyle.address)
@@ -410,18 +396,14 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     
     const expectedPendingReward = 566
     const kylePendingReward = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
-    // console.log({ kylePendingReward })
-    // expect(kylePendingReward).to.eq(expectedPendingReward)
 
     // should allow withdrawal of rewards for 30 days after endtimestamp
     await advanceNBlocks(500)
     
     // kyle called accumulate rewards before CLAIM_GRACE_PERIOD
     const kylePendingReward2 = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
-    // console.log({ kylePendingReward2 })
     // peter calls accumulate rewards during CLAIM_GRACE_PERIOD
     const peterPendingReward = await (await RewardDistributor.pendingRewardToken(0, peter.address)).toNumber()
-    // console.log({ peterPendingReward })
     expect(kylePendingReward2).to.eq(peterPendingReward)
     await increaseTime(40 * ONE_DAY_IN_SECONDS)
 

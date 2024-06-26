@@ -5,7 +5,6 @@ import "../util/Initializable.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../interfaces/IRewardDistributor.sol";
 import "../interfaces/IRewardDistributorManager.sol";
-import "hardhat/console.sol";
 
 abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializable {
 
@@ -252,7 +251,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         }
 
         uint256 amount = pool.receiptTokenAddr.balanceOf(_user);
-        
+
         return 
             calculatePendingReward(amount, accRewardTokenPerShare, user) +
             user.pendingReward;
