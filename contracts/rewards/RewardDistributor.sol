@@ -7,7 +7,6 @@ import "../interfaces/IRewardDistributor.sol";
 import "../interfaces/IRewardDistributorManager.sol";
 
 abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializable {
-
     /// @dev PoolInfo
     struct PoolInfo {
         IERC20 receiptTokenAddr;
@@ -169,10 +168,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @dev Add a distribution param for a lending pair
     /// @param _allocPoints specifies the allocation points
     /// @param _lendingPair the lending pair being added
-    function add(
-        DistributorConfigVars calldata _allocPoints,
-        IBSLendingPair _lendingPair
-    )
+    function add(DistributorConfigVars calldata _allocPoints, IBSLendingPair _lendingPair)
         external
         onlyGuardian
     {
@@ -214,7 +210,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         delete pendingRewardActivation;
 
         // set activated to true
-        if(!activated) activated = true;
+        if (!activated) activated = true;
 
         emit ActivateReward(address(this), block.timestamp);
     }
@@ -252,9 +248,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
         uint256 amount = pool.receiptTokenAddr.balanceOf(_user);
 
-        return 
-            calculatePendingReward(amount, accRewardTokenPerShare, user) +
-            user.pendingReward;
+        return calculatePendingReward(amount, accRewardTokenPerShare, user) + user.pendingReward;
     }
 
     /// @dev return accumulated reward share for the pool
@@ -324,7 +318,10 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @dev update the end timestamp
     /// @param _newEndTimestamp new end timestamp
     function updateEndTimestamp(uint256 _newEndTimestamp) external onlyGuardian {
-        require(block.timestamp < endTimestamp && _newEndTimestamp > endTimestamp, "INVALID_TIMESTAMP");
+        require(
+            block.timestamp < endTimestamp && _newEndTimestamp > endTimestamp,
+            "INVALID_TIMESTAMP"
+        );
         endTimestamp = _newEndTimestamp;
 
         emit UpdateEndTimestamp(address(this), _newEndTimestamp, block.timestamp);
@@ -363,10 +360,8 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         UserInfo memory _userInfo
     ) internal view returns (uint256 pendingReward) {
         if (
-            _userInfo.lastUpdateTimestamp >= endTimestamp
-            ||
-            block.timestamp > endTimestamp + CLAIM_REWARD_GRACE_PERIOD
-            ||
+            _userInfo.lastUpdateTimestamp >= endTimestamp ||
+            block.timestamp > endTimestamp + CLAIM_REWARD_GRACE_PERIOD ||
             _amount == 0
         ) return 0;
 
@@ -388,11 +383,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         if (_user != address(0)) {
             UserInfo storage user = userInfo[_pid][_user];
             uint256 amount = pool.receiptTokenAddr.balanceOf(_user);
-            user.pendingReward += calculatePendingReward(
-                amount,
-                pool.accRewardTokenPerShare,
-                user
-            );
+            user.pendingReward += calculatePendingReward(amount, pool.accRewardTokenPerShare, user);
             user.lastAccRewardTokenPerShare = pool.accRewardTokenPerShare;
             user.lastUpdateTimestamp = block.timestamp;
         }
