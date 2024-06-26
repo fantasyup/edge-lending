@@ -85,6 +85,11 @@ export async function increaseTime(duration: number) {
     await ethers.provider.send('evm_mine', [])
 }
 
+export async function setNextBlockTimestamp(timestamp: number) {
+    await ethers.provider.send('evm_setNextBlockTimestamp', [timestamp]); 
+    await ethers.provider.send('evm_mine', [timestamp]);
+}
+
 export interface IAccount {
     address: EthereumAddress,
     signer: Signer,

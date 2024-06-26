@@ -8,6 +8,7 @@ import "../interfaces/IRewardDistributorManager.sol";
 import "hardhat/console.sol";
 
 abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializable {
+
     /// @dev PoolInfo
     struct PoolInfo {
         IERC20 receiptTokenAddr;
@@ -16,23 +17,10 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
         uint128 allocPoint;
     }
 
-    /// @dev
-    //
-    // We do some fancy math here. Basically, any point in time, the amount of reward tokens
-    // entitled to a user but is pending to be distributed is:
-    //
-    //   pending reward = (user.amount * pool.accRewardTokenPerShare) - user.rewardDebt
-    //
-    // Whenever a user deposits or withdraws LP tokens to a pool. Here's what happens:
-    //   1. The pool's `accRewardTokenPerShare` (and `lastUpdateTimestamp`) gets updated.
-    //   2. User's pending reward gets updated
-    //   3. User's `amount` gets updated.
-    //   4. User's `rewardDebt` gets updated.
-    //
+    /// @dev UserInfo
     struct UserInfo {
-        uint256 amount; // the balance of the user
+        uint256 lastAccRewardTokenPerShare;
         uint256 pendingReward; // pending user reward to be withdrawn
-        uint256 rewardDebt; // Reward debt
         uint256 lastUpdateTimestamp; // last time user accumulated rewards
     }
 
@@ -83,8 +71,8 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     /// @dev grace period for user to claim rewards after endTimestamp
     uint256 private constant CLAIM_REWARD_GRACE_PERIOD = 30 days;
 
-    /// @dev period for users to withdraw rewards before it can be
-    /// re-claimed by the guardian to prevent funds being locked in contract
+    /// @dev period for users to withdraw rewards after endTimestamp before it can be
+    /// reclaimed by the guardian to prevent funds being locked in contract
     uint256 private constant WITHDRAW_REWARD_GRACE_PERIOD = 90 days;
 
     event Withdraw(
@@ -263,8 +251,10 @@ contract RewardDistributor is RewardDistributorStorageV1 {
             accRewardTokenPerShare = calculatePoolReward(pool, totalSupply);
         }
 
-        return
-            calculatePendingReward(pool.receiptTokenAddr, accRewardTokenPerShare, user, _user) +
+        uint256 amount = pool.receiptTokenAddr.balanceOf(_user);
+        
+        return 
+            calculatePendingReward(amount, accRewardTokenPerShare, user) +
             user.pendingReward;
     }
 
@@ -369,25 +359,20 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     }
 
     function calculatePendingReward(
-        IERC20 _receiptTokenAddr,
+        uint256 _amount,
         uint256 _accRewardTokenPerShare,
-        UserInfo memory _userInfo,
-        address _user
+        UserInfo memory _userInfo
     ) internal view returns (uint256 pendingReward) {
-        if (_userInfo.lastUpdateTimestamp > endTimestamp) return 0;
-
-        uint256 amount = _userInfo.amount;
-
         if (
-            _userInfo.amount == 0 &&
-            _userInfo.pendingReward == 0 &&
-            _userInfo.rewardDebt == 0 &&
-            block.timestamp < endTimestamp + CLAIM_REWARD_GRACE_PERIOD
-        ) {
-            amount = _receiptTokenAddr.balanceOf(_user);
-        }
+            _userInfo.lastUpdateTimestamp >= endTimestamp
+            ||
+            block.timestamp > endTimestamp + CLAIM_REWARD_GRACE_PERIOD
+            ||
+            _amount == 0
+        ) return 0;
 
-        pendingReward = ((amount * _accRewardTokenPerShare) / SHARE_SCALE) - _userInfo.rewardDebt;
+        uint256 rewardDebt = (_amount * _userInfo.lastAccRewardTokenPerShare) / SHARE_SCALE;
+        pendingReward = ((_amount * _accRewardTokenPerShare) / SHARE_SCALE) - rewardDebt;
     }
 
     /// @dev update pool and accrue rewards for user
@@ -403,14 +388,13 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
         if (_user != address(0)) {
             UserInfo storage user = userInfo[_pid][_user];
+            uint256 amount = pool.receiptTokenAddr.balanceOf(_user);
             user.pendingReward += calculatePendingReward(
-                pool.receiptTokenAddr,
+                amount,
                 pool.accRewardTokenPerShare,
-                user,
-                _user
+                user
             );
-            user.amount = IERC20(pool.receiptTokenAddr).balanceOf(_user);
-            user.rewardDebt = ((user.amount * pool.accRewardTokenPerShare) / SHARE_SCALE);
+            user.lastAccRewardTokenPerShare = pool.accRewardTokenPerShare;
             user.lastUpdateTimestamp = block.timestamp;
         }
     }

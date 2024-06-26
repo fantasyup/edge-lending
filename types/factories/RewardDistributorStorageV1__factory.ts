@@ -294,17 +294,12 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "amount",
+        name: "lastAccRewardTokenPerShare",
         type: "uint256",
       },
       {
         internalType: "uint256",
         name: "pendingReward",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "rewardDebt",
         type: "uint256",
       },
       {

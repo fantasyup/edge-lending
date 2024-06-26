@@ -1,26 +1,41 @@
 import { ethers, waffle } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import { expect, assert } from "chai";
-import { runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars, advanceNBlocks, currentTimestamp, increaseTime } from "../lib";
-import { deployMockDistributorManager, deployUUPSProxy } from "../../helpers/contracts";
+import { runTestSuite, setupAndInitLendingPair, TestVars, defaultLendingPairInitVars, advanceNBlocks, increaseTime, currentTimestamp, setNextBlockTimestamp } from "../lib";
+import {
+    deployMockDistributorManager,
+    deployUUPSProxy
+} from "../../helpers/contracts";
 import { ContractId } from "../../helpers/types";
 
 const ONE_DAY_IN_SECONDS = 86400
+const MIN_SECS = 1000
+const MAX_SECS = 5000
+const DISTRIBUTION_PER_SECOND = 100
 
-async function setupAndInitRewardDistributor(vars: TestVars) {
+async function setupAndInitRewardDistributor(vars: TestVars): Promise<{
+    timeToStartDistribution: number, timeToEndDistribution: number
+}> {
     const {
         LendingPair,
         RewardDistributor,
+        RewardDistributorManager,
         BorrowAsset,
         accounts: [admin, bob, kyle]
       } = vars
+          
+    // credit the reward distributor address with tokens
+    await BorrowAsset.setBalanceTo(RewardDistributor.address, 1_000_000_000);
+
+    const timeToStartDistribution = await currentTimestamp() + MIN_SECS
+    const timeToEndDistribution = await currentTimestamp() + MAX_SECS
 
     await RewardDistributor.initialize(
         "uniswap",
         BorrowAsset.address,
-        100,
-        await currentTimestamp() + 100,
-        await currentTimestamp() + 180,
+        DISTRIBUTION_PER_SECOND,
+        timeToStartDistribution,
+        timeToEndDistribution,
         admin.address
     )
 
@@ -36,6 +51,12 @@ async function setupAndInitRewardDistributor(vars: TestVars) {
         LendingPair.address
         )
     ).to.emit(RewardDistributor, 'AddDistribution')
+
+    await expect(
+        RewardDistributor.activatePendingRewards()
+    ).to.be.revertedWith("ONLY_APPROVED_DISTRIBUTOR")
+
+    return { timeToStartDistribution, timeToEndDistribution }
 }
 
 runTestSuite("RewardDistributor", (vars: TestVars) => {
@@ -218,31 +239,8 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     )
     
     await RewardDistributorManager.initialize(admin.address);
-    const endSeconds = 500
 
-    // credit the reward distributor address with tokens
-    await BorrowAsset.setBalanceTo(RewardDistributor.address, 1_000_000_000);
-    
-    const blockCurrentTimestamp = await currentTimestamp()
-    await RewardDistributor.initialize(
-        "uniswap",
-        BorrowAsset.address,
-        100,
-        blockCurrentTimestamp + 100,
-        blockCurrentTimestamp + endSeconds,
-        admin.address
-    )
-
-    const allocPoints = {
-        collateralTokenAllocPoint: 1,
-        debtTokenAllocPoint: 1,
-        borrowAssetTokenAllocPoint: 1
-    }
-
-    await RewardDistributor.add(
-        allocPoints,
-        LendingPair.address
-    )
+    const { timeToStartDistribution, timeToEndDistribution } = await setupAndInitRewardDistributor(vars);
     
     // should reject a
     await expect(
@@ -251,10 +249,9 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
     // approve distributor on manager
     await RewardDistributorManager["setDistributorStatus(address,bool)"](RewardDistributor.address, true)
+
     // activate rewards
     await RewardDistributor.activatePendingRewards();
-
-
     
     // confirm that the rewards have been activated
     expect(await RewardDistributorManager.tokenRewardToDistributors(
@@ -271,19 +268,31 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         await LendingPair.debtToken(),
         0
     )).to.eq(RewardDistributor.address)
-    
-    // increase time to start distributing rewards
-    await increaseTime(100)
 
     // kyle deposits borrow asset
     // helper.depositBorrowAsset(kyle, 1000)
+    await increaseTime(timeToStartDistribution - await currentTimestamp())
+
     const amountToDeposit = 1000
     await helper.depositCollateralAsset(kyle, amountToDeposit)
 
-    await advanceNBlocks(10)
+
+    await increaseTime(10)
+
+    // call accumulate rewards
+    await RewardDistributor["accumulateReward(address,address)"](
+        await LendingPair.wrappedCollateralAsset(),
+        kyle.address
+    )
     
     const pending = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
+    // console.log(`kkkk ${await currentTimestamp()}`)
+    const time = await currentTimestamp() - timeToStartDistribution
+    // console.log(time)
+    // console.log(await currentTimestamp())
     // console.log({ pending })
+    // console.log((time * DISTRIBUTION_PER_SECOND) / 3)
+    // expect(pending).to.eq(366)
 
 
     // split advance and check pending
@@ -294,13 +303,13 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
 
     await wrappedCollateralAsset.connect(kyle.signer).transfer(bob.address, amountToDeposit / 2)
     
-    await advanceNBlocks(10)
+    await increaseTime(10)
 
     const bobPending = await (await RewardDistributor.pendingRewardToken(0, bob.address)).toNumber()
-    // console.log({ bobPending })
+    console.log({ bobPending })
 
     const kylePendingT = await (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
-    // console.log({ kylePendingT })
+    console.log({ kylePendingT })
 
     // console.log({ kylePendingT })
 
@@ -321,7 +330,7 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
     ).to.eq(0)
 
     // stop accumulating after end timestamp
-    await advanceNBlocks(endSeconds)
+    await increaseTime(timeToEndDistribution - await currentTimestamp())
 
     // call accumulate rewards
     await RewardDistributor.accumulateReward(await LendingPair.wrappedCollateralAsset(), kyle.address)
@@ -507,9 +516,10 @@ runTestSuite("RewardDistributor", (vars: TestVars) => {
         kyle.address
     )
     const balance = await (await BorrowAsset.balanceOf(kyle.address)).toNumber();
-    const paidOut = (await RewardDistributor.userInfo(0, kyle.address)).rewardDebt.toNumber()
+    const paidOut = (await RewardDistributor.pendingRewardToken(0, kyle.address)).toNumber()
+    expect(paidOut).to.eq(0)
 
-    expect(balance).to.eq(paidOut)
+    // check debt reward calculation
   })
 
 })
