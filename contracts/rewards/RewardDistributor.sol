@@ -248,7 +248,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
         uint256 amount = pool.receiptTokenAddr.balanceOf(_user);
 
-        return calculatePendingReward(amount, accRewardTokenPerShare, user) + user.pendingReward;
+        return calculatePendingReward(amount, accRewardTokenPerShare, user);
     }
 
     /// @dev return accumulated reward share for the pool
@@ -367,6 +367,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
 
         uint256 rewardDebt = (_amount * _userInfo.lastAccRewardTokenPerShare) / SHARE_SCALE;
         pendingReward = ((_amount * _accRewardTokenPerShare) / SHARE_SCALE) - rewardDebt;
+        pendingReward += _userInfo.pendingReward;
     }
 
     /// @dev update pool and accrue rewards for user
@@ -383,7 +384,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
         if (_user != address(0)) {
             UserInfo storage user = userInfo[_pid][_user];
             uint256 amount = pool.receiptTokenAddr.balanceOf(_user);
-            user.pendingReward += calculatePendingReward(amount, pool.accRewardTokenPerShare, user);
+            user.pendingReward = calculatePendingReward(amount, pool.accRewardTokenPerShare, user);
             user.lastAccRewardTokenPerShare = pool.accRewardTokenPerShare;
             user.lastUpdateTimestamp = block.timestamp;
         }
