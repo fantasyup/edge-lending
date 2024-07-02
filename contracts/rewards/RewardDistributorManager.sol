@@ -6,7 +6,6 @@ import "../interfaces/IRewardDistributor.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IRewardDistributorManager.sol";
-import "hardhat/console.sol";
 
 abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable, IRewardDistributorManager {
     /// @dev admin
