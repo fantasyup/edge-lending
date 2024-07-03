@@ -39,7 +39,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updatePairImpl(ethers.constants.AddressZero)
-        ).to.revertedWith("INVALID_CONTRACT")
+        ).to.revertedWith("INV_C")
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updatePairImpl(bob.address)
@@ -58,7 +58,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateCollateralWrapperImpl(ethers.constants.AddressZero)
-        ).to.revertedWith("INVALID_CONTRACT")
+        ).to.revertedWith("INV_C")
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateCollateralWrapperImpl(bob.address)
@@ -77,7 +77,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateDebtTokenImpl(ethers.constants.AddressZero)
-        ).to.revertedWith("INVALID_CONTRACT")
+        ).to.revertedWith("INV_C")
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateDebtTokenImpl(bob.address)
@@ -96,7 +96,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateBorrowAssetWrapperImpl(ethers.constants.AddressZero)
-        ).to.revertedWith("INVALID_CONTRACT")
+        ).to.revertedWith("INV_C")
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateBorrowAssetWrapperImpl(bob.address)

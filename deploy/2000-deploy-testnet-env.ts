@@ -122,4 +122,5 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
 
 export default deployTestnet
 deployTestnet.tags = [`${tag}`]
+deployTestnet.dependencies = [ContractId.LendingPairFactory]
 deployTestnet.runAtTheEnd = true;

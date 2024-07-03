@@ -46,12 +46,12 @@ contract LendingPairFactory is Pausable {
         address _borrowAssetWrapperLogic,
         address _rewardDistributionManager
     ) {
-        require(_owner != address(0), "invalid owner");
-        require(_pairLogic != address(0), "invalid pair logic");
-        require(_collateralWrapperLogic != address(0), "invalid collateral wrapper logic");
-        require(_debtTokenLogic != address(0), "invalid debt logic");
-        require(_borrowAssetWrapperLogic != address(0), "invalid borrow asset logic");
-        require(_rewardDistributionManager != address(0), "invalid reward manager logic");
+        require(_owner != address(0), "inv_o");
+        require(_pairLogic != address(0), "inv_l");
+        require(_collateralWrapperLogic != address(0), "inv_c");
+        require(_debtTokenLogic != address(0), "inv_d");
+        require(_borrowAssetWrapperLogic != address(0), "inv_b");
+        require(_rewardDistributionManager != address(0), "inv_r");
 
         owner = _owner;
         lendingPairImplementation = _pairLogic;
@@ -72,31 +72,31 @@ contract LendingPairFactory is Pausable {
     }
 
     function updatePairImpl(address _newLogicContract) external onlyOwner {
-        require(_newLogicContract != address(0), "INVALID_CONTRACT");
+        require(_newLogicContract != address(0), "INV_C");
         lendingPairImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
 
     function updateCollateralWrapperImpl(address _newLogicContract) external onlyOwner {
-        require(_newLogicContract != address(0), "INVALID_CONTRACT");
+        require(_newLogicContract != address(0), "INV_C");
         collateralWrapperImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
 
     function updateDebtTokenImpl(address _newLogicContract) external onlyOwner {
-        require(_newLogicContract != address(0), "INVALID_CONTRACT");
+        require(_newLogicContract != address(0), "INV_C");
         debtTokenImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
 
     function updateBorrowAssetWrapperImpl(address _newLogicContract) external onlyOwner {
-        require(_newLogicContract != address(0), "INVALID_CONTRACT");
+        require(_newLogicContract != address(0), "INV_C");
         borrowAssetWrapperImplementation = _newLogicContract;
         emit LogicContractUpdated(_newLogicContract);
     }
     
     function updateRewardManager(address _newManager) external onlyOwner {
-        require(_newManager != address(0), "INVALID_CONTRACT");
+        require(_newManager != address(0), "INV_C");
         rewardDistributionManager = _newManager;
         emit LogicContractUpdated(_newManager);
     }
@@ -116,7 +116,7 @@ contract LendingPairFactory is Pausable {
         onlyOwner
         returns (address ir)
     {
-        require(address(_team) != address(0), "invalid team");
+        require(address(_team) != address(0), "inv_t");
 
         ir = address(
             new JumpRateModelV2(
@@ -164,12 +164,12 @@ contract LendingPairFactory is Pausable {
         IERC20 _collateralAsset,
         BorrowLocalVars calldata _borrowVars
     ) external whenNotPaused returns (address newLendingPair) {
-        require(_pauseGuardian != address(0), "INVALID_GUARDIAN");
-        require(address(_collateralAsset) != address(0), "INVALID_C_ASSET");
-        require(address(_borrowVars.borrowAsset) != address(0), "INVALID_B_ASSET");
+        require(_pauseGuardian != address(0), "INV_G");
+        require(address(_collateralAsset) != address(0), "INV_C");
+        require(address(_borrowVars.borrowAsset) != address(0), "INV_B");
         require(
             validInterestRateModels[address(_borrowVars.interestRateModel)] == true,
-            "INVALID_INTEREST_MODEL"
+            "INV_I"
         );
 
 

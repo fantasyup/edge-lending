@@ -48,6 +48,7 @@ export const deployAndInitUUPSProxy = async(
         from: deployer,
         args: [],
         log: true,
+
     })
   
       // initialize proxy
@@ -58,6 +59,7 @@ export const deployAndInitUUPSProxy = async(
 
     if (tx.newlyDeployed) {
         await (await uups.initializeProxy(implementation)).wait()
+        console.log(`Successfully Initialized ${id} proxy`)
     }
 }
 export const deployDataTypesLib = async () => {
