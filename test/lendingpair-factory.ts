@@ -39,7 +39,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updatePairImpl(ethers.constants.AddressZero)
-        ).to.revertedWith("INVALID_CONTRACT")
+        ).to.revertedWith("INV_C")
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updatePairImpl(bob.address)
@@ -58,7 +58,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateCollateralWrapperImpl(ethers.constants.AddressZero)
-        ).to.revertedWith("INVALID_CONTRACT")
+        ).to.revertedWith("INV_C")
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateCollateralWrapperImpl(bob.address)
@@ -77,7 +77,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateDebtTokenImpl(ethers.constants.AddressZero)
-        ).to.revertedWith("INVALID_CONTRACT")
+        ).to.revertedWith("INV_C")
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateDebtTokenImpl(bob.address)
@@ -96,7 +96,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateBorrowAssetWrapperImpl(ethers.constants.AddressZero)
-        ).to.revertedWith("INVALID_CONTRACT")
+        ).to.revertedWith("INV_C")
 
         await expect(
             LendingPairFactory.connect(vars.blackSmithTeam.signer).updateBorrowAssetWrapperImpl(bob.address)
@@ -218,7 +218,7 @@ runTestSuite("LendingPairFactory", (vars: TestVars) => {
         await expect(await lendingPair.interestRate()).eq(modelEv!.args!.ir)
         await expect(await (await lendingPair.liquidationFee()).toString()).eq(liquidationFee.toString())
         await expect(await (await lendingPair.collateralFactor()).toString()).eq(collateralFactor.toString())
-        await expect(await (await lendingPair["feeWithdrawalAddr()"]()).toString()).eq(vars.blackSmithTeam.address)
+        await expect(await (await lendingPair["feeWithdrawalAddr()"]()).toString()).eq(vars.FeeWithdrawal.address)
         
     })
 

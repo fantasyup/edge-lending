@@ -119,7 +119,7 @@ export interface TestVars {
     RewardDistributor: RewardDistributor,
     RewardDistributorManager: RewardDistributorManager,
     RewardDistributorFactory: RewardDistributorFactory,
-    FeeWithdrawal: FeeWithdrawal,
+    FeeWithdrawal: FeeWithdrawal
 }
 
 const testVars: TestVars = {
@@ -146,7 +146,7 @@ const testVars: TestVars = {
     RewardDistributor: {} as RewardDistributor,
     RewardDistributorManager: {} as RewardDistributorManager,
     RewardDistributorFactory: {} as RewardDistributorFactory,
-    FeeWithdrawal: {} as FeeWithdrawal,
+    FeeWithdrawal: {} as FeeWithdrawal
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
@@ -189,7 +189,6 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
 }
 
 export async function deployTestTokensAndMock() {
-    const BorrowAsset = await deployMockToken();
     return {
         BorrowAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
         CollateralAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
@@ -198,9 +197,7 @@ export async function deployTestTokensAndMock() {
         FlashBorrower: await deployMockFlashBorrower(),
         MockVault: await deployMockVault(),
         MockRewardDistributorManager: await deployMockDistributorManager(),
-        EdgeToken: await deployMockToken(),
-        // add WETH
-        // 
+        EdgeToken: await deployMockToken()
     }
 }
 

@@ -6,7 +6,6 @@ import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable
 import { UUPSProxiable } from "./upgradability/UUPSProxiable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "./interfaces/IBSVault.sol";
-import "hardhat/console.sol";
 
 abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
     /// @notice the flashloan rate to charge for flash loans

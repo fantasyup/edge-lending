@@ -17,10 +17,10 @@ const deployRewardDistributorFactory: DeployFunction = async function (hre: Hard
             managerImplementation.address,
         ],
         log: true,
-        libraries: {
-        }
+        deterministicDeployment: true
     });
 }
 
 export default deployRewardDistributorFactory
 deployRewardDistributorFactory.tags = [`${ContractId.RewardDistributorFactory}`]
+deployRewardDistributorFactory.dependencies = [ContractId.RewardDistributor]

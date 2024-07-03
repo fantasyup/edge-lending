@@ -12,3 +12,4 @@ coverage.json
 deployments/localhost
 Flattened.sol
 *solcx-*
+deploy.txt

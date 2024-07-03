@@ -6,7 +6,6 @@ import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IDebtToken.sol";
 import "./token/ERC20Permit.sol";
 import "./token/IERC20Details.sol";
-import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title DebtToken

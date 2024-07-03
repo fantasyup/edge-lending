@@ -10,9 +10,10 @@ const deployWrapperToken: DeployFunction = async function (hre: HardhatRuntimeEn
     from: deployer,
     args: [],
     log: true,
+    deterministicDeployment: true
   });
 
 };
 
 export default deployWrapperToken
-deployWrapperToken.tags = [`${ContractId.WrapperToken}`]
+deployWrapperToken.tags = [ContractId.WrapperToken]

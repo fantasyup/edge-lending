@@ -1,13 +1,3 @@
-/**
- * Initialize the Vault with UUPSProxy 
- * 
- * 
- * To run
- * ```
- * npx hardhat run ./scripts/initialize-vault-proxy.ts --network [e.g. localhost]
- * ```
- */
-
 import  hre from 'hardhat';
 import { ethers } from "hardhat"
 import { ContractId } from '../helpers/types';

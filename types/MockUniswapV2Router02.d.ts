@@ -83,57 +83,57 @@ export class MockUniswapV2Router02 extends Contract {
   functions: {
     swapExactTokensForTokens(
       amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
+      arg1: BigNumberish,
       path: string[],
       to: string,
-      deadline: BigNumberish,
+      arg4: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
       amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
+      arg1: BigNumberish,
       path: string[],
       to: string,
-      deadline: BigNumberish,
+      arg4: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
   swapExactTokensForTokens(
     amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
+    arg1: BigNumberish,
     path: string[],
     to: string,
-    deadline: BigNumberish,
+    arg4: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
     amountIn: BigNumberish,
-    amountOutMin: BigNumberish,
+    arg1: BigNumberish,
     path: string[],
     to: string,
-    deadline: BigNumberish,
+    arg4: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
     swapExactTokensForTokens(
       amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
+      arg1: BigNumberish,
       path: string[],
       to: string,
-      deadline: BigNumberish,
+      arg4: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
     "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
       amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
+      arg1: BigNumberish,
       path: string[],
       to: string,
-      deadline: BigNumberish,
+      arg4: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
   };
@@ -143,19 +143,19 @@ export class MockUniswapV2Router02 extends Contract {
   estimateGas: {
     swapExactTokensForTokens(
       amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
+      arg1: BigNumberish,
       path: string[],
       to: string,
-      deadline: BigNumberish,
+      arg4: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
       amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
+      arg1: BigNumberish,
       path: string[],
       to: string,
-      deadline: BigNumberish,
+      arg4: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -163,19 +163,19 @@ export class MockUniswapV2Router02 extends Contract {
   populateTransaction: {
     swapExactTokensForTokens(
       amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
+      arg1: BigNumberish,
       path: string[],
       to: string,
-      deadline: BigNumberish,
+      arg4: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"(
       amountIn: BigNumberish,
-      amountOutMin: BigNumberish,
+      arg1: BigNumberish,
       path: string[],
       to: string,
-      deadline: BigNumberish,
+      arg4: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
