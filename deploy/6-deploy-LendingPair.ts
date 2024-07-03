@@ -18,13 +18,6 @@ const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnv
   /// 0.005%
   const liquidationFeeShare = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
 
-  // deploy library with deterministic set to true
-  const DataTypesLib = await deploy(ContractId.DataTypes, {
-    from: deployer,
-    args: [],
-    deterministicDeployment: true
-  })
-
   await deploy(ContractId.LendingPair, {
     from: deployer,
     args: [
@@ -34,11 +27,7 @@ const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnv
       liquidationFeeShare,
     ],
     log: true,
-    deterministicDeployment: true,
-    libraries: {
-      [ContractId.DataTypes]: DataTypesLib.address,
-      // [ContractId.SafeERC20]: SafeERC20Lib.address
-    }
+    deterministicDeployment: true
   });
 
 };

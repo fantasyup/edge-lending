@@ -4,7 +4,7 @@ import "hardhat-typechain";
 import "@nomiclabs/hardhat-waffle"
 import "@nomiclabs/hardhat-etherscan"
 import "solidity-coverage"
-// import "hardhat-contract-sizer"
+import "hardhat-contract-sizer"
 import "hardhat-tracer"
 import "hardhat-deploy"
 import 'hardhat-deploy-ethers'

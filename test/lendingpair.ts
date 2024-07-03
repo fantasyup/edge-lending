@@ -407,7 +407,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     // frank has no borrows
     await expect(
       LendingPair.connect(frank.signer).repay(100, frank.address)
-    ).to.revertedWith("PAYING_MORE_THAN_OWED")
+    ).to.revertedWith("MORE_THAN_OWED")
   })
 
   it("repay", async function() {
@@ -547,7 +547,7 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     
     await expect(
       LendingPair.liquidate(admin.address)
-    ).to.revertedWith("NOT_LIQUIDATE_YOURSELF")
+    ).to.revertedWith("NOT_LIQUIDATE_SELF")
 
    })
 

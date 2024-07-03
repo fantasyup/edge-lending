@@ -6,10 +6,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract MockUniswapV2Router02 {
     function swapExactTokensForTokens(
         uint256 amountIn,
-        uint256 amountOutMin,
+        uint256 /*amountOutMin*/,
         address[] calldata path,
         address to,
-        uint256 deadline
+        uint256 /*deadline*/
     ) external virtual returns (uint256[] memory amounts) {
         IERC20(path[0]).transferFrom(msg.sender, address(this), amountIn);
         IERC20(path[2]).transfer(to, amountIn);

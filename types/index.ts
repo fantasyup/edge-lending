@@ -11,7 +11,6 @@ export type { IUniswapV2Router01 } from "./IUniswapV2Router01";
 export type { IUniswapV2Router02 } from "./IUniswapV2Router02";
 export type { BorrowWrapperToken } from "./BorrowWrapperToken";
 export type { CollateralWrapperToken } from "./CollateralWrapperToken";
-export type { DataTypes } from "./DataTypes";
 export type { DebtToken } from "./DebtToken";
 export type { FeeWithdrawal } from "./FeeWithdrawal";
 export type { LendingPairHelper } from "./LendingPairHelper";
@@ -71,7 +70,6 @@ export { IUniswapV2Router01__factory } from "./factories/IUniswapV2Router01__fac
 export { IUniswapV2Router02__factory } from "./factories/IUniswapV2Router02__factory";
 export { BorrowWrapperToken__factory } from "./factories/BorrowWrapperToken__factory";
 export { CollateralWrapperToken__factory } from "./factories/CollateralWrapperToken__factory";
-export { DataTypes__factory } from "./factories/DataTypes__factory";
 export { DebtToken__factory } from "./factories/DebtToken__factory";
 export { FeeWithdrawal__factory } from "./factories/FeeWithdrawal__factory";
 export { LendingPairHelper__factory } from "./factories/LendingPairHelper__factory";

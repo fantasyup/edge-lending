@@ -324,7 +324,7 @@ export const deployLendingPair = async (
             vault, oracle, feewithdrawalAddr, feeShare
         ], 
         {
-            DataTypes: (await deployContract<DataTypes>('DataTypes', [])).address,
+            // DataTypes: (await deployContract<DataTypes>('DataTypes', [])).address,
             // SafeERC20: (await deployContract<SafeERC20>('SafeERC20', [])).address
         }
     );
