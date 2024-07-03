@@ -20,7 +20,17 @@ export enum ContractId {
     MockChainlinkUSDAdapter = 'MockChainlinkUSDAdapter',
     VaultStorageLayoutTester = 'VaultStorageLayoutTester',
     SafeERC20 = 'SafeERC20',
-    VaultFactory = 'VaultFactory'
+    VaultFactory = 'VaultFactory',
+    RewardDistributorManager = 'RewardDistributorManager',
+    RewardDistributor = 'RewardDistributor',
+    RewardDistributorFactory = 'RewardDistributorFactory',
+    MockDistributorManager = 'MockRewardDistributorManager',
+    FeeWithdrawal = 'FeeWithdrawal',
+    MockUniswapV2Router02 = 'MockUniswapV2Router02',
+    VaultProxy = 'VaultProxy',
+    FeeWithdrawalProxy = 'FeeWithdrawalProxy',
+    PriceOracleAggregatorProxy = 'PriceOracleAggregatorProxy',
+    RewardDistributorManagerProxy = 'RewardDistributorManagerProxy'
 }
 
 export enum LendingPairEdgeActions {

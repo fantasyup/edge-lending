@@ -6,19 +6,11 @@ const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRun
     const { deployments: { deploy, get }, getNamedAccounts } = hre;
     const { deployer, blackSmithTeam } = await getNamedAccounts();
 
-    const dataTypesLib = await get(ContractId.DataTypes)
     const lendingPairImplementation = await get(ContractId.LendingPair)
     const debtTokenImplementation = await get(ContractId.DebtToken)
     const collateralWrapperImplementation = await get(ContractId.CollateralWrapperToken)
     const borrowWrapperImpl = await get(ContractId.WrapperToken)
-    
-    // deploy library with deterministic set to true
-    const ClonesLib = await deploy('Clones', {
-      from: deployer,
-      args: [],
-      deterministicDeployment: true
-    })
-
+    const rewardDistributorManager = !!process.env.WITH_PROXY ? await get(ContractId.RewardDistributorManagerProxy): await get(ContractId.RewardDistributorManager)
 
     await deploy(ContractId.LendingPairFactory, {
       from: deployer,
@@ -27,15 +19,20 @@ const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRun
         lendingPairImplementation.address,
         collateralWrapperImplementation.address,
         debtTokenImplementation.address,
-        borrowWrapperImpl.address
+        borrowWrapperImpl.address,
+        rewardDistributorManager.address
       ],
       log: true,
-      libraries: {
-        [ContractId.DataTypes]: dataTypesLib.address,
-        'Clones': ClonesLib.address
-      }
+      deterministicDeployment: true
     });
 }
 
 export default deployLendingPairFactory
-deployLendingPairFactory.tags = [`${ContractId.LendingPairFactory}`]
+deployLendingPairFactory.tags = [ContractId.LendingPairFactory]
+deployLendingPairFactory.dependencies = [
+  ContractId.LendingPair,
+  ContractId.DebtToken,
+  ContractId.CollateralWrapperToken,
+  ContractId.WrapperToken,
+  ContractId.RewardDistributorManager
+]

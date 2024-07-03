@@ -30,12 +30,13 @@ interface BorrowWrapperTokenInterface extends ethers.utils.Interface {
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
-    "initialize(address,address,string,string)": FunctionFragment;
+    "initialize(address,address,string,string,address)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "nonces(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
+    "rewardManager()": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -72,7 +73,7 @@ interface BorrowWrapperTokenInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string, string]
+    values: [string, string, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -92,6 +93,10 @@ interface BorrowWrapperTokenInterface extends ethers.utils.Interface {
       BytesLike,
       BytesLike
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "rewardManager",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
@@ -135,6 +140,10 @@ interface BorrowWrapperTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "rewardManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -284,14 +293,16 @@ export class BorrowWrapperToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -343,6 +354,10 @@ export class BorrowWrapperToken extends Contract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    rewardManager(overrides?: CallOverrides): Promise<[string]>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<[string]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
@@ -467,14 +482,16 @@ export class BorrowWrapperToken extends Contract {
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
+    _manager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,string,string)"(
+  "initialize(address,address,string,string,address)"(
     __owner: string,
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
+    _manager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -526,6 +543,10 @@ export class BorrowWrapperToken extends Contract {
     s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  rewardManager(overrides?: CallOverrides): Promise<string>;
+
+  "rewardManager()"(overrides?: CallOverrides): Promise<string>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -650,14 +671,16 @@ export class BorrowWrapperToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -709,6 +732,10 @@ export class BorrowWrapperToken extends Contract {
       s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    rewardManager(overrides?: CallOverrides): Promise<string>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<string>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -854,14 +881,16 @@ export class BorrowWrapperToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -913,6 +942,10 @@ export class BorrowWrapperToken extends Contract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    rewardManager(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1043,14 +1076,16 @@ export class BorrowWrapperToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       __owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1105,6 +1140,10 @@ export class BorrowWrapperToken extends Contract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    rewardManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "rewardManager()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

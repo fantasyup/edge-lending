@@ -19,14 +19,14 @@ library DataTypes {
         IDebtToken debtToken;
     }
 
-    function validBorrowAssetConfig(BorrowAssetConfig calldata self, address _owner) external view {
-        require(self.initialExchangeRateMantissa > 0, "IE");
-        require(self.reserveFactorMantissa > 0, "IF");
-        require(self.collateralFactor > 0, "IC");
-        require(self.liquidationFee > 0, "IL");
-        require(address(self.wrappedBorrowAsset) != address(0), "IWB");
-        require(address(self.debtToken) != address(0), "IDB");
-        require(self.wrappedBorrowAsset.owner() == _owner, "IVW");
-        require(self.debtToken.owner() == _owner, "IVDW");
+    function validBorrowAssetConfig(BorrowAssetConfig memory self, address _owner) internal view {
+        require(self.initialExchangeRateMantissa > 0, "E");
+        require(self.reserveFactorMantissa > 0, "F");
+        require(self.collateralFactor > 0, "C");
+        require(self.liquidationFee > 0, "L");
+        require(address(self.wrappedBorrowAsset) != address(0), "B");
+        require(address(self.debtToken) != address(0), "IB");
+        require(self.wrappedBorrowAsset.owner() == _owner, "IW");
+        require(self.debtToken.owner() == _owner, "IVW");
     }
 }

@@ -5,7 +5,6 @@ import "../interfaces/IOracle.sol";
 contract MockPriceOracle is IOracle {
     uint256 lastestAnswer;
 
-
     constructor(uint256 _price) {
         lastestAnswer = _price;
     }

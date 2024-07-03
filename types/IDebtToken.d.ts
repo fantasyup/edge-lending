@@ -26,7 +26,7 @@ interface IDebtTokenInterface extends ethers.utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
     "increaseTotalDebt(uint256)": FunctionFragment;
-    "initialize(address,address,string,string)": FunctionFragment;
+    "initialize(address,address,string,string,address)": FunctionFragment;
     "mint(address,address,uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "principal(address)": FunctionFragment;
@@ -54,7 +54,7 @@ interface IDebtTokenInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string, string]
+    values: [string, string, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -210,14 +210,16 @@ export class IDebtToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -338,14 +340,16 @@ export class IDebtToken extends Contract {
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
+    _manager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,string,string)"(
+  "initialize(address,address,string,string,address)"(
     _owner: string,
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
+    _manager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -463,14 +467,16 @@ export class IDebtToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -619,14 +625,16 @@ export class IDebtToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -748,14 +756,16 @@ export class IDebtToken extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

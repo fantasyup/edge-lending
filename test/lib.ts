@@ -10,12 +10,17 @@ import {
     LendingPairHelper,
     MockFlashBorrower,
     MockPriceOracle,
+    MockRewardDistributorManager,
     MockToken,
     MockVault,
+    RewardDistributor,
+    RewardDistributorFactory,
+    RewardDistributorManager,
     Vault as BVault,
     Vault,
     VaultFactory,
     WrapperToken,
+    FeeWithdrawal,
 } from "../types";
 import { 
   deployMockPriceOracle,
@@ -31,7 +36,12 @@ import {
   deployMockFlashBorrower,
   deployMockVault,
   getLendingPairFactoryDeployment,
-  getVaultFactoryDeployment
+  getVaultFactoryDeployment,
+  deployMockDistributorManager,
+  getRewardDistributorDeployment,
+  getRewardDistributorFactoryDeployment,
+  getRewardDistributorManagerDeployment,
+  getFeeWithdrawalDeployment
 } from "../helpers/contracts";
 import { EthereumAddress } from "../helpers/types";
 import { 
@@ -40,14 +50,13 @@ import {
     signVaultApproveContractMessage
 } from "../helpers/message";
 import { assert } from "chai";
+// 'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair' | 'LendingPairHelper' | 'LendingPairFactory' | 'VaultFactory'
 
 export async function makeLendingPairTestSuiteVars(
-        price?: BigNumber
-    ): Promise<Pick<
-        TestVars,
-        'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair' | 'LendingPairHelper' | 'LendingPairFactory' | 'VaultFactory'
-    >> {
+       testVars: any
+): Promise<TestVars> {
     return {
+        ...testVars,
         Vault: await getVaultDeployment(),
         PriceOracleAggregator: await getPriceOracleAggregatorDeployment(),
         CollateralWrapperToken: await getCollateralWrapperDeployment(),
@@ -57,7 +66,11 @@ export async function makeLendingPairTestSuiteVars(
         LendingPair: await getLendingPairDeployment(),
         LendingPairHelper: await getLendingPairHelperDeployment(),
         LendingPairFactory: await getLendingPairFactoryDeployment(),
-        VaultFactory: await getVaultFactoryDeployment()
+        VaultFactory: await getVaultFactoryDeployment(),
+        RewardDistributor: await getRewardDistributorDeployment(),
+        RewardDistributorFactory: await getRewardDistributorFactoryDeployment(),
+        RewardDistributorManager: await getRewardDistributorManagerDeployment(),
+        FeeWithdrawal: await getFeeWithdrawalDeployment(),
     }
 }
 
@@ -67,17 +80,14 @@ export async function advanceNBlocks(n: number) {
     }
 }
 
-export async function initializeWrapperTokens(
-    owner: string,
-    wrapperToken: WrapperToken | DebtToken,
-    underlying: string
-) {
-    await wrapperToken.initialize(
-      owner,
-      underlying,
-      "DEMO",
-      "DMO"
-    )
+export async function increaseTime(duration: number) {
+    await ethers.provider.send("evm_increaseTime", [duration]);
+    await ethers.provider.send('evm_mine', [])
+}
+
+export async function setNextBlockTimestamp(timestamp: number) {
+    await ethers.provider.send('evm_setNextBlockTimestamp', [timestamp]); 
+    await ethers.provider.send('evm_mine', [timestamp]);
 }
 
 export interface IAccount {
@@ -87,6 +97,7 @@ export interface IAccount {
 }
 export interface TestVars {
     BorrowAsset: MockToken,
+    EdgeToken: MockToken,
     CollateralAsset: MockToken,
     MockVault: MockVault,
     Vault: Vault,
@@ -104,10 +115,16 @@ export interface TestVars {
     FlashBorrower: MockFlashBorrower,
     LendingPairFactory: LendingPairFactory,
     VaultFactory: VaultFactory,
+    MockRewardDistributorManager: MockRewardDistributorManager,
+    RewardDistributor: RewardDistributor,
+    RewardDistributorManager: RewardDistributorManager,
+    RewardDistributorFactory: RewardDistributorFactory,
+    FeeWithdrawal: FeeWithdrawal
 }
 
 const testVars: TestVars = {
     BorrowAsset: {} as MockToken,
+    EdgeToken: {} as MockToken,
     CollateralAsset: {} as MockToken,
     MockVault: {} as MockVault,
     Vault: {} as Vault,
@@ -124,7 +141,12 @@ const testVars: TestVars = {
     blackSmithTeam: {} as IAccount,
     FlashBorrower: {} as MockFlashBorrower,
     LendingPairFactory: {} as LendingPairFactory,
-    VaultFactory: {} as VaultFactory
+    VaultFactory: {} as VaultFactory,
+    MockRewardDistributorManager: {} as MockRewardDistributorManager,
+    RewardDistributor: {} as RewardDistributor,
+    RewardDistributorManager: {} as RewardDistributorManager,
+    RewardDistributorFactory: {} as RewardDistributorFactory,
+    FeeWithdrawal: {} as FeeWithdrawal
 }
 
 export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
@@ -148,28 +170,35 @@ export function runTestSuite(title: string, tests: (arg: TestVars) => void) {
             const { blackSmithTeam } = await getNamedAccounts()
             // address used in performing admin actions in InterestRateModel
             testVars.blackSmithTeam  = testVars.accounts.find(x => x.address.toLowerCase() === blackSmithTeam.toLowerCase()) as IAccount
-            // do this here because of some unusual race condition
-            // in the deployments code
         })
 
         beforeEach(async () => {
             const setupTest = deployments.createFixture(async ({deployments, getNamedAccounts, ethers}, options) => {
                 await deployments.fixture(); // ensure you start from a fresh deployments
-                testVars.BorrowAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
-                testVars.CollateralAssetMockPriceOracle = await deployMockPriceOracle(BigNumber.from(10).pow(8))
-                testVars.BorrowAsset = await deployMockToken()
-                testVars.CollateralAsset = await deployMockToken()
-                testVars.FlashBorrower = await deployMockFlashBorrower()
-                testVars.MockVault = await deployMockVault()
+                const vars = await deployTestTokensAndMock()
+                Object.assign(testVars, vars)
             });
 
             await setupTest()
-            const vars = await makeLendingPairTestSuiteVars()
+            const vars = await makeLendingPairTestSuiteVars(testVars)
             Object.assign(testVars, vars)
         })
         
         tests(testVars)
     })
+}
+
+export async function deployTestTokensAndMock() {
+    return {
+        BorrowAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
+        CollateralAssetMockPriceOracle: await deployMockPriceOracle(BigNumber.from(10).pow(8)),
+        BorrowAsset: await deployMockToken(),
+        CollateralAsset: await deployMockToken(),
+        FlashBorrower: await deployMockFlashBorrower(),
+        MockVault: await deployMockVault(),
+        MockRewardDistributorManager: await deployMockDistributorManager(),
+        EdgeToken: await deployMockToken()
+    }
 }
 
 export function LendingPairHelpers(
@@ -340,6 +369,21 @@ export function LendingPairHelpers(
           }
     }
 }
+
+export async function initializeWrapperTokens(
+    owner: string,
+    wrapperToken: WrapperToken | DebtToken,
+    underlying: string,
+    rewardDistributorManager: EthereumAddress
+) {
+    await wrapperToken.initialize(
+      owner,
+      underlying,
+      "DEMO",
+      "DMO",
+      rewardDistributorManager
+    )
+}
   
 export async function setupLendingPair(
     lendingPair: LendingPair,
@@ -347,27 +391,31 @@ export async function setupLendingPair(
     BorrowAsset: MockToken,
     BorrowAssetDepositWrapperToken: WrapperToken,
     CollateralWrapperToken: WrapperToken,
-    DebtWrapperToken: DebtToken
+    DebtWrapperToken: DebtToken,
+    rewardDistributorManager:  RewardDistributorManager
   ) {
     // collateral wrapper token
     await initializeWrapperTokens(
       lendingPair.address,
       CollateralWrapperToken,
-      CollateralAsset.address
+      CollateralAsset.address,
+      rewardDistributorManager.address
     )
   
     // borrow wrapper token
     await initializeWrapperTokens(
       lendingPair.address,
       BorrowAssetDepositWrapperToken,
-      BorrowAsset.address
+      BorrowAsset.address,
+      rewardDistributorManager.address
     )
     
     // debt token
     await initializeWrapperTokens(
       lendingPair.address,
       DebtWrapperToken,
-      BorrowAsset.address
+      BorrowAsset.address,
+      rewardDistributorManager.address
     )
   }
   
@@ -394,6 +442,8 @@ export async function setupAndInitLendingPair(
       CollateralAssetMockPriceOracle,
       InterestRateModel,
       blackSmithTeam,
+      MockRewardDistributorManager,
+      RewardDistributorManager,
     } : TestVars,
     {
         initialExchangeRateMantissa,
@@ -410,7 +460,8 @@ export async function setupAndInitLendingPair(
       BorrowAsset,
       BorrowWrapperToken,
       CollateralWrapperToken,
-      DebtToken
+      DebtToken,
+      RewardDistributorManager
     )
   
     await LendingPair.initialize(
@@ -453,4 +504,9 @@ export const defaultLendingPairInitVars = {
     reserveFactorMantissa,
     collateralFactor,
     liquidationFee,
+}
+
+export async function currentTimestamp() {
+    const block = await (ethers.getDefaultProvider()).getBlock('latest')
+    return block.timestamp
 }

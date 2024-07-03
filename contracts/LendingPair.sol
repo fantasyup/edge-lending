@@ -13,7 +13,6 @@ import "./interfaces/IPriceOracleAggregator.sol";
 import "./DataTypes.sol";
 import "./util/Initializable.sol";
 import "./token/IERC20Details.sol";
-import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -72,7 +71,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     uint256 public override borrowIndex;
 
     /// @notice Total amount of reserves of the underlying held in this market
-    uint256 public totalReserves;
+    uint256 public override totalReserves;
 
     /// @dev The amount of collateral required for a borrow position in 1e18
     uint256 public collateralFactor;
@@ -93,10 +92,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     IERC20 public override collateralAsset;
 
     /// @notice The wrapper token for the borrow asset
-    IBSWrapperToken public wrapperBorrowedAsset;
+    IBSWrapperToken public override wrapperBorrowedAsset;
 
-    /// @notice The wrapper token for the borrow asset
-    IBSWrapperToken public wrappedCollateralAsset;
+    /// @notice The wrapper token for the collateral asset
+    IBSWrapperToken public override wrappedCollateralAsset;
 
     /// @notice The wrapper token for debt
     IDebtToken public override debtToken;
@@ -113,7 +112,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     modifier onlyPauseGuardian() {
-        require(msg.sender == pauseGuardian, "ONLY_GUARDIAN");
+        require(msg.sender == pauseGuardian, "O_G");
         _;
     }
 
@@ -261,7 +260,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _debtOwner this should be the msg.sender or address that delegates credit to the msg.sender
     /// @dev we use normalized amounts to calculate the
     function borrow(uint256 _amountToBorrow, address _debtOwner) external whenNotPaused(Actions.Borrow) {
-        require(_debtOwner != address(0), "INVALID_DEBT_OWNER");
+        require(_debtOwner != address(0), "INV_DEBT_OWNER");
         // save on sload
         uint8 __borrowAssetUnderlyingDecimal = _borrowAssetUnderlyingDecimal;
         IERC20 __asset = asset;
@@ -297,39 +296,32 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         emit Borrow(msg.sender, _amountToBorrow);
     }
 
-    struct RepayBorrowLocalVars {
-        uint256 repayAmount;
-        uint256 accountBorrows;
-        uint256 accountBorrowsNew;
-        uint256 totalBorrowsNew;
-    }
-
     /// @notice Sender repays their own borrow
     /// @param _repayAmount The amount of borrow asset to repay represented in underlying
     /// @param _beneficiary address to repay loan position
     function repay(uint256 _repayAmount, address _beneficiary) public {
-        require(_beneficiary != address(0), "INVALID_BENEFICIARY");
-        // create local vars storage
-        RepayBorrowLocalVars memory vars;
+        require(_beneficiary != address(0), "INV_BENEFICIARY");
 
         // We fetch the amount the borrower owes, with accumulated interest
-        vars.accountBorrows = borrowBalanceCurrent(_beneficiary);
+        uint256 accountBorrows = borrowBalanceCurrent(_beneficiary);
 
         // require the borrower cant pay more than they owe
-        require(_repayAmount <= vars.accountBorrows, "PAYING_MORE_THAN_OWED");
+        require(_repayAmount <= accountBorrows, "MORE_THAN_OWED");
+
+        uint256 repayAmount = 0;
 
         if (_repayAmount == 0) {
-            vars.repayAmount = vars.accountBorrows;
+            repayAmount = accountBorrows;
         } else {
-            vars.repayAmount = _repayAmount;
+            repayAmount = _repayAmount;
         }
 
         // convert repayAmount to share and round up
-        uint256 repayAmountInShares = vault.toShare(asset, vars.repayAmount, true);
+        uint256 repayAmountInShares = vault.toShare(asset, repayAmount, true);
 
         require(
             vault.balanceOf(asset, msg.sender) >= repayAmountInShares,
-            "NOT_ENOUGH_BALANCE_TO_REPAY"
+            "NOT_ENOUGH_BALANCE"
         );
 
         // transfer the borrow asset from the borrower to LendingPair
@@ -337,14 +329,14 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         accountInterestIndex[_beneficiary] = borrowIndex;
 
-        debtToken.burn(_beneficiary, vars.repayAmount);
+        debtToken.burn(_beneficiary, repayAmount);
 
         emit Repay(
             address(this),
             address(asset),
             _beneficiary,
             msg.sender,
-            _repayAmount
+            repayAmount
         );
     }
 
@@ -360,7 +352,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _to Address to send the underlying tokens to
     /// @param _amount of wrapper token to redeem
     function redeem(address _to, uint256 _amount) public override {
-        require(_to != address(0), "INVALID_TO");
+        require(_to != address(0), "INV_TO");
 
         RedeemLocalVars memory vars;
 
@@ -412,7 +404,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint8[] calldata actions,
         bytes[] calldata data
     ) external {
-        require(actions.length == data.length, "INVALID");
+        require(actions.length == data.length, "INV");
 
         for (uint8 i = 0; i < actions.length;  i++) {
             uint8 action = actions[i];
@@ -607,7 +599,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice withdrawFees to the feeWithdrawalAddr
     /// @param _toWithdraw is the amount of a reservers being withdrawn
     /// @dev this function can be called by anyone
-    function withdrawFees(uint256 _toWithdraw) external {
+    function withdrawFees(uint256 _toWithdraw) external override {
         require(totalReserves >= _toWithdraw, "NOT_ENOUGH_BALANCE");
 
         totalReserves = totalReserves - _toWithdraw;
@@ -753,7 +745,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     function liquidate(address _borrower) external {
         // require the liquidator is not also the borrower
-        require(msg.sender != _borrower, "NOT_LIQUIDATE_YOURSELF");
+        require(msg.sender != _borrower, "NOT_LIQUIDATE_SELF");
 
         uint256 currentBorrowAssetPriceInUSD = oracle.getPriceInUSD(asset);
         uint256 priceOfCollateralInUSD = getPriceOfCollateral();

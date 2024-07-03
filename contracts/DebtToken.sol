@@ -6,7 +6,6 @@ import "./interfaces/IBSLendingPair.sol";
 import "./interfaces/IDebtToken.sol";
 import "./token/ERC20Permit.sol";
 import "./token/IERC20Details.sol";
-import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title DebtToken
@@ -37,7 +36,8 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
         address __owner,
         address _underlying,
         string memory _tokenName,
-        string memory _tokenSymbol
+        string memory _tokenSymbol,
+        IRewardDistributorManager _manager
     ) external virtual override initializer {
         require(__owner != address(0), "invalid owner");
         require(_underlying != address(0), "invalid underlying");
@@ -47,6 +47,7 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
         initializeERC20(_tokenName, _tokenSymbol, underlyingDecimal);
         initializeERC20Permit(_tokenName);
         underlying = _underlying;
+        rewardManager = _manager;
     }
 
     function principal(address _account) external view override returns (uint256) {
@@ -68,6 +69,7 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
         if(_debtOwner != _to) {
             _decreaseBorrowAllowance(_debtOwner, _to, _amount);
         }
+        _rewardHook(address(0), _debtOwner);
         _mint(_debtOwner, _amount);
     }
 
@@ -85,6 +87,7 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
         override(IBSWrapperTokenBase)
         onlyLendingPair
     {
+        _rewardHook(_from, address(0));
         _balances[_from] = balanceOf(_from) - _amount;
         if (_amount > _totalSupply) {
             _totalSupply = 0;

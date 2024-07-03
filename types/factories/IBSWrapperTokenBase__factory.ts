@@ -174,6 +174,11 @@ const _abi = [
         name: "_tokenSymbol",
         type: "string",
       },
+      {
+        internalType: "contract IRewardDistributorManager",
+        name: "_manager",
+        type: "address",
+      },
     ],
     name: "initialize",
     outputs: [],

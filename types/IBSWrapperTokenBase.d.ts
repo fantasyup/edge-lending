@@ -25,7 +25,7 @@ interface IBSWrapperTokenBaseInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(address,uint256)": FunctionFragment;
-    "initialize(address,address,string,string)": FunctionFragment;
+    "initialize(address,address,string,string,address)": FunctionFragment;
     "owner()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
@@ -47,7 +47,7 @@ interface IBSWrapperTokenBaseInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string, string]
+    values: [string, string, string, string, string]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -180,14 +180,16 @@ export class IBSWrapperTokenBase extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -274,14 +276,16 @@ export class IBSWrapperTokenBase extends Contract {
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
+    _manager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,string,string)"(
+  "initialize(address,address,string,string,address)"(
     _owner: string,
     _underlying: string,
     _tokenName: string,
     _tokenSymbol: string,
+    _manager: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -368,14 +372,16 @@ export class IBSWrapperTokenBase extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -483,14 +489,16 @@ export class IBSWrapperTokenBase extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -581,14 +589,16 @@ export class IBSWrapperTokenBase extends Contract {
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,string,string)"(
+    "initialize(address,address,string,string,address)"(
       _owner: string,
       _underlying: string,
       _tokenName: string,
       _tokenSymbol: string,
+      _manager: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

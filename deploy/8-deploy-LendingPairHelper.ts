@@ -16,8 +16,9 @@ const deployLendingPairHelper: DeployFunction = async function (hre: HardhatRunt
             vault.address
         ],
         log: true,
+        deterministicDeployment: true
     });
 }
 
 export default deployLendingPairHelper
-deployLendingPairHelper.tags = [`${ContractId.LendingPairHelper}`]
+deployLendingPairHelper.tags = [ContractId.LendingPairHelper]

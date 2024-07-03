@@ -3,7 +3,6 @@ pragma solidity 0.8.1;
 
 import "./WrapperToken.sol";
 import "./interfaces/IBSLendingPair.sol";
-import "hardhat/console.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title CollateralWrapperToken

@@ -46,11 +46,11 @@ contract VaultStorageLayoutTester is Vault {
         }
         require(slot == 6 && offset == 0, "userApprovedContracts rate has changed location");
 
-         assembly {
+        assembly {
             slot := userApprovalNonce.slot
             offset := userApprovalNonce.offset
         }
- 
+
         require(slot == 7 && offset == 0, "userApprovedContracts rate has changed location");
     }
 }

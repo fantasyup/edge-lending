@@ -10,9 +10,10 @@ const deployDebtToken: DeployFunction = async function (hre: HardhatRuntimeEnvir
     from: deployer,
     args: [],
     log: true,
+    deterministicDeployment: true
   });
 
 };
 
 export default deployDebtToken
-deployDebtToken.tags = [`${ContractId.DebtToken}`]
+deployDebtToken.tags = [ContractId.DebtToken]

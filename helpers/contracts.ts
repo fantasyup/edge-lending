@@ -1,4 +1,4 @@
-import { deployments, ethers, waffle } from "hardhat";
+import { deployments, ethers, waffle, getNamedAccounts } from "hardhat";
 import { Signer, Contract, BigNumber } from "ethers"
 import { ContractId, EthereumAddress } from "../helpers/types"
 import { Vault } from '../types/Vault'
@@ -13,12 +13,13 @@ import {
     MockLendingPair,
     MockPriceOracle,
     MockToken,
-    MockVault, PriceOracleAggregator, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken 
+    MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken,
+    FeeWithdrawal,
+    MockUniswapV2Router02,
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
 import { MockChainlinkUSDAdapter } from "../types/MockChainlinkUSDAdapter";
-import { VaultStorageLayout } from "../types/VaultStorageLayout";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
@@ -36,6 +37,31 @@ export const deployContract = async<ContractType extends Contract>(
     return contract
 }
 
+export const deployAndInitUUPSProxy = async(
+    id: string,
+    implementation: string
+) => {
+    const { deployer } = await getNamedAccounts();
+
+    const tx = await deployments.deploy(id, {
+        contract: ContractId.UUPSProxy,
+        from: deployer,
+        args: [],
+        log: true,
+
+    })
+  
+      // initialize proxy
+    const uups = await ethers.getContractAt(
+        ContractId.UUPSProxy,
+        tx.address
+    ) as UUPSProxy
+
+    if (tx.newlyDeployed) {
+        await (await uups.initializeProxy(implementation)).wait()
+        console.log(`Successfully Initialized ${id} proxy`)
+    }
+}
 export const deployDataTypesLib = async () => {
     return await deployContract<DataTypes>('DataTypes', [])
 }
@@ -114,18 +140,58 @@ export const getVaultFactoryDeployment = async(): Promise<VaultFactory> =>{
     )) as VaultFactory
 }
 
+export const getRewardDistributorDeployment = async(): Promise<RewardDistributor> => {
+    return (await ethers.getContractAt(
+        ContractId.RewardDistributor,
+        (await deployments.get(ContractId.RewardDistributor)).address
+    )) as RewardDistributor
+}
+
+export const getRewardDistributorFactoryDeployment = async(): Promise<RewardDistributorFactory> => {
+    return (await ethers.getContractAt(
+        ContractId.RewardDistributorFactory,
+        (await deployments.get(ContractId.RewardDistributorFactory)).address
+    )) as RewardDistributorFactory
+}
+
+export const getRewardDistributorManagerDeployment = async(): Promise<RewardDistributorManager> => {
+    return (await ethers.getContractAt(
+        ContractId.RewardDistributorManager,
+        (await deployments.get(ContractId.RewardDistributorManager)).address
+    )) as RewardDistributorManager
+}
+
+export const getFeeWithdrawalDeployment = async(): Promise<FeeWithdrawal> => {
+    return (await ethers.getContractAt(
+        ContractId.FeeWithdrawal,
+        (await deployments.get(ContractId.FeeWithdrawal)).address
+    )) as FeeWithdrawal
+}
+
+export const getPriceOracleAggregatorProxy = async(): Promise<PriceOracleAggregator> => {
+    return (await ethers.getContractAt(
+        ContractId.PriceOracleAggregator,
+        (await deployments.get(ContractId.PriceOracleAggregatorProxy)).address
+    )) as PriceOracleAggregator
+}
+
+export const getVaultProxy = async(): Promise<Vault> => {
+    return (await ethers.getContractAt(
+        ContractId.Vault,
+        (await deployments.get(ContractId.VaultProxy)).address
+    )) as Vault
+}
+
+export const getFeeWithdrawalProxy = async(): Promise<FeeWithdrawal> => {
+    return (await ethers.getContractAt(
+        ContractId.FeeWithdrawal,
+        (await deployments.get(ContractId.FeeWithdrawalProxy)).address
+    )) as FeeWithdrawal
+}
+
 export const deployMockToken = async(decimals ?: number) => {
     return await deployContract<MockToken>(ContractId.MockToken, [decimals || 18])
 }
-
-// export const deployLendingPair = async () => {
-//     const dataTypesLib = await deployDataTypesLib()
-
-//     return await deployContract<LendingPair>(ContractId.LendingPair, [], 
-//     {
-//         DataTypes: dataTypesLib.address
-//     })
-// }
 
 export const deployUUPSProxy = async () => {
     return await deployContract<UUPSProxy>(ContractId.UUPSProxy, [])
@@ -230,4 +296,46 @@ export const deployLendingPairFactory = async(
         debtTokenLogic,
         borrowAssetWrapperLogic
     ])
+}
+
+export const deployMockDistributorManager = async() => {
+    return await deployContract<LendingPairFactory>(ContractId.MockDistributorManager, [])
+}
+
+export const deployFeeWithdrawal = async (
+    vault: EthereumAddress,
+    receiver: EthereumAddress,
+    edgeToken: EthereumAddress,
+    weth: EthereumAddress,
+) => {
+    return await deployContract<FeeWithdrawal>(
+        ContractId.FeeWithdrawal,
+        [vault, receiver, edgeToken, weth]
+    );
+}
+
+
+export const deployLendingPair = async (
+    vault: EthereumAddress,
+    oracle: EthereumAddress,
+    feewithdrawalAddr: EthereumAddress,
+    feeShare: BigNumber
+) => {
+    return await deployContract<LendingPair>(
+        ContractId.LendingPair, [
+            vault, oracle, feewithdrawalAddr, feeShare
+        ], 
+        {
+            // DataTypes: (await deployContract<DataTypes>('DataTypes', [])).address,
+            // SafeERC20: (await deployContract<SafeERC20>('SafeERC20', [])).address
+        }
+    );
+}
+
+
+export const deployMockUniswapV2Router02 = async () => {
+    return await deployContract<MockUniswapV2Router02>(
+        ContractId.MockUniswapV2Router02,
+        []
+    )
 }
