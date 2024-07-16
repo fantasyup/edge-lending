@@ -12,9 +12,7 @@ runTestSuite("Vault Factory", (vars: TestVars) => {
             blackSmithTeam,
             accounts: [admin, bob]
         } = vars
-
-        console.log(VaultFactory.address)
-
+        
         await expect(
             VaultFactory.updateVaultLogic(bob.address)
         ).to.be.revertedWith("ONLY_OWNER")
