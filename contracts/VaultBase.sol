@@ -28,6 +28,9 @@ abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
 
     /// @notice mapping of user to approval nonce
     mapping(address => uint256) public userApprovalNonce;
+
+    /// @dev cached domain separator
+    bytes32 internal _CACHED_DOMAIN_SEPARATOR;
 }
 
 abstract contract VaultBase is VaultStorageV1  {
@@ -36,9 +39,6 @@ abstract contract VaultBase is VaultStorageV1  {
 
     /// @notice vault version
     string public constant version = "1";
-
-    /// @dev cached domain separator
-    bytes32 internal _CACHED_DOMAIN_SEPARATOR;
 
     /// @dev vault approval message digest
     bytes32 internal constant _VAULT_APPROVAL_SIGNATURE_TYPE_HASH =
