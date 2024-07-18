@@ -78,14 +78,9 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       accounts: [admin, bob]
     } = vars
 
-    await setupLendingPair(
-      LendingPair,
-      CollateralAsset,
-      BorrowAsset,
-      BorrowWrapperToken,
-      CollateralWrapperToken,
-      DebtToken,
-      RewardDistributorManager
+    const helper = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin }
     )
 
     const lendingPairHelpers = LendingPairHelpers(Vault, LendingPair, BorrowAsset, BorrowAsset, PriceOracleAggregator, admin)

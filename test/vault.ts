@@ -5,7 +5,7 @@ import {
   Vault,
   MockToken
 } from "../types";
-import { IAccount, LendingPairHelpers, runTestSuite, TestVars } from "./lib";
+import { defaultLendingPairInitVars, IAccount, LendingPairHelpers, runTestSuite, setupAndInitLendingPair, TestVars } from "./lib";
 import { signVaultApproveContractMessage } from "../helpers/message";
 import { EthereumAddress } from "../helpers/types";
 
@@ -181,7 +181,10 @@ runTestSuite("Vault", (vars: TestVars) => {
 
   it('approveContract', async() => {
     const { Vault, BorrowAsset, LendingPair, PriceOracleAggregator, accounts: [admin,  bob]} = vars
-    const lendingPairHelpers = LendingPairHelpers(Vault, LendingPair, BorrowAsset, BorrowAsset, PriceOracleAggregator, admin)
+    const lendingPairHelpers = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin }
+    )
     
     const nonce = (await Vault.userApprovalNonce(admin.address)).toNumber()
     expect(
