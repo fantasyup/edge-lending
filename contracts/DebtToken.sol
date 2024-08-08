@@ -73,6 +73,15 @@ contract DebtToken is IDebtToken, WrapperTokenBase {
         _mint(_debtOwner, _amount);
     }
 
+    function _mint(address _account, uint256 _amount) internal virtual override {
+        require(_account != address(0), "ERC20: mint to the zero address");
+
+        _totalSupply += _amount;
+        _balances[_account] = balanceOf(_account) + _amount;
+        emit Transfer(address(0), _account, _amount);
+    }
+
+
     function owner() external view override returns (address) {
         return _owner;
     }

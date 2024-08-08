@@ -603,7 +603,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         require(totalReserves >= _toWithdraw, "NOT_ENOUGH_BALANCE");
 
         totalReserves = totalReserves - _toWithdraw;
-        vault.transfer(asset, address(this), feeWithdrawalAddr, _toWithdraw);
+        uint256 toVaultShares = vault.toShare(asset, _toWithdraw, false);
+        vault.transfer(asset, address(this), feeWithdrawalAddr, toVaultShares);
 
         emit ReserveWithdraw(feeWithdrawalAddr, _toWithdraw);
     }
