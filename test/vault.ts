@@ -137,6 +137,36 @@ runTestSuite("Vault", (vars: TestVars) => {
 
   })
 
+  it('registerProtocol', async() => {
+    const { Vault, BorrowAsset, accounts: [admin,  bob]} = vars
+    expect(
+      await Vault.registerProtocol()
+    ).to.emit(Vault, 'RegisterProtocol').withArgs(
+      admin.address
+    )
+  })
+
+  it('allowContract', async() => {
+    const { Vault, accounts: [admin,  bob]} = vars
+
+    await expect(
+      Vault.connect(bob.signer).enableContract(bob.address, true)
+    ).to.be.revertedWith('ONLY_OWNER')
+
+    expect(
+      await Vault.enableContract(bob.address, true)
+    ).to.emit(Vault, 'AllowContract').withArgs(
+      admin.address,
+      true
+    )
+  })
+
+  // auth and approveContract
+  it('approveContract', async() => {
+    const { Vault, accounts: [admin,  bob]} = vars
+    
+  })
+
   it('approveContract - fails invalid to / fails with wrong signature ', async () => {
     const { Vault, accounts: [admin,  bob]} = vars
     const vaultDetails = { 

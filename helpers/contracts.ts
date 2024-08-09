@@ -168,12 +168,12 @@ export const getFeeWithdrawalDeployment = async(): Promise<FeeWithdrawal> => {
     )) as FeeWithdrawal
 }
 
-export const getPriceOracleAggregatorProxy = async(): Promise<PriceOracleAggregator> => {
-    return (await ethers.getContractAt(
-        ContractId.PriceOracleAggregator,
-        (await deployments.get(ContractId.PriceOracleAggregatorProxy)).address
-    )) as PriceOracleAggregator
-}
+// export const getPriceOracleAggregatorProxy = async(): Promise<PriceOracleAggregator> => {
+//     return (await ethers.getContractAt(
+//         ContractId.PriceOracleAggregator,
+//         (await deployments.get(ContractId.PriceOracleAggregatorProxy)).address
+//     )) as PriceOracleAggregator
+// }
 
 export const getVaultProxy = async(): Promise<Vault> => {
     return (await ethers.getContractAt(

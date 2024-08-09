@@ -33,7 +33,7 @@ abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
     mapping(address => address) public registeredContracts;
 
     /// @notice mapping to contract to whitelist status
-    mapping(address => bool) public whitelistedContracts;
+    mapping(address => bool) public allowedContracts;
 
 }
 

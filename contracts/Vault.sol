@@ -66,17 +66,17 @@ contract Vault is VaultBase {
     /// @dev register protocol
     function registerProtocol() public {
         registeredContracts[msg.sender] = msg.sender;
-        emit LogRegisterProtocol(msg.sender);
+        emit RegisterProtocol(msg.sender);
     }
 
     /// @notice Enables or disables a contract for approval without signed message.
-    function whitelistMasterContract(address _contract, bool _status) public onlyOwner {
+    function allowContract(address _contract, bool _status) public onlyOwner {
         // Checks
-        require(_contract != address(0), "MasterCMgr: Cannot approve 0");
+        require(_contract != address(0), "invalid_address");
 
         // Effects
-        whitelistedContracts[_contract] = _status;
-        emit LogWhiteListContract(_contract, _status);
+        allowedContracts[_contract] = _status;
+        emit AllowContract(_contract, _status);
     }
     
     /// @notice approve a contract to enable the contract to withdraw
@@ -94,7 +94,7 @@ contract Vault is VaultBase {
         if (v == 0 && r == 0 && s == 0) {
             require(msg.sender == _user, "invalid_sender");
             require(registeredContracts[_contract] == address(0), "clone");
-            require(whitelistedContracts[_contract], "not_whitelisted");
+            require(allowedContracts[_contract], "not_whitelisted");
         } else {
             bytes32 digest =
                 keccak256(

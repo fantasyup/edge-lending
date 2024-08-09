@@ -9,7 +9,7 @@ import {
 import { BigNumber, Contract } from 'ethers';
 import { ContractId } from '../helpers/types';
 import { LendingPairFactory } from '../types';
-import { getFeeWithdrawalProxy, getPriceOracleAggregatorProxy, getVaultProxy } from '../helpers/contracts';
+import { getFeeWithdrawalProxy, getPriceOracleAggregatorDeployment, getVaultProxy } from '../helpers/contracts';
 
 const tag = `testnet`
 
@@ -63,16 +63,16 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
     const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
     
     // set price oracles
-    const priceProxy = await getPriceOracleAggregatorProxy()
+    const priceOracle = await getPriceOracleAggregatorDeployment()
     const vaultProxy = await getVaultProxy()
     const feeWithdrawalProxy = await getFeeWithdrawalProxy()
     
-    await priceProxy.connect(teamSigner).setOracleForAsset(
+    await priceOracle.connect(teamSigner).setOracleForAsset(
         [BorrowAsset.address],
         [BorrowAssetMockPriceOracle.address]
     ).catch(e => console.log(e))
 
-    await priceProxy.connect(teamSigner).setOracleForAsset(
+    await priceOracle.connect(teamSigner).setOracleForAsset(
         [CollateralAsset.address],
         [CollateralAssetMockPriceOracle.address]
     )
@@ -105,7 +105,7 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
     console.log(`FeeWithdrawal: ${vars.FeeWithdrawal.address}`)
     console.log(`FeeWithdrawalProxy: ${feeWithdrawalProxy.address}`)
     console.log(`PriceOracleAggregator: ${vars.PriceOracleAggregator.address}`)
-    console.log(`PriceOracleAggregatorProxy: ${priceProxy.address}`)
+    // console.log(`PriceOracleAggregatorProxy: ${priceProxy.address}`)
     console.log(`LendingPair: ${vars.LendingPair.address}`)
     console.log(`------- Test Lending Pair ----------------------`)
     console.log(`LendingPair: ${newLendingPairEv!.args!.pair}`)
