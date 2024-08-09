@@ -67,14 +67,14 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
     const vaultProxy = await getVaultProxy()
     const feeWithdrawalProxy = await getFeeWithdrawalProxy()
     
-    await priceProxy.connect(teamSigner).updateOracleForAsset(
-        BorrowAsset.address,
-        BorrowAssetMockPriceOracle.address
+    await priceProxy.connect(teamSigner).setOracleForAsset(
+        [BorrowAsset.address],
+        [BorrowAssetMockPriceOracle.address]
     ).catch(e => console.log(e))
 
-    await priceProxy.connect(teamSigner).updateOracleForAsset(
-        CollateralAsset.address,
-        CollateralAssetMockPriceOracle.address
+    await priceProxy.connect(teamSigner).setOracleForAsset(
+        [CollateralAsset.address],
+        [CollateralAssetMockPriceOracle.address]
     )
 
     // use lending pair factory to create a lending pair

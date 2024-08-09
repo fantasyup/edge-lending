@@ -336,9 +336,9 @@ export function LendingPairHelpers(
             asset: MockToken,
             priceOracle: MockPriceOracle
         ) => {
-            return await oracleAggregator.connect(team.signer).updateOracleForAsset(
-                asset.address,
-                priceOracle.address
+            return await oracleAggregator.connect(team.signer).setOracleForAsset(
+                [asset.address],
+                [priceOracle.address]
             )
         },
         approveLendingPairInVault: async(

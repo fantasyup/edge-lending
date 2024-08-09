@@ -122,6 +122,38 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
+        name: "sender",
+        type: "address",
+      },
+    ],
+    name: "LogRegisterProtocol",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "whitelist",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "status",
+        type: "bool",
+      },
+    ],
+    name: "LogWhiteListContract",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
         name: "newOwner",
         type: "address",
       },

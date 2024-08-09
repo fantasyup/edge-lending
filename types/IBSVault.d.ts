@@ -104,6 +104,8 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     "Approval(address,address,bool)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
+    "LogRegisterProtocol(address)": EventFragment;
+    "LogWhiteListContract(address,bool)": EventFragment;
     "OwnershipAccepted(address,uint256)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
@@ -114,6 +116,8 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "LogRegisterProtocol"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "LogWhiteListContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
@@ -672,6 +676,18 @@ export class IBSVault extends Contract {
         feeAmount: BigNumber;
         receiver: string;
       }
+    >;
+
+    LogRegisterProtocol(
+      sender: null
+    ): TypedEventFilter<[string], { sender: string }>;
+
+    LogWhiteListContract(
+      whitelist: null,
+      status: null
+    ): TypedEventFilter<
+      [string, boolean],
+      { whitelist: string; status: boolean }
     >;
 
     OwnershipAccepted(

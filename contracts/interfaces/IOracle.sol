@@ -7,7 +7,6 @@ interface IOracle {
     /// @param newPrice price of the asset
     event PriceUpdated(address asset, uint256 newPrice);
 
-    function getPriceInUSD() external returns (uint256);
-
-    function viewPriceInUSD() external view returns (uint256);
+    /// @dev returns latest answer
+    function latestAnswer() external view returns (int256);
 }

@@ -680,7 +680,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice getTotalAvailableCollateralValueInUSD returns the total availible collaeral value for an account in USD
     /// @param _account is the address whos collateral is being retreived
     /// @dev this function runs calculations to accrue interest for an up to date amount
-    function getTotalAvailableCollateralValueInUSD(address _account) public returns (uint256) {
+    function getTotalAvailableCollateralValueInUSD(address _account) public view returns (uint256) {
         return
             getPriceOfToken(
                 collateralAsset,
@@ -698,19 +698,19 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /// @dev returns price of collateral in usd
-    function getPriceOfCollateral() public returns (uint256) {
+    function getPriceOfCollateral() public view returns (uint256) {
         return oracle.getPriceInUSD(collateralAsset);
     }
 
     /// @dev returns price of collateral in usd
-    function getPriceOfBorrowAsset() external returns (uint256) {
+    function getPriceOfBorrowAsset() external view returns (uint256) {
         return oracle.getPriceInUSD(asset);
     }
 
     /// @notice getPriceOfToken returns price of token in usd
     /// @param _token this is the price of the token
     /// @param _amount this is the amount of tokens
-    function getPriceOfToken(IERC20 _token, uint256 _amount) public returns (uint256) {
+    function getPriceOfToken(IERC20 _token, uint256 _amount) public view returns (uint256) {
         return oracle.getPriceInUSD(_token) * _amount;
     }
 
@@ -730,7 +730,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @notice getBorrowLimit returns the borrow limit for an account
     /// @param _account is the input account address
     /// @dev this calculation uses current values for calculations
-    function getBorrowLimitInUSD(address _account) public returns (uint256) {
+    function getBorrowLimitInUSD(address _account) public view returns (uint256) {
         uint256 availibleCollateralValue = getTotalAvailableCollateralValueInUSD(_account);
         return calcBorrowLimit(availibleCollateralValue);
     }

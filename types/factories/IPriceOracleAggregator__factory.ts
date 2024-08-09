@@ -26,6 +26,63 @@ const _abi = [
     inputs: [
       {
         indexed: false,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "OwnershipAccepted",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "contract IERC20",
+        name: "_token",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "StableTokenAdded",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_newTeam",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "TransferControl",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
         internalType: "contract IERC20",
         name: "token",
         type: "address",
@@ -56,44 +113,44 @@ const _abi = [
         type: "uint256",
       },
     ],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
       {
-        internalType: "contract IERC20",
-        name: "_asset",
-        type: "address",
-      },
-      {
-        internalType: "contract IOracle",
-        name: "_oracle",
-        type: "address",
+        internalType: "contract IERC20[]",
+        name: "_tokens",
+        type: "address[]",
       },
     ],
-    name: "updateOracleForAsset",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IERC20",
-        name: "_token",
-        type: "address",
-      },
-    ],
-    name: "viewPriceInUSD",
+    name: "getPriceInUSDMultiple",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "uint256[]",
         name: "",
-        type: "uint256",
+        type: "uint256[]",
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IERC20[]",
+        name: "_asset",
+        type: "address[]",
+      },
+      {
+        internalType: "contract IOracle[]",
+        name: "_oracle",
+        type: "address[]",
+      },
+    ],
+    name: "setOracleForAsset",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ];

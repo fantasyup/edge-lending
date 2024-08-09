@@ -63,6 +63,22 @@ contract Vault is VaultBase {
     // Vault Actions
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /// @dev register protocol
+    function registerProtocol() public {
+        registeredContracts[msg.sender] = msg.sender;
+        emit LogRegisterProtocol(msg.sender);
+    }
+
+    /// @notice Enables or disables a contract for approval without signed message.
+    function whitelistMasterContract(address _contract, bool _status) public onlyOwner {
+        // Checks
+        require(_contract != address(0), "MasterCMgr: Cannot approve 0");
+
+        // Effects
+        whitelistedContracts[_contract] = _status;
+        emit LogWhiteListContract(_contract, _status);
+    }
+    
     /// @notice approve a contract to enable the contract to withdraw
     function approveContract(
         address _user,
@@ -73,32 +89,39 @@ contract Vault is VaultBase {
         bytes32 s
     ) external override {
         require(_contract != address(0), "INVALID_CONTRACT");
+        require(_user != address(0), "INVALID_USER");
 
-        bytes32 digest =
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    _domainSeparatorV4(),
-                    keccak256(
-                        abi.encode(
-                            _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
-                            _status
-                                // solhint-disable-next-line
-                                ? keccak256("Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission")
-                                : keccak256(
-                                    "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
-                                ),
-                            _user,
-                            _contract,
-                            _status,
-                            userApprovalNonce[_user]++
+        if (v == 0 && r == 0 && s == 0) {
+            require(msg.sender == _user, "invalid_sender");
+            require(registeredContracts[_contract] == address(0), "clone");
+            require(whitelistedContracts[_contract], "not_whitelisted");
+        } else {
+            bytes32 digest =
+                keccak256(
+                    abi.encodePacked(
+                        "\x19\x01",
+                        _domainSeparatorV4(),
+                        keccak256(
+                            abi.encode(
+                                _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
+                                _status
+                                    // solhint-disable-next-line
+                                    ? keccak256("Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission")
+                                    : keccak256(
+                                        "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
+                                    ),
+                                _user,
+                                _contract,
+                                _status,
+                                userApprovalNonce[_user]++
+                            )
                         )
                     )
-                )
-            );
+                );
 
-        address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress == _user, "INVALID_SIGNATURE");
+                address recoveredAddress = ecrecover(digest, v, r, s);
+                require(recoveredAddress == _user, "INVALID_SIGNATURE");
+        }
 
         userApprovedContracts[_user][_contract] = _status;
 

@@ -21,50 +21,60 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
   functions: {
-    "admin()": FunctionFragment;
+    "acceptOwnership()": FunctionFragment;
+    "addStable(address[])": FunctionFragment;
     "assetToOracle(address)": FunctionFragment;
-    "getCodeAddress()": FunctionFragment;
     "getPriceInUSD(address)": FunctionFragment;
-    "proxiableUUID()": FunctionFragment;
-    "updateCode(address)": FunctionFragment;
-    "updateOracleForAsset(address,address)": FunctionFragment;
-    "viewPriceInUSD(address)": FunctionFragment;
+    "getPriceInUSDMultiple(address[])": FunctionFragment;
+    "owner()": FunctionFragment;
+    "removeOracleForAsset(address)": FunctionFragment;
+    "setOracleForAsset(address[],address[])": FunctionFragment;
+    "stableTokens(address)": FunctionFragment;
+    "transferToNewOwner(address)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "acceptOwnership",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "addStable", values: [string[]]): string;
   encodeFunctionData(
     functionFragment: "assetToOracle",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getCodeAddress",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getPriceInUSD",
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "proxiableUUID",
-    values?: undefined
+    functionFragment: "getPriceInUSDMultiple",
+    values: [string[]]
   ): string;
-  encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "updateOracleForAsset",
-    values: [string, string]
+    functionFragment: "removeOracleForAsset",
+    values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "setOracleForAsset",
+    values: [string[], string[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "stableTokens",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferToNewOwner",
     values: [string]
   ): string;
 
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "assetToOracle",
+    functionFragment: "acceptOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "addStable", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getCodeAddress",
+    functionFragment: "assetToOracle",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -72,25 +82,37 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "proxiableUUID",
+    functionFragment: "getPriceInUSDMultiple",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "updateOracleForAsset",
+    functionFragment: "removeOracleForAsset",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "setOracleForAsset",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "stableTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferToNewOwner",
     data: BytesLike
   ): Result;
 
   events: {
-    "CodeUpdated(bytes32,address)": EventFragment;
+    "OwnershipAccepted(address,uint256)": EventFragment;
+    "StableTokenAdded(address,uint256)": EventFragment;
+    "TransferControl(address,uint256)": EventFragment;
     "UpdateOracle(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "StableTokenAdded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateOracle"): EventFragment;
 }
 
@@ -138,9 +160,23 @@ export class PriceOracleAggregator extends Contract {
   interface: PriceOracleAggregatorInterface;
 
   functions: {
-    admin(overrides?: CallOverrides): Promise<[string]>;
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+    "acceptOwnership()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    addStable(
+      _tokens: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "addStable(address[])"(
+      _tokens: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     assetToOracle(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
@@ -149,64 +185,87 @@ export class PriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    getCodeAddress(
-      overrides?: CallOverrides
-    ): Promise<[string] & { codeAddress: string }>;
-
-    "getCodeAddress()"(
-      overrides?: CallOverrides
-    ): Promise<[string] & { codeAddress: string }>;
-
     getPriceInUSD(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { price: BigNumber }>;
 
     "getPriceInUSD(address)"(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
-
-    "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
-
-    updateCode(
-      newAddress: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "updateCode(address)"(
-      newAddress: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    updateOracleForAsset(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "updateOracleForAsset(address,address)"(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    viewPriceInUSD(
-      _token: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber] & { price: BigNumber }>;
 
-    "viewPriceInUSD(address)"(
-      _token: string,
+    getPriceInUSDMultiple(
+      _tokens: string[],
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber[]] & { prices: BigNumber[] }>;
+
+    "getPriceInUSDMultiple(address[])"(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { prices: BigNumber[] }>;
+
+    owner(overrides?: CallOverrides): Promise<[string]>;
+
+    "owner()"(overrides?: CallOverrides): Promise<[string]>;
+
+    removeOracleForAsset(
+      _asset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "removeOracleForAsset(address)"(
+      _asset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setOracleForAsset(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setOracleForAsset(address[],address[])"(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    stableTokens(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
+
+    "stableTokens(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    transferToNewOwner(
+      _newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "transferToNewOwner(address)"(
+      _newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
-  admin(overrides?: CallOverrides): Promise<string>;
+  acceptOwnership(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  "admin()"(overrides?: CallOverrides): Promise<string>;
+  "acceptOwnership()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  addStable(
+    _tokens: string[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "addStable(address[])"(
+    _tokens: string[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   assetToOracle(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -215,57 +274,77 @@ export class PriceOracleAggregator extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getCodeAddress(overrides?: CallOverrides): Promise<string>;
-
-  "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
-
-  getPriceInUSD(
-    _token: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  getPriceInUSD(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "getPriceInUSD(address)"(
-    _token: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  proxiableUUID(overrides?: CallOverrides): Promise<string>;
-
-  "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
-
-  updateCode(
-    newAddress: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "updateCode(address)"(
-    newAddress: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  updateOracleForAsset(
-    _asset: string,
-    _oracle: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "updateOracleForAsset(address,address)"(
-    _asset: string,
-    _oracle: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  viewPriceInUSD(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  "viewPriceInUSD(address)"(
     _token: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  callStatic: {
-    admin(overrides?: CallOverrides): Promise<string>;
+  getPriceInUSDMultiple(
+    _tokens: string[],
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
 
-    "admin()"(overrides?: CallOverrides): Promise<string>;
+  "getPriceInUSDMultiple(address[])"(
+    _tokens: string[],
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  owner(overrides?: CallOverrides): Promise<string>;
+
+  "owner()"(overrides?: CallOverrides): Promise<string>;
+
+  removeOracleForAsset(
+    _asset: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "removeOracleForAsset(address)"(
+    _asset: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setOracleForAsset(
+    _asset: string[],
+    _oracle: string[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setOracleForAsset(address[],address[])"(
+    _asset: string[],
+    _oracle: string[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  stableTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+  "stableTokens(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  transferToNewOwner(
+    _newOwner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "transferToNewOwner(address)"(
+    _newOwner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  callStatic: {
+    acceptOwnership(overrides?: CallOverrides): Promise<void>;
+
+    "acceptOwnership()"(overrides?: CallOverrides): Promise<void>;
+
+    addStable(_tokens: string[], overrides?: CallOverrides): Promise<void>;
+
+    "addStable(address[])"(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     assetToOracle(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -273,10 +352,6 @@ export class PriceOracleAggregator extends Contract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    getCodeAddress(overrides?: CallOverrides): Promise<string>;
-
-    "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
 
     getPriceInUSD(
       _token: string,
@@ -288,47 +363,83 @@ export class PriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    proxiableUUID(overrides?: CallOverrides): Promise<string>;
-
-    "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
-
-    updateCode(newAddress: string, overrides?: CallOverrides): Promise<void>;
-
-    "updateCode(address)"(
-      newAddress: string,
+    getPriceInUSDMultiple(
+      _tokens: string[],
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber[]>;
 
-    updateOracleForAsset(
+    "getPriceInUSDMultiple(address[])"(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    owner(overrides?: CallOverrides): Promise<string>;
+
+    "owner()"(overrides?: CallOverrides): Promise<string>;
+
+    removeOracleForAsset(
       _asset: string,
-      _oracle: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "updateOracleForAsset(address,address)"(
+    "removeOracleForAsset(address)"(
       _asset: string,
-      _oracle: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    viewPriceInUSD(
-      _token: string,
+    setOracleForAsset(
+      _asset: string[],
+      _oracle: string[],
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<void>;
 
-    "viewPriceInUSD(address)"(
-      _token: string,
+    "setOracleForAsset(address[],address[])"(
+      _asset: string[],
+      _oracle: string[],
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<void>;
+
+    stableTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+    "stableTokens(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    transferToNewOwner(
+      _newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "transferToNewOwner(address)"(
+      _newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
-    CodeUpdated(
-      uuid: null,
-      codeAddress: null
+    OwnershipAccepted(
+      newOwner: null,
+      timestamp: null
     ): TypedEventFilter<
-      [string, string],
-      { uuid: string; codeAddress: string }
+      [string, BigNumber],
+      { newOwner: string; timestamp: BigNumber }
+    >;
+
+    StableTokenAdded(
+      _token: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { _token: string; timestamp: BigNumber }
+    >;
+
+    TransferControl(
+      _newTeam: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { _newTeam: string; timestamp: BigNumber }
     >;
 
     UpdateOracle(
@@ -338,9 +449,23 @@ export class PriceOracleAggregator extends Contract {
   };
 
   estimateGas: {
-    admin(overrides?: CallOverrides): Promise<BigNumber>;
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
-    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "acceptOwnership()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    addStable(
+      _tokens: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "addStable(address[])"(
+      _tokens: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     assetToOracle(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -349,61 +474,88 @@ export class PriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     getPriceInUSD(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "getPriceInUSD(address)"(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    updateCode(
-      newAddress: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "updateCode(address)"(
-      newAddress: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    updateOracleForAsset(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "updateOracleForAsset(address,address)"(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    viewPriceInUSD(
-      _token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "viewPriceInUSD(address)"(
-      _token: string,
+    getPriceInUSDMultiple(
+      _tokens: string[],
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getPriceInUSDMultiple(address[])"(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    removeOracleForAsset(
+      _asset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "removeOracleForAsset(address)"(
+      _asset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setOracleForAsset(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setOracleForAsset(address[],address[])"(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    stableTokens(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "stableTokens(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    transferToNewOwner(
+      _newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "transferToNewOwner(address)"(
+      _newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    acceptOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
-    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "acceptOwnership()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    addStable(
+      _tokens: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "addStable(address[])"(
+      _tokens: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     assetToOracle(
       arg0: string,
@@ -415,56 +567,70 @@ export class PriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getCodeAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "getCodeAddress()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     getPriceInUSD(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "getPriceInUSD(address)"(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    updateCode(
-      newAddress: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "updateCode(address)"(
-      newAddress: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateOracleForAsset(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "updateOracleForAsset(address,address)"(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    viewPriceInUSD(
-      _token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "viewPriceInUSD(address)"(
-      _token: string,
+    getPriceInUSDMultiple(
+      _tokens: string[],
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getPriceInUSDMultiple(address[])"(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    removeOracleForAsset(
+      _asset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "removeOracleForAsset(address)"(
+      _asset: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setOracleForAsset(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setOracleForAsset(address[],address[])"(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    stableTokens(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "stableTokens(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    transferToNewOwner(
+      _newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "transferToNewOwner(address)"(
+      _newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

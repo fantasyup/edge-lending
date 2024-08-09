@@ -38,7 +38,7 @@ contract LendingPairHelper {
         for (uint256 i = 0; i < pairs.length; i++) {
             IBSLendingPair pair = pairs[i];
             uint256 currentBorrowBalance = pair.borrowBalancePrior(_account);
-            uint256 priceInUSD = pair.oracle().viewPriceInUSD(pair.asset()) * currentBorrowBalance;
+            uint256 priceInUSD = pair.oracle().getPriceInUSD(pair.asset()) * currentBorrowBalance;
             totals[i] = priceInUSD;
         }
     }

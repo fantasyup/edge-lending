@@ -54,6 +54,10 @@ interface IBSVault is IERC3156FlashLender {
 
     event OwnershipAccepted(address newOwner, uint256 timestamp);
 
+    event LogRegisterProtocol(address sender);
+
+    event LogWhiteListContract(address whitelist, bool status);
+
     // ************** //
     // *** FUNCTIONS *** //
     // ************** //

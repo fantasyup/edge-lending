@@ -38,6 +38,8 @@ interface VaultInterface extends ethers.utils.Interface {
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
+    "registerProtocol()": FunctionFragment;
+    "registeredContracts(address)": FunctionFragment;
     "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
@@ -49,6 +51,8 @@ interface VaultInterface extends ethers.utils.Interface {
     "userApprovalNonce(address)": FunctionFragment;
     "userApprovedContracts(address,address)": FunctionFragment;
     "version()": FunctionFragment;
+    "whitelistMasterContract(address,bool)": FunctionFragment;
+    "whitelistedContracts(address)": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
@@ -106,6 +110,14 @@ interface VaultInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "registerProtocol",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registeredContracts",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "toShare",
     values: [string, BigNumberish, boolean]
   ): string;
@@ -137,6 +149,14 @@ interface VaultInterface extends ethers.utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "whitelistMasterContract",
+    values: [string, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "whitelistedContracts",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "withdraw",
     values: [string, string, string, BigNumberish]
@@ -180,6 +200,14 @@ interface VaultInterface extends ethers.utils.Interface {
     functionFragment: "proxiableUUID",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "registerProtocol",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "registeredContracts",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "toUnderlying",
@@ -206,6 +234,14 @@ interface VaultInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "whitelistMasterContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "whitelistedContracts",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
@@ -213,6 +249,8 @@ interface VaultInterface extends ethers.utils.Interface {
     "CodeUpdated(bytes32,address)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
+    "LogRegisterProtocol(address)": EventFragment;
+    "LogWhiteListContract(address,bool)": EventFragment;
     "OwnershipAccepted(address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
@@ -226,6 +264,8 @@ interface VaultInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "LogRegisterProtocol"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "LogWhiteListContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
@@ -429,6 +469,24 @@ export class Vault extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
 
+    registerProtocol(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "registerProtocol()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    registeredContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "registeredContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -541,6 +599,28 @@ export class Vault extends Contract {
     version(overrides?: CallOverrides): Promise<[string]>;
 
     "version()"(overrides?: CallOverrides): Promise<[string]>;
+
+    whitelistMasterContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "whitelistMasterContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    whitelistedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "whitelistedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     withdraw(
       _token: string,
@@ -702,6 +782,21 @@ export class Vault extends Contract {
 
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
+  registerProtocol(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "registerProtocol()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  registeredContracts(arg0: string, overrides?: CallOverrides): Promise<string>;
+
+  "registeredContracts(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   toShare(
     _token: string,
     _amount: BigNumberish,
@@ -814,6 +909,28 @@ export class Vault extends Contract {
   version(overrides?: CallOverrides): Promise<string>;
 
   "version()"(overrides?: CallOverrides): Promise<string>;
+
+  whitelistMasterContract(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "whitelistMasterContract(address,bool)"(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  whitelistedContracts(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "whitelistedContracts(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   withdraw(
     _token: string,
@@ -967,6 +1084,20 @@ export class Vault extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
+    registerProtocol(overrides?: CallOverrides): Promise<void>;
+
+    "registerProtocol()"(overrides?: CallOverrides): Promise<void>;
+
+    registeredContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "registeredContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1073,6 +1204,28 @@ export class Vault extends Contract {
 
     "version()"(overrides?: CallOverrides): Promise<string>;
 
+    whitelistMasterContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "whitelistMasterContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    whitelistedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "whitelistedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     withdraw(
       _token: string,
       _from: string,
@@ -1140,6 +1293,18 @@ export class Vault extends Contract {
         feeAmount: BigNumber;
         receiver: string;
       }
+    >;
+
+    LogRegisterProtocol(
+      sender: null
+    ): TypedEventFilter<[string], { sender: string }>;
+
+    LogWhiteListContract(
+      whitelist: null,
+      status: null
+    ): TypedEventFilter<
+      [string, boolean],
+      { whitelist: string; status: boolean }
     >;
 
     OwnershipAccepted(
@@ -1338,6 +1503,24 @@ export class Vault extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    registerProtocol(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "registerProtocol()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    registeredContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "registeredContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1450,6 +1633,28 @@ export class Vault extends Contract {
     version(overrides?: CallOverrides): Promise<BigNumber>;
 
     "version()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    whitelistMasterContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "whitelistMasterContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    whitelistedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "whitelistedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     withdraw(
       _token: string,
@@ -1621,6 +1826,24 @@ export class Vault extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    registerProtocol(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "registerProtocol()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    registeredContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "registeredContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1736,6 +1959,28 @@ export class Vault extends Contract {
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "version()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    whitelistMasterContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "whitelistMasterContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    whitelistedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "whitelistedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     withdraw(
       _token: string,
