@@ -21,6 +21,25 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: "address",
+        name: "whitelist",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "status",
+        type: "bool",
+      },
+    ],
+    name: "AllowContract",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: "address",
         name: "user",
@@ -141,38 +160,6 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-    ],
-    name: "LogRegisterProtocol",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "whitelist",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "status",
-        type: "bool",
-      },
-    ],
-    name: "LogWhiteListContract",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
         name: "newOwner",
         type: "address",
       },
@@ -197,6 +184,19 @@ const _abi = [
       },
     ],
     name: "Paused",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "sender",
+        type: "address",
+      },
+    ],
+    name: "RegisterProtocol",
     type: "event",
   },
   {
@@ -311,6 +311,25 @@ const _abi = [
     ],
     name: "Withdraw",
     type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "allowedContracts",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
   },
   {
     inputs: [
@@ -746,25 +765,6 @@ const _abi = [
       },
     ],
     name: "userApprovedContracts",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    name: "whitelistedContracts",
     outputs: [
       {
         internalType: "bool",

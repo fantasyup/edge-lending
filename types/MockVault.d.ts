@@ -24,6 +24,8 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "MAX_FLASHLOAN_RATE()": FunctionFragment;
     "acceptOwnership()": FunctionFragment;
     "addProfit(address,uint256)": FunctionFragment;
+    "allowContract(address,bool)": FunctionFragment;
+    "allowedContracts(address)": FunctionFragment;
     "approveContract(address,address,bool,uint8,bytes32,bytes32)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
@@ -52,8 +54,6 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "userApprovalNonce(address)": FunctionFragment;
     "userApprovedContracts(address,address)": FunctionFragment;
     "version()": FunctionFragment;
-    "whitelistMasterContract(address,bool)": FunctionFragment;
-    "whitelistedContracts(address)": FunctionFragment;
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
@@ -68,6 +68,14 @@ interface MockVaultInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "addProfit",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "allowContract",
+    values: [string, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "allowedContracts",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "approveContract",
@@ -155,14 +163,6 @@ interface MockVaultInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "whitelistMasterContract",
-    values: [string, boolean]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "whitelistedContracts",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "withdraw",
     values: [string, string, string, BigNumberish]
   ): string;
@@ -176,6 +176,14 @@ interface MockVaultInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "addProfit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "allowContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "allowedContracts",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "approveContract",
     data: BytesLike
@@ -240,25 +248,17 @@ interface MockVaultInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "whitelistMasterContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "whitelistedContracts",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
+    "AllowContract(address,bool)": EventFragment;
     "Approval(address,address,bool)": EventFragment;
     "CodeUpdated(bytes32,address)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
-    "LogRegisterProtocol(address)": EventFragment;
-    "LogWhiteListContract(address,bool)": EventFragment;
     "OwnershipAccepted(address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
+    "RegisterProtocol(address)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
@@ -266,14 +266,14 @@ interface MockVaultInterface extends ethers.utils.Interface {
     "Withdraw(address,address,address,uint256,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AllowContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogRegisterProtocol"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogWhiteListContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RegisterProtocol"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
@@ -348,6 +348,28 @@ export class MockVault extends Contract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    allowContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "allowContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    allowedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     approveContract(
       _user: string,
@@ -618,28 +640,6 @@ export class MockVault extends Contract {
 
     "version()"(overrides?: CallOverrides): Promise<[string]>;
 
-    whitelistMasterContract(
-      _contract: string,
-      _status: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "whitelistMasterContract(address,bool)"(
-      _contract: string,
-      _status: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    whitelistedContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    "whitelistedContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
     withdraw(
       _token: string,
       _from: string,
@@ -680,6 +680,25 @@ export class MockVault extends Contract {
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  allowContract(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "allowContract(address,bool)"(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  allowedContracts(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+  "allowedContracts(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   approveContract(
     _user: string,
@@ -940,28 +959,6 @@ export class MockVault extends Contract {
 
   "version()"(overrides?: CallOverrides): Promise<string>;
 
-  whitelistMasterContract(
-    _contract: string,
-    _status: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "whitelistMasterContract(address,bool)"(
-    _contract: string,
-    _status: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  whitelistedContracts(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  "whitelistedContracts(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
   withdraw(
     _token: string,
     _from: string,
@@ -998,6 +995,25 @@ export class MockVault extends Contract {
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    allowContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "allowContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    allowedContracts(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     approveContract(
       _user: string,
@@ -1246,28 +1262,6 @@ export class MockVault extends Contract {
 
     "version()"(overrides?: CallOverrides): Promise<string>;
 
-    whitelistMasterContract(
-      _contract: string,
-      _status: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "whitelistMasterContract(address,bool)"(
-      _contract: string,
-      _status: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    whitelistedContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "whitelistedContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     withdraw(
       _token: string,
       _from: string,
@@ -1286,6 +1280,14 @@ export class MockVault extends Contract {
   };
 
   filters: {
+    AllowContract(
+      whitelist: null,
+      status: null
+    ): TypedEventFilter<
+      [string, boolean],
+      { whitelist: string; status: boolean }
+    >;
+
     Approval(
       user: string | null,
       allowed: string | null,
@@ -1337,18 +1339,6 @@ export class MockVault extends Contract {
       }
     >;
 
-    LogRegisterProtocol(
-      sender: null
-    ): TypedEventFilter<[string], { sender: string }>;
-
-    LogWhiteListContract(
-      whitelist: null,
-      status: null
-    ): TypedEventFilter<
-      [string, boolean],
-      { whitelist: string; status: boolean }
-    >;
-
     OwnershipAccepted(
       newOwner: null,
       timestamp: null
@@ -1358,6 +1348,10 @@ export class MockVault extends Contract {
     >;
 
     Paused(account: null): TypedEventFilter<[string], { account: string }>;
+
+    RegisterProtocol(
+      sender: null
+    ): TypedEventFilter<[string], { sender: string }>;
 
     Transfer(
       token: string | null,
@@ -1424,6 +1418,28 @@ export class MockVault extends Contract {
       _token: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    allowContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "allowContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    allowedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     approveContract(
@@ -1688,28 +1704,6 @@ export class MockVault extends Contract {
 
     "version()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    whitelistMasterContract(
-      _contract: string,
-      _status: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "whitelistMasterContract(address,bool)"(
-      _contract: string,
-      _status: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    whitelistedContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "whitelistedContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     withdraw(
       _token: string,
       _from: string,
@@ -1754,6 +1748,28 @@ export class MockVault extends Contract {
       _token: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    allowContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "allowContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    allowedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     approveContract(
@@ -2025,28 +2041,6 @@ export class MockVault extends Contract {
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "version()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    whitelistMasterContract(
-      _contract: string,
-      _status: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "whitelistMasterContract(address,bool)"(
-      _contract: string,
-      _status: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    whitelistedContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "whitelistedContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     withdraw(
       _token: string,

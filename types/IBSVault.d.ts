@@ -101,24 +101,24 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
+    "AllowContract(address,bool)": EventFragment;
     "Approval(address,address,bool)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
-    "LogRegisterProtocol(address)": EventFragment;
-    "LogWhiteListContract(address,bool)": EventFragment;
     "OwnershipAccepted(address,uint256)": EventFragment;
+    "RegisterProtocol(address)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "UpdateFlashLoanRate(uint256)": EventFragment;
     "Withdraw(address,address,address,uint256,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AllowContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogRegisterProtocol"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogWhiteListContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RegisterProtocol"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateFlashLoanRate"): EventFragment;
@@ -635,6 +635,14 @@ export class IBSVault extends Contract {
   };
 
   filters: {
+    AllowContract(
+      whitelist: null,
+      status: null
+    ): TypedEventFilter<
+      [string, boolean],
+      { whitelist: string; status: boolean }
+    >;
+
     Approval(
       user: string | null,
       allowed: string | null,
@@ -678,18 +686,6 @@ export class IBSVault extends Contract {
       }
     >;
 
-    LogRegisterProtocol(
-      sender: null
-    ): TypedEventFilter<[string], { sender: string }>;
-
-    LogWhiteListContract(
-      whitelist: null,
-      status: null
-    ): TypedEventFilter<
-      [string, boolean],
-      { whitelist: string; status: boolean }
-    >;
-
     OwnershipAccepted(
       newOwner: null,
       timestamp: null
@@ -697,6 +693,10 @@ export class IBSVault extends Contract {
       [string, BigNumber],
       { newOwner: string; timestamp: BigNumber }
     >;
+
+    RegisterProtocol(
+      sender: null
+    ): TypedEventFilter<[string], { sender: string }>;
 
     Transfer(
       token: string | null,
