@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IERC3156FlashBorrower.sol";
-import "./interfaces/IBSLendingPair.sol";
 import "./VaultBase.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
