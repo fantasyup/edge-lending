@@ -14,6 +14,7 @@ runTestSuite("Vault - Upgradable Layout", (vars: TestVars) => {
 
         // initialize proxiedVault
         await proxiedVault.initialize(flashLoanRate, admin.address);
+        console.log(proxiedVault.address)
 
         expect(await proxiedVault.flashLoanRate()).to.eq(flashLoanRate)
         expect(await proxiedVault.owner()).to.eq(admin.address)

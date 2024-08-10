@@ -40,24 +40,24 @@ describe('PriceOracleAggregator', function() {
     })
 
     it("correct team address", async function() {
-        expect(await PriceOracleAggregator.admin()).to.eq(admin)
+        expect(await PriceOracleAggregator.owner()).to.eq(admin)
     })
 
     it("updateOracleForAsset - fails for non admin", async function(){
         await expect(
-            PriceOracleAggregator.connect(await ethers.getSigner(frank)).updateOracleForAsset(
-                asset.address,
-                bob
+            PriceOracleAggregator.connect(await ethers.getSigner(frank)).setOracleForAsset(
+                [asset.address],
+                [bob]
             )
-        ).to.revertedWith('ONLY_ADMIN')
+        ).to.revertedWith('ONLY_OWNER')
     })
 
 
     it("updateOracleForAsset - fails for invalid oracle adddress", async function(){
         await expect(
-            PriceOracleAggregator.updateOracleForAsset(
-                asset.address,
-                ethers.constants.AddressZero
+            PriceOracleAggregator.setOracleForAsset(
+                [asset.address],
+                [ethers.constants.AddressZero]
             )
         ).to.revertedWith('INVALID_ORACLE')
     })
@@ -65,39 +65,30 @@ describe('PriceOracleAggregator', function() {
     it('getPriceInUSD - fails for non existent oracle', async function() {
         await expect(
             PriceOracleAggregator.getPriceInUSD(frank)
-        ).revertedWith('INVALID_ORACLE')
+        ).revertedWith('INVALID_PRICE')
     })
 
-    it('viewPriceInUSD - fails for non existent oracle', async function() {
+    it("setOracleForAsset", async function() {
         await expect(
-            PriceOracleAggregator.viewPriceInUSD(frank)
-        ).revertedWith('INVALID_ORACLE')
-    })
-
-    it("updateOracleForAsset", async function() {
-        await expect(
-            PriceOracleAggregator.updateOracleForAsset(
-                asset.address,
-                MockChainlinkUSDAdapter.address
+            PriceOracleAggregator.setOracleForAsset(
+                [asset.address],
+                [MockChainlinkUSDAdapter.address]
             )
         ).to.emit(PriceOracleAggregator, 'UpdateOracle')
         .withArgs(asset.address, MockChainlinkUSDAdapter.address)
 
         // view price
         expect(
-            await (await PriceOracleAggregator.viewPriceInUSD(asset.address)).toString()
+            await (await PriceOracleAggregator.getPriceInUSD(asset.address)).toString()
         ).to.eq('100000000')
-
-        // get price
-        const tx = await (await PriceOracleAggregator.getPriceInUSD(asset.address)).wait()
     })
 
-    it('price oracle proxy', async function() {
-        const uups = await deployUUPSProxy();
-        await uups.initializeProxy(PriceOracleAggregator.address);
-        expect(
-            await PriceOracleAggregator.attach(uups.address)["admin()"]()
-        ).to.eq(admin)
-    })
+    // it('price oracle proxy', async function() {
+    //     const uups = await deployUUPSProxy();
+    //     await uups.initializeProxy(PriceOracleAggregator.address);
+    //     expect(
+    //         await PriceOracleAggregator.attach(uups.address)["admin()"]()
+    //     ).to.eq(admin)
+    // })
 
 })

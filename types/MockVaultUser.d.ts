@@ -19,44 +19,25 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface MockPriceOracleInterface extends ethers.utils.Interface {
+interface MockVaultUserInterface extends ethers.utils.Interface {
   functions: {
-    "latestAnswer()": FunctionFragment;
-    "setPrice(int256)": FunctionFragment;
-    "viewPriceInUSD()": FunctionFragment;
+    "attack(address)": FunctionFragment;
+    "execute(address,address)": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "attack", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "latestAnswer",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPrice",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "viewPriceInUSD",
-    values?: undefined
+    functionFragment: "execute",
+    values: [string, string]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "latestAnswer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "viewPriceInUSD",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "attack", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
 
-  events: {
-    "PriceUpdated(address,uint256)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "PriceUpdated"): EventFragment;
+  events: {};
 }
 
-export class MockPriceOracle extends Contract {
+export class MockVaultUser extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -97,112 +78,119 @@ export class MockPriceOracle extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: MockPriceOracleInterface;
+  interface: MockVaultUserInterface;
 
   functions: {
-    latestAnswer(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "latestAnswer()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    setPrice(
-      _newPrice: BigNumberish,
+    attack(
+      _vault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setPrice(int256)"(
-      _newPrice: BigNumberish,
+    "attack(address)"(
+      _vault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    viewPriceInUSD(overrides?: CallOverrides): Promise<[BigNumber]>;
+    execute(
+      _vault: string,
+      _approve: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "execute(address,address)"(
+      _vault: string,
+      _approve: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
-  latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  setPrice(
-    _newPrice: BigNumberish,
+  attack(
+    _vault: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setPrice(int256)"(
-    _newPrice: BigNumberish,
+  "attack(address)"(
+    _vault: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+  execute(
+    _vault: string,
+    _approve: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  "execute(address,address)"(
+    _vault: string,
+    _approve: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   callStatic: {
-    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
+    attack(_vault: string, overrides?: CallOverrides): Promise<void>;
 
-    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "attack(address)"(_vault: string, overrides?: CallOverrides): Promise<void>;
 
-    setPrice(_newPrice: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    "setPrice(int256)"(
-      _newPrice: BigNumberish,
+    execute(
+      _vault: string,
+      _approve: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "execute(address,address)"(
+      _vault: string,
+      _approve: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
-  filters: {
-    PriceUpdated(
-      asset: null,
-      newPrice: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { asset: string; newPrice: BigNumber }
-    >;
-  };
+  filters: {};
 
   estimateGas: {
-    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    setPrice(
-      _newPrice: BigNumberish,
+    attack(
+      _vault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setPrice(int256)"(
-      _newPrice: BigNumberish,
+    "attack(address)"(
+      _vault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+    execute(
+      _vault: string,
+      _approve: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "execute(address,address)"(
+      _vault: string,
+      _approve: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    latestAnswer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "latestAnswer()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    setPrice(
-      _newPrice: BigNumberish,
+    attack(
+      _vault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setPrice(int256)"(
-      _newPrice: BigNumberish,
+    "attack(address)"(
+      _vault: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    viewPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    execute(
+      _vault: string,
+      _approve: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
-    "viewPriceInUSD()"(
-      overrides?: CallOverrides
+    "execute(address,address)"(
+      _vault: string,
+      _approve: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

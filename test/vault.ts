@@ -8,6 +8,7 @@ import {
 import { IAccount, LendingPairHelpers, runTestSuite, TestVars } from "./lib";
 import { signVaultApproveContractMessage } from "../helpers/message";
 import { EthereumAddress } from "../helpers/types";
+import { deployMockVaultUser } from "../helpers/contracts";
 
 const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
 const BASE = ethers.utils.parseUnits("1", 18);
@@ -135,6 +136,64 @@ runTestSuite("Vault", (vars: TestVars) => {
       await Vault.paused()
     ).to.eq(false)
 
+  })
+
+  it('allowContract', async() => {
+    const { Vault, blackSmithTeam, accounts: [admin,  bob]} = vars
+
+    await Vault.initialize(flashLoanRate, admin.address);
+
+    await expect(
+      Vault.connect(bob.signer).allowContract(bob.address, true)
+    ).to.be.revertedWith('ONLY_OWNER')
+
+    await expect(
+      await Vault.allowContract(bob.address, true)
+    ).to.emit(Vault, 'AllowContract').withArgs(
+      bob.address,
+      true
+    )
+  })
+
+  it('approveContract - contract', async() => {
+    const { Vault, accounts: [admin,  bob]} = vars
+    await Vault.initialize(flashLoanRate, admin.address);
+
+    const vaultUser = await deployMockVaultUser()
+    const vaultUserApp = await deployMockVaultUser()
+
+    await expect(
+        vaultUser.execute(Vault.address, vaultUserApp.address)
+    ).to.be.revertedWith('NOT_WHITELISTED')
+
+    await expect(
+      vaultUser.attack(Vault.address)
+  ).to.be.revertedWith('INVALID_APPROVE')
+    
+    await expect(
+      Vault.connect(bob.signer).approveContract(
+        admin.address,
+        admin.address,
+        true,
+        0,
+        ethers.constants.HashZero,
+        ethers.constants.HashZero
+    )).to.be.revertedWith("ONLY_CONTRACT")
+
+    await expect(
+      await Vault.allowContract(vaultUserApp.address, true)
+    ).to.emit(Vault, 'AllowContract').withArgs(
+      vaultUserApp.address,
+      true
+    )
+
+    // approve contract
+    await expect(
+      await vaultUser.execute(Vault.address, vaultUserApp.address)
+    ).to.emit(
+      Vault,
+      'Approval'
+    ).withArgs(vaultUser.address, vaultUserApp.address, true)
   })
 
   it('approveContract - fails invalid to / fails with wrong signature ', async () => {

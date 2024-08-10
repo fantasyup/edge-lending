@@ -2,12 +2,12 @@ name: CI
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the develop branch
+  # Triggers the workflow on push or pull request events
   push:
-    branches: [development, master]
+    branches: [development, master, feat/*]
     paths: ['**.js', '**.sol']
   pull_request:
-    branches: [development, master]
+    branches: [development, master, feat/*]
     paths: ['**.js', '**.sol']
 
 jobs:

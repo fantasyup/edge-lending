@@ -3,21 +3,21 @@ pragma solidity 0.8.1;
 import "../interfaces/IOracle.sol";
 
 contract MockPriceOracle is IOracle {
-    uint256 lastestAnswer;
+    int256 lastestAnswer;
 
-    constructor(uint256 _price) {
+    constructor(int256 _price) {
         lastestAnswer = _price;
     }
 
-    function setPrice(uint256 _newPrice) external {
+    function setPrice(int256 _newPrice) external {
         lastestAnswer = _newPrice;
     }
 
-    function getPriceInUSD() external view override returns (uint256) {
+    function latestAnswer() external view override returns (int256) {
         return lastestAnswer;
     }
 
-    function viewPriceInUSD() external view override returns (uint256) {
+    function viewPriceInUSD() external view returns (int256) {
         return lastestAnswer;
     }
 }

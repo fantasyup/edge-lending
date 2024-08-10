@@ -29,8 +29,9 @@ export enum ContractId {
     MockUniswapV2Router02 = 'MockUniswapV2Router02',
     VaultProxy = 'VaultProxy',
     FeeWithdrawalProxy = 'FeeWithdrawalProxy',
-    PriceOracleAggregatorProxy = 'PriceOracleAggregatorProxy',
-    RewardDistributorManagerProxy = 'RewardDistributorManagerProxy'
+    // PriceOracleAggregatorProxy = 'PriceOracleAggregatorProxy',
+    RewardDistributorManagerProxy = 'RewardDistributorManagerProxy',
+    MockVaultUser = 'MockVaultUser'
 }
 
 export enum LendingPairEdgeActions {

@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IERC3156FlashBorrower.sol";
-import "./interfaces/IBSLendingPair.sol";
 import "./VaultBase.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +62,16 @@ contract Vault is VaultBase {
     // Vault Actions
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /// @notice Enables or disables a contract for approval without signed message.
+    function allowContract(address _contract, bool _status) external onlyOwner {
+        // Checks
+        require(_contract != address(0), "invalid_address");
+
+        // Effects
+        allowedContracts[_contract] = _status;
+        emit AllowContract(_contract, _status);
+    }
+    
     /// @notice approve a contract to enable the contract to withdraw
     function approveContract(
         address _user,
@@ -73,32 +82,42 @@ contract Vault is VaultBase {
         bytes32 s
     ) external override {
         require(_contract != address(0), "INVALID_CONTRACT");
+        require(_user != address(0), "INVALID_USER");
 
-        bytes32 digest =
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    _domainSeparatorV4(),
-                    keccak256(
-                        abi.encode(
-                            _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
-                            _status
-                                // solhint-disable-next-line
-                                ? keccak256("Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission")
-                                : keccak256(
-                                    "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
-                                ),
-                            _user,
-                            _contract,
-                            _status,
-                            userApprovalNonce[_user]++
+        if (v == 0 && r == bytes32(0) && s == bytes32(0)) {
+            // ensure that it's a contract
+            require(msg.sender != tx.origin, "ONLY_CONTRACT");
+            // ensure that _user != _contract
+            require(_user != _contract, "INVALID_APPROVE");
+            // ensure that _contract is allowed
+            require(allowedContracts[_contract], "NOT_WHITELISTED");
+        } else {
+            bytes32 digest =
+                keccak256(
+                    abi.encodePacked(
+                        "\x19\x01",
+                        _domainSeparatorV4(),
+                        keccak256(
+                            abi.encode(
+                                _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
+                                _status
+                                    // solhint-disable-next-line
+                                    ? keccak256("Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission")
+                                    : keccak256(
+                                        "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
+                                    ),
+                                _user,
+                                _contract,
+                                _status,
+                                userApprovalNonce[_user]++
+                            )
                         )
                     )
-                )
-            );
+                );
 
-        address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress == _user, "INVALID_SIGNATURE");
+                address recoveredAddress = ecrecover(digest, v, r, s);
+                require(recoveredAddress == _user, "INVALID_SIGNATURE");
+        }
 
         userApprovedContracts[_user][_contract] = _status;
 
