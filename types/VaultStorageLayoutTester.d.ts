@@ -40,8 +40,6 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
-    "registerProtocol()": FunctionFragment;
-    "registeredContracts(address)": FunctionFragment;
     "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
@@ -117,14 +115,6 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "proxiableUUID",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "registerProtocol",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "registeredContracts",
-    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "toShare",
@@ -211,14 +201,6 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "proxiableUUID",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "registerProtocol",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "registeredContracts",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
@@ -499,24 +481,6 @@ export class VaultStorageLayoutTester extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
-
-    registerProtocol(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "registerProtocol()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    registeredContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "registeredContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
 
     toShare(
       _token: string,
@@ -814,21 +778,6 @@ export class VaultStorageLayoutTester extends Contract {
 
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
-  registerProtocol(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "registerProtocol()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  registeredContracts(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-  "registeredContracts(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   toShare(
     _token: string,
     _amount: BigNumberish,
@@ -1116,20 +1065,6 @@ export class VaultStorageLayoutTester extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
-
-    registerProtocol(overrides?: CallOverrides): Promise<void>;
-
-    "registerProtocol()"(overrides?: CallOverrides): Promise<void>;
-
-    registeredContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "registeredContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
 
     toShare(
       _token: string,
@@ -1540,24 +1475,6 @@ export class VaultStorageLayoutTester extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    registerProtocol(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "registerProtocol()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    registeredContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "registeredContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1866,24 +1783,6 @@ export class VaultStorageLayoutTester extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    registerProtocol(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "registerProtocol()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registeredContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "registeredContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     toShare(
       _token: string,

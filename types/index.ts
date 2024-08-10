@@ -47,6 +47,7 @@ export type { MockRewardDistributorManager } from "./MockRewardDistributorManage
 export type { MockToken } from "./MockToken";
 export type { MockUniswapV2Router02 } from "./MockUniswapV2Router02";
 export type { MockVault } from "./MockVault";
+export type { MockVaultUser } from "./MockVaultUser";
 export type { VaultStorageLayoutTester } from "./VaultStorageLayoutTester";
 export type { ERC20 } from "./ERC20";
 export type { ERC20Permit } from "./ERC20Permit";
@@ -106,6 +107,7 @@ export { MockRewardDistributorManager__factory } from "./factories/MockRewardDis
 export { MockToken__factory } from "./factories/MockToken__factory";
 export { MockUniswapV2Router02__factory } from "./factories/MockUniswapV2Router02__factory";
 export { MockVault__factory } from "./factories/MockVault__factory";
+export { MockVaultUser__factory } from "./factories/MockVaultUser__factory";
 export { VaultStorageLayoutTester__factory } from "./factories/VaultStorageLayoutTester__factory";
 export { ERC20__factory } from "./factories/ERC20__factory";
 export { ERC20Permit__factory } from "./factories/ERC20Permit__factory";

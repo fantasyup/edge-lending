@@ -104,5 +104,4 @@ interface IBSVault is IERC3156FlashLender {
 
     function toUnderlying(IERC20 token, uint256 share) external view returns (uint256);
 
-    function registerProtocol() external;
 }

@@ -29,9 +29,6 @@ abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
     /// @notice mapping of user to approval nonce
     mapping(address => uint256) public userApprovalNonce;
 
-    /// @notice mapping of contracts to approved status
-    mapping(address => address) public registeredContracts;
-
     /// @notice mapping to contract to whitelist status
     mapping(address => bool) public allowedContracts;
 

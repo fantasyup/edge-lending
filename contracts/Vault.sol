@@ -63,12 +63,6 @@ contract Vault is VaultBase {
     // Vault Actions
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /// @dev register protocol
-    function registerProtocol() external override {
-        registeredContracts[msg.sender] = msg.sender;
-        emit RegisterProtocol(msg.sender);
-    }
-
     /// @notice Enables or disables a contract for approval without signed message.
     function allowContract(address _contract, bool _status) external onlyOwner {
         // Checks
@@ -91,15 +85,13 @@ contract Vault is VaultBase {
         require(_contract != address(0), "INVALID_CONTRACT");
         require(_user != address(0), "INVALID_USER");
 
-        if (v == 0 && r == 0 && s == 0) {
+        if (v == 0 && r == bytes32(0) && s == bytes32(0)) {
             // ensure that it's a contract
             require(msg.sender != tx.origin, "ONLY_CONTRACT");
-            // ensure that it's registered
-            require(registeredContracts[_contract] == address(0), "ONLY_REGISTERED");
             // ensure that _user != _contract
             require(_user != _contract, "INVALID_APPROVE");
             // ensure that _contract is allowed
-            require(allowedContracts[_contract], "not_whitelisted");
+            require(allowedContracts[_contract], "NOT_WHITELISTED");
         } else {
             bytes32 digest =
                 keccak256(

@@ -16,6 +16,7 @@ import {
     MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken,
     FeeWithdrawal,
     MockUniswapV2Router02,
+    MockVaultUser,
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
@@ -314,7 +315,6 @@ export const deployFeeWithdrawal = async (
     );
 }
 
-
 export const deployLendingPair = async (
     vault: EthereumAddress,
     oracle: EthereumAddress,
@@ -332,10 +332,16 @@ export const deployLendingPair = async (
     );
 }
 
-
 export const deployMockUniswapV2Router02 = async () => {
     return await deployContract<MockUniswapV2Router02>(
         ContractId.MockUniswapV2Router02,
+        []
+    )
+}
+
+export const deployMockVaultUser = async () => {
+    return await deployContract<MockVaultUser>(
+        ContractId.MockVaultUser,
         []
     )
 }

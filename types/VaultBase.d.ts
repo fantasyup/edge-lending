@@ -37,7 +37,6 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
-    "registeredContracts(address)": FunctionFragment;
     "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
@@ -102,10 +101,6 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "registeredContracts",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "toShare",
     values: [string, BigNumberish, boolean]
   ): string;
@@ -168,10 +163,6 @@ interface VaultBaseInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "proxiableUUID",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "registeredContracts",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
@@ -412,16 +403,6 @@ export class VaultBase extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
 
-    registeredContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "registeredContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     toShare(
       token: string,
       amount: BigNumberish,
@@ -658,13 +639,6 @@ export class VaultBase extends Contract {
 
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
-  registeredContracts(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-  "registeredContracts(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   toShare(
     token: string,
     amount: BigNumberish,
@@ -900,16 +874,6 @@ export class VaultBase extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
-
-    registeredContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "registeredContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
 
     toShare(
       token: string,
@@ -1264,16 +1228,6 @@ export class VaultBase extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    registeredContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "registeredContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     toShare(
       token: string,
       amount: BigNumberish,
@@ -1522,16 +1476,6 @@ export class VaultBase extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    registeredContracts(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "registeredContracts(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     toShare(
       token: string,
