@@ -45,7 +45,12 @@ contract Vault is VaultBase {
     function initialize(uint256 _flashLoanRate, address _owner) external override initializer {
         require(_owner != address(0), "INVALID_OWNER");
         require(flashLoanRate < MAX_FLASHLOAN_RATE, "INVALID_RATE");
-
+        
+        _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(
+            _EIP712_TYPE_HASH,
+            _HASHED_NAME,
+            _HASHED_VERSION
+        );
         flashLoanRate = _flashLoanRate;
         owner = _owner;
     }
