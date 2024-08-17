@@ -78,17 +78,12 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       accounts: [admin, bob]
     } = vars
 
-    await setupLendingPair(
-      LendingPair,
-      CollateralAsset,
-      BorrowAsset,
-      BorrowWrapperToken,
-      CollateralWrapperToken,
-      DebtToken,
-      RewardDistributorManager
+    const lendingPairHelpers = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin }
     )
 
-    const lendingPairHelpers = LendingPairHelpers(Vault, LendingPair, BorrowAsset, BorrowAsset, PriceOracleAggregator, admin)
+    // const lendingPairHelpers = LendingPairHelpers(Vault, LendingPair, BorrowAsset, BorrowAsset, PriceOracleAggregator, admin)
 
     await lendingPairHelpers.approveLendingPairInVault(bob, true);
     await expect(

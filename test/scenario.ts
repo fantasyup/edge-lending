@@ -9,6 +9,8 @@ import {
   advanceNBlocks,
   TestVars,
   runTestSuite,
+  defaultLendingPairInitVars,
+  setupAndInitLendingPair,
 } from "./lib";
 import { LendingPair } from "../design/LendingPair";
 import deployLendingPair from "../deploy/6-deploy-LendingPair";
@@ -53,58 +55,14 @@ runTestSuite("scenarios", (vars: TestVars) => {
 
           const CollateralAsset = await deployMockToken(CollateralTokenDecimalPlaces);
           const BorrowTokenWithDecimals = await deployMockToken(BorrowTokenDecimalPlaces);
-          // const newBorrowAssetWrapper = await deployWrappedToken();
-          // console.log(newBorrowAssetWrapper.address)
-          await initializeWrapperTokens(
-            newLendingPair.address,
-            newBorrowAssetWrapper,
-            BorrowTokenWithDecimals.address,
-            MockRewardDistributorManager.address
-          );
-
-          // collateral wrapper token
-          await initializeWrapperTokens(
-            newLendingPair.address,
-            newCollateralWrapperToken,
-            CollateralAsset.address,
-            MockRewardDistributorManager.address
-          );
-
-          // debt token
-          await initializeWrapperTokens(
-            newLendingPair.address,
-            newDebtWrapperToken,
-            BorrowTokenWithDecimals.address,
-            MockRewardDistributorManager.address
-          );
-
-          await newLendingPair.initialize(
-            "test",
-            "tst",
-            BorrowTokenWithDecimals.address,
-            CollateralAsset.address,
+          const helper = await setupAndInitLendingPair(
             {
-              initialExchangeRateMantissa: initialExchangeRateMantissa,
-              reserveFactorMantissa,
-              collateralFactor,
-              wrappedBorrowAsset: newBorrowAssetWrapper.address,
-              liquidationFee,
-              debtToken: newDebtWrapperToken.address,
+              ...vars,
+              CollateralAsset,
+              BorrowAsset: BorrowTokenWithDecimals
             },
-            newCollateralWrapperToken.address,
-            InterestRateModel.address,
-            admin.address
-          );
-
-          const helper = LendingPairHelpers(
-            Vault,
-            newLendingPair,
-            BorrowTokenWithDecimals,
-            CollateralAsset,
-            PriceOracleAggregator,
-            vars.blackSmithTeam
-          );
-          // console.log(`address `, MockPriceOracle.address)
+            {...defaultLendingPairInitVars, account: admin }
+          )
           // set price oracle for assets
           await helper.addPriceOracleForAsset(CollateralAsset, CollateralAssetMockPriceOracle);
           await helper.addPriceOracleForAsset(BorrowTokenWithDecimals, BorrowAssetMockPriceOracle);
