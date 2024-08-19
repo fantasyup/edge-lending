@@ -32,6 +32,9 @@ abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
     /// @notice mapping to contract to whitelist status
     mapping(address => bool) public allowedContracts;
 
+    /// @dev cached domain separator
+    bytes32 internal _CACHED_DOMAIN_SEPARATOR;
+
 }
 
 abstract contract VaultBase is VaultStorageV1  {
@@ -48,7 +51,7 @@ abstract contract VaultBase is VaultStorageV1  {
         );
 
     /// @dev EIP712 type hash
-    bytes32 private constant _EIP712_TYPE_HASH =
+    bytes32 internal constant _EIP712_TYPE_HASH =
         keccak256(
             "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
         );
@@ -62,20 +65,11 @@ abstract contract VaultBase is VaultStorageV1  {
 
     bytes32 internal immutable _HASHED_NAME;
     bytes32 internal immutable _HASHED_VERSION;
-    bytes32 private immutable _CACHED_DOMAIN_SEPARATOR;
     uint256 private immutable _CACHED_CHAIN_ID;
 
     constructor() {
-        bytes32 hashedVersion = keccak256(bytes(version));
-        bytes32 hashedName = keccak256(bytes(name));
-
-        _HASHED_NAME = hashedName;
-        _HASHED_VERSION = hashedVersion;
-        _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(
-            _EIP712_TYPE_HASH,
-            hashedName,
-            hashedVersion
-        );
+        _HASHED_NAME = keccak256(bytes(name));
+        _HASHED_VERSION = keccak256(bytes(version));
         _CACHED_CHAIN_ID = _getChainId();
     }
 

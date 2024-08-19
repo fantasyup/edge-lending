@@ -454,6 +454,9 @@ export async function setupAndInitLendingPair(
         accountsToApproveInVault
     }: LendingPairInitVars
   ) {
+    
+    await Vault.initialize(0, blackSmithTeam.address);
+
     await setupLendingPair(
       LendingPair,
       CollateralAsset,
