@@ -35,12 +35,16 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
         contract: ContractId.MockToken,
         args: [18],
         from: deployer,
+        log: true,
+        skipIfAlreadyDeployed: true
     });
 
     const CollateralAsset = await deploy('CollateralAsset', {
         contract: ContractId.MockToken,
         args: [18],
-        from: deployer
+        from: deployer,
+        log: true,
+        skipIfAlreadyDeployed: true
     });
 
     const vars = await makeLendingPairTestSuiteVars({});
@@ -67,15 +71,15 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
     const vaultProxy = await getVaultProxy()
     const feeWithdrawalProxy = await getFeeWithdrawalProxy()
     
-    await priceOracle.connect(teamSigner).setOracleForAsset(
+    await (await priceOracle.connect(teamSigner).setOracleForAsset(
         [BorrowAsset.address],
         [BorrowAssetMockPriceOracle.address]
-    ).catch(e => console.log(e))
+    )).wait().catch(e => console.log(e))
 
-    await priceOracle.connect(teamSigner).setOracleForAsset(
+    await (await priceOracle.connect(teamSigner).setOracleForAsset(
         [CollateralAsset.address],
         [CollateralAssetMockPriceOracle.address]
-    )
+    )).wait().catch(e => console.log(e))
 
     // use lending pair factory to create a lending pair
     const newLendingPairTx = await (await vars.LendingPairFactory.createLendingPairWithProxy(
