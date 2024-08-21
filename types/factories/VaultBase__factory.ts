@@ -691,7 +691,12 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "",
+        name: "totalUnderlyingDeposit",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "totalSharesMinted",
         type: "uint256",
       },
     ],

@@ -2,12 +2,18 @@
 pragma solidity 0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import { UUPSProxiable } from "./upgradability/UUPSProxiable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "./interfaces/IBSVault.sol";
 
-abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
+abstract contract VaultStorageV1 is ReentrancyGuard, UUPSProxiable, Pausable, IBSVault {
+    struct TotalBase {
+        uint256 totalUnderlyingDeposit; // total underlying asset deposit
+        uint256 totalSharesMinted; // total vault shares minted
+    }
+
     /// @notice the flashloan rate to charge for flash loans
     uint256 public flashLoanRate;
 
@@ -17,11 +23,11 @@ abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
     /// @dev the address that access to perform `admin` functions
     address public newOwner;
 
+    /// @dev cached domain separator
+    bytes32 internal _CACHED_DOMAIN_SEPARATOR;
+
     /// @notice mapping of token asset to user address and balance
     mapping(IERC20 => mapping(address => uint256)) public override balanceOf;
-
-    /// @notice mapping of token asset to total deposit
-    mapping(IERC20 => uint256) public totals;
 
     /// @notice mapping of user to contract to approval status
     mapping(address => mapping(address => bool)) public userApprovedContracts;
@@ -32,8 +38,8 @@ abstract contract VaultStorageV1 is UUPSProxiable, Pausable, IBSVault {
     /// @notice mapping to contract to whitelist status
     mapping(address => bool) public allowedContracts;
 
-    /// @dev cached domain separator
-    bytes32 internal _CACHED_DOMAIN_SEPARATOR;
+    /// @notice mapping of asset to total deposit and shares minted
+    mapping(IERC20 => TotalBase) public totals;
 
 }
 

@@ -429,12 +429,25 @@ export class VaultBase extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    totals(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    totals(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     "totals(address)"(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     transfer(
       _token: string,
@@ -665,12 +678,25 @@ export class VaultBase extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  totals(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+  totals(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber] & {
+      totalUnderlyingDeposit: BigNumber;
+      totalSharesMinted: BigNumber;
+    }
+  >;
 
   "totals(address)"(
     arg0: string,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<
+    [BigNumber, BigNumber] & {
+      totalUnderlyingDeposit: BigNumber;
+      totalSharesMinted: BigNumber;
+    }
+  >;
 
   transfer(
     _token: string,
@@ -901,12 +927,25 @@ export class VaultBase extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    totals(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    totals(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     "totals(address)"(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     transfer(
       _token: string,
