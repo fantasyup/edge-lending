@@ -561,9 +561,14 @@ runTestSuite("Vault", (vars: TestVars) => {
   });
 
   it("toShare/toUnderlying - convert to appropriate shares & underlying", async () => {
-    const { Vault, BorrowAsset, accounts: [admin, bob, alice] } = vars
+    const { Vault, BorrowAsset, FlashBorrower, accounts: [admin, bob, alice] } = vars
 
-    const adminAmountToDeposit = 1000
+    const helper = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin }
+    )
+
+    const adminAmountToDeposit = 10000
     await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin], adminAmountToDeposit)
     const adminShare = (await Vault.balanceOf(BorrowAsset.address, admin.address)).toNumber()
     expect(adminShare).to.eq(adminAmountToDeposit)
@@ -574,25 +579,42 @@ runTestSuite("Vault", (vars: TestVars) => {
 
     // // check the underlying value for the shares minted it should be
     // // equal to amountToIncrease + increase in underlying balance
-    // const newValue = await (await Vault.toUnderlying(BorrowAsset.address, adminAmountToDeposit)).toNumber()
-    // expect(newValue).to.eq(amountToIncrease + adminAmountToDeposit)
+    const newValue = await (await Vault.toUnderlying(BorrowAsset.address, adminAmountToDeposit)).toNumber()
+    // it should not take into consideration direct transfers
+    expect(newValue).to.eq(adminAmountToDeposit)
     
-    // // a new user bob deposits 1000
-    // await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [bob], adminAmountToDeposit)
+    // a new user bob deposits 10000
+    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [bob], adminAmountToDeposit)
 
-    // // 1000 * 1000 / 5000 = 200 
-    // const bobShare = (await Vault.balanceOf(BorrowAsset.address, bob.address)).toNumber()
-    // expect(bobShare).to.eq(200)
+    // 10000 * 10000 / 10000 = 10000 
+    const bobShare = (await Vault.balanceOf(BorrowAsset.address, bob.address)).toNumber()
+    expect(bobShare).to.eq(adminAmountToDeposit)
     
-    // // increase underlying of vault by 11
-    // await BorrowAsset.setBalanceTo(Vault.address, 11)
 
-    // /// a new user alice deposits
-    // const aliceAmountToDeposit = 300
-    // await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [alice], aliceAmountToDeposit)
-    // // 300 * 1200 / 6011 = 59.89
-    // const aliceShare = (await Vault.balanceOf(BorrowAsset.address, alice.address)).toNumber()
-    // expect(aliceShare).to.eq(59)
+    /// a new user alice deposits
+    const aliceAmountToDeposit = 30000
+    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [alice], aliceAmountToDeposit)
+    // 300 * 2000 / 6011 = 30
+    const aliceShare = (await Vault.balanceOf(BorrowAsset.address, alice.address)).toNumber()
+    expect(aliceShare).to.eq(aliceAmountToDeposit)
+
+    await setupAccountBalance(BorrowAsset, [admin.address, FlashBorrower.address], 1_000_000)
+    const data = ethers.utils.defaultAbiCoder.encode(['bool'], [true])
+
+    await(await Vault.flashLoan(
+      FlashBorrower.address,
+      BorrowAsset.address,
+      10_000,
+      data
+    )).wait()
+
+    const newTotals = await (await Vault.totals(BorrowAsset.address)).totalUnderlyingDeposit
+    expect(newTotals).to.eq(50500)
+
+    // 
+    const aliceAmount = (await Vault.toUnderlying(BorrowAsset.address, aliceAmountToDeposit)).toNumber()
+    expect(aliceAmount).to.eq(30300)
+
   })
 
     // const computationalLimit = ethers.BigNumber.from(2).pow(256).sub(1)
