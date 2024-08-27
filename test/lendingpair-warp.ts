@@ -57,8 +57,6 @@ runTestSuite("LendingPair - Edge", (vars: TestVars) => {
         actions.push(LendingPairEdgeActions.VAULT_WITHDRAW)
         data.push(withdrawData)
 
-        // 
-
-        await LendingPair.edge(actions, data)        
+        await expect(LendingPair.edge(actions, data)).to.not.be.reverted
     })
 })
