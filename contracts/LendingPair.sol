@@ -259,7 +259,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @param _amountToBorrow is the amount of the borrow asset vault shares the user wants to borrow
     /// @param _debtOwner this should be the msg.sender or address that delegates credit to the msg.sender
     /// @dev we use normalized amounts to calculate the
-    function borrow(uint256 _amountToBorrow, address _debtOwner) external whenNotPaused(Actions.Borrow) {
+    function borrow(uint256 _amountToBorrow, address _debtOwner) public whenNotPaused(Actions.Borrow) {
         require(_debtOwner != address(0), "INV_DEBT_OWNER");
         // save on sload
         uint8 __borrowAssetUnderlyingDecimal = _borrowAssetUnderlyingDecimal;
@@ -390,15 +390,17 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         emit Redeem(address(this), address(asset), msg.sender, _to, vars.amount, vars.burnTokens);
     }
     
-    uint8 private constant COLLATERAL_DEPOSIT = 1;
-    uint8 private constant BORROW_ASSET_DEPOSIT = 2;
-    uint8 private constant REPAY = 3;
+    uint8 private constant BORROW_ASSET_DEPOSIT = 1;
+    uint8 private constant REPAY = 2;
+    uint8 private constant BORROW = 3;
     uint8 private constant REDEEM = 4;
     uint8 private constant WITHDRAW_COLLATERAL = 5;
-    uint8 private constant VAULT_DEPOSIT = 6;
-    uint8 private constant VAULT_WITHDRAW = 7;
-    uint8 private constant VAULT_TRANSFER = 8;
-    uint8 private constant VAULT_APPROVE_CONTRACT = 9;
+
+    uint8 private constant COLLATERAL_DEPOSIT = 10;
+    uint8 private constant VAULT_DEPOSIT = 11;
+    uint8 private constant VAULT_WITHDRAW = 12;
+    uint8 private constant VAULT_TRANSFER = 13;
+    uint8 private constant VAULT_APPROVE_CONTRACT = 14;
 
     function edge(
         uint8[] calldata actions,
@@ -417,6 +419,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             } else if (action == REPAY) {
                 (uint256 amount, address beneficiary) = abi.decode(data[i], (uint256, address));
                 repay(amount, beneficiary);
+            } else if (action == BORROW) {
+                (address debtOwner, uint256 amount) = abi.decode(data[i], (address, uint256));
+                borrow(amount, debtOwner);
             } else if (action == REDEEM) {
                 (address receipient, uint256 amount) = abi.decode(data[i], (address, uint256));
                 redeem(receipient, amount);
