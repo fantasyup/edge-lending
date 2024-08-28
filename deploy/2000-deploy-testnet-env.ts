@@ -44,7 +44,7 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
         args: [18],
         from: deployer,
         log: true,
-        skipIfAlreadyDeployed: true
+        skipIfAlreadyDeployed: true,
     });
 
     const vars = await makeLendingPairTestSuiteVars({});
@@ -126,5 +126,5 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
 
 export default deployTestnet
 deployTestnet.tags = [`${tag}`]
-deployTestnet.dependencies = [ContractId.LendingPairFactory]
+// deployTestnet.dependencies = [ContractId.LendingPairFactory]
 deployTestnet.runAtTheEnd = true;
