@@ -856,6 +856,29 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         return block.number;
     }
 
+    /// @notice Returns the current per-block borrow interest rate for this cToken
+    /// @return The borrow interest rate per block, scaled by 1e18
+    function borrowRatePerBlock() external view returns (uint256) {
+        return
+            interestRate.getBorrowRate(
+                getCashPrior(),
+                debtToken.totalSupply(),
+                totalReserves
+            );
+    }
+
+    /// @notice Returns the current per-block supply interest rate for this cToken
+    /// @return The supply interest rate per block, scaled by 1e18
+    function supplyRatePerBlock() external view returns (uint256) {
+        return
+            interestRate.getSupplyRate(
+                getCashPrior(),
+                debtToken.totalSupply(),
+                totalReserves,
+                reserveFactorMantissa
+            );
+    }
+
     /// @dev scales the input to from _underlyingDecimal to 18 decimal places
     function normalize(uint256 _amount, uint8 _underlyingDecimal) internal pure returns (uint256) {
         if (_underlyingDecimal >= 18) {
