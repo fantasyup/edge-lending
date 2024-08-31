@@ -457,11 +457,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         fee = (_amount * liquidationFee) / PRECISION;
     }
 
-    /// @notice Accrue interest then return the up-to-date exchange rate
+     /// @notice Provides the cached exchange rate
     /// @return Calculated exchange rate scaled by 1e18
-    function exchangeRateCurrent() public returns (uint256) {
-        accrueInterest();
-
+    function exchangeRateCached() public view returns(uint256) {
         // convert amount to underlying
         uint256 currentTotalSupply = vault.toUnderlying(asset, wrapperBorrowedAsset.totalSupply());
 
@@ -483,6 +481,13 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
             return (exchangeRate.mantissa);
         }
+    }
+
+    /// @notice Accrue interest then return the up-to-date exchange rate
+    /// @return Calculated exchange rate scaled by 1e18
+    function exchangeRateCurrent() public returns (uint256) {
+        accrueInterest();
+        return exchangeRateCached();
     }
 
     /// @notice getCashPrior is a view funcion that returns the balance of all held borrow asset
