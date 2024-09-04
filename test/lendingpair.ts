@@ -297,6 +297,16 @@ runTestSuite("LendingPair", (vars: TestVars) => {
     await expect(
       await (await DebtToken.totalSupply()).toNumber()
     ).to.eq(amountToBorrow)
+
+    // check supply rate
+    expect(await LendingPair.supplyRatePerBlock()).to.be.not.eq(ethers.constants.Zero)
+    /// check borrow rate
+    expect(await LendingPair.borrowRatePerBlock()).to.be.not.eq(ethers.constants.Zero)
+    
+    await LendingPair.exchangeRateCurrent()
+
+    // const exchnageRateCached = await LendingPair.exchangeRateCached()
+    // console.log(exchnageRateCached.toString())
   })
 
   it("collateral transfer - can not transfer more than allowed that puts loan at risk", async () => {

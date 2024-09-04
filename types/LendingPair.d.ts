@@ -862,13 +862,13 @@ export class LendingPair extends Contract {
     ): Promise<ContractTransaction>;
 
     repay(
-      _repayAmount: BigNumberish,
+      _repayAmountShares: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "repay(uint256,address)"(
-      _repayAmount: BigNumberish,
+      _repayAmountShares: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -1280,13 +1280,13 @@ export class LendingPair extends Contract {
   ): Promise<ContractTransaction>;
 
   repay(
-    _repayAmount: BigNumberish,
+    _repayAmountShares: BigNumberish,
     _beneficiary: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "repay(uint256,address)"(
-    _repayAmount: BigNumberish,
+    _repayAmountShares: BigNumberish,
     _beneficiary: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1687,13 +1687,13 @@ export class LendingPair extends Contract {
     ): Promise<void>;
 
     repay(
-      _repayAmount: BigNumberish,
+      _repayAmountShares: BigNumberish,
       _beneficiary: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "repay(uint256,address)"(
-      _repayAmount: BigNumberish,
+      _repayAmountShares: BigNumberish,
       _beneficiary: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -2271,13 +2271,13 @@ export class LendingPair extends Contract {
     ): Promise<BigNumber>;
 
     repay(
-      _repayAmount: BigNumberish,
+      _repayAmountShares: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "repay(uint256,address)"(
-      _repayAmount: BigNumberish,
+      _repayAmountShares: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -2719,13 +2719,13 @@ export class LendingPair extends Contract {
     ): Promise<PopulatedTransaction>;
 
     repay(
-      _repayAmount: BigNumberish,
+      _repayAmountShares: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "repay(uint256,address)"(
-      _repayAmount: BigNumberish,
+      _repayAmountShares: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
