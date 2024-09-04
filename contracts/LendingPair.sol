@@ -645,13 +645,16 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @notice Figures out how much of a given collateral an account is allowed to withdraw
     /// @param _account is the account being checked
+    /// @return max amount of share user is allowed to withdraw
     /// @dev this function runs calculations to accrue interest for an up to date amount
     function getMaxWithdrawAllowed(address _account) public override returns (uint256) {
         // save on sload
         uint8 __collateralAssetUnderlyingDecimal = _collateralAssetUnderlyingDecimal;
+        
+        uint256 borrowedTotalWithInterestInUnderlying = vault.toUnderlying(asset, borrowBalanceCurrent(_account));
 
         uint256 normalizedBorrowedAmountTotal =
-            normalize(borrowBalanceCurrent(_account), _borrowAssetUnderlyingDecimal);
+            normalize(borrowedTotalWithInterestInUnderlying, _borrowAssetUnderlyingDecimal);
 
         uint256 currentCollateralValueInUSD = getPriceOfCollateral();
 
@@ -676,7 +679,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
                 __collateralAssetUnderlyingDecimal
             );
 
-        return leftoverCollateral / currentCollateralValueInUSD;
+        return vault.toShare(collateralAsset, leftoverCollateral / currentCollateralValueInUSD, false);
     }
 
     /// @notice getTotalAvailableCollateralValueInUSD returns the total availible collaeral value for an account in USD
