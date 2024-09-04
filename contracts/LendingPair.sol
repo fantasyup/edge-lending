@@ -488,12 +488,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @notice getCashPrior is a view funcion that returns the balance of all held borrow asset
     /// in vault shares
-    function getCashPrior() public view returns (uint256) {
-        return vault.balanceOf(asset, address(this));
-        // if (currentBalance > 0 ) {
-        //     return vault.toUnderlying(asset, currentBalance);
-        // }
-        // return currentBalance;
+    function getCashPrior() public view returns (uint256 availableCash) {
+        availableCash = vault.balanceOf(asset, address(this));
     }
 
     /// @notice Total amount of outstanding borrows of the asset in this market
