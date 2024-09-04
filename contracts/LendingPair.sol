@@ -272,7 +272,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         // calculate the borrowed total in vault shares
         uint256 borrowedTotalWithInterest = borrowBalanceCurrent(_debtOwner);
         // convert it to the appropriate underlying amount
-        uint256 borrowedTotalWithInterestInUnderlying = vault.toUnderlying(__asset, borrowedTotalWithInterest);
+        uint256 borrowedTotalWithInterestInUnderlying = borrowedTotalWithInterest == 0 ? 0: vault.toUnderlying(__asset, borrowedTotalWithInterest);
         // borrow asset price
         uint256 currentBorrowAssetPrice = oracle.getPriceInUSD(__asset);
         // borrowed total in usd
@@ -469,7 +469,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             Exp memory exchangeRate;
 
             // calculate total value held by contract plus owed to contract
-            // uint256 totalBorrows = totalBorrows();
             cashPlusBorrowsMinusReserves = totalCash + totalBorrows() - totalReserves;
 
             // calculate exchange rate
@@ -645,13 +644,16 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @notice Figures out how much of a given collateral an account is allowed to withdraw
     /// @param _account is the account being checked
-    /// @return max amount of share user is allowed to withdraw
+    /// @return maxWithdrawAllowed max amount of share user is allowed to withdraw
     /// @dev this function runs calculations to accrue interest for an up to date amount
-    function getMaxWithdrawAllowed(address _account) public override returns (uint256) {
+    function getMaxWithdrawAllowed(address _account) public override returns (uint256 maxWithdrawAllowed) {
         // save on sload
         uint8 __collateralAssetUnderlyingDecimal = _collateralAssetUnderlyingDecimal;
         
-        uint256 borrowedTotalWithInterestInUnderlying = vault.toUnderlying(asset, borrowBalanceCurrent(_account));
+        // calculate the borrowed total in vault shares
+        uint256 borrowedTotalWithInterest = borrowBalanceCurrent(_account);
+        // convert it to the appropriate underlying amount
+        uint256 borrowedTotalWithInterestInUnderlying = borrowedTotalWithInterest == 0 ? 0: vault.toUnderlying(asset, borrowedTotalWithInterest);
 
         uint256 normalizedBorrowedAmountTotal =
             normalize(borrowedTotalWithInterestInUnderlying, _borrowAssetUnderlyingDecimal);
@@ -679,7 +681,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
                 __collateralAssetUnderlyingDecimal
             );
 
-        return vault.toShare(collateralAsset, leftoverCollateral / currentCollateralValueInUSD, false);
+        maxWithdrawAllowed = vault.toShare(collateralAsset, leftoverCollateral / currentCollateralValueInUSD, false);
     }
 
     /// @notice getTotalAvailableCollateralValueInUSD returns the total availible collaeral value for an account in USD

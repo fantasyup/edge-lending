@@ -481,6 +481,8 @@ runTestSuite("LendingPair", (vars: TestVars) => {
       {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, bob]}      
     )
 
+    await helper.depositBorrowAsset(admin, 500)
+
     const currentWrapperTokenBalance = await (await BorrowWrapperToken.balanceOf(admin.address)).toNumber();
 
     await expect(

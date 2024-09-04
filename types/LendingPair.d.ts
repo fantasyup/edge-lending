@@ -699,9 +699,13 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    getCashPrior(overrides?: CallOverrides): Promise<[BigNumber]>;
+    getCashPrior(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { availableCash: BigNumber }>;
 
-    "getCashPrior()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "getCashPrior()"(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { availableCash: BigNumber }>;
 
     getMaxWithdrawAllowed(
       _account: string,
