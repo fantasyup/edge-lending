@@ -352,8 +352,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     struct RedeemLocalVars {
         uint256 exchangeRateMantissa;
         uint256 amountOfSharesToRedeem;
-        uint256 currentBSBalance;
-        uint256 currentUnderlyingBalance;
         uint256 amountOfTokens;
     }
 
@@ -365,14 +363,11 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
         RedeemLocalVars memory vars;
 
-        // fetch the users current wrapped balance
-        vars.currentBSBalance = wrapperBorrowedAsset.balanceOf(msg.sender);
-
         // retreive current exchange rate
         vars.exchangeRateMantissa = exchangeRateCurrent();
 
         if (_amount == 0) {
-            vars.amountOfTokens = vars.currentUnderlyingBalance;
+            vars.amountOfTokens = wrapperBorrowedAsset.balanceOf(msg.sender);
         } else {
             vars.amountOfTokens = _amount;
         }
@@ -382,11 +377,11 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             vars.amountOfTokens
         );
         
-        // ensure the vault pair has enough borrow asset balance
+        // ensure the lending pair has enough borrow asset balance
         require(vault.balanceOf(asset, address(this)) >= vars.amountOfSharesToRedeem, "NOT_ENOUGH_BALANCE");
-        // reverts if the user doesn't have enough balance
-        wrapperBorrowedAsset.burn(msg.sender, vars.amountOfSharesToRedeem);
-        // transfer
+        // reverts if the user doesn't have enough tokens
+        wrapperBorrowedAsset.burn(msg.sender, vars.amountOfTokens);
+        // transfer the quantity of shares to the user
         vault.transfer(asset, address(this), _to, vars.amountOfSharesToRedeem);
 
         emit Redeem(address(this), address(asset), msg.sender, _to, vars.amountOfTokens, vars.amountOfSharesToRedeem);
@@ -462,7 +457,6 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
      /// @notice Provides the cached exchange rate
     /// @return Calculated exchange rate scaled by 1e18
     function exchangeRateCached() public view returns(uint256) {
-        // convert amount to underlying
         uint256 currentTotalSupply = wrapperBorrowedAsset.totalSupply();
 
         if (currentTotalSupply == 0) {
