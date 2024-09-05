@@ -759,8 +759,10 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint256 priceOfCollateralInUSD = getPriceOfCollateral();
 
         uint256 borrowedTotalWithInterest = borrowBalanceCurrent(_borrower);
+        // convert it to the appropriate underlying amount
+        uint256 borrowedTotalWithInterestInUnderlying = borrowedTotalWithInterest == 0 ? 0: vault.toUnderlying(asset, borrowedTotalWithInterest);
         uint256 borrowedTotalInUSDNormalized = 
-            normalize(borrowedTotalWithInterest, _borrowAssetUnderlyingDecimal) *
+            normalize(borrowedTotalWithInterestInUnderlying, _borrowAssetUnderlyingDecimal) *
                 currentBorrowAssetPriceInUSD;
         uint256 borrowLimitInUSDNormalized =
             normalize(getBorrowLimit(_borrower), _collateralAssetUnderlyingDecimal) *
@@ -787,9 +789,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
             // convert borrowedTotal to usd
             uint256 borrowedTotalInUSD =
-                currentBorrowAssetPriceInUSD * (borrowedTotalWithInterest + totalLiquidationFee);
+                currentBorrowAssetPriceInUSD * vault.toUnderlying(asset, (borrowedTotalWithInterest + totalLiquidationFee));
 
-            // @TODO ceil!?
             uint256 amountOfCollateralToLiquidate = borrowedTotalInUSD / priceOfCollateralInUSD;
             uint256 amountOfCollateralToLiquidateInVaultShares =
                 vault.toShare(collateralAsset, amountOfCollateralToLiquidate, true);
@@ -801,20 +802,18 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @dev _repayLiquidatingLoan
     /// @param _borrower is the address of the borrower who took out the loan
     /// @param _liquidator is the address of the account who is liquidating the loan
-    /// @param _borrowedAmount is the amount of StableCoin being repayed + fee
+    /// @param _borrowedAmountInVaultShare is the amount being repayed + fee in vault share
     /// @dev
     function _repayLiquidatingLoan(
         address _borrower,
         address _liquidator,
-        uint256 _borrowedAmount,
-        uint256 _borrowedAmountPlusFee
+        uint256 _borrowedAmountInVaultShare,
+        uint256 _borrowedAmountInVaultSharePlusFee
     ) internal {
-        // borrowed amount + liquidation fee
-        uint256 amountInShares = vault.toShare(asset, _borrowedAmountPlusFee, true);
         // repay the liquidated position
-        vault.transfer(asset, _liquidator, address(this), amountInShares);
+        vault.transfer(asset, _liquidator, address(this), _borrowedAmountInVaultSharePlusFee);
         // burn borrower debt
-        debtToken.burn(_borrower, _borrowedAmount);
+        debtToken.burn(_borrower, _borrowedAmountInVaultShare);
     }
 
     /// @dev _liquidate is a function to liquidate a user
