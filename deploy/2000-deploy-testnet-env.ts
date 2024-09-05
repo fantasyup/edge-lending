@@ -100,7 +100,7 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
     const newLendingPairEv = newLendingPairTx.events?.find(x => x.event === 'NewLendingPair')
 
     console.log("\n\n\n")
-    console.log("========================= dev environment deploy ================================")
+    console.log("========================= testnet environment deploy ================================")
     console.log(`Vault: ${vars.Vault.address}`)
     console.log(`VaultProxy: ${vaultProxy.address}`)
     console.log(`VaultFactory: ${vars.VaultFactory.address}`)
