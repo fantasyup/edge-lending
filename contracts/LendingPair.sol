@@ -262,7 +262,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
 
     /// @param _amountToBorrow is the amount of the borrow asset the user wants to borrow
     /// @param _debtOwner this should be the msg.sender or address that delegates credit to the msg.sender
-    /// @dev we use normalized amounts to calculate the
+    /// @dev we use normalized amounts to calculate the amounts
     function borrow(uint256 _amountToBorrow, address _debtOwner) public whenNotPaused(Actions.Borrow) {
         require(_debtOwner != address(0), "INV_DEBT_OWNER");
         // save on sload
@@ -290,7 +290,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         uint256 borrowAmountInUSDNormalized =
             normalize(_amountToBorrow, __borrowAssetUnderlyingDecimal) * currentBorrowAssetPrice;
         // require the amount being borrowed is less than
-        // or equal to the amount they are aloud to borrow
+        // or equal to the amount they are allowed to borrow
         require(
             borrowAmountAllowedInUSDNormalized >= borrowAmountInUSDNormalized,
             "BORROWING_MORE_THAN_ALLOWED"
@@ -309,7 +309,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     }
 
     /// @notice Sender repays their own borrow
-    /// @param _repayAmountShares The amount of borrow asset to repay
+    /// @param _repayAmountShares The amount of borrow asset to repay in vault shares
     /// @param _beneficiary address to repay loan position
     function repay(uint256 _repayAmountShares, address _beneficiary) public {
         require(_beneficiary != address(0), "INV_BENEFICIARY");
@@ -633,6 +633,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         wrappedCollateralAsset.burn(msg.sender, amount);
         // transfer them their token
         vault.transfer(collateralAsset, address(this), msg.sender, amount);
+
         emit WithdrawCollateral(msg.sender, amount);
     }
 
@@ -790,8 +791,8 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
             // convert borrowedTotal to usd
             uint256 borrowedTotalInUSD =
                 currentBorrowAssetPriceInUSD * vault.toUnderlying(asset, (borrowedTotalWithInterest + totalLiquidationFee));
-
-            uint256 amountOfCollateralToLiquidate = borrowedTotalInUSD / priceOfCollateralInUSD;
+            
+            uint256 amountOfCollateralToLiquidate = (borrowedTotalInUSD * _collateralAssetUnderlyingDecimal) / (priceOfCollateralInUSD * _borrowAssetUnderlyingDecimal);
             uint256 amountOfCollateralToLiquidateInVaultShares =
                 vault.toShare(collateralAsset, amountOfCollateralToLiquidate, true);
             
