@@ -268,7 +268,7 @@ contract Vault is VaultBase {
         address _token,
         uint256 _amount,
         bytes calldata _data
-    ) external override returns (bool) {
+    ) external override nonReentrant returns (bool) {
         require(totals[IERC20(_token)].totalUnderlyingDeposit >= _amount, "Not enough balance");
 
         IERC20 token = IERC20(_token);
@@ -289,7 +289,7 @@ contract Vault is VaultBase {
         uint256 receivedFees = token.balanceOf(address(this)) - tokenBalBefore;
         require(receivedFees >= fee, "not enough fees");
         
-        totals[IERC20(_token)].totalUnderlyingDeposit += receivedFees;
+        totals[IERC20(_token)].totalUnderlyingDeposit += fee;
 
         emit FlashLoan(msg.sender, token, _amount, fee, address(_receiver));
 
@@ -341,5 +341,15 @@ contract Vault is VaultBase {
     {
         TotalBase storage total = totals[_token];
         amount = (_share * total.totalUnderlyingDeposit) / total.totalSharesMinted;
+    }
+
+    /// @notice rescueFunds
+    /// @param _token ERC20 token to rescue funds from
+    function rescueFunds(IERC20 _token) external nonReentrant onlyOwner {
+        uint256 currentBalance = _token.balanceOf(address(this));
+        uint256 amount = currentBalance - totals[_token].totalUnderlyingDeposit;
+        _token.safeTransferFrom(address(this), owner, amount);
+
+        emit RescueFunds(_token, amount);
     }
 }
