@@ -339,6 +339,39 @@ runTestSuite("LendingPair", (vars: TestVars) => {
 
   })
 
+  it("collateral transferFrom - can not transferFrom more than allowed that puts loan at risk", async () => {
+    const { LendingPair, CollateralWrapperToken, accounts: [admin,  frank, bob]} = vars
+    const helper = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin, accountsToApproveInVault: [frank, admin, bob]}      
+    )
+
+    await helper.approveLendingPairInVault(bob, true)
+    await helper.approveLendingPairInVault(frank, true)
+
+    // deposit collateral
+    await helper.depositCollateralAsset(frank, amountToDeposit)
+    // deposit borrow asset
+    await helper.depositBorrowAsset(bob, 1000)
+    // borrow 
+    await LendingPair.connect(frank.signer).borrow(200, frank.address)
+
+    // try to withdraw transfer entire collateral
+    const balance = await (await CollateralWrapperToken.balanceOf(frank.address)).toNumber()
+    
+    await CollateralWrapperToken.connect(frank.signer).approve(bob.address, balance);
+
+    await expect(
+      CollateralWrapperToken.connect(bob.signer).transferFrom(frank.address, bob.address, balance)
+    ).to.revertedWith('EXCEEDS_ALLOWED')
+
+    // collateral transfer - can transfer part of collateral
+    await expect(
+      await CollateralWrapperToken.connect(frank.signer).transfer(bob.address, 50)
+    ).to.emit(CollateralWrapperToken, 'Transfer')
+
+  })
+
   it('withdrawCollateral', async () => {
     const { Vault, LendingPair, CollateralWrapperToken, CollateralAsset, BorrowAsset, accounts: [admin, bob, james]} = vars
     const helper = await setupAndInitLendingPair(

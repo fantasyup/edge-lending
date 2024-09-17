@@ -617,8 +617,28 @@ runTestSuite("Vault", (vars: TestVars) => {
 
   })
 
-    // const computationalLimit = ethers.BigNumber.from(2).pow(256).sub(1)
-    // it("extreme limits", async function() {
-    // })
+  it('rescueFunds', async () => {
+    const { Vault, BorrowAsset, FlashBorrower, accounts: [admin, bob, alice] } = vars
+    const helper = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin }
+    )
+
+    const adminAmountToDeposit = 10000
+    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin], adminAmountToDeposit)
+
+    // increase the vault fund amount
+    const newBalance = adminAmountToDeposit * 2
+    BorrowAsset.setBalanceTo(Vault.address, newBalance);
+    
+    expect((await BorrowAsset.balanceOf(Vault.address)).toNumber()).to.eq(newBalance + adminAmountToDeposit)
+    await expect(Vault.connect(vars.blackSmithTeam.signer).rescueFunds(BorrowAsset.address)).to.emit(Vault, 'RescueFunds').withArgs(BorrowAsset.address, newBalance)
+
+    expect((await BorrowAsset.balanceOf(Vault.address)).toNumber()).to.eq(adminAmountToDeposit)
+  })
+
+  // const computationalLimit = ethers.BigNumber.from(2).pow(256).sub(1)
+  // it("extreme limits", async function() {
+  // })
 
 });

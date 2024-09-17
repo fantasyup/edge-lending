@@ -825,7 +825,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         address _liquidator,
         uint256 amountOfCollateralToLiquidateInVaultShares
     ) internal {
-        uint accountCollateralBalance = wrappedCollateralAsset.balanceOf(_account);
+        uint256 accountCollateralBalance = wrappedCollateralAsset.balanceOf(_account);
         // incase the value of the collateral drops
         // faster than liquidate
         if (amountOfCollateralToLiquidateInVaultShares > accountCollateralBalance) {

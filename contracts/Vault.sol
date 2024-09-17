@@ -343,12 +343,12 @@ contract Vault is VaultBase {
         amount = (_share * total.totalUnderlyingDeposit) / total.totalSharesMinted;
     }
 
-    /// @notice rescueFunds
+    /// @notice rescueFunds Enables us to rescue funds that are not tracked
     /// @param _token ERC20 token to rescue funds from
     function rescueFunds(IERC20 _token) external nonReentrant onlyOwner {
         uint256 currentBalance = _token.balanceOf(address(this));
         uint256 amount = currentBalance - totals[_token].totalUnderlyingDeposit;
-        _token.safeTransferFrom(address(this), owner, amount);
+        _token.safeTransfer(owner, amount);
 
         emit RescueFunds(_token, amount);
     }

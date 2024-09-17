@@ -193,6 +193,7 @@ interface VaultBaseInterface extends ethers.utils.Interface {
     "OwnershipAccepted(address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "RegisterProtocol(address)": EventFragment;
+    "RescueFunds(address,uint256)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
@@ -208,6 +209,7 @@ interface VaultBaseInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RegisterProtocol"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RescueFunds"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
@@ -1086,6 +1088,14 @@ export class VaultBase extends Contract {
     RegisterProtocol(
       sender: null
     ): TypedEventFilter<[string], { sender: string }>;
+
+    RescueFunds(
+      token: null,
+      amount: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { token: string; amount: BigNumber }
+    >;
 
     Transfer(
       token: string | null,
