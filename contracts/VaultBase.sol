@@ -69,6 +69,9 @@ abstract contract VaultBase is VaultStorageV1  {
     /// @notice max flashlaon rate 10%
     uint256 public constant MAX_FLASHLOAN_RATE = 1e17;
 
+    /// @dev minimum vault share balance
+    uint256 internal constant MINIMUM_SHARE_BALANCE = 1000; // To prevent the ratio going off
+
     bytes32 internal immutable _HASHED_NAME;
     bytes32 internal immutable _HASHED_VERSION;
     uint256 private immutable _CACHED_CHAIN_ID;

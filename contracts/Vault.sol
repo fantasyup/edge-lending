@@ -94,6 +94,8 @@ contract Vault is VaultBase {
         require(_user != address(0), "INVALID_USER");
 
         if (v == 0 && r == bytes32(0) && s == bytes32(0)) {
+            // ensure that user match
+            require(_user == msg.sender, "NOT_SENDER");
             // ensure that it's a contract
             require(msg.sender != tx.origin, "ONLY_CONTRACT");
             // ensure that _user != _contract
@@ -192,8 +194,13 @@ contract Vault is VaultBase {
         balanceOf[_token][_from] = balanceOf[_token][_from] - _shares;
 
         TotalBase storage total = totals[_token];
+
         total.totalUnderlyingDeposit -= amountOut;
         total.totalSharesMinted -= _shares;
+
+        // prevents the ratio from being reset
+        // @TODO update
+        require(total.totalSharesMinted >= MINIMUM_SHARE_BALANCE, "INVALID_RATIO");
 
         _token.safeTransfer(_to, amountOut);
 

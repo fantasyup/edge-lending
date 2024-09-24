@@ -14,6 +14,7 @@ const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
 const BASE = ethers.utils.parseUnits("1", 18);
 const amountToDeposit = 100
 const sharesToTransfer = 5
+const MINIMUM_SHARE_BALANCE = 1000
 
 const initializeVault = (vault: Vault, user: IAccount) =>  vault.initialize(flashLoanRate, user.address);
 
@@ -485,11 +486,13 @@ runTestSuite("Vault", (vars: TestVars) => {
 
   it("withdraw - correctly", async () => {
     const { Vault, BorrowAsset, accounts: [admin] } = vars
-    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin])
+    const amountToDeposit = 100000
+    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin], amountToDeposit)
 
     const currentTotals = (
       await (await Vault.totals(BorrowAsset.address)).totalSharesMinted
     ).toNumber();
+    
     const currentBalance = (
       await Vault.balanceOf(BorrowAsset.address, admin.address)
     ).toNumber();
@@ -498,25 +501,40 @@ runTestSuite("Vault", (vars: TestVars) => {
       BorrowAsset.address,
       currentBalance
     );
+
     await expect(
-      Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance)
+      Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance - MINIMUM_SHARE_BALANCE)
     )
       .to.emit(Vault, "Withdraw")
       .withArgs(
         BorrowAsset.address,
         admin.address,
         admin.address,
-        currentBalance,
-        expectedAmountOut.toNumber()
+        currentBalance - MINIMUM_SHARE_BALANCE,
+        expectedAmountOut.toNumber() - MINIMUM_SHARE_BALANCE
       );
 
     expect(
       await (await Vault.balanceOf(BorrowAsset.address, admin.address)).toNumber()
-    ).eq(0);
+    ).eq(MINIMUM_SHARE_BALANCE);
 
     expect((await Vault.totals(BorrowAsset.address)).totalSharesMinted.toNumber()).eq(
-      currentTotals - currentBalance
+      MINIMUM_SHARE_BALANCE
     );
+  });
+
+  it("withdraw - fails if user tries to withdraw past minimum share balance", async () => {
+    const { Vault, BorrowAsset, accounts: [admin] } = vars
+    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin], 10000)
+
+    const currentBalance = (
+      await Vault.balanceOf(BorrowAsset.address, admin.address)
+    ).toNumber();
+    console.log(currentBalance)
+
+    await expect(
+      Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance)
+    ).to.be.revertedWith('INVALID_RATIO')
   });
 
   it("updateFlashloanRate", async () => {
