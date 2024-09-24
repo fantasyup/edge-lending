@@ -173,7 +173,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     
     await expect(
       Vault.connect(bob.signer).approveContract(
-        admin.address,
+        bob.address,
         admin.address,
         true,
         0,
