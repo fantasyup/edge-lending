@@ -107,6 +107,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
     "OwnershipAccepted(address,uint256)": EventFragment;
     "RegisterProtocol(address)": EventFragment;
+    "RescueFunds(address,uint256)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "UpdateFlashLoanRate(uint256)": EventFragment;
@@ -119,6 +120,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RegisterProtocol"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RescueFunds"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateFlashLoanRate"): EventFragment;
@@ -697,6 +699,14 @@ export class IBSVault extends Contract {
     RegisterProtocol(
       sender: null
     ): TypedEventFilter<[string], { sender: string }>;
+
+    RescueFunds(
+      token: null,
+      amount: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { token: string; amount: BigNumber }
+    >;
 
     Transfer(
       token: string | null,

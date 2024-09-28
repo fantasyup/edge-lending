@@ -58,6 +58,8 @@ interface IBSVault is IERC3156FlashLender {
 
     event AllowContract(address whitelist, bool status);
 
+    event RescueFunds(IERC20 token, uint256 amount);
+
     // ************** //
     // *** FUNCTIONS *** //
     // ************** //

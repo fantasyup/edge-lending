@@ -40,6 +40,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
+    "rescueFunds(address)": FunctionFragment;
     "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
@@ -116,6 +117,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     functionFragment: "proxiableUUID",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "rescueFunds", values: [string]): string;
   encodeFunctionData(
     functionFragment: "toShare",
     values: [string, BigNumberish, boolean]
@@ -203,6 +205,10 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     functionFragment: "proxiableUUID",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "rescueFunds",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "toUnderlying",
@@ -244,6 +250,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     "OwnershipAccepted(address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "RegisterProtocol(address)": EventFragment;
+    "RescueFunds(address,uint256)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
@@ -259,6 +266,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RegisterProtocol"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RescueFunds"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
@@ -482,6 +490,16 @@ export class VaultStorageLayoutTester extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
 
+    rescueFunds(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "rescueFunds(address)"(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -508,12 +526,25 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { amount: BigNumber }>;
 
-    totals(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    totals(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     "totals(address)"(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     transfer(
       _token: string,
@@ -778,6 +809,16 @@ export class VaultStorageLayoutTester extends Contract {
 
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
+  rescueFunds(
+    _token: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "rescueFunds(address)"(
+    _token: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   toShare(
     _token: string,
     _amount: BigNumberish,
@@ -804,12 +845,25 @@ export class VaultStorageLayoutTester extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  totals(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+  totals(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber] & {
+      totalUnderlyingDeposit: BigNumber;
+      totalSharesMinted: BigNumber;
+    }
+  >;
 
   "totals(address)"(
     arg0: string,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<
+    [BigNumber, BigNumber] & {
+      totalUnderlyingDeposit: BigNumber;
+      totalSharesMinted: BigNumber;
+    }
+  >;
 
   transfer(
     _token: string,
@@ -1066,6 +1120,13 @@ export class VaultStorageLayoutTester extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
+    rescueFunds(_token: string, overrides?: CallOverrides): Promise<void>;
+
+    "rescueFunds(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1092,12 +1153,25 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    totals(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    totals(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     "totals(address)"(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     transfer(
       _token: string,
@@ -1266,6 +1340,14 @@ export class VaultStorageLayoutTester extends Contract {
     RegisterProtocol(
       sender: null
     ): TypedEventFilter<[string], { sender: string }>;
+
+    RescueFunds(
+      token: null,
+      amount: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { token: string; amount: BigNumber }
+    >;
 
     Transfer(
       token: string | null,
@@ -1474,6 +1556,16 @@ export class VaultStorageLayoutTester extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    rescueFunds(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "rescueFunds(address)"(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     toShare(
       _token: string,
@@ -1783,6 +1875,16 @@ export class VaultStorageLayoutTester extends Contract {
     proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    rescueFunds(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "rescueFunds(address)"(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     toShare(
       _token: string,

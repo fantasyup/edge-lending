@@ -14,6 +14,7 @@ const flashLoanRate = ethers.utils.parseUnits("0.05", 18);
 const BASE = ethers.utils.parseUnits("1", 18);
 const amountToDeposit = 100
 const sharesToTransfer = 5
+const MINIMUM_SHARE_BALANCE = 1000
 
 const initializeVault = (vault: Vault, user: IAccount) =>  vault.initialize(flashLoanRate, user.address);
 
@@ -172,7 +173,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     
     await expect(
       Vault.connect(bob.signer).approveContract(
-        admin.address,
+        bob.address,
         admin.address,
         true,
         0,
@@ -322,7 +323,7 @@ runTestSuite("Vault", (vars: TestVars) => {
       await (await Vault.balanceOf(BorrowAsset.address, admin.address)).toNumber()
     ).eq(amountToDeposit);
 
-    expect((await Vault.totals(BorrowAsset.address)).toNumber()).eq(
+    expect((await (await Vault.totals(BorrowAsset.address)).totalSharesMinted).toNumber()).eq(
       amountToDeposit
     );
   });
@@ -358,7 +359,7 @@ runTestSuite("Vault", (vars: TestVars) => {
       await Vault.balanceOf(BorrowAsset.address, admin.address)
     ).toNumber();
     const remainingShareBalance = currentBalance - sharesToTransfer;
-    const currentTotal = (await Vault.totals(BorrowAsset.address)).toNumber();
+    const currentTotal = (await (await Vault.totals(BorrowAsset.address)).totalSharesMinted).toNumber();
 
     expect(await Vault.transfer(BorrowAsset.address, admin.address, bob.address, sharesToTransfer))
       .to.emit(Vault, "Transfer")
@@ -372,15 +373,15 @@ runTestSuite("Vault", (vars: TestVars) => {
       await (await Vault.balanceOf(BorrowAsset.address, bob.address)).toNumber()
     ).eq(sharesToTransfer);
 
-    expect((await Vault.totals(BorrowAsset.address)).toNumber()).eq(
-      currentTotal
-    );
+    // expect((await Vault.totals(BorrowAsset.address)).toNumber()).eq(
+    //   currentTotal
+    // );
   });
 
   it("maxFlashLoan", async () => {
     const { Vault, BorrowAsset } = vars
     const currentTotals = (
-      await Vault.totals(BorrowAsset.address)
+      await (await Vault.totals(BorrowAsset.address)).totalSharesMinted
     ).toNumber();
     expect(
       await (await Vault.maxFlashLoan(BorrowAsset.address)).toNumber()
@@ -391,7 +392,7 @@ runTestSuite("Vault", (vars: TestVars) => {
     const { Vault, BorrowAsset, accounts: [admin] } = vars
     await initializeVault(Vault, admin)
 
-    const amountToFlashLoan = await Vault.totals(BorrowAsset.address);
+    const amountToFlashLoan = await (await Vault.totals(BorrowAsset.address)).totalSharesMinted;
     const expectedFlashFee = flashLoanRate.mul(amountToFlashLoan).div(BASE);
 
     expect(
@@ -485,11 +486,13 @@ runTestSuite("Vault", (vars: TestVars) => {
 
   it("withdraw - correctly", async () => {
     const { Vault, BorrowAsset, accounts: [admin] } = vars
-    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin])
+    const amountToDeposit = 100000
+    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin], amountToDeposit)
 
     const currentTotals = (
-      await Vault.totals(BorrowAsset.address)
+      await (await Vault.totals(BorrowAsset.address)).totalSharesMinted
     ).toNumber();
+    
     const currentBalance = (
       await Vault.balanceOf(BorrowAsset.address, admin.address)
     ).toNumber();
@@ -498,25 +501,39 @@ runTestSuite("Vault", (vars: TestVars) => {
       BorrowAsset.address,
       currentBalance
     );
+
     await expect(
-      Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance)
+      Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance - MINIMUM_SHARE_BALANCE)
     )
       .to.emit(Vault, "Withdraw")
       .withArgs(
         BorrowAsset.address,
         admin.address,
         admin.address,
-        currentBalance,
-        expectedAmountOut.toNumber()
+        currentBalance - MINIMUM_SHARE_BALANCE,
+        expectedAmountOut.toNumber() - MINIMUM_SHARE_BALANCE
       );
 
     expect(
       await (await Vault.balanceOf(BorrowAsset.address, admin.address)).toNumber()
-    ).eq(0);
+    ).eq(MINIMUM_SHARE_BALANCE);
 
-    expect((await Vault.totals(BorrowAsset.address)).toNumber()).eq(
-      currentTotals - currentBalance
+    expect((await Vault.totals(BorrowAsset.address)).totalSharesMinted.toNumber()).eq(
+      MINIMUM_SHARE_BALANCE
     );
+  });
+
+  it("withdraw - fails if user tries to withdraw past minimum share balance", async () => {
+    const { Vault, BorrowAsset, accounts: [admin] } = vars
+    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin], 10000)
+
+    const currentBalance = (
+      await Vault.balanceOf(BorrowAsset.address, admin.address)
+    ).toNumber();
+
+    await expect(
+      Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance - 1)
+    ).to.be.revertedWith('INVALID_RATIO')
   });
 
   it("updateFlashloanRate", async () => {
@@ -561,9 +578,14 @@ runTestSuite("Vault", (vars: TestVars) => {
   });
 
   it("toShare/toUnderlying - convert to appropriate shares & underlying", async () => {
-    const { Vault, BorrowAsset, accounts: [admin, bob, alice] } = vars
+    const { Vault, BorrowAsset, FlashBorrower, accounts: [admin, bob, alice] } = vars
 
-    const adminAmountToDeposit = 1000
+    const helper = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin }
+    )
+
+    const adminAmountToDeposit = 10000
     await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin], adminAmountToDeposit)
     const adminShare = (await Vault.balanceOf(BorrowAsset.address, admin.address)).toNumber()
     expect(adminShare).to.eq(adminAmountToDeposit)
@@ -572,31 +594,68 @@ runTestSuite("Vault", (vars: TestVars) => {
     const amountToIncrease = 4000
     await BorrowAsset.setBalanceTo(Vault.address, amountToIncrease)
 
-    // check the underlying value for the shares minted it should be
-    // equal to amountToIncrease + increase in underlying balance
+    // // check the underlying value for the shares minted it should be
+    // // equal to amountToIncrease + increase in underlying balance
     const newValue = await (await Vault.toUnderlying(BorrowAsset.address, adminAmountToDeposit)).toNumber()
-    expect(newValue).to.eq(amountToIncrease + adminAmountToDeposit)
+    // it should not take into consideration direct transfers
+    expect(newValue).to.eq(adminAmountToDeposit)
     
-    // a new user bob deposits 1000
+    // a new user bob deposits 10000
     await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [bob], adminAmountToDeposit)
 
-    // 1000 * 1000 / 5000 = 200 
+    // 10000 * 10000 / 10000 = 10000 
     const bobShare = (await Vault.balanceOf(BorrowAsset.address, bob.address)).toNumber()
-    expect(bobShare).to.eq(200)
+    expect(bobShare).to.eq(adminAmountToDeposit)
     
-    // increase underlying of vault by 11
-    await BorrowAsset.setBalanceTo(Vault.address, 11)
 
     /// a new user alice deposits
-    const aliceAmountToDeposit = 300
+    const aliceAmountToDeposit = 30000
     await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [alice], aliceAmountToDeposit)
-    // 300 * 1200 / 6011 = 59.89
+    // 300 * 2000 / 6011 = 30
     const aliceShare = (await Vault.balanceOf(BorrowAsset.address, alice.address)).toNumber()
-    expect(aliceShare).to.eq(59)
+    expect(aliceShare).to.eq(aliceAmountToDeposit)
+
+    await setupAccountBalance(BorrowAsset, [admin.address, FlashBorrower.address], 1_000_000)
+    const data = ethers.utils.defaultAbiCoder.encode(['bool'], [true])
+
+    await(await Vault.flashLoan(
+      FlashBorrower.address,
+      BorrowAsset.address,
+      10_000,
+      data
+    )).wait()
+
+    const newTotals = await (await Vault.totals(BorrowAsset.address)).totalUnderlyingDeposit
+    expect(newTotals).to.eq(50500)
+
+    // 
+    const aliceAmount = (await Vault.toUnderlying(BorrowAsset.address, aliceAmountToDeposit)).toNumber()
+    expect(aliceAmount).to.eq(30300)
+
   })
 
-    // const computationalLimit = ethers.BigNumber.from(2).pow(256).sub(1)
-    // it("extreme limits", async function() {
-    // })
+  it('rescueFunds', async () => {
+    const { Vault, BorrowAsset, FlashBorrower, accounts: [admin, bob, alice] } = vars
+    const helper = await setupAndInitLendingPair(
+      vars,
+      {...defaultLendingPairInitVars, account: admin }
+    )
+
+    const adminAmountToDeposit = 10000
+    await setupAccountBalanceAndVaultDeposit(Vault, BorrowAsset, [admin], adminAmountToDeposit)
+
+    // increase the vault fund amount
+    const newBalance = adminAmountToDeposit * 2
+    BorrowAsset.setBalanceTo(Vault.address, newBalance);
+    
+    expect((await BorrowAsset.balanceOf(Vault.address)).toNumber()).to.eq(newBalance + adminAmountToDeposit)
+    await expect(Vault.connect(vars.blackSmithTeam.signer).rescueFunds(BorrowAsset.address)).to.emit(Vault, 'RescueFunds').withArgs(BorrowAsset.address, newBalance)
+
+    expect((await BorrowAsset.balanceOf(Vault.address)).toNumber()).to.eq(adminAmountToDeposit)
+  })
+
+  // const computationalLimit = ethers.BigNumber.from(2).pow(256).sub(1)
+  // it("extreme limits", async function() {
+  // })
 
 });

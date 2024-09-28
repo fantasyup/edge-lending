@@ -44,7 +44,7 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
         args: [18],
         from: deployer,
         log: true,
-        skipIfAlreadyDeployed: true
+        skipIfAlreadyDeployed: true,
     });
 
     const vars = await makeLendingPairTestSuiteVars({});
@@ -100,7 +100,7 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
     const newLendingPairEv = newLendingPairTx.events?.find(x => x.event === 'NewLendingPair')
 
     console.log("\n\n\n")
-    console.log("========================= dev environment deploy ================================")
+    console.log("========================= testnet environment deploy ================================")
     console.log(`Vault: ${vars.Vault.address}`)
     console.log(`VaultProxy: ${vaultProxy.address}`)
     console.log(`VaultFactory: ${vars.VaultFactory.address}`)
@@ -126,5 +126,5 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
 
 export default deployTestnet
 deployTestnet.tags = [`${tag}`]
-deployTestnet.dependencies = [ContractId.LendingPairFactory]
+// deployTestnet.dependencies = [ContractId.LendingPairFactory]
 deployTestnet.runAtTheEnd = true;

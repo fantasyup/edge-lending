@@ -455,7 +455,7 @@ export async function setupAndInitLendingPair(
     }: LendingPairInitVars
   ) {
     
-    await Vault.initialize(0, blackSmithTeam.address);
+    await Vault.initialize(BigNumber.from("50000000000000000"), blackSmithTeam.address);
 
     await setupLendingPair(
       LendingPair,

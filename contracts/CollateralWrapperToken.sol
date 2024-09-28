@@ -10,10 +10,17 @@ import "./interfaces/IBSLendingPair.sol";
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract CollateralWrapperToken is WrapperToken {
-    function transfer(address _recipient, uint256 _amount) external override returns (bool) {
-        uint256 maxWithdrawAllowed = IBSLendingPair(this.owner()).getMaxWithdrawAllowed(msg.sender);
-        require(_amount <= maxWithdrawAllowed, "EXCEEDS_ALLOWED");
-        _transfer(msg.sender, _recipient, _amount);
-        return true;
+
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal virtual override {
+        uint256 maxWithdrawAllowed = IBSLendingPair(this.owner()).getMaxWithdrawAllowed(sender);
+        require(amount <= maxWithdrawAllowed, "EXCEEDS_ALLOWED");
+
+        super._transfer(sender, recipient, amount);
     }
+
+
 }
