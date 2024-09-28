@@ -530,10 +530,9 @@ runTestSuite("Vault", (vars: TestVars) => {
     const currentBalance = (
       await Vault.balanceOf(BorrowAsset.address, admin.address)
     ).toNumber();
-    console.log(currentBalance)
 
     await expect(
-      Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance)
+      Vault.withdraw(BorrowAsset.address, admin.address, admin.address, currentBalance - 1)
     ).to.be.revertedWith('INVALID_RATIO')
   });
 

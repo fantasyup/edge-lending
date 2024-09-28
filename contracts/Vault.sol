@@ -199,8 +199,11 @@ contract Vault is VaultBase {
         total.totalSharesMinted -= _shares;
 
         // prevents the ratio from being reset
-        // @TODO update
-        require(total.totalSharesMinted >= MINIMUM_SHARE_BALANCE, "INVALID_RATIO");
+        require(
+            total.totalSharesMinted >= MINIMUM_SHARE_BALANCE
+            || 
+            total.totalSharesMinted == 0, "INVALID_RATIO"
+        );
 
         _token.safeTransfer(_to, amountOut);
 
