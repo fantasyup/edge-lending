@@ -13,3 +13,4 @@ deployments/localhost
 Flattened.sol
 *solcx-*
 deploy.txt
+exports

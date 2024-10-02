@@ -80,7 +80,7 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
         [CollateralAsset.address],
         [CollateralAssetMockPriceOracle.address]
     )).wait().catch(e => console.log(e))
-
+    
     // use lending pair factory to create a lending pair
     const newLendingPairTx = await (await vars.LendingPairFactory.createLendingPairWithProxy(
         "DEMO",
@@ -96,7 +96,7 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
             interestRateModel: modelEv!.args!.ir
         },
     )).wait();
-
+    console.log('here3')
     const newLendingPairEv = newLendingPairTx.events?.find(x => x.event === 'NewLendingPair')
 
     console.log("\n\n\n")
