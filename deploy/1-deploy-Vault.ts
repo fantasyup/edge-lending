@@ -1,8 +1,8 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import { ContractId } from "../helpers/types"
-import { UUPSProxy } from '../types';
-import { deployAndInitUUPSProxy } from '../helpers/contracts';
+import { UUPSProxy, Vault } from '../types';
+import { deployAndInitUUPSProxy, getVaultProxy } from '../helpers/contracts';
 
 const deployVault: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments: { deploy, get }, getNamedAccounts, ethers } = hre;
@@ -15,10 +15,19 @@ const deployVault: DeployFunction = async function (hre: HardhatRuntimeEnvironme
   });
 
   // initialize vault proxy
-  if (process.env.WITH_PROXY) await deployAndInitUUPSProxy(
-    ContractId.VaultProxy,
-    vaultTx.address
+  if (process.env.WITH_PROXY) {
+    await deployAndInitUUPSProxy(
+      ContractId.VaultProxy,
+      vaultTx.address
     )
+    // initialize vault
+    const vault = await getVaultProxy()
+    console.log("==== initializing vault ====")
+    // @TODO update
+    const tx = await vault.initialize(0, blackSmithTeam)
+    console.log(`tx hash: ${tx.hash}`)
+    console.log("==== finished vault initializing")
+  }
 
 };
 

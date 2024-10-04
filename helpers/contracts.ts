@@ -63,6 +63,7 @@ export const deployAndInitUUPSProxy = async(
         console.log(`Successfully Initialized ${id} proxy`)
     }
 }
+
 export const deployDataTypesLib = async () => {
     return await deployContract<DataTypes>('DataTypes', [])
 }

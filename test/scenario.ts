@@ -32,9 +32,6 @@ runTestSuite("scenarios", (vars: TestVars) => {
         ]
 
         for (let i = 0 ; i < 1; i++ ) {
-          // resets the contract state
-          // await deployments.fixture();
-
           const BorrowTokenDecimalPlaces = decimalPlaces[i][0];
           const CollateralTokenDecimalPlaces = decimalPlaces[i][1];
           const {
@@ -132,4 +129,38 @@ runTestSuite("scenarios", (vars: TestVars) => {
           await expect(newLendingPair.connect(admin.signer).liquidate(frank.address)).to.emit(newLendingPair, "Liquidate");
       }
   });
+
+  // significant changes in the design of the protocol
+  // multiple users
+  // flashloans
+
+  //////
+  //   
+  //
+  //
+  //
+  //  
+  //////
+ 
+  it('multiple users', async () => {
+    
+    const {
+      CollateralWrapperToken: newCollateralWrapperToken,
+      DebtToken,
+      BorrowWrapperToken,
+      PriceOracleAggregator,
+      BorrowAssetMockPriceOracle,
+      CollateralAssetMockPriceOracle,
+      Vault,
+      InterestRateModel,
+      LendingPair: newLendingPair,
+      MockRewardDistributorManager
+    } = vars;
+
+ 
+    // promise.all 20x flashloans
+
+
+  })
+
 });

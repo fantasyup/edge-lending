@@ -39,7 +39,6 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "debtToken()": FunctionFragment;
     "depositBorrowAsset(address,uint256)": FunctionFragment;
     "depositCollateral(address,uint256)": FunctionFragment;
-    "exchangeRateCached()": FunctionFragment;
     "exchangeRateCurrent()": FunctionFragment;
     "feeWithdrawalAddr()": FunctionFragment;
     "getBorrowLimit(address)": FunctionFragment;
@@ -138,10 +137,6 @@ interface LendingPairInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "depositCollateral",
     values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "exchangeRateCached",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "exchangeRateCurrent",
@@ -336,10 +331,6 @@ interface LendingPairInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "depositCollateral",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "exchangeRateCached",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -640,13 +631,13 @@ export class LendingPair extends Contract {
     "debtToken()"(overrides?: CallOverrides): Promise<[string]>;
 
     depositBorrowAsset(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "depositBorrowAsset(address,uint256)"(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -662,10 +653,6 @@ export class LendingPair extends Contract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    exchangeRateCached(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "exchangeRateCached()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     exchangeRateCurrent(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -699,13 +686,9 @@ export class LendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    getCashPrior(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { availableCash: BigNumber }>;
+    getCashPrior(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "getCashPrior()"(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { availableCash: BigNumber }>;
+    "getCashPrior()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getMaxWithdrawAllowed(
       _account: string,
@@ -866,13 +849,13 @@ export class LendingPair extends Contract {
     ): Promise<ContractTransaction>;
 
     repay(
-      _repayAmountShares: BigNumberish,
+      _repayAmount: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "repay(uint256,address)"(
-      _repayAmountShares: BigNumberish,
+      _repayAmount: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -1067,13 +1050,13 @@ export class LendingPair extends Contract {
   "debtToken()"(overrides?: CallOverrides): Promise<string>;
 
   depositBorrowAsset(
-    _tokenReceipeint: string,
+    _tokenRecipient: string,
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "depositBorrowAsset(address,uint256)"(
-    _tokenReceipeint: string,
+    _tokenRecipient: string,
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1089,10 +1072,6 @@ export class LendingPair extends Contract {
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  exchangeRateCached(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "exchangeRateCached()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   exchangeRateCurrent(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1284,13 +1263,13 @@ export class LendingPair extends Contract {
   ): Promise<ContractTransaction>;
 
   repay(
-    _repayAmountShares: BigNumberish,
+    _repayAmount: BigNumberish,
     _beneficiary: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "repay(uint256,address)"(
-    _repayAmountShares: BigNumberish,
+    _repayAmount: BigNumberish,
     _beneficiary: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1481,13 +1460,13 @@ export class LendingPair extends Contract {
     "debtToken()"(overrides?: CallOverrides): Promise<string>;
 
     depositBorrowAsset(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "depositBorrowAsset(address,uint256)"(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1503,10 +1482,6 @@ export class LendingPair extends Contract {
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    exchangeRateCached(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "exchangeRateCached()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     exchangeRateCurrent(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1691,13 +1666,13 @@ export class LendingPair extends Contract {
     ): Promise<void>;
 
     repay(
-      _repayAmountShares: BigNumberish,
+      _repayAmount: BigNumberish,
       _beneficiary: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "repay(uint256,address)"(
-      _repayAmountShares: BigNumberish,
+      _repayAmount: BigNumberish,
       _beneficiary: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -2055,13 +2030,13 @@ export class LendingPair extends Contract {
     "debtToken()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     depositBorrowAsset(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "depositBorrowAsset(address,uint256)"(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -2077,10 +2052,6 @@ export class LendingPair extends Contract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    exchangeRateCached(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "exchangeRateCached()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     exchangeRateCurrent(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -2275,13 +2246,13 @@ export class LendingPair extends Contract {
     ): Promise<BigNumber>;
 
     repay(
-      _repayAmountShares: BigNumberish,
+      _repayAmount: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "repay(uint256,address)"(
-      _repayAmountShares: BigNumberish,
+      _repayAmount: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -2485,13 +2456,13 @@ export class LendingPair extends Contract {
     "debtToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     depositBorrowAsset(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "depositBorrowAsset(address,uint256)"(
-      _tokenReceipeint: string,
+      _tokenRecipient: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2506,14 +2477,6 @@ export class LendingPair extends Contract {
       _tokenRecipient: string,
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    exchangeRateCached(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "exchangeRateCached()"(
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     exchangeRateCurrent(
@@ -2723,13 +2686,13 @@ export class LendingPair extends Contract {
     ): Promise<PopulatedTransaction>;
 
     repay(
-      _repayAmountShares: BigNumberish,
+      _repayAmount: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "repay(uint256,address)"(
-      _repayAmountShares: BigNumberish,
+      _repayAmount: BigNumberish,
       _beneficiary: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
