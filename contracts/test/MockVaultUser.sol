@@ -10,4 +10,4 @@ contract MockVaultUser {
     function attack(IBSVault _vault) external {
         _vault.approveContract(address(this), address(this), true, 0, 0, 0);
     }
-} 
+}

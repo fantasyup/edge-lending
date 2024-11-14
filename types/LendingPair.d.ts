@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface LendingPairInterface extends ethers.utils.Interface {
   functions: {
+    "USE_RETURN_INPUT()": FunctionFragment;
     "VERSION()": FunctionFragment;
     "accountInterestIndex(address)": FunctionFragment;
     "accrueInterest()": FunctionFragment;
@@ -75,6 +76,10 @@ interface LendingPairInterface extends ethers.utils.Interface {
     "wrapperBorrowedAsset()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "USE_RETURN_INPUT",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "VERSION", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "accountInterestIndex",
@@ -273,6 +278,10 @@ interface LendingPairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "USE_RETURN_INPUT",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "VERSION", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "accountInterestIndex",
@@ -512,6 +521,10 @@ export class LendingPair extends Contract {
   interface: LendingPairInterface;
 
   functions: {
+    USE_RETURN_INPUT(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "USE_RETURN_INPUT()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     VERSION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "VERSION()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -931,6 +944,10 @@ export class LendingPair extends Contract {
     "wrapperBorrowedAsset()"(overrides?: CallOverrides): Promise<[string]>;
   };
 
+  USE_RETURN_INPUT(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "USE_RETURN_INPUT()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   VERSION(overrides?: CallOverrides): Promise<BigNumber>;
 
   "VERSION()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1345,6 +1362,10 @@ export class LendingPair extends Contract {
   "wrapperBorrowedAsset()"(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    USE_RETURN_INPUT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "USE_RETURN_INPUT()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     VERSION(overrides?: CallOverrides): Promise<BigNumber>;
 
     "VERSION()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1657,13 +1678,13 @@ export class LendingPair extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     "redeem(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     repay(
       _repayAmount: BigNumberish,
@@ -1708,13 +1729,13 @@ export class LendingPair extends Contract {
       actions: BigNumberish[],
       data: BytesLike[],
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     "edge(uint8[],bytes[])"(
       actions: BigNumberish[],
       data: BytesLike[],
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     withdrawCollateral(
       _amount: BigNumberish,
@@ -1911,6 +1932,10 @@ export class LendingPair extends Contract {
   };
 
   estimateGas: {
+    USE_RETURN_INPUT(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "USE_RETURN_INPUT()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     VERSION(overrides?: CallOverrides): Promise<BigNumber>;
 
     "VERSION()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -2329,6 +2354,12 @@ export class LendingPair extends Contract {
   };
 
   populateTransaction: {
+    USE_RETURN_INPUT(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "USE_RETURN_INPUT()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "VERSION()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;

@@ -37,6 +37,9 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     /// @dev version
     uint256 public constant VERSION = 0x1;
 
+    /// @dev return input
+    int256 public constant USE_RETURN_INPUT = -2;
+
     /// @notice where the tokens are stored
     IBSVault public immutable vault;
 
@@ -257,7 +260,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         );
     }
 
-    /// @param _amountToBorrow is the amount of the borrow asset vault shares the user wants to borrow
+    /// @param _amountToBorrow is the amount of the borrow asset tokens the user wants to borrow
     /// @param _debtOwner this should be the msg.sender or address that delegates credit to the msg.sender
     /// @dev we use normalized amounts to calculate the
     function borrow(uint256 _amountToBorrow, address _debtOwner) public whenNotPaused(Actions.Borrow) {
@@ -347,14 +350,14 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     struct RedeemLocalVars {
         uint256 exchangeRateMantissa;
         uint256 amountOfTokensToRedeem;
-        uint256 amountOfSharesToRedeem;
+        // uint256 amountOfSharesToRedeem;
         uint256 amountOfTokens;
     }
 
     /// @notice Allows a user to redeem their Wrapper Token for the appropriate amount of underlying asset
     /// @param _to Address to send the underlying tokens to
     /// @param _amount of wrapper token to redeem
-    function redeem(address _to, uint256 _amount) public override {
+    function redeem(address _to, uint256 _amount) public override returns(uint256 amountOfSharesToRedeem){
         require(_to != address(0), "INV_TO");
 
         RedeemLocalVars memory vars;
@@ -375,18 +378,18 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         );
 
         // convert it to shares
-        vars.amountOfSharesToRedeem = vault.toShare(asset, vars.amountOfTokensToRedeem, false);
+        amountOfSharesToRedeem = vault.toShare(asset, vars.amountOfTokensToRedeem, false);
 
         // ensure the lending pair has enough borrow asset balance
-        require(vault.balanceOf(asset, address(this)) >= vars.amountOfSharesToRedeem, "NOT_ENOUGH_BALANCE");
+        require(vault.balanceOf(asset, address(this)) >= amountOfSharesToRedeem, "NOT_ENOUGH_BALANCE");
 
         // reverts if the user doesn't have enough tokens
         wrapperBorrowedAsset.burn(msg.sender, vars.amountOfTokens);
 
         // transfer the quantity of shares to the user
-        vault.transfer(asset, address(this), _to, vars.amountOfSharesToRedeem);
+        vault.transfer(asset, address(this), _to, amountOfSharesToRedeem);
 
-        emit Redeem(address(this), address(asset), msg.sender, _to, vars.amountOfSharesToRedeem, vars.amountOfTokens);
+        emit Redeem(address(this), address(asset), msg.sender, _to, amountOfSharesToRedeem, vars.amountOfTokens);
     }
     
     uint8 private constant BORROW_ASSET_DEPOSIT = 1;
@@ -404,38 +407,38 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
     function edge(
         uint8[] calldata actions,
         bytes[] calldata data
-    ) external {
+    ) external returns (uint256 value) {
         require(actions.length == data.length, "INV");
 
         for (uint8 i = 0; i < actions.length;  i++) {
             uint8 action = actions[i];
             if (action == BORROW_ASSET_DEPOSIT) {
-                (address receipient, uint256 vaultAmount) = abi.decode(data[i], (address, uint256));
-                depositBorrowAsset(receipient, vaultAmount);
+                (address receipient, int256 vaultAmount) = abi.decode(data[i], (address, int256));
+                depositBorrowAsset(receipient, select(vaultAmount, value));
             } else if (action == COLLATERAL_DEPOSIT) {
-                (address receipient, uint256 amount) = abi.decode(data[i], (address, uint256));
-                depositCollateral(receipient, amount);
+                (address receipient, int256 amount) = abi.decode(data[i], (address, int256));
+                depositCollateral(receipient, select(amount, value));
             } else if (action == REPAY) {
-                (uint256 amount, address beneficiary) = abi.decode(data[i], (uint256, address));
-                repay(amount, beneficiary);
+                (address beneficiary, int256 amount) = abi.decode(data[i], (address, int256));
+                repay(select(amount, value), beneficiary);
             } else if (action == BORROW) {
-                (address debtOwner, uint256 amount) = abi.decode(data[i], (address, uint256));
-                borrow(amount, debtOwner);
+                (address debtOwner, int256 amount) = abi.decode(data[i], (address, int256));
+                borrow(select(amount, value), debtOwner);
             } else if (action == REDEEM) {
-                (address receipient, uint256 amount) = abi.decode(data[i], (address, uint256));
-                redeem(receipient, amount);
+                (address receipient, int256 amount) = abi.decode(data[i], (address, int256));
+                value = redeem(receipient, select(amount, value));
             } else if (action == WITHDRAW_COLLATERAL) {
-                (uint256 amount) = abi.decode(data[i], (uint256));
-                withdrawCollateral(amount);
+                (int256 amount) = abi.decode(data[i], (int256));
+                withdrawCollateral(select(amount, value));
             } else if (action == VAULT_DEPOSIT) {
-                (address token, address to, uint256 amount) = abi.decode(data[i], (address, address, uint256));
-                vault.deposit(IERC20(token), msg.sender, to, amount);
+                (address token, address to, int256 amount) = abi.decode(data[i], (address, address, int256));
+                value = vault.deposit(IERC20(token), msg.sender, to, select(amount, value));
             } else if (action == VAULT_WITHDRAW) {
-                (address token, address to, uint256 amount) = abi.decode(data[i], (address, address, uint256));
-                vault.withdraw(IERC20(token), msg.sender, to, amount);
+                (address token, address to, int256 amount) = abi.decode(data[i], (address, address, int256));
+                value = vault.withdraw(IERC20(token), msg.sender, to, select(amount, value));
             } else if (action == VAULT_TRANSFER) {
-                (address token, address to, uint256 amount) = abi.decode(data[i], (address, address, uint256));
-                vault.transfer(IERC20(token), msg.sender, to, amount);
+                (address token, address to, int256 amount) = abi.decode(data[i], (address, address, int256));
+                vault.transfer(IERC20(token), msg.sender, to, select(amount, value));
             } else if (action == VAULT_APPROVE_CONTRACT) {
                 (
                     address _user,
@@ -448,6 +451,11 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
                 vault.approveContract(_user, _contract, status, v, r, s);
             }
         }
+    }
+
+    /// @dev select Select which argument to pass
+    function select(int256 paramInput, uint256 returnInput) internal pure returns(uint256 value) {
+        value = paramInput >= 0 ? uint256(paramInput) : (paramInput == USE_RETURN_INPUT) ? returnInput : uint256(paramInput);
     }
 
     /// @notice calculateFee is used to calculate the fee earned

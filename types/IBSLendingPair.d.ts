@@ -724,13 +724,13 @@ export class IBSLendingPair extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     "redeem(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     totalReserves(overrides?: CallOverrides): Promise<BigNumber>;
 
