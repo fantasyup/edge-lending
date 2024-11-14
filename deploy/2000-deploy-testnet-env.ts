@@ -107,33 +107,32 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
     console.log("==== finished creating lending pair ====")
 
     const newLendingPairEv = newLendingPairTx.events?.find(x => x.event === 'NewLendingPair')
-    // Run some test cases
-    const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC as string, `m/44'/60'/0'/0/0`)
+    // // Run some test cases
+    // const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC as string, `m/44'/60'/0'/0/0`)
 
-    const account = {
-        address: await wallet.getAddress(),
-        signer: await ethers.getSigner(wallet.address),
-        privateKey: wallet.privateKey
-    }
+    // const account = {
+    //     address: await wallet.getAddress(),
+    //     signer: await ethers.getSigner(wallet.address),
+    //     privateKey: wallet.privateKey
+    // }
 
-    console.log("===== approve in vault ======")
+    // console.log("===== approve in vault ======")
 
-    const testLendingPair =  await ethers.getContractAt('LendingPair', newLendingPairEv!.args!.pair, wallet)
-    const testBorrowAsset = await ethers.getContractAt('MockToken', BorrowAsset.address, wallet)
-    const testCollateralAsset = await ethers.getContractAt('MockToken', CollateralAsset.address, wallet)
+    // const testLendingPair =  await ethers.getContractAt('LendingPair', newLendingPairEv!.args!.pair, wallet)
+    // const testBorrowAsset = await ethers.getContractAt('MockToken', BorrowAsset.address, wallet)
+    // const testCollateralAsset = await ethers.getContractAt('MockToken', CollateralAsset.address, wallet)
 
-    const helper = LendingPairHelpers(
-        vaultProxy,
-        testLendingPair as LendingPair,
-        testBorrowAsset as MockToken,
-        testCollateralAsset as MockToken,
-        priceOracle,
-        account
-    )
+    // const helper = LendingPairHelpers(
+    //     vaultProxy,
+    //     testLendingPair as LendingPair,
+    //     testBorrowAsset as MockToken,
+    //     testCollateralAsset as MockToken,
+    //     priceOracle,
+    //     account
+    // )
 
-    await helper.approveLendingPairInVault(account, true).catch(e => console.log(e))
-    
-    console.log("===== approved in vault =====")
+    // await helper.approveLendingPairInVault(account, true).catch(e => console.log(e))
+    // console.log("===== approved in vault =====")
 
     console.log("\n\n\n")
     console.log("========================= testnet environment deploy ================================")

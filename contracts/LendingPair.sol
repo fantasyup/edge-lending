@@ -203,7 +203,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         emit ActionUnPaused(uint8(action), block.timestamp);
     }
 
-    /// @notice deposit allows a user to deposit underlying collateral from vault
+    /// @notice depositCollateral allows a user to deposit underlying collateral from vault
     /// @param _tokenRecipient address to credit the wrapped collateral shares
     /// @param _amount is the amount of underlying collateral asset being deposited
     function depositCollateral(address _tokenRecipient, uint256 _amount)
