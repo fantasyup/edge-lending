@@ -144,7 +144,7 @@ interface IBSLendingPair {
 
     function depositCollateral(address _tokenReceipeint, uint256 _vaultShareAmount) external;
 
-    function redeem(address _to, uint256 _amount) external;
+    function redeem(address _to, uint256 _amount) external returns(uint256);
 
     function collateralOfAccount(address _account) external view returns (uint256);
 

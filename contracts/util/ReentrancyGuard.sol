@@ -35,7 +35,7 @@ abstract contract ReentrancyGuard {
 
     uint256 private _status;
 
-    function __init_ReentrancyGuard () internal {
+    function __init_ReentrancyGuard() internal {
         _status = _NOT_ENTERED;
     }
 

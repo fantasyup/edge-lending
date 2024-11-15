@@ -3,12 +3,13 @@ import { DeployFunction } from 'hardhat-deploy/types';
 import { 
     defaultLendingPairInitVars,
     deployTestTokensAndMock,
+    LendingPairHelpers,
     makeLendingPairTestSuiteVars,
     setupLendingPair
 } from '../test/lib';
 import { BigNumber, Contract } from 'ethers';
 import { ContractId } from '../helpers/types';
-import { LendingPairFactory } from '../types';
+import { LendingPair, LendingPairFactory, MockToken } from '../types';
 import { getFeeWithdrawalProxy, getPriceOracleAggregatorDeployment, getVaultProxy } from '../helpers/contracts';
 
 const tag = `testnet`
@@ -70,7 +71,9 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
     const priceOracle = await getPriceOracleAggregatorDeployment()
     const vaultProxy = await getVaultProxy()
     const feeWithdrawalProxy = await getFeeWithdrawalProxy()
-    
+
+    console.log("==== setting price oracles ====")
+
     await (await priceOracle.connect(teamSigner).setOracleForAsset(
         [BorrowAsset.address],
         [BorrowAssetMockPriceOracle.address]
@@ -81,7 +84,11 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
         [CollateralAssetMockPriceOracle.address]
     )).wait().catch(e => console.log(e))
 
+    console.log("==== finished setting price oracles ====")
+    
     // use lending pair factory to create a lending pair
+    console.log("==== creating lending pair ====")
+
     const newLendingPairTx = await (await vars.LendingPairFactory.createLendingPairWithProxy(
         "DEMO",
         "DST",
@@ -97,7 +104,36 @@ const deployTestnet: DeployFunction = async function (hre: HardhatRuntimeEnviron
         },
     )).wait();
 
+    console.log("==== finished creating lending pair ====")
+
     const newLendingPairEv = newLendingPairTx.events?.find(x => x.event === 'NewLendingPair')
+    // Run some test cases
+    const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC as string, `m/44'/60'/0'/0/0`)
+
+    const account = {
+        address: await wallet.getAddress(),
+        signer: await ethers.getSigner(wallet.address),
+        privateKey: wallet.privateKey
+    }
+
+    console.log("===== approve in vault ======")
+
+    const testLendingPair =  await ethers.getContractAt('LendingPair', newLendingPairEv!.args!.pair, wallet)
+    const testBorrowAsset = await ethers.getContractAt('MockToken', BorrowAsset.address, wallet)
+    const testCollateralAsset = await ethers.getContractAt('MockToken', CollateralAsset.address, wallet)
+
+    const helper = LendingPairHelpers(
+        vaultProxy,
+        testLendingPair as LendingPair,
+        testBorrowAsset as MockToken,
+        testCollateralAsset as MockToken,
+        priceOracle,
+        account
+    )
+
+    await helper.approveLendingPairInVault(account, true).catch(e => console.log(e))
+    
+    console.log("===== approved in vault =====")
 
     console.log("\n\n\n")
     console.log("========================= testnet environment deploy ================================")
