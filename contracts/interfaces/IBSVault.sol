@@ -80,7 +80,7 @@ interface IBSVault is IERC3156FlashLender {
         address _from,
         address _to,
         uint256 _amount
-    ) external returns (uint256);
+    ) external returns (uint256, uint256);
 
     function withdraw(
         IERC20 _token,

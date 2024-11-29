@@ -432,7 +432,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
                 withdrawCollateral(select(amount, value));
             } else if (action == VAULT_DEPOSIT) {
                 (address token, address to, int256 amount) = abi.decode(data[i], (address, address, int256));
-                value = vault.deposit(IERC20(token), msg.sender, to, select(amount, value));
+                (value, ) = vault.deposit(IERC20(token), msg.sender, to, select(amount, value));
             } else if (action == VAULT_WITHDRAW) {
                 (address token, address to, int256 amount) = abi.decode(data[i], (address, address, int256));
                 value = vault.withdraw(IERC20(token), msg.sender, to, select(amount, value));

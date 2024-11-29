@@ -1056,7 +1056,9 @@ export class MockVault extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<
+      [BigNumber, BigNumber] & { amountOut: BigNumber; shareOut: BigNumber }
+    >;
 
     "deposit(address,address,address,uint256)"(
       _token: string,
@@ -1064,7 +1066,9 @@ export class MockVault extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<
+      [BigNumber, BigNumber] & { amountOut: BigNumber; shareOut: BigNumber }
+    >;
 
     flashFee(
       arg0: string,
