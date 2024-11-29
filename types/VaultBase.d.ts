@@ -818,7 +818,7 @@ export class VaultBase extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, BigNumber]>;
 
     "deposit(address,address,address,uint256)"(
       _token: string,
@@ -826,7 +826,7 @@ export class VaultBase extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, BigNumber]>;
 
     flashFee(
       token: string,

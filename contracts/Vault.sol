@@ -150,17 +150,19 @@ contract Vault is VaultBase {
     /// @param _from which account to pull the tokens.
     /// @param _to which account to push the tokens.
     /// @param _amount Token amount in native representation to deposit.
+    /// @return amountOut The deposit amount in underlying token
     /// @return shareOut The deposit amount in vault shares
     function deposit(
         IERC20 _token,
         address _from,
         address _to,
         uint256 _amount
-    ) external override whenNotPaused allowed(_from) nonReentrant returns (uint256 shareOut) {
+    ) external override whenNotPaused allowed(_from) nonReentrant returns (uint256 amountOut, uint256 shareOut) {
         // Checks
         require(_to != address(0), "INVALID_TO_ADDRESS");
 
         // calculate shares
+        amountOut = _amount;
         shareOut = toShare(_token, _amount, false);
 
         // transfer appropriate amount of underlying from _from to vault

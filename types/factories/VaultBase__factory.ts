@@ -455,6 +455,11 @@ const _abi = [
         name: "",
         type: "uint256",
       },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
     stateMutability: "nonpayable",
     type: "function",

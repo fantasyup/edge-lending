@@ -775,7 +775,7 @@ export class VaultStorageV1 extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, BigNumber]>;
 
     "deposit(address,address,address,uint256)"(
       _token: string,
@@ -783,7 +783,7 @@ export class VaultStorageV1 extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, BigNumber]>;
 
     flashFee(
       token: string,
