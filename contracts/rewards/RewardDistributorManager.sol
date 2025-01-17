@@ -7,7 +7,7 @@ import "../interfaces/IBSLendingPair.sol";
 import "../upgradability/UUPSProxiable.sol";
 import "../interfaces/IRewardDistributorManager.sol";
 
-abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable, IRewardDistributorManager {
+abstract contract RewardDistributorManagerStorageV1 is UUPSProxiable, IRewardDistributorManager {
     /// @dev admin
     address public owner;
 
@@ -21,7 +21,7 @@ abstract contract RewardDistirbutorManagerStorageV1 is UUPSProxiable, IRewardDis
     mapping(address => IRewardDistributor[]) public tokenRewardToDistributors;
 }
 
-contract RewardDistributorManager is RewardDistirbutorManagerStorageV1 {
+contract RewardDistributorManager is RewardDistributorManagerStorageV1 {
     modifier onlyOwner {
         require(owner == msg.sender, "ONLY_OWNER");
         _;
@@ -62,7 +62,7 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1 {
         onlyOwner
     {
         approvedDistributors[_distributor] = _approve;
-        emit ApprovedDistributor(_distributor, block.timestamp);
+        emit DistributorStatusUpdated(_distributor, _approve, block.timestamp);
     }
 
     /// @dev Enables a distributor contract to activate reward for a token
@@ -120,17 +120,20 @@ contract RewardDistributorManager is RewardDistirbutorManagerStorageV1 {
         }
     }
 
-    function commitOwnerTransfer(address _newOwner) external onlyOwner {
+    function transferOwnership(address _newOwner) external onlyOwner {
         require(_newOwner != address(0), "INVALID_NEW_OWNER");
         newOwner = _newOwner;
         emit TransferControl(_newOwner, block.timestamp);
     }
 
-    function acceptOwnerTransfer() external {
+    function acceptOwnership() external {
         require(msg.sender == newOwner, "invalid owner");
+
+        // emit event before state change to do not trigger null address
+        emit OwnershipAccepted(owner, newOwner, block.timestamp);
+
         owner = newOwner;
         newOwner = address(0);
-        emit OwnershipAccepted(newOwner, block.timestamp);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

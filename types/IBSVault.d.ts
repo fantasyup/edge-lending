@@ -105,7 +105,7 @@ interface IBSVaultInterface extends ethers.utils.Interface {
     "Approval(address,address,bool)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
     "RegisterProtocol(address)": EventFragment;
     "RescueFunds(address,uint256)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
@@ -689,11 +689,12 @@ export class IBSVault extends Contract {
     >;
 
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
     >;
 
     RegisterProtocol(

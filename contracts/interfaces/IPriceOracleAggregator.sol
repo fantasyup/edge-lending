@@ -15,7 +15,7 @@ interface IPriceOracleAggregator {
 
     function setOracleForAsset(IERC20[] calldata _asset, IOracle[] calldata _oracle) external;
 
-    event OwnershipAccepted(address newOwner, uint256 timestamp);
+    event OwnershipAccepted(address prevOwner, address newOwner, uint256 timestamp);
     event TransferControl(address _newTeam, uint256 timestamp);
     event StableTokenAdded(IERC20 _token, uint256 timestamp);
 }

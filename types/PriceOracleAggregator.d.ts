@@ -30,7 +30,7 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
     "removeOracleForAsset(address)": FunctionFragment;
     "setOracleForAsset(address[],address[])": FunctionFragment;
     "stableTokens(address)": FunctionFragment;
-    "transferToNewOwner(address)": FunctionFragment;
+    "transferOwnership(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -64,7 +64,7 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferToNewOwner",
+    functionFragment: "transferOwnership",
     values: [string]
   ): string;
 
@@ -99,12 +99,12 @@ interface PriceOracleAggregatorInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferToNewOwner",
+    functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
 
   events: {
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
     "StableTokenAdded(address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "UpdateOracle(address,address)": EventFragment;
@@ -238,12 +238,12 @@ export class PriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -324,12 +324,12 @@ export class PriceOracleAggregator extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  transferToNewOwner(
+  transferOwnership(
     _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transferToNewOwner(address)"(
+  "transferOwnership(address)"(
     _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -406,12 +406,12 @@ export class PriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -419,11 +419,12 @@ export class PriceOracleAggregator extends Contract {
 
   filters: {
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
     >;
 
     StableTokenAdded(
@@ -527,12 +528,12 @@ export class PriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -623,12 +624,12 @@ export class PriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

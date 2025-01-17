@@ -6,11 +6,11 @@ interface IRewardDistributorManager {
     /// @dev Emitted on Initialization
     event Initialized(address owner, uint256 timestamp);
 
-    event ApprovedDistributor(IRewardDistributor distributor, uint256 timestamp);
+    event DistributorStatusUpdated(IRewardDistributor distributor, bool approve, uint256 timestamp);
     event AddReward(address tokenAddr, IRewardDistributor distributor, uint256 timestamp);
     event RemoveReward(address tokenAddr, IRewardDistributor distributor, uint256 timestamp);
     event TransferControl(address _newTeam, uint256 timestamp);
-    event OwnershipAccepted(address newOwner, uint256 timestamp);
+    event OwnershipAccepted(address prevOwner, address newOwner, uint256 timestamp);
 
     function activateReward(address _tokenAddr) external;
 
