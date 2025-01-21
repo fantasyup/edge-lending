@@ -43,7 +43,7 @@ import {
   getRewardDistributorManagerDeployment,
   getFeeWithdrawalDeployment
 } from "../helpers/contracts";
-import { EthereumAddress } from "../helpers/types";
+import { ContractId, EthereumAddress } from "../helpers/types";
 import { 
     signDebtTokenBorrowDelegateMessage,
     signPermitMessage,
@@ -52,25 +52,73 @@ import {
 import { assert } from "chai";
 // 'Vault' | 'PriceOracleAggregator' | 'CollateralWrapperToken' | 'BorrowWrapperToken' | 'DebtToken' | 'InterestRateModel' | 'LendingPair' | 'LendingPairHelper' | 'LendingPairFactory' | 'VaultFactory'
 
+
 export async function makeLendingPairTestSuiteVars(
        testVars: any
 ): Promise<TestVars> {
+    const team = testVars.blackSmithTeam;
+
+    const Vault = await getVaultDeployment();
+    const PriceOracleAggregator = await getPriceOracleAggregatorDeployment(team.address);
+    const CollateralWrapperToken= await getCollateralWrapperDeployment();
+    const BorrowWrapperToken= await getBorrowWrapperDeployment(); // WrapperToken
+    const DebtToken= await getDebtTokenDeployment();
+
+    const InterestRateModel= await getInterestRateModelDeployment(
+        team.address
+    );
+    const FeeWithdrawal= await getFeeWithdrawalDeployment({
+        vault: Vault.address,
+        receiver: team.address,
+        edgeToken: testVars.EdgeToken.address,
+        weth: BorrowWrapperToken.address, // mock
+    });
+    const LendingPair = await getLendingPairDeployment({
+        vault: Vault.address,
+        priceOracleAggregator: PriceOracleAggregator.address,
+        feeWithdrawal: FeeWithdrawal.address,
+        feeShare: '50000000000000000'
+    });
+    const RewardDistributorManager= await getRewardDistributorManagerDeployment();
+    const LendingPairFactory= await getLendingPairFactoryDeployment({
+        admin: team.address,
+        pairLogic: LendingPair.address,
+        collateralWrapperLogic: CollateralWrapperToken.address,
+        debtTokenLogic: DebtToken.address,
+        borrowAssetWrapperLogic: BorrowWrapperToken.address,
+        rewardDistributorManager: RewardDistributorManager.address
+    });
+    const LendingPairHelper= await getLendingPairHelperDeployment(Vault.address);
+    const VaultFactory= await getVaultFactoryDeployment({
+        team: team.address,
+        vault: Vault.address
+    });
+    const RewardDistributor= await getRewardDistributorDeployment({
+        manager: RewardDistributorManager.address
+    });
+    const RewardDistributorFactory= await getRewardDistributorFactoryDeployment({
+        owner: testVars.accounts[0].address,
+        manager: RewardDistributor.address
+    });
+    
+    
+
     return {
         ...testVars,
-        Vault: await getVaultDeployment(),
-        PriceOracleAggregator: await getPriceOracleAggregatorDeployment(),
-        CollateralWrapperToken: await getCollateralWrapperDeployment(),
-        BorrowWrapperToken: await getBorrowWrapperDeployment(),
-        DebtToken: await getDebtTokenDeployment(),
-        InterestRateModel: await getInterestRateModelDeployment(),
-        LendingPair: await getLendingPairDeployment(),
-        LendingPairHelper: await getLendingPairHelperDeployment(),
-        LendingPairFactory: await getLendingPairFactoryDeployment(),
-        VaultFactory: await getVaultFactoryDeployment(),
-        RewardDistributor: await getRewardDistributorDeployment(),
-        RewardDistributorFactory: await getRewardDistributorFactoryDeployment(),
-        RewardDistributorManager: await getRewardDistributorManagerDeployment(),
-        FeeWithdrawal: await getFeeWithdrawalDeployment(),
+        Vault,
+        PriceOracleAggregator,
+        CollateralWrapperToken,
+        BorrowWrapperToken,
+        DebtToken,
+        InterestRateModel,
+        LendingPair,
+        LendingPairHelper,
+        LendingPairFactory,
+        VaultFactory,
+        RewardDistributor,
+        RewardDistributorFactory,
+        RewardDistributorManager,
+        FeeWithdrawal,
     }
 }
 

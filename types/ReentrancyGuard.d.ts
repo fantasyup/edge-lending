@@ -18,25 +18,25 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface DataTypesInterface extends ethers.utils.Interface {
+interface ReentrancyGuardInterface extends ethers.utils.Interface {
   functions: {
-    "c_0xf1c0a980(bytes32)": FunctionFragment;
+    "c_0x6b12c86e(bytes32)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "c_0xf1c0a980",
+    functionFragment: "c_0x6b12c86e",
     values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "c_0xf1c0a980",
+    functionFragment: "c_0x6b12c86e",
     data: BytesLike
   ): Result;
 
   events: {};
 }
 
-export class DataTypes extends Contract {
+export class ReentrancyGuard extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -77,38 +77,38 @@ export class DataTypes extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: DataTypesInterface;
+  interface: ReentrancyGuardInterface;
 
   functions: {
-    c_0xf1c0a980(
-      c__0xf1c0a980: BytesLike,
+    c_0x6b12c86e(
+      c__0x6b12c86e: BytesLike,
       overrides?: CallOverrides
     ): Promise<[void]>;
 
-    "c_0xf1c0a980(bytes32)"(
-      c__0xf1c0a980: BytesLike,
+    "c_0x6b12c86e(bytes32)"(
+      c__0x6b12c86e: BytesLike,
       overrides?: CallOverrides
     ): Promise<[void]>;
   };
 
-  c_0xf1c0a980(
-    c__0xf1c0a980: BytesLike,
+  c_0x6b12c86e(
+    c__0x6b12c86e: BytesLike,
     overrides?: CallOverrides
   ): Promise<void>;
 
-  "c_0xf1c0a980(bytes32)"(
-    c__0xf1c0a980: BytesLike,
+  "c_0x6b12c86e(bytes32)"(
+    c__0x6b12c86e: BytesLike,
     overrides?: CallOverrides
   ): Promise<void>;
 
   callStatic: {
-    c_0xf1c0a980(
-      c__0xf1c0a980: BytesLike,
+    c_0x6b12c86e(
+      c__0x6b12c86e: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "c_0xf1c0a980(bytes32)"(
-      c__0xf1c0a980: BytesLike,
+    "c_0x6b12c86e(bytes32)"(
+      c__0x6b12c86e: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -116,25 +116,25 @@ export class DataTypes extends Contract {
   filters: {};
 
   estimateGas: {
-    c_0xf1c0a980(
-      c__0xf1c0a980: BytesLike,
+    c_0x6b12c86e(
+      c__0x6b12c86e: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "c_0xf1c0a980(bytes32)"(
-      c__0xf1c0a980: BytesLike,
+    "c_0x6b12c86e(bytes32)"(
+      c__0x6b12c86e: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    c_0xf1c0a980(
-      c__0xf1c0a980: BytesLike,
+    c_0x6b12c86e(
+      c__0x6b12c86e: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "c_0xf1c0a980(bytes32)"(
-      c__0xf1c0a980: BytesLike,
+    "c_0x6b12c86e(bytes32)"(
+      c__0x6b12c86e: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
