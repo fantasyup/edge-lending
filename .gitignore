@@ -14,3 +14,4 @@ Flattened.sol
 *solcx-*
 deploy.txt
 exports
+.env
