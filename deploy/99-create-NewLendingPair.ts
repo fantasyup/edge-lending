@@ -2,7 +2,7 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {DeployFunction} from 'hardhat-deploy/types';
 import { ContractId } from "../helpers/types"
 import { getLendingPairFactoryDeployment } from '../helpers/contracts';
-const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+const createLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const lendingPairFactory = await getLendingPairFactoryDeployment()
   if (!process.env.LendingPairName || !process.env.LendingPairSymbol || !process.env.PauseGuardian
@@ -30,12 +30,4 @@ const deployLendingPairFactory: DeployFunction = async function (hre: HardhatRun
     console.log("New Lending Pair Created tx:",tx.hash)
 }
 
-export default deployLendingPairFactory
-deployLendingPairFactory.tags = [ContractId.LendingPairFactory]
-deployLendingPairFactory.dependencies = [
-  ContractId.LendingPair,
-  ContractId.DebtToken,
-  ContractId.CollateralWrapperToken,
-  ContractId.WrapperToken,
-  ContractId.RewardDistributorManager
-]
+export default createLendingPair
