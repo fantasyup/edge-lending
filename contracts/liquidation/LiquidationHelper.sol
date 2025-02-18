@@ -44,11 +44,11 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2, Withdrawable {
 
     constructor(
         address _addressProvider,
+        IBalancerVaultV2 _balancerVault,
         bytes32[] memory _balancerPoolIds,
-        IBSLendingPair[] memory _edgePairs,
-        IBalancerVaultV2 _vault
+        IBSLendingPair[] memory _edgePairs
     ) public FlashLoanReceiverBaseV2(_addressProvider) {
-        require(address(_vault) != address(0), "Invalid Balancer Vault");
+        require(address(_balancerVault) != address(0), "Invalid Balancer Vault");
 
         for (uint256 i = 0; i < _edgePairs.length; i++) {
             address asset = address(_edgePairs[i].asset());
@@ -57,49 +57,7 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2, Withdrawable {
             assetToEdgePair[asset] = _edgePairs[i];
             balancerPoolIds[asset] = _balancerPoolIds[i];
         }
-    }
-
-    /**
-     * @dev This function must be called only be the LENDING_POOL and takes care of repaying
-     * active debt positions, migrating collateral and incurring new V2 debt token debt.
-     *
-     * @param assets The array of flash loaned assets used to repay debts.
-     * @param amounts The array of flash loaned asset amounts used to repay debts.
-     * @param premiums The array of premiums incurred as additional debts.
-     * @param initiator The address that initiated the flash loan, unused.
-     * @param params The byte array containing
-     */
-    function executeOperation(
-        address[] calldata assets,
-        uint256[] calldata amounts,
-        uint256[] calldata premiums,
-        address initiator,
-        bytes calldata params
-    ) external override returns (bool) {
-        LiquidationParams memory decodedParams = _decodeParams(params);
-
-        require(
-            assets.length == 1 && assets[0] == decodedParams.borrowedAsset,
-            "INCONSISTENT_PARAMS"
-        );
-
-        _liquidateAndSwap(
-            decodedParams.pair,
-            decodedParams.collateralAsset,
-            decodedParams.borrowedAsset,
-            decodedParams.user,
-            amounts[0],
-            premiums[0],
-            initiator
-        );
-
-        // Approve the LendingPool contract allowance to *pull* the owed amount
-        for (uint256 i = 0; i < assets.length; i++) {
-            uint256 amountOwing = amounts[i] + premiums[i];
-            IERC20(assets[i]).approve(address(LENDING_POOL), amountOwing);
-        }
-
-        return true;
+        balancerVault = _balancerVault;
     }
 
     /**
@@ -215,6 +173,49 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2, Withdrawable {
             abi.decode(params, (address, address, address, address));
 
         return LiquidationParams(pair, collateralAsset, borrowedAsset, user);
+    }
+
+    /**
+     * @dev This function must be called only be the LENDING_POOL and takes care of repaying
+     * active debt positions, migrating collateral and incurring new V2 debt token debt.
+     *
+     * @param assets The array of flash loaned assets used to repay debts.
+     * @param amounts The array of flash loaned asset amounts used to repay debts.
+     * @param premiums The array of premiums incurred as additional debts.
+     * @param initiator The address that initiated the flash loan, unused.
+     * @param params The byte array containing
+     */
+    function executeOperation(
+        address[] calldata assets,
+        uint256[] calldata amounts,
+        uint256[] calldata premiums,
+        address initiator,
+        bytes calldata params
+    ) external override returns (bool) {
+        LiquidationParams memory decodedParams = _decodeParams(params);
+
+        require(
+            assets.length == 1 && assets[0] == decodedParams.borrowedAsset,
+            "INCONSISTENT_PARAMS"
+        );
+
+        _liquidateAndSwap(
+            decodedParams.pair,
+            decodedParams.collateralAsset,
+            decodedParams.borrowedAsset,
+            decodedParams.user,
+            amounts[0],
+            premiums[0],
+            initiator
+        );
+
+        // Approve the LendingPool contract allowance to *pull* the owed amount
+        for (uint256 i = 0; i < assets.length; i++) {
+            uint256 amountOwing = amounts[i] + premiums[i];
+            IERC20(assets[i]).approve(address(LENDING_POOL), amountOwing);
+        }
+
+        return true;
     }
 
     /**
