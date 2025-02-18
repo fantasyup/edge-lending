@@ -8,6 +8,7 @@ import "solidity-coverage"
 import "hardhat-tracer"
 import "hardhat-deploy"
 import 'hardhat-deploy-ethers'
+import './helpers/deploy/constants.tst'
 // import "hardhat-gas-reporter"
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -17,67 +18,6 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
     console.log(await account.address);
   }
 });
-
-task('deploypair', 'Deploy New Lending-Pair')
-  .addParam('factory', "The LendingPairFactory's address")
-  .addParam('pair', "The LendingPair's name")
-  .setAction(async (taskArgs, hre) => {
-
-    const PAIRS = {
-      'ETH-USDC-PAIR': {
-        Symbol: 'ETHUSDC',
-        PauseGuardian: '0x0000000000000000000000000000000000000000',
-        CollateralAsset: '0x0000000000000000000000000000000000000000',
-        BorrowVars: {
-          borrowAsset: '0x0000000000000000000000000000000000000000',
-          initialExchangeRateMantissa: '0',
-          reserveFactorMantissa: '0',
-          collateralFactor: '0',
-          liquidationFee: '0',
-          interestRateModel: '0x0000000000000000000000000000000000000000',
-        },
-      },
-    }
-
-    const Pair = PAIRS['ETH-USDC-PAIR'];
-    const BorrowVar = PAIRS['ETH-USDC-PAIR']['BorrowVars'];
-
-    const borrowAsset = BorrowVar['borrowAsset']
-    const initialExchangeRateMantissa =
-    BorrowVar['initialExchangeRateMantissa']
-    const reserveFactorMantissa =
-    BorrowVar['reserveFactorMantissa']
-    const collateralFactor =
-    BorrowVar['collateralFactor']
-    const liquidationFee =
-    BorrowVar['liquidationFee']
-    const interestRateModel =
-    BorrowVar['interestRateModel']
-
-    const _borrowVars = {
-      borrowAsset,
-      initialExchangeRateMantissa,
-      reserveFactorMantissa,
-      collateralFactor,
-      liquidationFee,
-      interestRateModel,
-    }
-    const lendingPairFactory = await hre.ethers.getContractFactory(
-      'LendingPairFactory'
-    )
-  
-    const lendingPairContract = await lendingPairFactory.attach(
-      taskArgs['factory']
-    )
-    const tx = await lendingPairContract.createLendingPairWithProxy(
-      taskArgs['pair'],
-      Pair['Symbol'],
-      Pair['PauseGuardian'],
-      Pair['CollateralAsset'],
-      _borrowVars
-    )
-    console.log('tx',tx);
-  })
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY || "429eb57532b54560b1d4cc4201724bf0";
 
