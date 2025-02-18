@@ -2,6 +2,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 import { ContractId } from '../helpers/types';
 import { getLendingPairFactoryDeployment } from '../helpers/contracts';
+
 const createLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const lendingPairFactory = await getLendingPairFactoryDeployment();
   if (
