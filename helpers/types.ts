@@ -62,6 +62,22 @@ export interface IApproveMessageData {
     contract: EthereumAddress
 }
 
+
+export interface PAIRS {
+    [pair: string]: {
+      Symbol: string,
+      PauseGuardian: string,
+      CollateralAsset: string,
+      BorrowVars: {
+        borrowAsset: string,
+        initialExchangeRateMantissa: string,
+        reserveFactorMantissa: string,
+        collateralFactor: string,
+        liquidationFee: string,
+        interestRateModel: string,
+      },
+    },
+}
 export interface IDelegateBorrowMessageData {
     from: EthereumAddress,
     to: EthereumAddress,
