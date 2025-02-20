@@ -5,18 +5,18 @@
 import { Contract, Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 
-import type { IRewardDistributorManager } from "../IRewardDistributorManager";
+import type { RewardDistributorManagerStorageV1 } from "../RewardDistributorManagerStorageV1";
 
-export class IRewardDistributorManager__factory {
+export class RewardDistributorManagerStorageV1__factory {
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IRewardDistributorManager {
+  ): RewardDistributorManagerStorageV1 {
     return new Contract(
       address,
       _abi,
       signerOrProvider
-    ) as IRewardDistributorManager;
+    ) as RewardDistributorManagerStorageV1;
   }
 }
 
@@ -44,6 +44,25 @@ const _abi = [
       },
     ],
     name: "AddReward",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "bytes32",
+        name: "uuid",
+        type: "bytes32",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "codeAddress",
+        type: "address",
+      },
+    ],
+    name: "CodeUpdated",
     type: "event",
   },
   {
@@ -193,6 +212,64 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "contract IRewardDistributor",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "approvedDistributors",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getCodeAddress",
+    outputs: [
+      {
+        internalType: "address",
+        name: "codeAddress",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "proxiableUUID",
+    outputs: [
+      {
+        internalType: "bytes32",
+        name: "",
+        type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "_tokenAddr",
         type: "address",
@@ -204,6 +281,43 @@ const _abi = [
       },
     ],
     name: "removeReward",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "tokenRewardToDistributors",
+    outputs: [
+      {
+        internalType: "contract IRewardDistributor",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newAddress",
+        type: "address",
+      },
+    ],
+    name: "updateCode",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

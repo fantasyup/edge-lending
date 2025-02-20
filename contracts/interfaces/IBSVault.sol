@@ -52,7 +52,7 @@ interface IBSVault is IERC3156FlashLender {
 
     event Approval(address indexed user, address indexed allowed, bool status);
 
-    event OwnershipAccepted(address newOwner, uint256 timestamp);
+    event OwnershipAccepted(address prevOwner, address newOwner, uint256 timestamp);
 
     event RegisterProtocol(address sender);
 

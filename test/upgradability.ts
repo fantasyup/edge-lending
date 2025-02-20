@@ -12,8 +12,13 @@ describe("UUPSProxy", function() {
 
     before(async function() {
         const deployment = await deployments.fixture(ContractId.UUPSProxy)
-        UUPSProxy = await ethers.getContractAt(ContractId.UUPSProxy, deployment[ContractId.UUPSProxy].address) as BUUPSProxy
         MockLendingPair = await deployMockLendingPair()
+        if (!(await deployments.getOrNull(ContractId.UUPSProxy))) {
+            // deploy mock
+            UUPSProxy = await deployUUPSProxy();
+        } else {
+            UUPSProxy = await ethers.getContractAt(ContractId.UUPSProxy, deployment[ContractId.UUPSProxy].address) as BUUPSProxy
+        }
     })
 
     describe("initializeProxy", function() {

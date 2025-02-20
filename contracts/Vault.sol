@@ -16,7 +16,7 @@ import "./VaultBase.sol";
 /// It represents the deposited token amount in form of shares
 /// This contract implements the EIP3156 IERC3156FlashBorrower for flashloans.
 /// Rebasing tokens ARE NOT supported and WILL cause loss of funds.
-/// 
+///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 contract Vault is VaultBase {
@@ -48,13 +48,13 @@ contract Vault is VaultBase {
         require(flashLoanRate < MAX_FLASHLOAN_RATE, "INVALID_RATE");
 
         __init_ReentrancyGuard();
-        
+
         _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(
             _EIP712_TYPE_HASH,
             _HASHED_NAME,
             _HASHED_VERSION
         );
-        
+
         flashLoanRate = _flashLoanRate;
         owner = _owner;
     }
@@ -80,7 +80,7 @@ contract Vault is VaultBase {
         allowedContracts[_contract] = _status;
         emit AllowContract(_contract, _status);
     }
-    
+
     /// @notice approve a contract to enable the contract to withdraw
     function approveContract(
         address _user,
@@ -111,9 +111,10 @@ contract Vault is VaultBase {
                         keccak256(
                             abi.encode(
                                 _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
-                                _status
-                                    // solhint-disable-next-line
-                                    ? keccak256("Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission")
+                                _status // solhint-disable-next-line
+                                    ? keccak256(
+                                        "Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission"
+                                    )
                                     : keccak256(
                                         "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
                                     ),
@@ -126,8 +127,8 @@ contract Vault is VaultBase {
                     )
                 );
 
-                address recoveredAddress = ecrecover(digest, v, r, s);
-                require(recoveredAddress == _user, "INVALID_SIGNATURE");
+            address recoveredAddress = ecrecover(digest, v, r, s);
+            require(recoveredAddress == _user, "INVALID_SIGNATURE");
         }
 
         userApprovedContracts[_user][_contract] = _status;
@@ -157,7 +158,14 @@ contract Vault is VaultBase {
         address _from,
         address _to,
         uint256 _amount
-    ) external override whenNotPaused allowed(_from) nonReentrant returns (uint256 amountOut, uint256 shareOut) {
+    )
+        external
+        override
+        whenNotPaused
+        allowed(_from)
+        nonReentrant
+        returns (uint256 amountOut, uint256 shareOut)
+    {
         // Checks
         require(_to != address(0), "INVALID_TO_ADDRESS");
 
@@ -169,7 +177,7 @@ contract Vault is VaultBase {
         _token.safeTransferFrom(_from, address(this), _amount);
 
         balanceOf[_token][_to] = balanceOf[_token][_to] + shareOut;
-        
+
         TotalBase storage total = totals[_token];
         total.totalUnderlyingDeposit += _amount;
         total.totalSharesMinted += shareOut;
@@ -202,9 +210,8 @@ contract Vault is VaultBase {
 
         // prevents the ratio from being reset
         require(
-            total.totalSharesMinted >= MINIMUM_SHARE_BALANCE
-            || 
-            total.totalSharesMinted == 0, "INVALID_RATIO"
+            total.totalSharesMinted >= MINIMUM_SHARE_BALANCE || total.totalSharesMinted == 0,
+            "INVALID_RATIO"
         );
 
         _token.safeTransfer(_to, amountOut);
@@ -229,14 +236,17 @@ contract Vault is VaultBase {
     /// @notice accept transfer of control
     function acceptOwnership() external {
         require(msg.sender == newOwner, "invalid owner");
+
+        // emit event before state change to do not trigger null address
+        emit OwnershipAccepted(owner, newOwner, block.timestamp);
+
         owner = newOwner;
         newOwner = address(0);
-        emit OwnershipAccepted(newOwner, block.timestamp);
     }
 
     /// @notice Transfer control from current owner address to another
     /// @param _newOwner The new team
-    function transferToNewOwner(address _newOwner) external onlyOwner {
+    function transferOwnership(address _newOwner) external onlyOwner {
         require(_newOwner != address(0), "INVALID_NEW_OWNER");
         newOwner = _newOwner;
         emit TransferControl(_newOwner, block.timestamp);
@@ -300,7 +310,7 @@ contract Vault is VaultBase {
 
         uint256 receivedFees = token.balanceOf(address(this)) - tokenBalBefore;
         require(receivedFees >= fee, "not enough fees");
-        
+
         totals[IERC20(_token)].totalUnderlyingDeposit += fee;
 
         emit FlashLoan(msg.sender, token, _amount, fee, address(_receiver));

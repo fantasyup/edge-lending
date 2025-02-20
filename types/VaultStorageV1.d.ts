@@ -175,7 +175,7 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
     "CodeUpdated(bytes32,address)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "RegisterProtocol(address)": EventFragment;
     "RescueFunds(address,uint256)": EventFragment;
@@ -1025,11 +1025,12 @@ export class VaultStorageV1 extends Contract {
     >;
 
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
     >;
 
     Paused(account: null): TypedEventFilter<[string], { account: string }>;

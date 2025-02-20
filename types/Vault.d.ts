@@ -45,7 +45,7 @@ interface VaultInterface extends ethers.utils.Interface {
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
     "transfer(address,address,address,uint256)": FunctionFragment;
-    "transferToNewOwner(address)": FunctionFragment;
+    "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
     "updateCode(address)": FunctionFragment;
     "updateFlashloanRate(uint256)": FunctionFragment;
@@ -131,7 +131,7 @@ interface VaultInterface extends ethers.utils.Interface {
     values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferToNewOwner",
+    functionFragment: "transferOwnership",
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
@@ -212,7 +212,7 @@ interface VaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "totals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "transferToNewOwner",
+    functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
@@ -238,7 +238,7 @@ interface VaultInterface extends ethers.utils.Interface {
     "CodeUpdated(bytes32,address)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "RegisterProtocol(address)": EventFragment;
     "RescueFunds(address,uint256)": EventFragment;
@@ -553,12 +553,12 @@ export class Vault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -868,12 +868,12 @@ export class Vault extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  transferToNewOwner(
+  transferOwnership(
     _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transferToNewOwner(address)"(
+  "transferOwnership(address)"(
     _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1176,12 +1176,12 @@ export class Vault extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1311,11 +1311,12 @@ export class Vault extends Contract {
     >;
 
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
     >;
 
     Paused(account: null): TypedEventFilter<[string], { account: string }>;
@@ -1599,12 +1600,12 @@ export class Vault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1917,12 +1918,12 @@ export class Vault extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

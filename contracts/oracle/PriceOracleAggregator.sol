@@ -100,14 +100,17 @@ contract PriceOracleAggregator is IPriceOracleAggregator {
     /// @notice accept transfer of control
     function acceptOwnership() external {
         require(msg.sender == newOwner, "invalid owner");
+
+        // emit event before state change to do not trigger null address
+        emit OwnershipAccepted(owner, newOwner, block.timestamp);
+
         owner = newOwner;
         newOwner = address(0);
-        emit OwnershipAccepted(newOwner, block.timestamp);
     }
 
     /// @notice Transfer control from current owner address to another
     /// @param _newOwner The new team
-    function transferToNewOwner(address _newOwner) external onlyOwner {
+    function transferOwnership(address _newOwner) external onlyOwner {
         require(_newOwner != address(0), "INVALID_NEW_OWNER");
         newOwner = _newOwner;
         emit TransferControl(_newOwner, block.timestamp);

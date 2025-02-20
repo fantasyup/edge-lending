@@ -19,13 +19,17 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
+interface RewardDistributorManagerStorageV1Interface
+  extends ethers.utils.Interface {
   functions: {
     "accumulateRewards(address,address)": FunctionFragment;
     "activateReward(address)": FunctionFragment;
+    "approvedDistributors(address)": FunctionFragment;
     "getCodeAddress()": FunctionFragment;
+    "owner()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "removeReward(address,address)": FunctionFragment;
+    "tokenRewardToDistributors(address,uint256)": FunctionFragment;
     "updateCode(address)": FunctionFragment;
   };
 
@@ -38,9 +42,14 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "approvedDistributors",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getCodeAddress",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "proxiableUUID",
     values?: undefined
@@ -48,6 +57,10 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "removeReward",
     values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenRewardToDistributors",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "updateCode", values: [string]): string;
 
@@ -60,15 +73,24 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "approvedDistributors",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getCodeAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "proxiableUUID",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "removeReward",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenRewardToDistributors",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "updateCode", data: BytesLike): Result;
@@ -92,7 +114,7 @@ interface MockRewardDistributorManagerInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
 }
 
-export class MockRewardDistributorManager extends Contract {
+export class RewardDistributorManagerStorageV1 extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -133,30 +155,40 @@ export class MockRewardDistributorManager extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: MockRewardDistributorManagerInterface;
+  interface: RewardDistributorManagerStorageV1Interface;
 
   functions: {
     accumulateRewards(
       _from: string,
       _to: string,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     activateReward(
       _tokenAddr: string,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     "activateReward(address)"(
       _tokenAddr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    approvedDistributors(
+      arg0: string,
       overrides?: CallOverrides
-    ): Promise<[void]>;
+    ): Promise<[boolean]>;
+
+    "approvedDistributors(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     getCodeAddress(
       overrides?: CallOverrides
@@ -166,6 +198,10 @@ export class MockRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<[string] & { codeAddress: string }>;
 
+    owner(overrides?: CallOverrides): Promise<[string]>;
+
+    "owner()"(overrides?: CallOverrides): Promise<[string]>;
+
     proxiableUUID(overrides?: CallOverrides): Promise<[string]>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
@@ -173,14 +209,26 @@ export class MockRewardDistributorManager extends Contract {
     removeReward(
       _tokenAddr: string,
       _distributor: string,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     "removeReward(address,address)"(
       _tokenAddr: string,
       _distributor: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[void]>;
+    ): Promise<[string]>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     updateCode(
       newAddress: string,
@@ -196,25 +244,42 @@ export class MockRewardDistributorManager extends Contract {
   accumulateRewards(
     _from: string,
     _to: string,
-    overrides?: CallOverrides
-  ): Promise<void>;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   "accumulateRewards(address,address)"(
     _from: string,
     _to: string,
-    overrides?: CallOverrides
-  ): Promise<void>;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  activateReward(_tokenAddr: string, overrides?: CallOverrides): Promise<void>;
+  activateReward(
+    _tokenAddr: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   "activateReward(address)"(
     _tokenAddr: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  approvedDistributors(
+    arg0: string,
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<boolean>;
+
+  "approvedDistributors(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
   "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
+  owner(overrides?: CallOverrides): Promise<string>;
+
+  "owner()"(overrides?: CallOverrides): Promise<string>;
 
   proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
@@ -223,14 +288,26 @@ export class MockRewardDistributorManager extends Contract {
   removeReward(
     _tokenAddr: string,
     _distributor: string,
-    overrides?: CallOverrides
-  ): Promise<void>;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   "removeReward(address,address)"(
     _tokenAddr: string,
     _distributor: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  tokenRewardToDistributors(
+    arg0: string,
+    arg1: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<string>;
+
+  "tokenRewardToDistributors(address,uint256)"(
+    arg0: string,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   updateCode(
     newAddress: string,
@@ -265,9 +342,23 @@ export class MockRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    approvedDistributors(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "approvedDistributors(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     getCodeAddress(overrides?: CallOverrides): Promise<string>;
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<string>;
+
+    owner(overrides?: CallOverrides): Promise<string>;
+
+    "owner()"(overrides?: CallOverrides): Promise<string>;
 
     proxiableUUID(overrides?: CallOverrides): Promise<string>;
 
@@ -284,6 +375,18 @@ export class MockRewardDistributorManager extends Contract {
       _distributor: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     updateCode(newAddress: string, overrides?: CallOverrides): Promise<void>;
 
@@ -359,28 +462,42 @@ export class MockRewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     activateReward(
       _tokenAddr: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "activateReward(address)"(
       _tokenAddr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    approvedDistributors(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "approvedDistributors(address)"(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getCodeAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getCodeAddress()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     proxiableUUID(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -389,12 +506,24 @@ export class MockRewardDistributorManager extends Contract {
     removeReward(
       _tokenAddr: string,
       _distributor: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "removeReward(address,address)"(
       _tokenAddr: string,
       _distributor: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -413,22 +542,32 @@ export class MockRewardDistributorManager extends Contract {
     accumulateRewards(
       _from: string,
       _to: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "accumulateRewards(address,address)"(
       _from: string,
       _to: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     activateReward(
       _tokenAddr: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "activateReward(address)"(
       _tokenAddr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    approvedDistributors(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "approvedDistributors(address)"(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -438,6 +577,10 @@ export class MockRewardDistributorManager extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     proxiableUUID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -445,12 +588,24 @@ export class MockRewardDistributorManager extends Contract {
     removeReward(
       _tokenAddr: string,
       _distributor: string,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "removeReward(address,address)"(
       _tokenAddr: string,
       _distributor: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    tokenRewardToDistributors(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "tokenRewardToDistributors(address,uint256)"(
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

@@ -53,7 +53,7 @@ interface IPriceOracleAggregatorInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
     "StableTokenAdded(address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "UpdateOracle(address,address)": EventFragment;
@@ -207,11 +207,12 @@ export class IPriceOracleAggregator extends Contract {
 
   filters: {
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
     >;
 
     StableTokenAdded(
