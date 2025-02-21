@@ -17,6 +17,9 @@ import {
     FeeWithdrawal,
     MockUniswapV2Router02,
     MockVaultUser,
+    MockBalancerVault,
+    MockAaveLendingPool,
+    MockLiquidationHelper
 } from "../types";
 import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
@@ -445,4 +448,18 @@ export const deployMockVaultUser = async () => {
         ContractId.MockVaultUser,
         []
     )
+}
+
+/////////// For liquidation Helper
+export const deployMockBalancerVault = async() => {
+    return await deployContract<MockBalancerVault>(ContractId.MockBalancerVault, [])
+}
+
+
+export const deployMockAaveLendingPool = async(premium: number) => {
+    return await deployContract<MockAaveLendingPool>(ContractId.MockAaveLendingPool, [premium])
+}
+
+export const deployMockLiquidationHelper = async(balancerVault: EthereumAddress, edgeVault: EthereumAddress, pool: EthereumAddress, pairs: EthereumAddress[]) => {
+    return await deployContract<MockLiquidationHelper>(ContractId.MockLiquidationHelper, [balancerVault, edgeVault, pool, pairs])
 }

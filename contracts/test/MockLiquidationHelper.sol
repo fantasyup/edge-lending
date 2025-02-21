@@ -1,37 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
-import "./aave/FlashLoanReceiverBaseV2.sol";
 import "../interfaces/aaveV2/ILendingPoolAddressesProviderV2.sol";
 import "../interfaces/aaveV2/ILendingPoolV2.sol";
 import "../interfaces/IBalancerVaultV2.sol";
 import "../interfaces/IBSLendingPair.sol";
-import "../interfaces/IBSVault.sol";
 
-////////////////////////////////////////////////////////////////////////////////////////////
-///
-/// @title LiquidationHelper
-/// @author @conlot-crypto
-/// @notice Element finance Principal(EFP) token Liquidator Contract.
-/// A contract that takes the flash loan from Aave.
-/// Repays the debt and liquidates the collateral via the EFP pools.
-/// Then uses the remaining funds to repay back the flashloan and keeps the rest as profit
-/// For USDC PT/USDC, wBTC PT/wBTC, DAI PT/DAI pairs
-///
-////////////////////////////////////////////////////////////////////////////////////////////
-
-contract LiquidationHelper is FlashLoanReceiverBaseV2 {
-    /// @dev Balancer V2 Vault
-    IBalancerVaultV2 public balancerVault;
-
-    /// @dev edge.finanace vault
-    IBSVault public immutable edgeVault;
-
-    /// @dev token asset => edge.finance lendingPair
+contract MockLiquidationHelper {
     mapping(address => IBSLendingPair) public assetToEdgePair;
-
-    /// @dev balancer Pool Ids
-    mapping(address => bytes32) public balancerPoolIds;
+    IBalancerVaultV2 public balancerVault;
+    IBSVault public immutable edgeVault;
+    ILendingPoolV2 public LENDING_POOL;
 
     struct LiquidationParams {
         address pair;
@@ -63,30 +42,21 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
     }
 
     constructor(
-        address _aaveAddressProvider,
         IBalancerVaultV2 _balancerVault,
         IBSVault _edgeVault,
-        bytes32[] memory _balancerPoolIds,
+        ILendingPoolV2 _pool,
         IBSLendingPair[] memory _edgePairs
-    ) public FlashLoanReceiverBaseV2(_aaveAddressProvider) {
-        require(address(_balancerVault) != address(0), "Invalid Balancer Vault");
-        require(address(_edgeVault) != address(0), "Invalid Edge Vault");
+    ) public {
+        balancerVault = _balancerVault;
+        LENDING_POOL = _pool;
+        edgeVault = _edgeVault;
 
         for (uint256 i = 0; i < _edgePairs.length; i++) {
             address asset = address(_edgePairs[i].asset());
-            require(asset != address(0), "Invalid Edge Lending Pair");
-
             assetToEdgePair[asset] = _edgePairs[i];
-            balancerPoolIds[asset] = _balancerPoolIds[i];
         }
-        balancerVault = _balancerVault;
-        edgeVault = _edgeVault;
     }
 
-    /**
-     * @dev
-     * @param params LiquidateAndSwapParams
-     */
     function _liquidateAndSwap(LiquidateAndSwapParams memory params) internal {
         LiquidationCallLocalVars memory vars;
         vars.initCollateralBalance = params.collateralAsset.balanceOf(address(this));
@@ -247,7 +217,7 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
         uint256[] calldata premiums,
         address initiator,
         bytes calldata params
-    ) external override returns (bool) {
+    ) public returns (bool) {
         LiquidationParams memory decodedParams = _decodeParams(params);
 
         require(

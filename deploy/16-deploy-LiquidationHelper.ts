@@ -6,7 +6,7 @@ import { ElementPTLiqudidationInfo } from "../helpers/constants";
 
 const deployLiquidationHelper: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {
-    deployments: { deploy },
+    deployments: { deploy, get },
     getNamedAccounts,
   } = hre;
   const { deployer } = await getNamedAccounts();
@@ -19,10 +19,11 @@ const deployLiquidationHelper: DeployFunction = async function (hre: HardhatRunt
 
   const balancerPoolIds = ElementPTs.map((e) => e.balancerPTPoolId);
   const edgePairs = ElementPTs.map((e) => e.edgePair);
+  const vault = await get(ContractId.Vault)
 
   await deploy(ContractId.LiquidationHelper, {
     from: deployer,
-    args: [AaveV2LendingPoolAddressProvider, BalancerV2Vault, balancerPoolIds, edgePairs],
+    args: [AaveV2LendingPoolAddressProvider, BalancerV2Vault, vault.address, balancerPoolIds, edgePairs],
     log: true,
     deterministicDeployment: true,
   });

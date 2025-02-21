@@ -32,7 +32,10 @@ export enum ContractId {
     // PriceOracleAggregatorProxy = 'PriceOracleAggregatorProxy',
     RewardDistributorManagerProxy = 'RewardDistributorManagerProxy',
     MockVaultUser = 'MockVaultUser',
-    LiquidationHelper = 'LiqudationHelper'
+    LiquidationHelper = 'LiquidationHelper',
+    MockBalancerVault = 'MockBalancerVault',
+    MockAaveLendingPool = 'MockAaveLendingPool',
+    MockLiquidationHelper = 'MockLiquidationHelper'
 }
 
 export enum LendingPairEdgeActions {

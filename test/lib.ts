@@ -41,7 +41,10 @@ import {
   getRewardDistributorDeployment,
   getRewardDistributorFactoryDeployment,
   getRewardDistributorManagerDeployment,
-  getFeeWithdrawalDeployment
+  getFeeWithdrawalDeployment,
+  deployMockBalancerVault,
+  deployMockAaveLendingPool,
+  deployMockLiquidationHelper,
 } from "../helpers/contracts";
 import { ContractId, EthereumAddress } from "../helpers/types";
 import { 
@@ -561,3 +564,34 @@ export async function currentTimestamp() {
     const block = await (ethers.getDefaultProvider()).getBlock('latest')
     return block.timestamp
 }
+
+
+export const setupLiquidationHelper = async (vars: TestVars) => {
+    const { Vault, LendingPair, accounts: [admin, bob]} = vars;
+
+    const AaveFlashLoanFee = 10;
+    const MockBalancerVault = await deployMockBalancerVault();
+    const MockAaveLendingPool = await deployMockAaveLendingPool(AaveFlashLoanFee);
+    const MockLiquidationHelper = await deployMockLiquidationHelper(
+      MockBalancerVault.address,
+      Vault.address,
+      MockAaveLendingPool.address,
+      [LendingPair.address]
+    );
+
+    await Vault.connect(bob.signer).allowContract(
+        MockLiquidationHelper.address,
+        true
+    );
+    await Vault.connect(bob.signer).allowContract(
+        LendingPair.address,
+        true
+    );
+
+    return {
+      MockLiquidationHelper,
+      MockBalancerVault,
+      MockAaveLendingPool,
+      AaveFlashLoanFee
+    };
+  };

@@ -8,7 +8,6 @@ import {
     ILendingPoolAddressesProviderV2
 } from "../../interfaces/aaveV2/ILendingPoolAddressesProviderV2.sol";
 import {ILendingPoolV2} from "../../interfaces/aaveV2/ILendingPoolV2.sol";
-import "./Withdrawable.sol";
 
 /** 
     !!!
