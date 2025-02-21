@@ -19,9 +19,9 @@ import {
     MockVaultUser,
     MockBalancerVault,
     MockAaveLendingPool,
-    MockLiquidationHelper
+    MockLiquidationHelper,
 } from "../types";
-import { DataTypes } from "../types/DataTypes";
+// import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
 import { MockChainlinkUSDAdapter } from "../types/MockChainlinkUSDAdapter";
 import { TestVars } from "../test/lib";
@@ -68,9 +68,9 @@ export const deployAndInitUUPSProxy = async(
     }
 }
 
-export const deployDataTypesLib = async () => {
-    return await deployContract<DataTypes>('DataTypes', [])
-}
+// export const deployDataTypesLib = async () => {
+//     return await deployContract<DataTypes>('DataTypes', [])
+// }
 
 export const deployVault = async() => {
     return await deployContract<Vault>(ContractId.Vault, [])
