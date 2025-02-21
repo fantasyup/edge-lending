@@ -21,10 +21,8 @@ import {
     MockAaveLendingPool,
     MockLiquidationHelper,
 } from "../types";
-// import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
 import { MockChainlinkUSDAdapter } from "../types/MockChainlinkUSDAdapter";
-import { TestVars } from "../test/lib";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
@@ -67,10 +65,6 @@ export const deployAndInitUUPSProxy = async(
         console.log(`Successfully Initialized ${id} proxy`)
     }
 }
-
-// export const deployDataTypesLib = async () => {
-//     return await deployContract<DataTypes>('DataTypes', [])
-// }
 
 export const deployVault = async() => {
     return await deployContract<Vault>(ContractId.Vault, [])
