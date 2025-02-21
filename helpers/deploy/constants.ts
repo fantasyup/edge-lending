@@ -1,14 +1,14 @@
-import {PAIRS} from '../types';
+import { IPAIRS } from '../types';
 import { BigNumber, Event, Signer } from "ethers";
 
 const liquidationFee = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
 const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
-export const _PAIRS: PAIRS = {
+export const _PAIRS: IPAIRS = {
   'ETH-USDC-PAIR': {
-    Symbol: 'ETHUSDC',
-    PauseGuardian: '0x0000000000000000000000000000000000000000',
-    CollateralAsset: '0x0000000000000000000000000000000000000000',
-    BorrowVars: {
+    symbol: 'ETHUSDC',
+    pauseGuardian: '0x0000000000000000000000000000000000000000',
+    collateralAsset: '0x0000000000000000000000000000000000000000',
+    borrowVars: {
       borrowAsset: '0x0000000000000000000000000000000000000000',
       initialExchangeRateMantissa: '0',
       reserveFactorMantissa: '0',
@@ -18,10 +18,10 @@ export const _PAIRS: PAIRS = {
     },
   },
   'TEST-PAIR': {
-    Symbol: 'ETHUSDC',
-    PauseGuardian: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-    CollateralAsset: '0x1484a6020A0F08400F6f56715016d2C80e26cDC1',
-    BorrowVars: {
+    symbol: 'ETHUSDC',
+    pauseGuardian: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    collateralAsset: '0x1484a6020A0F08400F6f56715016d2C80e26cDC1',
+    borrowVars: {
       borrowAsset: '0x1484a6020A0F08400F6f56715016d2C80e26cDC1',
       initialExchangeRateMantissa: '1000000000000000000',
       reserveFactorMantissa: '500000000000000000',

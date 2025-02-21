@@ -63,12 +63,12 @@ export interface IApproveMessageData {
 }
 
 
-export interface PAIRS {
+export interface IPAIRS {
     [pair: string]: {
-      Symbol: string,
-      PauseGuardian: string,
-      CollateralAsset: string,
-      BorrowVars: {
+      symbol: string,
+      pauseGuardian: string,
+      collateralAsset: string,
+      borrowVars: {
         borrowAsset: string,
         initialExchangeRateMantissa: string,
         reserveFactorMantissa: string,
