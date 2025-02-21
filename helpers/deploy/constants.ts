@@ -1,4 +1,8 @@
 import {PAIRS} from '../types';
+import { BigNumber, Event, Signer } from "ethers";
+
+const liquidationFee = BigNumber.from(5).mul(BigNumber.from(10).pow(16))
+const collateralFactor = BigNumber.from(15).mul(BigNumber.from(10).pow(17))
 export const _PAIRS: PAIRS = {
   'ETH-USDC-PAIR': {
     Symbol: 'ETHUSDC',
@@ -11,6 +15,19 @@ export const _PAIRS: PAIRS = {
       collateralFactor: '0',
       liquidationFee: '0',
       interestRateModel: '0x0000000000000000000000000000000000000000',
+    },
+  },
+  'TEST-PAIR': {
+    Symbol: 'ETHUSDC',
+    PauseGuardian: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    CollateralAsset: '0x1484a6020A0F08400F6f56715016d2C80e26cDC1',
+    BorrowVars: {
+      borrowAsset: '0x1484a6020A0F08400F6f56715016d2C80e26cDC1',
+      initialExchangeRateMantissa: '1000000000000000000',
+      reserveFactorMantissa: '500000000000000000',
+      collateralFactor: collateralFactor.toString(),
+      liquidationFee: liquidationFee.toString(),
+      interestRateModel: '0x8a8e3698779b556e65ec1fe9fc1e2892f7a19e2b',
     },
   },
 }

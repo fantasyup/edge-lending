@@ -1,7 +1,24 @@
 import { task } from "hardhat/config";
 import {_PAIRS} from '../helpers/deploy/constants';
 import { ContractId,  } from "../helpers/types"
-
+import { getLendingPairFactoryDeployment } from '../helpers/contracts';
+import { 
+    CollateralWrapperToken,
+    DebtToken,
+    IPriceOracleAggregator,
+    JumpRateModelV2,
+    LendingPair,
+    LendingPairFactory,
+    MockFlashBorrower,
+    MockLendingPair,
+    MockPriceOracle,
+    MockToken,
+    MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken,
+    FeeWithdrawal,
+    MockUniswapV2Router02,
+    MockVaultUser,
+} from "../types";
+import { string } from "hardhat/internal/core/params/argumentTypes";
 task('deploypair', 'Deploy New Lending-Pair')
   .addParam('pair', "The LendingPair's name")
   .setAction(async (taskArgs, hre) => {
@@ -41,13 +58,19 @@ task('deploypair', 'Deploy New Lending-Pair')
     const lendingPairContract = await lendingPairFactory.attach(
         lendingPairFactoryAddress
       )
-      
-    const tx = await lendingPairContract.createLendingPairWithProxy(
+    const accounts = await hre.ethers.getSigners();
+
+    const tx = await (await lendingPairContract.connect(accounts[0]).createLendingPairWithProxy(
       pairName,
       Pair.Symbol,
       Pair.PauseGuardian,
       Pair.CollateralAsset,
-      _borrowVars
-    )
-    console.log('tx',tx);
+      Pair.BorrowVars
+    )).wait();
+
+    if (tx.events[1].event === 'NewLendingPair'){
+        console.log('NewLendingPair: ', tx.events[1]!.args!.pair);
+    }
+    console.log(`tx hash:`, `https://etherscan.io/tx/${tx.transactionHash}`);
+
   })
