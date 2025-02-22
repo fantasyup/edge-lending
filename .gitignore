@@ -14,3 +14,5 @@ Flattened.sol
 *solcx-*
 deploy.txt
 exports
+.env
+.DS_Store
