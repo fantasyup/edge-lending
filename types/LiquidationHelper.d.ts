@@ -23,11 +23,9 @@ interface LiquidationHelperInterface extends ethers.utils.Interface {
   functions: {
     "ADDRESSES_PROVIDER()": FunctionFragment;
     "LENDING_POOL()": FunctionFragment;
-    "assetToEdgePair(address)": FunctionFragment;
-    "balancerPoolIds(address)": FunctionFragment;
     "balancerVault()": FunctionFragment;
     "executeOperation(address[],uint256[],uint256[],address,bytes)": FunctionFragment;
-    "flashLoanToLiquidate(address,address,uint256)": FunctionFragment;
+    "flashLoanToLiquidate(address,address[],uint256)": FunctionFragment;
     "edgeVault()": FunctionFragment;
   };
 
@@ -40,14 +38,6 @@ interface LiquidationHelperInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "assetToEdgePair",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "balancerPoolIds",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "balancerVault",
     values?: undefined
   ): string;
@@ -57,7 +47,7 @@ interface LiquidationHelperInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "flashLoanToLiquidate",
-    values: [string, string, BigNumberish]
+    values: [string, string[], BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "edgeVault", values?: undefined): string;
 
@@ -67,14 +57,6 @@ interface LiquidationHelperInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "LENDING_POOL",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "assetToEdgePair",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "balancerPoolIds",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -146,20 +128,6 @@ export class LiquidationHelper extends Contract {
 
     "LENDING_POOL()"(overrides?: CallOverrides): Promise<[string]>;
 
-    assetToEdgePair(arg0: string, overrides?: CallOverrides): Promise<[string]>;
-
-    "assetToEdgePair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    balancerPoolIds(arg0: string, overrides?: CallOverrides): Promise<[string]>;
-
-    "balancerPoolIds(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     balancerVault(overrides?: CallOverrides): Promise<[string]>;
 
     "balancerVault()"(overrides?: CallOverrides): Promise<[string]>;
@@ -183,15 +151,15 @@ export class LiquidationHelper extends Contract {
     ): Promise<ContractTransaction>;
 
     flashLoanToLiquidate(
-      asset: string,
-      borrower: string,
+      pair: string,
+      borrowers: string[],
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "flashLoanToLiquidate(address,address,uint256)"(
-      asset: string,
-      borrower: string,
+    "flashLoanToLiquidate(address,address[],uint256)"(
+      pair: string,
+      borrowers: string[],
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -208,20 +176,6 @@ export class LiquidationHelper extends Contract {
   LENDING_POOL(overrides?: CallOverrides): Promise<string>;
 
   "LENDING_POOL()"(overrides?: CallOverrides): Promise<string>;
-
-  assetToEdgePair(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-  "assetToEdgePair(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  balancerPoolIds(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-  "balancerPoolIds(address)"(
-    arg0: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
 
   balancerVault(overrides?: CallOverrides): Promise<string>;
 
@@ -246,15 +200,15 @@ export class LiquidationHelper extends Contract {
   ): Promise<ContractTransaction>;
 
   flashLoanToLiquidate(
-    asset: string,
-    borrower: string,
+    pair: string,
+    borrowers: string[],
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "flashLoanToLiquidate(address,address,uint256)"(
-    asset: string,
-    borrower: string,
+  "flashLoanToLiquidate(address,address[],uint256)"(
+    pair: string,
+    borrowers: string[],
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -271,20 +225,6 @@ export class LiquidationHelper extends Contract {
     LENDING_POOL(overrides?: CallOverrides): Promise<string>;
 
     "LENDING_POOL()"(overrides?: CallOverrides): Promise<string>;
-
-    assetToEdgePair(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-    "assetToEdgePair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    balancerPoolIds(arg0: string, overrides?: CallOverrides): Promise<string>;
-
-    "balancerPoolIds(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
 
     balancerVault(overrides?: CallOverrides): Promise<string>;
 
@@ -309,15 +249,15 @@ export class LiquidationHelper extends Contract {
     ): Promise<boolean>;
 
     flashLoanToLiquidate(
-      asset: string,
-      borrower: string,
+      pair: string,
+      borrowers: string[],
       amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "flashLoanToLiquidate(address,address,uint256)"(
-      asset: string,
-      borrower: string,
+    "flashLoanToLiquidate(address,address[],uint256)"(
+      pair: string,
+      borrowers: string[],
       amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -337,26 +277,6 @@ export class LiquidationHelper extends Contract {
     LENDING_POOL(overrides?: CallOverrides): Promise<BigNumber>;
 
     "LENDING_POOL()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    assetToEdgePair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "assetToEdgePair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    balancerPoolIds(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "balancerPoolIds(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     balancerVault(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -381,15 +301,15 @@ export class LiquidationHelper extends Contract {
     ): Promise<BigNumber>;
 
     flashLoanToLiquidate(
-      asset: string,
-      borrower: string,
+      pair: string,
+      borrowers: string[],
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "flashLoanToLiquidate(address,address,uint256)"(
-      asset: string,
-      borrower: string,
+    "flashLoanToLiquidate(address,address[],uint256)"(
+      pair: string,
+      borrowers: string[],
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -411,26 +331,6 @@ export class LiquidationHelper extends Contract {
     LENDING_POOL(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "LENDING_POOL()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    assetToEdgePair(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "assetToEdgePair(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    balancerPoolIds(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "balancerPoolIds(address)"(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     balancerVault(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -455,15 +355,15 @@ export class LiquidationHelper extends Contract {
     ): Promise<PopulatedTransaction>;
 
     flashLoanToLiquidate(
-      asset: string,
-      borrower: string,
+      pair: string,
+      borrowers: string[],
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "flashLoanToLiquidate(address,address,uint256)"(
-      asset: string,
-      borrower: string,
+    "flashLoanToLiquidate(address,address[],uint256)"(
+      pair: string,
+      borrowers: string[],
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

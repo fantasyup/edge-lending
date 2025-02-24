@@ -44,8 +44,8 @@ runTestSuite("liquidationHelper", (vars: TestVars) => {
     const prevCollaterBalance = (await CollateralAsset.balanceOf(frank.address)).toNumber();
 
     await MockLiquidationHelper.connect(frank.signer).flashLoanToLiquidate(
-      BorrowAsset.address,
-      james.address,
+      LendingPair.address,
+      [james.address],
       amountToDeposit * 3
     );
 

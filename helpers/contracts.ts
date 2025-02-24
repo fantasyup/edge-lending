@@ -454,6 +454,6 @@ export const deployMockAaveLendingPool = async(premium: number) => {
     return await deployContract<MockAaveLendingPool>(ContractId.MockAaveLendingPool, [premium])
 }
 
-export const deployMockLiquidationHelper = async(balancerVault: EthereumAddress, edgeVault: EthereumAddress, pool: EthereumAddress, pairs: EthereumAddress[]) => {
-    return await deployContract<MockLiquidationHelper>(ContractId.MockLiquidationHelper, [balancerVault, edgeVault, pool, pairs])
+export const deployMockLiquidationHelper = async(balancerVault: EthereumAddress, edgeVault: EthereumAddress, pool: EthereumAddress, ) => {
+    return await deployContract<MockLiquidationHelper>(ContractId.MockLiquidationHelper, [balancerVault, edgeVault, pool])
 }

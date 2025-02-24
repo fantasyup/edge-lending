@@ -575,8 +575,7 @@ export const setupLiquidationHelper = async (vars: TestVars) => {
     const MockLiquidationHelper = await deployMockLiquidationHelper(
       MockBalancerVault.address,
       Vault.address,
-      MockAaveLendingPool.address,
-      [LendingPair.address]
+      MockAaveLendingPool.address
     );
 
     await Vault.connect(bob.signer).allowContract(

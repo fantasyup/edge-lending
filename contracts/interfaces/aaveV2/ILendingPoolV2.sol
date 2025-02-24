@@ -2,7 +2,7 @@
 pragma solidity 0.8.1;
 
 import {ILendingPoolAddressesProviderV2} from "./ILendingPoolAddressesProviderV2.sol";
-import {AaveDataTypes} from "../../liquidation/aave/AaveDataTypes.sol";
+import {AaveDataTypes} from "../../libraries/AaveDataTypes.sol";
 
 interface ILendingPoolV2 {
     /**
