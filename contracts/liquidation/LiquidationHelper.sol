@@ -37,15 +37,7 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
         address collateralAsset;
         address borrowedAsset;
         address initiator;
-    }
-
-    struct LiquidateAndSwapParams {
-        IBSLendingPair pair;
-        IERC20 collateralAsset;
-        IERC20 borrowedAsset;
         address[] borrowers;
-        uint256 flashBorrowedAmount;
-        address initiator;
     }
 
     /// @dev Balancer V2 Vault
@@ -53,9 +45,6 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
 
     /// @dev edge.finanace vault
     IBSVault public immutable edgeVault;
-
-    /// @dev params to be used for liquidating and swapping on balancer
-    LiquidateAndSwapParams internal liquidateAndSwapParams;
 
     constructor(
         address _aaveAddressProvider,
@@ -71,94 +60,77 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
 
     /**
      * @dev
-     * @param params LiquidateAndSwapParams
+     * @param flashBorrowedAmount flash borrowed amount from Aave
+     * @param params FlashLoanParams parameters
+     * @param premium FlashLoanBorrow fee
      */
-    function _liquidateAndSwap(uint256 premium) internal {
+    function _liquidateAndSwap(
+        uint256 flashBorrowedAmount,
+        FlashLoanParams memory params,
+        uint256 premium
+    ) internal {
         LiquidationCallLocalVars memory vars;
-        vars.initCollateralBalance = liquidateAndSwapParams.collateralAsset.balanceOf(
-            address(this)
-        );
+        vars.initCollateralBalance = IERC20(params.collateralAsset).balanceOf(address(this));
 
-        if (
-            address(liquidateAndSwapParams.collateralAsset) !=
-            address(liquidateAndSwapParams.borrowedAsset)
-        ) {
-            vars.initFlashBorrowedBalance = liquidateAndSwapParams.borrowedAsset.balanceOf(
-                address(this)
-            );
+        if (params.collateralAsset != params.borrowedAsset) {
+            vars.initFlashBorrowedBalance = IERC20(params.borrowedAsset).balanceOf(address(this));
 
             // Track leftover balance to rescue funds in case of external transfers into this contract
-            vars.borrowedAssetLeftovers =
-                vars.initFlashBorrowedBalance -
-                liquidateAndSwapParams.flashBorrowedAmount;
+            vars.borrowedAssetLeftovers = vars.initFlashBorrowedBalance - flashBorrowedAmount;
         }
 
-        vars.flashLoanDebt = liquidateAndSwapParams.flashBorrowedAmount + premium;
+        vars.flashLoanDebt = flashBorrowedAmount + premium;
 
         // approve to deposit into vault
-        liquidateAndSwapParams.borrowedAsset.approve(
-            address(edgeVault),
-            liquidateAndSwapParams.flashBorrowedAmount
-        );
+        IERC20(params.borrowedAsset).approve(address(edgeVault), flashBorrowedAmount);
 
         // deposit borrwoed asset into edge vault
         edgeVault.deposit(
-            liquidateAndSwapParams.borrowedAsset,
+            IERC20(params.borrowedAsset),
             address(this),
             address(this),
-            liquidateAndSwapParams.flashBorrowedAmount
+            flashBorrowedAmount
         );
 
         // approve pair to transfer tokens
-        edgeVault.approveContract(
-            address(this),
-            address(liquidateAndSwapParams.pair),
-            true,
-            0,
-            0,
-            0
-        );
+        edgeVault.approveContract(address(this), address(params.pair), true, 0, 0, 0);
 
         // Liquidate the user position and release the underlying collateral
-        for (uint256 i = 0; i < liquidateAndSwapParams.borrowers.length; i++) {
-            liquidateAndSwapParams.pair.liquidate(liquidateAndSwapParams.borrowers[i]);
+        for (uint256 i = 0; i < params.borrowers.length; i++) {
+            IBSLendingPair(params.pair).liquidate(params.borrowers[i]);
         }
 
         // withdraw borrowasset from edge vault
         edgeVault.withdraw(
-            liquidateAndSwapParams.borrowedAsset,
+            IERC20(params.borrowedAsset),
             address(this),
             address(this),
-            edgeVault.balanceOf(liquidateAndSwapParams.borrowedAsset, address(this))
+            edgeVault.balanceOf(IERC20(params.borrowedAsset), address(this))
         );
 
         // withdraw collateral from edge vault
         uint256 collateralBalanceAfter =
             edgeVault.withdraw(
-                liquidateAndSwapParams.collateralAsset,
+                IERC20(params.collateralAsset),
                 address(this),
                 address(this),
-                edgeVault.balanceOf(liquidateAndSwapParams.collateralAsset, address(this))
+                edgeVault.balanceOf(IERC20(params.collateralAsset), address(this))
             );
 
         // Track only collateral released, not current asset balance of the contract
         vars.diffCollateralBalance = collateralBalanceAfter - vars.initCollateralBalance;
 
-        if (
-            address(liquidateAndSwapParams.collateralAsset) !=
-            address(liquidateAndSwapParams.borrowedAsset)
-        ) {
+        if (params.collateralAsset != params.borrowedAsset) {
             // Discover flash loan balance after the liquidation
-            uint256 flashBorrowedAssetAfter =
-                liquidateAndSwapParams.borrowedAsset.balanceOf(address(this));
+            uint256 flashBorrowedAssetAfter = IERC20(params.borrowedAsset).balanceOf(address(this));
 
             // Use only flash loan borrowed assets, not current asset balance of the contract
             vars.diffFlashBorrowedBalance = flashBorrowedAssetAfter - vars.borrowedAssetLeftovers;
 
             // Swap released collateral into the debt asset, to repay the flash loan
             vars.soldAmount = _swapTokensForExactTokens(
-                address(liquidateAndSwapParams.collateralAsset),
-                address(liquidateAndSwapParams.borrowedAsset),
+                params.collateralAsset,
+                params.borrowedAsset,
                 vars.diffCollateralBalance,
                 vars.flashLoanDebt - vars.diffFlashBorrowedBalance
             );
@@ -169,14 +141,11 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
         }
 
         // Allow repay of flash loan
-        liquidateAndSwapParams.borrowedAsset.approve(address(LENDING_POOL), vars.flashLoanDebt);
+        IERC20(params.borrowedAsset).approve(address(LENDING_POOL), vars.flashLoanDebt);
 
         // Transfer remaining tokens to initiator
         if (vars.remainingTokens > 0) {
-            liquidateAndSwapParams.collateralAsset.transfer(
-                liquidateAndSwapParams.initiator,
-                vars.remainingTokens
-            );
+            IERC20(params.collateralAsset).transfer(params.initiator, vars.remainingTokens);
         }
     }
 
@@ -224,10 +193,15 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
      * @return FlashLoanParams struct containing decoded params
      */
     function _decodeParams(bytes memory params) internal pure returns (FlashLoanParams memory) {
-        (address pair, address collateralAsset, address borrowedAsset, address initiator) =
-            abi.decode(params, (address, address, address, address));
+        (
+            address pair,
+            address collateralAsset,
+            address borrowedAsset,
+            address initiator,
+            address[] memory borrowers
+        ) = abi.decode(params, (address, address, address, address, address[]));
 
-        return FlashLoanParams(pair, collateralAsset, borrowedAsset, initiator);
+        return FlashLoanParams(pair, collateralAsset, borrowedAsset, initiator, borrowers);
     }
 
     /**
@@ -252,16 +226,11 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
         require(
             assets.length == 1 &&
                 assets[0] == decodedParams.borrowedAsset &&
-                decodedParams.borrowedAsset == address(liquidateAndSwapParams.borrowedAsset) &&
-                decodedParams.collateralAsset == address(liquidateAndSwapParams.collateralAsset) &&
-                decodedParams.initiator == liquidateAndSwapParams.initiator &&
-                decodedParams.pair == address(liquidateAndSwapParams.pair),
+                decodedParams.borrowers.length > 0,
             "INCONSISTENT_PARAMS"
         );
 
-        _liquidateAndSwap(premiums[0]);
-
-        delete liquidateAndSwapParams;
+        _liquidateAndSwap(amounts[0], decodedParams, premiums[0]);
 
         return true;
     }
@@ -290,16 +259,14 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
         amounts[0] = amount;
 
         bytes memory params =
-            abi.encode(address(pair), pair.collateralAsset(), pair.asset(), msg.sender);
-
-        liquidateAndSwapParams = LiquidateAndSwapParams({
-            pair: pair,
-            collateralAsset: pair.collateralAsset(),
-            borrowedAsset: pair.asset(),
-            borrowers: borrowers,
-            flashBorrowedAmount: amounts[0],
-            initiator: msg.sender
-        });
+            abi.encode(
+                address(pair),
+                pair.collateralAsset(),
+                pair.asset(),
+                msg.sender,
+                amount,
+                borrowers
+            );
 
         LENDING_POOL.flashLoan(
             address(this), // receiverAddress
