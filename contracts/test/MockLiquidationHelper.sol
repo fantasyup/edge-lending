@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 
+import "hardhat/console.sol";
 import "../interfaces/aaveV2/ILendingPoolAddressesProviderV2.sol";
 import "../interfaces/aaveV2/ILendingPoolV2.sol";
 import "../interfaces/IBalancerVaultV2.sol";
@@ -38,7 +39,6 @@ contract MockLiquidationHelper {
     IBSVault public immutable edgeVault;
     ILendingPoolV2 public LENDING_POOL;
     LiquidateAndSwapParams internal liquidateAndSwapParams;
-    
 
     constructor(
         IBalancerVaultV2 _balancerVault,
@@ -106,11 +106,7 @@ contract MockLiquidationHelper {
             liquidateAndSwapParams.borrowedAsset,
             address(this),
             address(this),
-            edgeVault.toShare(
-                liquidateAndSwapParams.borrowedAsset,
-                edgeVault.balanceOf(liquidateAndSwapParams.borrowedAsset, address(this)),
-                true
-            )
+            edgeVault.balanceOf(liquidateAndSwapParams.borrowedAsset, address(this))
         );
 
         // withdraw collateral from edge vault
@@ -119,11 +115,7 @@ contract MockLiquidationHelper {
                 liquidateAndSwapParams.collateralAsset,
                 address(this),
                 address(this),
-                edgeVault.toShare(
-                    liquidateAndSwapParams.collateralAsset,
-                    edgeVault.balanceOf(liquidateAndSwapParams.collateralAsset, address(this)),
-                    true
-                )
+                edgeVault.balanceOf(liquidateAndSwapParams.collateralAsset, address(this))
             );
 
         // Track only collateral released, not current asset balance of the contract

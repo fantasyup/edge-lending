@@ -129,11 +129,7 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
             liquidateAndSwapParams.borrowedAsset,
             address(this),
             address(this),
-            edgeVault.toShare(
-                liquidateAndSwapParams.borrowedAsset,
-                edgeVault.balanceOf(liquidateAndSwapParams.borrowedAsset, address(this)),
-                true
-            )
+            edgeVault.balanceOf(liquidateAndSwapParams.borrowedAsset, address(this))
         );
 
         // withdraw collateral from edge vault
@@ -142,11 +138,7 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
                 liquidateAndSwapParams.collateralAsset,
                 address(this),
                 address(this),
-                edgeVault.toShare(
-                    liquidateAndSwapParams.collateralAsset,
-                    edgeVault.balanceOf(liquidateAndSwapParams.collateralAsset, address(this)),
-                    true
-                )
+                edgeVault.balanceOf(liquidateAndSwapParams.collateralAsset, address(this))
             );
 
         // Track only collateral released, not current asset balance of the contract
