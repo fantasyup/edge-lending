@@ -17,11 +17,12 @@ import {
     FeeWithdrawal,
     MockUniswapV2Router02,
     MockVaultUser,
+    MockBalancerVault,
+    MockAaveLendingPool,
+    MockLiquidationHelper,
 } from "../types";
-import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
 import { MockChainlinkUSDAdapter } from "../types/MockChainlinkUSDAdapter";
-import { TestVars } from "../test/lib";
 
 export const deployContract = async<ContractType extends Contract>(
     contractName: string,
@@ -63,10 +64,6 @@ export const deployAndInitUUPSProxy = async(
         await (await uups.initializeProxy(implementation)).wait()
         console.log(`Successfully Initialized ${id} proxy`)
     }
-}
-
-export const deployDataTypesLib = async () => {
-    return await deployContract<DataTypes>('DataTypes', [])
 }
 
 export const deployVault = async() => {
@@ -445,4 +442,18 @@ export const deployMockVaultUser = async () => {
         ContractId.MockVaultUser,
         []
     )
+}
+
+/////////// For liquidation Helper
+export const deployMockBalancerVault = async() => {
+    return await deployContract<MockBalancerVault>(ContractId.MockBalancerVault, [])
+}
+
+
+export const deployMockAaveLendingPool = async(premium: number) => {
+    return await deployContract<MockAaveLendingPool>(ContractId.MockAaveLendingPool, [premium])
+}
+
+export const deployMockLiquidationHelper = async(balancerVault: EthereumAddress, edgeVault: EthereumAddress, pool: EthereumAddress, ) => {
+    return await deployContract<MockLiquidationHelper>(ContractId.MockLiquidationHelper, [balancerVault, edgeVault, pool])
 }

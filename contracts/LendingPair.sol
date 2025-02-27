@@ -762,7 +762,7 @@ contract LendingPair is IBSLendingPair, Exponential, Initializable {
         return calcBorrowLimit(availibleCollateralValue);
     }
 
-    function liquidate(address _borrower) external {
+    function liquidate(address _borrower) external override {
         // require the liquidator is not also the borrower
         require(msg.sender != _borrower, "NOT_LIQUIDATE_SELF");
 
