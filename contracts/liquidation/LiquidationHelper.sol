@@ -72,12 +72,10 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
         LiquidationCallLocalVars memory vars;
         vars.initCollateralBalance = IERC20(params.collateralAsset).balanceOf(address(this));
 
-        if (params.collateralAsset != params.borrowedAsset) {
-            vars.initFlashBorrowedBalance = IERC20(params.borrowedAsset).balanceOf(address(this));
+        vars.initFlashBorrowedBalance = IERC20(params.borrowedAsset).balanceOf(address(this));
 
-            // Track leftover balance to rescue funds in case of external transfers into this contract
-            vars.borrowedAssetLeftovers = vars.initFlashBorrowedBalance - flashBorrowedAmount;
-        }
+        // Track leftover balance to rescue funds in case of external transfers into this contract
+        vars.borrowedAssetLeftovers = vars.initFlashBorrowedBalance - flashBorrowedAmount;
 
         vars.flashLoanDebt = flashBorrowedAmount + premium;
 
@@ -120,25 +118,21 @@ contract LiquidationHelper is FlashLoanReceiverBaseV2 {
         // Track only collateral released, not current asset balance of the contract
         vars.diffCollateralBalance = collateralBalanceAfter - vars.initCollateralBalance;
 
-        if (params.collateralAsset != params.borrowedAsset) {
-            // Discover flash loan balance after the liquidation
-            uint256 flashBorrowedAssetAfter = IERC20(params.borrowedAsset).balanceOf(address(this));
+        // Discover flash loan balance after the liquidation
+        uint256 flashBorrowedAssetAfter = IERC20(params.borrowedAsset).balanceOf(address(this));
 
-            // Use only flash loan borrowed assets, not current asset balance of the contract
-            vars.diffFlashBorrowedBalance = flashBorrowedAssetAfter - vars.borrowedAssetLeftovers;
+        // Use only flash loan borrowed assets, not current asset balance of the contract
+        vars.diffFlashBorrowedBalance = flashBorrowedAssetAfter - vars.borrowedAssetLeftovers;
 
-            // Swap released collateral into the debt asset, to repay the flash loan
-            vars.soldAmount = _swapTokensForExactTokens(
-                params.collateralAsset,
-                params.borrowedAsset,
-                vars.diffCollateralBalance,
-                vars.flashLoanDebt - vars.diffFlashBorrowedBalance
-            );
+        // Swap released collateral into the debt asset, to repay the flash loan
+        vars.soldAmount = _swapTokensForExactTokens(
+            params.collateralAsset,
+            params.borrowedAsset,
+            vars.diffCollateralBalance,
+            vars.flashLoanDebt - vars.diffFlashBorrowedBalance
+        );
 
-            vars.remainingTokens = vars.diffCollateralBalance - vars.soldAmount;
-        } else {
-            vars.remainingTokens = vars.diffCollateralBalance - premium;
-        }
+        vars.remainingTokens = vars.diffCollateralBalance - vars.soldAmount;
 
         // Allow repay of flash loan
         IERC20(params.borrowedAsset).approve(address(LENDING_POOL), vars.flashLoanDebt);
