@@ -15,7 +15,7 @@ contract MockLiquidationHelper {
         uint256 diffCollateralBalance;
         uint256 flashLoanDebt;
         uint256 soldAmount;
-        uint256 remainingTokens;
+        uint256 remainingCollateralTokens;
         uint256 borrowedAssetLeftovers;
     }
 
@@ -27,7 +27,7 @@ contract MockLiquidationHelper {
         address[] borrowers;
     }
 
-    IBalancerVaultV2 public balancerVault;
+    IBalancerVaultV2 public immutable balancerVault;
     IBSVault public immutable edgeVault;
     ILendingPoolV2 public LENDING_POOL;
 
@@ -102,6 +102,7 @@ contract MockLiquidationHelper {
         vars.diffFlashBorrowedBalance = flashBorrowedAssetAfter - vars.borrowedAssetLeftovers;
 
         // Swap released collateral into the debt asset, to repay the flash loan
+        // @TODO improve the swapping of collateral for borrowed asset by calculating the minimum expected collateral offchain
         vars.soldAmount = _swapTokensForExactTokens(
             params.collateralAsset,
             params.borrowedAsset,
@@ -109,14 +110,27 @@ contract MockLiquidationHelper {
             vars.flashLoanDebt - vars.diffFlashBorrowedBalance
         );
 
-        vars.remainingTokens = vars.diffCollateralBalance - vars.soldAmount;
+        vars.remainingCollateralTokens = vars.diffCollateralBalance - vars.soldAmount;
 
         // Allow repay of flash loan
         IERC20(params.borrowedAsset).approve(address(LENDING_POOL), vars.flashLoanDebt);
 
-        // Transfer remaining tokens to initiator
-        if (vars.remainingTokens > 0) {
-            IERC20(params.collateralAsset).transfer(params.initiator, vars.remainingTokens);
+        // Transfer remaining collateral tokens to initiator
+        if (vars.remainingCollateralTokens > 0) {
+            IERC20(params.collateralAsset).transfer(
+                params.initiator,
+                vars.remainingCollateralTokens
+            );
+        }
+
+        // Transfer remaining borrowed tokens ot initiator
+        uint256 availableBorrowedAssetAmount =
+            IERC20(params.borrowedAsset).balanceOf(address(this));
+        if (availableBorrowedAssetAmount > vars.flashLoanDebt) {
+            IERC20(params.borrowedAsset).transfer(
+                params.initiator,
+                availableBorrowedAssetAmount - vars.flashLoanDebt
+            );
         }
     }
 
