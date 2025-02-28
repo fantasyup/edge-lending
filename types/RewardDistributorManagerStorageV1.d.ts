@@ -19,7 +19,7 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface RewardDistirbutorManagerStorageV1Interface
+interface RewardDistributorManagerStorageV1Interface
   extends ethers.utils.Interface {
   functions: {
     "accumulateRewards(address,address)": FunctionFragment;
@@ -97,24 +97,24 @@ interface RewardDistirbutorManagerStorageV1Interface
 
   events: {
     "AddReward(address,address,uint256)": EventFragment;
-    "ApprovedDistributor(address,uint256)": EventFragment;
     "CodeUpdated(bytes32,address)": EventFragment;
+    "DistributorStatusUpdated(address,bool,uint256)": EventFragment;
     "Initialized(address,uint256)": EventFragment;
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
     "RemoveReward(address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AddReward"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ApprovedDistributor"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DistributorStatusUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemoveReward"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
 }
 
-export class RewardDistirbutorManagerStorageV1 extends Contract {
+export class RewardDistributorManagerStorageV1 extends Contract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -155,7 +155,7 @@ export class RewardDistirbutorManagerStorageV1 extends Contract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: RewardDistirbutorManagerStorageV1Interface;
+  interface: RewardDistributorManagerStorageV1Interface;
 
   functions: {
     accumulateRewards(
@@ -406,20 +406,21 @@ export class RewardDistirbutorManagerStorageV1 extends Contract {
       { tokenAddr: string; distributor: string; timestamp: BigNumber }
     >;
 
-    ApprovedDistributor(
-      distributor: null,
-      timestamp: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { distributor: string; timestamp: BigNumber }
-    >;
-
     CodeUpdated(
       uuid: null,
       codeAddress: null
     ): TypedEventFilter<
       [string, string],
       { uuid: string; codeAddress: string }
+    >;
+
+    DistributorStatusUpdated(
+      distributor: null,
+      approve: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, boolean, BigNumber],
+      { distributor: string; approve: boolean; timestamp: BigNumber }
     >;
 
     Initialized(
@@ -431,11 +432,12 @@ export class RewardDistirbutorManagerStorageV1 extends Contract {
     >;
 
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
     >;
 
     RemoveReward(

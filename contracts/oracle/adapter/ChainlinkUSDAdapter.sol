@@ -5,7 +5,6 @@ import "../../interfaces/IOracle.sol";
 import "../../interfaces/IChainlinkV3Aggregator.sol";
 
 contract ChainlinkUSDAdapter is IOracle {
-    
     /// @dev asset name
     string public assetName;
 
@@ -17,9 +16,6 @@ contract ChainlinkUSDAdapter is IOracle {
 
     /// @notice chainlink aggregator with price in USD
     IChainlinkV3Aggregator public immutable aggregator;
-
-    /// @dev the latestAnser returned
-    uint256 private latestAnswer;
 
     constructor(
         string memory _assetName,
@@ -36,15 +32,8 @@ contract ChainlinkUSDAdapter is IOracle {
     }
 
     /// @dev returns price of asset in 1e8
-    function getPriceInUSD() external override returns (uint256 price) {
-        (, int256 priceC, , , ) = aggregator.latestRoundData();
-        price = uint256(priceC);
-        latestAnswer = price;
-        emit PriceUpdated(asset, price);
-    }
-
-    /// @dev returns the latest price of asset
-    function viewPriceInUSD() external view override returns (uint256) {
-        return latestAnswer;
+    function latestAnswer() external view override returns (int256) {
+        (, int256 price, , , ) = aggregator.latestRoundData();
+        return price;
     }
 }

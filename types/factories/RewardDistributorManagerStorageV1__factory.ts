@@ -5,18 +5,18 @@
 import { Contract, Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 
-import type { RewardDistirbutorManagerStorageV1 } from "../RewardDistirbutorManagerStorageV1";
+import type { RewardDistributorManagerStorageV1 } from "../RewardDistributorManagerStorageV1";
 
-export class RewardDistirbutorManagerStorageV1__factory {
+export class RewardDistributorManagerStorageV1__factory {
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): RewardDistirbutorManagerStorageV1 {
+  ): RewardDistributorManagerStorageV1 {
     return new Contract(
       address,
       _abi,
       signerOrProvider
-    ) as RewardDistirbutorManagerStorageV1;
+    ) as RewardDistributorManagerStorageV1;
   }
 }
 
@@ -51,25 +51,6 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "contract IRewardDistributor",
-        name: "distributor",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "timestamp",
-        type: "uint256",
-      },
-    ],
-    name: "ApprovedDistributor",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
         internalType: "bytes32",
         name: "uuid",
         type: "bytes32",
@@ -82,6 +63,31 @@ const _abi = [
       },
     ],
     name: "CodeUpdated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "contract IRewardDistributor",
+        name: "distributor",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "approve",
+        type: "bool",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "DistributorStatusUpdated",
     type: "event",
   },
   {
@@ -106,6 +112,12 @@ const _abi = [
   {
     anonymous: false,
     inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "prevOwner",
+        type: "address",
+      },
       {
         indexed: false,
         internalType: "address",

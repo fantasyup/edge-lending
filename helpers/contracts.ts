@@ -16,8 +16,11 @@ import {
     MockVault, PriceOracleAggregator, RewardDistributor, RewardDistributorFactory, RewardDistributorManager, UUPSProxy, VaultFactory, VaultStorageLayoutTester, WrapperToken,
     FeeWithdrawal,
     MockUniswapV2Router02,
+    MockVaultUser,
+    MockBalancerVault,
+    MockAaveLendingPool,
+    MockLiquidationHelper,
 } from "../types";
-import { DataTypes } from "../types/DataTypes";
 import { LendingPairHelper } from "../types/LendingPairHelper";
 import { MockChainlinkUSDAdapter } from "../types/MockChainlinkUSDAdapter";
 
@@ -62,15 +65,16 @@ export const deployAndInitUUPSProxy = async(
         console.log(`Successfully Initialized ${id} proxy`)
     }
 }
-export const deployDataTypesLib = async () => {
-    return await deployContract<DataTypes>('DataTypes', [])
-}
 
 export const deployVault = async() => {
     return await deployContract<Vault>(ContractId.Vault, [])
 }
 
 export const getVaultDeployment = async(): Promise<Vault> =>{
+    if (!(await deployments.getOrNull(ContractId.Vault))) {
+        // deploy Mock
+        return await deployVault();
+    }
     return (await ethers.getContractAt(
         ContractId.Vault,
         (await deployments.get(ContractId.Vault)).address
@@ -78,6 +82,10 @@ export const getVaultDeployment = async(): Promise<Vault> =>{
 }
 
 export const getCollateralWrapperDeployment = async(): Promise<WrapperToken> =>{
+    if (!(await deployments.getOrNull(ContractId.CollateralWrapperToken))) {
+        // deploy Mock
+        return await deployCollateralWrapperToken();
+    }
     return (await ethers.getContractAt(
         ContractId.CollateralWrapperToken,
         (await deployments.get(ContractId.CollateralWrapperToken)).address
@@ -85,6 +93,10 @@ export const getCollateralWrapperDeployment = async(): Promise<WrapperToken> =>{
 }
 
 export const getBorrowWrapperDeployment = async(): Promise<WrapperToken> =>{
+    if (!(await deployments.getOrNull(ContractId.WrapperToken))) {
+        // deploy Mock
+        return await deployWrappedToken();
+    }
     return (await ethers.getContractAt(
         ContractId.WrapperToken,
         (await deployments.get(ContractId.WrapperToken)).address
@@ -92,62 +104,134 @@ export const getBorrowWrapperDeployment = async(): Promise<WrapperToken> =>{
 }
 
 export const getDebtTokenDeployment = async(): Promise<DebtToken> =>{
+    if (!(await deployments.getOrNull(ContractId.DebtToken))) {
+        // deploy Mock
+        return await deployDebtToken();
+    }
     return (await ethers.getContractAt(
         ContractId.DebtToken,
         (await deployments.get(ContractId.DebtToken)).address
     )) as DebtToken
 }
 
-export const getLendingPairHelperDeployment = async(): Promise<LendingPairHelper> =>{
+export const getLendingPairHelperDeployment = async(vault?: EthereumAddress): Promise<LendingPairHelper> =>{
+    if (vault && !(await deployments.getOrNull(ContractId.LendingPairHelper))) {
+        // deploy Mock
+        return await deployLendingPairHelper(vault);
+    }
     return (await ethers.getContractAt(
         ContractId.LendingPairHelper,
         (await deployments.get(ContractId.LendingPairHelper)).address
     )) as LendingPairHelper
 }
 
-export const getLendingPairDeployment = async(): Promise<LendingPair> =>{
+export const getLendingPairDeployment = async(
+    params: any
+): Promise<LendingPair> =>{
+    if (!(await deployments.getOrNull(ContractId.LendingPair))) { 
+        // deploy mock
+        return await deployLendingPair(
+            params.vault,
+            params.priceOracleAggregator,
+            params.feeWithdrawal,
+            params.feeShare,
+        )
+    }
     return (await ethers.getContractAt(
         ContractId.LendingPair,
         (await deployments.get(ContractId.LendingPair)).address
     )) as LendingPair
 }
 
-export const getLendingPairFactoryDeployment = async(): Promise<LendingPairFactory> =>{
+export const getLendingPairFactoryDeployment = async(params?: any): Promise<LendingPairFactory> =>{
+    if (!(await deployments.getOrNull(ContractId.LendingPairFactory))) { 
+        // deploy mock
+        return await deployLendingPairFactory(
+            params.admin,
+            params.pairLogic,
+            params.collateralWrapperLogic,
+            params.debtTokenLogic,
+            params.borrowAssetWrapperLogic,
+            params.rewardDistributorManager
+        );
+    }
+
     return (await ethers.getContractAt(
         ContractId.LendingPairFactory,
         (await deployments.get(ContractId.LendingPairFactory)).address
     )) as LendingPairFactory
 }
 
-export const getInterestRateModelDeployment = async(): Promise<JumpRateModelV2> =>{
+export const getInterestRateModelDeployment = async(
+    owner: EthereumAddress
+): Promise<JumpRateModelV2> =>{
+    if (!(await deployments.getOrNull(ContractId.JumpRateModelV2))) {
+        // deploy mock
+        return await deployInterestRateModel(
+            "30000000000000000",
+            "52222222222200000",
+            "70",
+            "1000000000000000000",
+            owner
+        );
+    }
     return (await ethers.getContractAt(
         ContractId.JumpRateModelV2,
         (await deployments.get(ContractId.JumpRateModelV2)).address
     )) as JumpRateModelV2
 }
 
-export const getPriceOracleAggregatorDeployment = async(): Promise<IPriceOracleAggregator> =>{
+export const getPriceOracleAggregatorDeployment = async(
+    admin?: EthereumAddress
+): Promise<IPriceOracleAggregator> =>{
+    if (admin && !(await deployments.getOrNull(ContractId.PriceOracleAggregator))) {
+        // deploy mock
+        return await deployPriceOracleAggregator(admin);
+    }
     return (await ethers.getContractAt(
         ContractId.PriceOracleAggregator,
         (await deployments.get(ContractId.PriceOracleAggregator)).address
     )) as IPriceOracleAggregator
 }
 
-export const getVaultFactoryDeployment = async(): Promise<VaultFactory> =>{
+export const getVaultFactoryDeployment = async(params: any): Promise<VaultFactory> =>{
+    if (!(await deployments.getOrNull(ContractId.VaultFactory))) {
+        // deploy mock
+        return await deployContract<VaultFactory>(
+            ContractId.VaultFactory, [
+                params.team,
+                params.vault
+            ]
+        )
+    }
     return (await ethers.getContractAt(
         ContractId.VaultFactory,
         (await deployments.get(ContractId.VaultFactory)).address
     )) as VaultFactory
 }
 
-export const getRewardDistributorDeployment = async(): Promise<RewardDistributor> => {
+export const getRewardDistributorDeployment = async(params: any): Promise<RewardDistributor> => {
+    if (!(await deployments.getOrNull(ContractId.RewardDistributor))) {
+        // deploy mock
+        return await deployContract<RewardDistributor>(ContractId.RewardDistributor, [params.manager])
+    }
     return (await ethers.getContractAt(
         ContractId.RewardDistributor,
         (await deployments.get(ContractId.RewardDistributor)).address
     )) as RewardDistributor
 }
 
-export const getRewardDistributorFactoryDeployment = async(): Promise<RewardDistributorFactory> => {
+export const getRewardDistributorFactoryDeployment = async(params: any): Promise<RewardDistributorFactory> => {
+    if (!(await deployments.getOrNull(ContractId.RewardDistributorFactory))) {
+        // deploy mock
+        return await deployContract<RewardDistributorFactory>(
+            ContractId.RewardDistributorFactory, 
+            [
+                params.owner,
+                params.manager
+            ]
+        )
+    }
     return (await ethers.getContractAt(
         ContractId.RewardDistributorFactory,
         (await deployments.get(ContractId.RewardDistributorFactory)).address
@@ -155,25 +239,38 @@ export const getRewardDistributorFactoryDeployment = async(): Promise<RewardDist
 }
 
 export const getRewardDistributorManagerDeployment = async(): Promise<RewardDistributorManager> => {
+    if (!(await deployments.getOrNull(ContractId.RewardDistributorManager))) {
+        // deploy mock
+        return await deployContract<RewardDistributorManager>(ContractId.RewardDistributorManager, [])
+    }
     return (await ethers.getContractAt(
         ContractId.RewardDistributorManager,
         (await deployments.get(ContractId.RewardDistributorManager)).address
     )) as RewardDistributorManager
 }
 
-export const getFeeWithdrawalDeployment = async(): Promise<FeeWithdrawal> => {
+export const getFeeWithdrawalDeployment = async(params: any): Promise<FeeWithdrawal> => {
+    if (!(await deployments.getOrNull(ContractId.FeeWithdrawal))) {
+        // deploy mock
+        return await deployFeeWithdrawal(
+            params.vault,
+            params.receiver,
+            params.edgeToken,
+            params.weth
+        );
+    }
     return (await ethers.getContractAt(
         ContractId.FeeWithdrawal,
         (await deployments.get(ContractId.FeeWithdrawal)).address
     )) as FeeWithdrawal
 }
 
-export const getPriceOracleAggregatorProxy = async(): Promise<PriceOracleAggregator> => {
-    return (await ethers.getContractAt(
-        ContractId.PriceOracleAggregator,
-        (await deployments.get(ContractId.PriceOracleAggregatorProxy)).address
-    )) as PriceOracleAggregator
-}
+// export const getPriceOracleAggregatorProxy = async(): Promise<PriceOracleAggregator> => {
+//     return (await ethers.getContractAt(
+//         ContractId.PriceOracleAggregator,
+//         (await deployments.get(ContractId.PriceOracleAggregatorProxy)).address
+//     )) as PriceOracleAggregator
+// }
 
 export const getVaultProxy = async(): Promise<Vault> => {
     return (await ethers.getContractAt(
@@ -266,8 +363,8 @@ export const deployMockVault =  async() => {
     return await deployContract<MockVault>(ContractId.MockVault, [])
 }
 
-export const deployLendingPairHelper = async(vault: Vault) => {
-    return await deployContract<LendingPairHelper>(ContractId.LendingPairHelper, [vault.address])
+export const deployLendingPairHelper = async(vault: EthereumAddress) => {
+    return await deployContract<LendingPairHelper>(ContractId.LendingPairHelper, [vault])
 }
 
 export const deployPriceOracleAggregator = async(admin: EthereumAddress) => {
@@ -287,14 +384,16 @@ export const deployLendingPairFactory = async(
     pairLogic: EthereumAddress,
     collateralWrapperLogic: EthereumAddress,
     debtTokenLogic: EthereumAddress,
-    borrowAssetWrapperLogic: EthereumAddress
+    borrowAssetWrapperLogic: EthereumAddress,
+    rewardDistributorManager: EthereumAddress,
 ) => {
     return await deployContract<LendingPairFactory>(ContractId.LendingPairFactory, [
         admin,
         pairLogic,
         collateralWrapperLogic,
         debtTokenLogic,
-        borrowAssetWrapperLogic
+        borrowAssetWrapperLogic,
+        rewardDistributorManager
     ])
 }
 
@@ -314,7 +413,6 @@ export const deployFeeWithdrawal = async (
     );
 }
 
-
 export const deployLendingPair = async (
     vault: EthereumAddress,
     oracle: EthereumAddress,
@@ -332,10 +430,30 @@ export const deployLendingPair = async (
     );
 }
 
-
 export const deployMockUniswapV2Router02 = async () => {
     return await deployContract<MockUniswapV2Router02>(
         ContractId.MockUniswapV2Router02,
         []
     )
+}
+
+export const deployMockVaultUser = async () => {
+    return await deployContract<MockVaultUser>(
+        ContractId.MockVaultUser,
+        []
+    )
+}
+
+/////////// For liquidation Helper
+export const deployMockBalancerVault = async() => {
+    return await deployContract<MockBalancerVault>(ContractId.MockBalancerVault, [])
+}
+
+
+export const deployMockAaveLendingPool = async(premium: number) => {
+    return await deployContract<MockAaveLendingPool>(ContractId.MockAaveLendingPool, [premium])
+}
+
+export const deployMockLiquidationHelper = async(balancerVault: EthereumAddress, edgeVault: EthereumAddress, pool: EthereumAddress, ) => {
+    return await deployContract<MockLiquidationHelper>(ContractId.MockLiquidationHelper, [balancerVault, edgeVault, pool])
 }

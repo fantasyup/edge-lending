@@ -101,20 +101,26 @@ interface IBSVaultInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
+    "AllowContract(address,bool)": EventFragment;
     "Approval(address,address,bool)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
+    "RegisterProtocol(address)": EventFragment;
+    "RescueFunds(address,uint256)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "UpdateFlashLoanRate(uint256)": EventFragment;
     "Withdraw(address,address,address,uint256,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AllowContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RegisterProtocol"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RescueFunds"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateFlashLoanRate"): EventFragment;
@@ -514,7 +520,7 @@ export class IBSVault extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, BigNumber]>;
 
     "deposit(address,address,address,uint256)"(
       _token: string,
@@ -522,7 +528,7 @@ export class IBSVault extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, BigNumber]>;
 
     flashFee(
       token: string,
@@ -631,6 +637,14 @@ export class IBSVault extends Contract {
   };
 
   filters: {
+    AllowContract(
+      whitelist: null,
+      status: null
+    ): TypedEventFilter<
+      [string, boolean],
+      { whitelist: string; status: boolean }
+    >;
+
     Approval(
       user: string | null,
       allowed: string | null,
@@ -675,11 +689,24 @@ export class IBSVault extends Contract {
     >;
 
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
+    >;
+
+    RegisterProtocol(
+      sender: null
+    ): TypedEventFilter<[string], { sender: string }>;
+
+    RescueFunds(
+      token: null,
+      amount: null
+    ): TypedEventFilter<
       [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      { token: string; amount: BigNumber }
     >;
 
     Transfer(

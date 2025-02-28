@@ -57,12 +57,18 @@ const _abi = [
       },
       {
         indexed: false,
+        internalType: "bool",
+        name: "approve",
+        type: "bool",
+      },
+      {
+        indexed: false,
         internalType: "uint256",
         name: "timestamp",
         type: "uint256",
       },
     ],
-    name: "ApprovedDistributor",
+    name: "DistributorStatusUpdated",
     type: "event",
   },
   {
@@ -87,6 +93,12 @@ const _abi = [
   {
     anonymous: false,
     inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "prevOwner",
+        type: "address",
+      },
       {
         indexed: false,
         internalType: "address",

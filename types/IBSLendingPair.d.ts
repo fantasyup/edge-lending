@@ -33,6 +33,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     "depositCollateral(address,uint256)": FunctionFragment;
     "getMaxWithdrawAllowed(address)": FunctionFragment;
     "initialize(string,string,address,address,tuple,address,address,address)": FunctionFragment;
+    "liquidate(address)": FunctionFragment;
     "oracle()": FunctionFragment;
     "redeem(address,uint256)": FunctionFragment;
     "totalReserves()": FunctionFragment;
@@ -99,6 +100,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
       string
     ]
   ): string;
+  encodeFunctionData(functionFragment: "liquidate", values: [string]): string;
   encodeFunctionData(functionFragment: "oracle", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "redeem",
@@ -160,6 +162,7 @@ interface IBSLendingPairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "liquidate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
   decodeFunctionResult(
@@ -382,6 +385,16 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    liquidate(
+      user: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "liquidate(address)"(
+      user: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     oracle(overrides?: CallOverrides): Promise<[string]>;
 
     "oracle()"(overrides?: CallOverrides): Promise<[string]>;
@@ -546,6 +559,16 @@ export class IBSLendingPair extends Contract {
     _wrappedCollateralAsset: string,
     _interestRate: string,
     _pauseGuardian: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  liquidate(
+    user: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "liquidate(address)"(
+    user: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -716,6 +739,13 @@ export class IBSLendingPair extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    liquidate(user: string, overrides?: CallOverrides): Promise<void>;
+
+    "liquidate(address)"(
+      user: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     oracle(overrides?: CallOverrides): Promise<string>;
 
     "oracle()"(overrides?: CallOverrides): Promise<string>;
@@ -724,13 +754,13 @@ export class IBSLendingPair extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     "redeem(address,uint256)"(
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
     totalReserves(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1049,6 +1079,16 @@ export class IBSLendingPair extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    liquidate(
+      user: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "liquidate(address)"(
+      user: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     oracle(overrides?: CallOverrides): Promise<BigNumber>;
 
     "oracle()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1216,6 +1256,16 @@ export class IBSLendingPair extends Contract {
       _wrappedCollateralAsset: string,
       _interestRate: string,
       _pauseGuardian: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    liquidate(
+      user: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "liquidate(address)"(
+      user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

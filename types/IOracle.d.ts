@@ -11,7 +11,6 @@ import {
   PopulatedTransaction,
   Contract,
   ContractTransaction,
-  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -21,25 +20,16 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IOracleInterface extends ethers.utils.Interface {
   functions: {
-    "getPriceInUSD()": FunctionFragment;
-    "viewPriceInUSD()": FunctionFragment;
+    "latestAnswer()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getPriceInUSD",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "latestAnswer",
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getPriceInUSD",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "latestAnswer",
     data: BytesLike
   ): Result;
 
@@ -94,39 +84,19 @@ export class IOracle extends Contract {
   interface: IOracleInterface;
 
   functions: {
-    getPriceInUSD(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    latestAnswer(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "getPriceInUSD()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
-  getPriceInUSD(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getPriceInUSD()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -140,32 +110,14 @@ export class IOracle extends Contract {
   };
 
   estimateGas: {
-    getPriceInUSD(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getPriceInUSD(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    latestAnswer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getPriceInUSD()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "viewPriceInUSD()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

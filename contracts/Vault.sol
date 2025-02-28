@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IERC3156FlashBorrower.sol";
-import "./interfaces/IBSLendingPair.sol";
 import "./VaultBase.sol";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,6 +15,7 @@ import "./VaultBase.sol";
 /// It enables deposit, withdrawal, flashloans and transfer of tokens.
 /// It represents the deposited token amount in form of shares
 /// This contract implements the EIP3156 IERC3156FlashBorrower for flashloans.
+/// Rebasing tokens ARE NOT supported and WILL cause loss of funds.
 ///
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -46,12 +46,15 @@ contract Vault is VaultBase {
     function initialize(uint256 _flashLoanRate, address _owner) external override initializer {
         require(_owner != address(0), "INVALID_OWNER");
         require(flashLoanRate < MAX_FLASHLOAN_RATE, "INVALID_RATE");
+
+        __init_ReentrancyGuard();
         
         _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(
             _EIP712_TYPE_HASH,
             _HASHED_NAME,
             _HASHED_VERSION
         );
+        
         flashLoanRate = _flashLoanRate;
         owner = _owner;
     }
@@ -68,6 +71,16 @@ contract Vault is VaultBase {
     // Vault Actions
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /// @notice Enables or disables a contract for approval without signed message.
+    function allowContract(address _contract, bool _status) external onlyOwner {
+        // Checks
+        require(_contract != address(0), "invalid_address");
+
+        // Effects
+        allowedContracts[_contract] = _status;
+        emit AllowContract(_contract, _status);
+    }
+
     /// @notice approve a contract to enable the contract to withdraw
     function approveContract(
         address _user,
@@ -78,32 +91,45 @@ contract Vault is VaultBase {
         bytes32 s
     ) external override {
         require(_contract != address(0), "INVALID_CONTRACT");
+        require(_user != address(0), "INVALID_USER");
 
-        bytes32 digest =
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    _domainSeparatorV4(),
-                    keccak256(
-                        abi.encode(
-                            _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
-                            _status
-                                // solhint-disable-next-line
-                                ? keccak256("Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission")
-                                : keccak256(
-                                    "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
-                                ),
-                            _user,
-                            _contract,
-                            _status,
-                            userApprovalNonce[_user]++
+        if (v == 0 && r == bytes32(0) && s == bytes32(0)) {
+            // ensure that user match
+            require(_user == msg.sender, "NOT_SENDER");
+            // ensure that it's a contract
+            require(msg.sender != tx.origin, "ONLY_CONTRACT");
+            // ensure that _user != _contract
+            require(_user != _contract, "INVALID_APPROVE");
+            // ensure that _contract is allowed
+            require(allowedContracts[_contract], "NOT_WHITELISTED");
+        } else {
+            bytes32 digest =
+                keccak256(
+                    abi.encodePacked(
+                        "\x19\x01",
+                        _domainSeparatorV4(),
+                        keccak256(
+                            abi.encode(
+                                _VAULT_APPROVAL_SIGNATURE_TYPE_HASH,
+                                _status // solhint-disable-next-line
+                                    ? keccak256(
+                                        "Grant full access to funds in Edge Vault? Read more here https://edge.finance/permission"
+                                    )
+                                    : keccak256(
+                                        "Revoke access to Edge Vault? Read more here https://edge.finance/revoke"
+                                    ),
+                                _user,
+                                _contract,
+                                _status,
+                                userApprovalNonce[_user]++
+                            )
                         )
                     )
-                )
-            );
+                );
 
-        address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress == _user, "INVALID_SIGNATURE");
+            address recoveredAddress = ecrecover(digest, v, r, s);
+            require(recoveredAddress == _user, "INVALID_SIGNATURE");
+        }
 
         userApprovedContracts[_user][_contract] = _status;
 
@@ -125,25 +151,38 @@ contract Vault is VaultBase {
     /// @param _from which account to pull the tokens.
     /// @param _to which account to push the tokens.
     /// @param _amount Token amount in native representation to deposit.
-    /// @return amountOut The deposit amount in vault shares
+    /// @return amountOut The deposit amount in underlying token
+    /// @return shareOut The deposit amount in vault shares
     function deposit(
         IERC20 _token,
         address _from,
         address _to,
         uint256 _amount
-    ) external override whenNotPaused allowed(_from) returns (uint256 amountOut) {
+    )
+        external
+        override
+        whenNotPaused
+        allowed(_from)
+        nonReentrant
+        returns (uint256 amountOut, uint256 shareOut)
+    {
         // Checks
         require(_to != address(0), "INVALID_TO_ADDRESS");
 
-        amountOut = toShare(_token, _amount, false);
+        // calculate shares
+        amountOut = _amount;
+        shareOut = toShare(_token, _amount, false);
+
         // transfer appropriate amount of underlying from _from to vault
         _token.safeTransferFrom(_from, address(this), _amount);
 
-        // calculate shares
-        balanceOf[_token][_to] = balanceOf[_token][_to] + amountOut;
-        totals[_token] = totals[_token] + amountOut;
+        balanceOf[_token][_to] = balanceOf[_token][_to] + shareOut;
 
-        emit Deposit(_token, _from, _to, _amount, amountOut);
+        TotalBase storage total = totals[_token];
+        total.totalUnderlyingDeposit += _amount;
+        total.totalSharesMinted += shareOut;
+
+        emit Deposit(_token, _from, _to, _amount, shareOut);
     }
 
     /// @notice Withdraw the underlying share of `token` from a user account.
@@ -157,13 +196,23 @@ contract Vault is VaultBase {
         address _from,
         address _to,
         uint256 _shares
-    ) external override whenNotPaused allowed(_from) returns (uint256 amountOut) {
+    ) external override whenNotPaused allowed(_from) nonReentrant returns (uint256 amountOut) {
         // Checks
         require(_to != address(0), "INVALID_TO_ADDRESS");
 
         amountOut = toUnderlying(_token, _shares);
         balanceOf[_token][_from] = balanceOf[_token][_from] - _shares;
-        totals[_token] = totals[_token] - _shares;
+
+        TotalBase storage total = totals[_token];
+
+        total.totalUnderlyingDeposit -= amountOut;
+        total.totalSharesMinted -= _shares;
+
+        // prevents the ratio from being reset
+        require(
+            total.totalSharesMinted >= MINIMUM_SHARE_BALANCE || total.totalSharesMinted == 0,
+            "INVALID_RATIO"
+        );
 
         _token.safeTransfer(_to, amountOut);
 
@@ -187,14 +236,17 @@ contract Vault is VaultBase {
     /// @notice accept transfer of control
     function acceptOwnership() external {
         require(msg.sender == newOwner, "invalid owner");
+
+        // emit event before state change to do not trigger null address
+        emit OwnershipAccepted(owner, newOwner, block.timestamp);
+
         owner = newOwner;
         newOwner = address(0);
-        emit OwnershipAccepted(newOwner, block.timestamp);
     }
 
     /// @notice Transfer control from current owner address to another
     /// @param _newOwner The new team
-    function transferToNewOwner(address _newOwner) external onlyOwner {
+    function transferOwnership(address _newOwner) external onlyOwner {
         require(_newOwner != address(0), "INVALID_NEW_OWNER");
         newOwner = _newOwner;
         emit TransferControl(_newOwner, block.timestamp);
@@ -217,7 +269,7 @@ contract Vault is VaultBase {
     /// @param _token The loan currency.
     /// @return The amount of `token` that can be borrowed.
     function maxFlashLoan(address _token) external view override returns (uint256) {
-        return totals[IERC20(_token)];
+        return totals[IERC20(_token)].totalUnderlyingDeposit;
     }
 
     /// @notice The fee to be charged for a given loan.
@@ -238,8 +290,8 @@ contract Vault is VaultBase {
         address _token,
         uint256 _amount,
         bytes calldata _data
-    ) external override returns (bool) {
-        require(totals[IERC20(_token)] >= _amount, "Not enough balance");
+    ) external override nonReentrant returns (bool) {
+        require(totals[IERC20(_token)].totalUnderlyingDeposit >= _amount, "Not enough balance");
 
         IERC20 token = IERC20(_token);
 
@@ -259,12 +311,14 @@ contract Vault is VaultBase {
         uint256 receivedFees = token.balanceOf(address(this)) - tokenBalBefore;
         require(receivedFees >= fee, "not enough fees");
 
+        totals[IERC20(_token)].totalUnderlyingDeposit += fee;
+
         emit FlashLoan(msg.sender, token, _amount, fee, address(_receiver));
 
         return true;
     }
 
-    /// @dev Update the flashloan rate charged, only blacksmith team can call
+    /// @dev Update the flashloan rate charged, only owner can call
     /// @param _newRate The ERC-20 token.
     function updateFlashloanRate(uint256 _newRate) external onlyOwner {
         require(_newRate < MAX_FLASHLOAN_RATE, "invalid rate");
@@ -282,9 +336,11 @@ contract Vault is VaultBase {
         uint256 _amount,
         bool _ceil
     ) public view override returns (uint256 share) {
-        uint256 currentTotal = totals[_token];
+        TotalBase storage total = totals[_token];
+
+        uint256 currentTotal = total.totalSharesMinted;
         if (currentTotal > 0) {
-            uint256 currentUnderlyingBalance = _token.balanceOf(address(this));
+            uint256 currentUnderlyingBalance = total.totalUnderlyingDeposit;
             share = (_amount * currentTotal) / currentUnderlyingBalance;
 
             if (_ceil && ((share * currentUnderlyingBalance) / currentTotal) < _amount) {
@@ -305,6 +361,17 @@ contract Vault is VaultBase {
         override
         returns (uint256 amount)
     {
-        amount = (_share * _token.balanceOf(address(this))) / totals[_token];
+        TotalBase storage total = totals[_token];
+        amount = (_share * total.totalUnderlyingDeposit) / total.totalSharesMinted;
+    }
+
+    /// @notice rescueFunds Enables us to rescue funds that are not tracked
+    /// @param _token ERC20 token to rescue funds from
+    function rescueFunds(IERC20 _token) external nonReentrant onlyOwner {
+        uint256 currentBalance = _token.balanceOf(address(this));
+        uint256 amount = currentBalance - totals[_token].totalUnderlyingDeposit;
+        _token.safeTransfer(owner, amount);
+
+        emit RescueFunds(_token, amount);
     }
 }

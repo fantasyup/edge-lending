@@ -38,25 +38,12 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "getPriceInUSD",
+    name: "latestAnswer",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "int256",
         name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "viewPriceInUSD",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        type: "int256",
       },
     ],
     stateMutability: "view",

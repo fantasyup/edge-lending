@@ -23,6 +23,8 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
   functions: {
     "MAX_FLASHLOAN_RATE()": FunctionFragment;
     "acceptOwnership()": FunctionFragment;
+    "allowContract(address,bool)": FunctionFragment;
+    "allowedContracts(address)": FunctionFragment;
     "approveContract(address,address,bool,uint8,bytes32,bytes32)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
@@ -38,11 +40,12 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
+    "rescueFunds(address)": FunctionFragment;
     "toShare(address,uint256,bool)": FunctionFragment;
     "toUnderlying(address,uint256)": FunctionFragment;
     "totals(address)": FunctionFragment;
     "transfer(address,address,address,uint256)": FunctionFragment;
-    "transferToNewOwner(address)": FunctionFragment;
+    "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
     "updateCode(address)": FunctionFragment;
     "updateFlashloanRate(uint256)": FunctionFragment;
@@ -60,6 +63,14 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "acceptOwnership",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "allowContract",
+    values: [string, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "allowedContracts",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "approveContract",
@@ -106,6 +117,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     functionFragment: "proxiableUUID",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "rescueFunds", values: [string]): string;
   encodeFunctionData(
     functionFragment: "toShare",
     values: [string, BigNumberish, boolean]
@@ -120,7 +132,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferToNewOwner",
+    functionFragment: "transferOwnership",
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
@@ -156,6 +168,14 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "allowContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "allowedContracts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "approveContract",
     data: BytesLike
   ): Result;
@@ -185,6 +205,10 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     functionFragment: "proxiableUUID",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "rescueFunds",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "toShare", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "toUnderlying",
@@ -193,7 +217,7 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "totals", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "transferToNewOwner",
+    functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
@@ -218,12 +242,15 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
+    "AllowContract(address,bool)": EventFragment;
     "Approval(address,address,bool)": EventFragment;
     "CodeUpdated(bytes32,address)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
+    "RegisterProtocol(address)": EventFragment;
+    "RescueFunds(address,uint256)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
@@ -231,12 +258,15 @@ interface VaultStorageLayoutTesterInterface extends ethers.utils.Interface {
     "Withdraw(address,address,address,uint256,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AllowContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RegisterProtocol"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RescueFunds"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
@@ -299,6 +329,28 @@ export class VaultStorageLayoutTester extends Contract {
     "acceptOwnership()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    allowContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "allowContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    allowedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     approveContract(
       _user: string,
@@ -438,6 +490,16 @@ export class VaultStorageLayoutTester extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<[string]>;
 
+    rescueFunds(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "rescueFunds(address)"(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -464,12 +526,25 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { amount: BigNumber }>;
 
-    totals(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    totals(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     "totals(address)"(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     transfer(
       _token: string,
@@ -487,12 +562,12 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -583,6 +658,25 @@ export class VaultStorageLayoutTester extends Contract {
   "acceptOwnership()"(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  allowContract(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "allowContract(address,bool)"(
+    _contract: string,
+    _status: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  allowedContracts(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+  "allowedContracts(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   approveContract(
     _user: string,
@@ -715,6 +809,16 @@ export class VaultStorageLayoutTester extends Contract {
 
   "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
+  rescueFunds(
+    _token: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "rescueFunds(address)"(
+    _token: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   toShare(
     _token: string,
     _amount: BigNumberish,
@@ -741,12 +845,25 @@ export class VaultStorageLayoutTester extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  totals(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+  totals(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber] & {
+      totalUnderlyingDeposit: BigNumber;
+      totalSharesMinted: BigNumber;
+    }
+  >;
 
   "totals(address)"(
     arg0: string,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<
+    [BigNumber, BigNumber] & {
+      totalUnderlyingDeposit: BigNumber;
+      totalSharesMinted: BigNumber;
+    }
+  >;
 
   transfer(
     _token: string,
@@ -764,12 +881,12 @@ export class VaultStorageLayoutTester extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  transferToNewOwner(
+  transferOwnership(
     _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transferToNewOwner(address)"(
+  "transferOwnership(address)"(
     _newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -857,6 +974,25 @@ export class VaultStorageLayoutTester extends Contract {
 
     "acceptOwnership()"(overrides?: CallOverrides): Promise<void>;
 
+    allowContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "allowContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    allowedContracts(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     approveContract(
       _user: string,
       _contract: string,
@@ -895,7 +1031,9 @@ export class VaultStorageLayoutTester extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<
+      [BigNumber, BigNumber] & { amountOut: BigNumber; shareOut: BigNumber }
+    >;
 
     "deposit(address,address,address,uint256)"(
       _token: string,
@@ -903,7 +1041,9 @@ export class VaultStorageLayoutTester extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<
+      [BigNumber, BigNumber] & { amountOut: BigNumber; shareOut: BigNumber }
+    >;
 
     flashFee(
       arg0: string,
@@ -984,6 +1124,13 @@ export class VaultStorageLayoutTester extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<string>;
 
+    rescueFunds(_token: string, overrides?: CallOverrides): Promise<void>;
+
+    "rescueFunds(address)"(
+      _token: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1010,12 +1157,25 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    totals(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    totals(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     "totals(address)"(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     transfer(
       _token: string,
@@ -1033,12 +1193,12 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1112,6 +1272,14 @@ export class VaultStorageLayoutTester extends Contract {
   };
 
   filters: {
+    AllowContract(
+      whitelist: null,
+      status: null
+    ): TypedEventFilter<
+      [string, boolean],
+      { whitelist: string; status: boolean }
+    >;
+
     Approval(
       user: string | null,
       allowed: string | null,
@@ -1164,14 +1332,27 @@ export class VaultStorageLayoutTester extends Contract {
     >;
 
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
     >;
 
     Paused(account: null): TypedEventFilter<[string], { account: string }>;
+
+    RegisterProtocol(
+      sender: null
+    ): TypedEventFilter<[string], { sender: string }>;
+
+    RescueFunds(
+      token: null,
+      amount: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { token: string; amount: BigNumber }
+    >;
 
     Transfer(
       token: string | null,
@@ -1226,6 +1407,28 @@ export class VaultStorageLayoutTester extends Contract {
 
     "acceptOwnership()"(
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    allowContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "allowContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    allowedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     approveContract(
@@ -1359,6 +1562,16 @@ export class VaultStorageLayoutTester extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    rescueFunds(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "rescueFunds(address)"(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1408,12 +1621,12 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1508,6 +1721,28 @@ export class VaultStorageLayoutTester extends Contract {
 
     "acceptOwnership()"(
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    allowContract(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "allowContract(address,bool)"(
+      _contract: string,
+      _status: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    allowedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     approveContract(
@@ -1646,6 +1881,16 @@ export class VaultStorageLayoutTester extends Contract {
 
     "proxiableUUID()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    rescueFunds(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "rescueFunds(address)"(
+      _token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     toShare(
       _token: string,
       _amount: BigNumberish,
@@ -1698,12 +1943,12 @@ export class VaultStorageLayoutTester extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferToNewOwner(
+    transferOwnership(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transferToNewOwner(address)"(
+    "transferOwnership(address)"(
       _newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

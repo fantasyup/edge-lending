@@ -21,6 +21,25 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: "address",
+        name: "whitelist",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "status",
+        type: "bool",
+      },
+    ],
+    name: "AllowContract",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: "address",
         name: "user",
@@ -122,6 +141,12 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
+        name: "prevOwner",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
         name: "newOwner",
         type: "address",
       },
@@ -133,6 +158,38 @@ const _abi = [
       },
     ],
     name: "OwnershipAccepted",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "sender",
+        type: "address",
+      },
+    ],
+    name: "RegisterProtocol",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "contract IERC20",
+        name: "token",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "RescueFunds",
     type: "event",
   },
   {
@@ -322,6 +379,11 @@ const _abi = [
     ],
     name: "deposit",
     outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
       {
         internalType: "uint256",
         name: "",

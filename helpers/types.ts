@@ -29,20 +29,27 @@ export enum ContractId {
     MockUniswapV2Router02 = 'MockUniswapV2Router02',
     VaultProxy = 'VaultProxy',
     FeeWithdrawalProxy = 'FeeWithdrawalProxy',
-    PriceOracleAggregatorProxy = 'PriceOracleAggregatorProxy',
-    RewardDistributorManagerProxy = 'RewardDistributorManagerProxy'
+    // PriceOracleAggregatorProxy = 'PriceOracleAggregatorProxy',
+    RewardDistributorManagerProxy = 'RewardDistributorManagerProxy',
+    MockVaultUser = 'MockVaultUser',
+    LiquidationHelper = 'LiquidationHelper',
+    MockBalancerVault = 'MockBalancerVault',
+    MockAaveLendingPool = 'MockAaveLendingPool',
+    MockLiquidationHelper = 'MockLiquidationHelper'
 }
 
 export enum LendingPairEdgeActions {
-    COLLATERAL_DEPOSIT = 1,
-    BORROW_ASSET_DEPOSIT = 2,
-    REPAY = 3,
+    BORROW_ASSET_DEPOSIT = 1,
+    REPAY = 2,
+    BORROW = 3,
     REDEEM = 4,
     WITHDRAW_COLLATERAL = 5,
-    VAULT_DEPOSIT = 6,
-    VAULT_WITHDRAW = 7,
-    VAULT_TRANSFER = 8,
-    VAULT_APPROVE_CONTRACT = 9
+
+    COLLATERAL_DEPOSIT = 10,
+    VAULT_DEPOSIT = 11,
+    VAULT_WITHDRAW = 12,
+    VAULT_TRANSFER = 13,
+    VAULT_APPROVE_CONTRACT = 14
 }
 
 export interface IAssetDetails {
@@ -59,6 +66,22 @@ export interface IApproveMessageData {
     contract: EthereumAddress
 }
 
+
+export interface IPAIRS {
+    [pair: string]: {
+      symbol: string,
+      pauseGuardian: string,
+      collateralAsset: string,
+      borrowVars: {
+        borrowAsset: string,
+        initialExchangeRateMantissa: string,
+        reserveFactorMantissa: string,
+        collateralFactor: string,
+        liquidationFee: string,
+        interestRateModel: string,
+      },
+    },
+}
 export interface IDelegateBorrowMessageData {
     from: EthereumAddress,
     to: EthereumAddress,

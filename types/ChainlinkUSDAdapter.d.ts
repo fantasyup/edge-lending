@@ -11,7 +11,6 @@ import {
   PopulatedTransaction,
   Contract,
   ContractTransaction,
-  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -25,8 +24,7 @@ interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
     "asset()": FunctionFragment;
     "assetName()": FunctionFragment;
     "assetSymbol()": FunctionFragment;
-    "getPriceInUSD()": FunctionFragment;
-    "viewPriceInUSD()": FunctionFragment;
+    "latestAnswer()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -40,11 +38,7 @@ interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getPriceInUSD",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "latestAnswer",
     values?: undefined
   ): string;
 
@@ -56,11 +50,7 @@ interface ChainlinkUSDAdapterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getPriceInUSD",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "latestAnswer",
     data: BytesLike
   ): Result;
 
@@ -131,17 +121,9 @@ export class ChainlinkUSDAdapter extends Contract {
 
     "assetSymbol()"(overrides?: CallOverrides): Promise<[string]>;
 
-    getPriceInUSD(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    latestAnswer(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "getPriceInUSD()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   aggregator(overrides?: CallOverrides): Promise<string>;
@@ -160,17 +142,9 @@ export class ChainlinkUSDAdapter extends Contract {
 
   "assetSymbol()"(overrides?: CallOverrides): Promise<string>;
 
-  getPriceInUSD(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getPriceInUSD()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
     aggregator(overrides?: CallOverrides): Promise<string>;
@@ -189,13 +163,9 @@ export class ChainlinkUSDAdapter extends Contract {
 
     "assetSymbol()"(overrides?: CallOverrides): Promise<string>;
 
-    getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -225,17 +195,9 @@ export class ChainlinkUSDAdapter extends Contract {
 
     "assetSymbol()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getPriceInUSD(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -255,18 +217,8 @@ export class ChainlinkUSDAdapter extends Contract {
 
     "assetSymbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getPriceInUSD(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    latestAnswer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getPriceInUSD()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    viewPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "viewPriceInUSD()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

@@ -54,15 +54,15 @@ interface IRewardDistributorManagerInterface extends ethers.utils.Interface {
 
   events: {
     "AddReward(address,address,uint256)": EventFragment;
-    "ApprovedDistributor(address,uint256)": EventFragment;
+    "DistributorStatusUpdated(address,bool,uint256)": EventFragment;
     "Initialized(address,uint256)": EventFragment;
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
     "RemoveReward(address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "AddReward"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ApprovedDistributor"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DistributorStatusUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RemoveReward"): EventFragment;
@@ -228,12 +228,13 @@ export class IRewardDistributorManager extends Contract {
       { tokenAddr: string; distributor: string; timestamp: BigNumber }
     >;
 
-    ApprovedDistributor(
+    DistributorStatusUpdated(
       distributor: null,
+      approve: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { distributor: string; timestamp: BigNumber }
+      [string, boolean, BigNumber],
+      { distributor: string; approve: boolean; timestamp: BigNumber }
     >;
 
     Initialized(
@@ -245,11 +246,12 @@ export class IRewardDistributorManager extends Contract {
     >;
 
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
     >;
 
     RemoveReward(

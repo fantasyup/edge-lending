@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../util/Initializable.sol";
 import "../interfaces/IBSLendingPair.sol";
 import "../interfaces/IRewardDistributor.sol";
@@ -61,6 +62,8 @@ abstract contract RewardDistributorStorageV1 is IRewardDistributor, Initializabl
 }
 
 contract RewardDistributor is RewardDistributorStorageV1 {
+    using SafeERC20 for IERC20;
+
     /// @notice manager
     IRewardDistributorManager public immutable rewardDistributorManager;
 
@@ -335,7 +338,7 @@ contract RewardDistributor is RewardDistributorStorageV1 {
             "REWARD_PERIOD_ACTIVE"
         );
         uint256 amount = rewardToken.balanceOf(address(this));
-        rewardToken.transfer(_to, amount);
+        rewardToken.safeTransfer(_to, amount);
 
         emit WithdrawUnclaimedReward(address(this), amount, block.timestamp);
     }
@@ -344,9 +347,9 @@ contract RewardDistributor is RewardDistributorStorageV1 {
     function safeTokenTransfer(address _to, uint256 _amount) internal {
         uint256 balance = rewardToken.balanceOf(address(this));
         if (_amount > balance) {
-            rewardToken.transfer(_to, balance);
+            rewardToken.safeTransfer(_to, balance);
         } else {
-            rewardToken.transfer(_to, _amount);
+            rewardToken.safeTransfer(_to, _amount);
         }
     }
 

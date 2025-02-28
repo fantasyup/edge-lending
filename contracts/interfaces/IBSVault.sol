@@ -52,7 +52,13 @@ interface IBSVault is IERC3156FlashLender {
 
     event Approval(address indexed user, address indexed allowed, bool status);
 
-    event OwnershipAccepted(address newOwner, uint256 timestamp);
+    event OwnershipAccepted(address prevOwner, address newOwner, uint256 timestamp);
+
+    event RegisterProtocol(address sender);
+
+    event AllowContract(address whitelist, bool status);
+
+    event RescueFunds(IERC20 token, uint256 amount);
 
     // ************** //
     // *** FUNCTIONS *** //
@@ -74,7 +80,7 @@ interface IBSVault is IERC3156FlashLender {
         address _from,
         address _to,
         uint256 _amount
-    ) external returns (uint256);
+    ) external returns (uint256, uint256);
 
     function withdraw(
         IERC20 _token,

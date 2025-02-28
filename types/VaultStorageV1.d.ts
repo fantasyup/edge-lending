@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface VaultStorageV1Interface extends ethers.utils.Interface {
   functions: {
+    "allowedContracts(address)": FunctionFragment;
     "approveContract(address,address,bool,uint8,bytes32,bytes32)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "deposit(address,address,address,uint256)": FunctionFragment;
@@ -44,6 +45,10 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
     "withdraw(address,address,address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "allowedContracts",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "approveContract",
     values: [string, string, boolean, BigNumberish, BytesLike, BytesLike]
@@ -115,6 +120,10 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "allowedContracts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "approveContract",
     data: BytesLike
   ): Result;
@@ -161,12 +170,15 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
+    "AllowContract(address,bool)": EventFragment;
     "Approval(address,address,bool)": EventFragment;
     "CodeUpdated(bytes32,address)": EventFragment;
     "Deposit(address,address,address,uint256,uint256)": EventFragment;
     "FlashLoan(address,address,uint256,uint256,address)": EventFragment;
-    "OwnershipAccepted(address,uint256)": EventFragment;
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
     "Paused(address)": EventFragment;
+    "RegisterProtocol(address)": EventFragment;
+    "RescueFunds(address,uint256)": EventFragment;
     "Transfer(address,address,address,uint256)": EventFragment;
     "TransferControl(address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
@@ -174,12 +186,15 @@ interface VaultStorageV1Interface extends ethers.utils.Interface {
     "Withdraw(address,address,address,uint256,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AllowContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CodeUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FlashLoan"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RegisterProtocol"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RescueFunds"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
@@ -231,6 +246,16 @@ export class VaultStorageV1 extends Contract {
   interface: VaultStorageV1Interface;
 
   functions: {
+    allowedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     approveContract(
       _user: string,
       _contract: string,
@@ -383,12 +408,25 @@ export class VaultStorageV1 extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    totals(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    totals(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     "totals(address)"(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     transfer(
       _token: string,
@@ -454,6 +492,13 @@ export class VaultStorageV1 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  allowedContracts(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+  "allowedContracts(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   approveContract(
     _user: string,
@@ -600,12 +645,25 @@ export class VaultStorageV1 extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  totals(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+  totals(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber] & {
+      totalUnderlyingDeposit: BigNumber;
+      totalSharesMinted: BigNumber;
+    }
+  >;
 
   "totals(address)"(
     arg0: string,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<
+    [BigNumber, BigNumber] & {
+      totalUnderlyingDeposit: BigNumber;
+      totalSharesMinted: BigNumber;
+    }
+  >;
 
   transfer(
     _token: string,
@@ -672,6 +730,13 @@ export class VaultStorageV1 extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    allowedContracts(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     approveContract(
       _user: string,
       _contract: string,
@@ -710,7 +775,7 @@ export class VaultStorageV1 extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, BigNumber]>;
 
     "deposit(address,address,address,uint256)"(
       _token: string,
@@ -718,7 +783,7 @@ export class VaultStorageV1 extends Contract {
       _to: string,
       _amount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<[BigNumber, BigNumber]>;
 
     flashFee(
       token: string,
@@ -817,12 +882,25 @@ export class VaultStorageV1 extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    totals(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    totals(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     "totals(address)"(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<
+      [BigNumber, BigNumber] & {
+        totalUnderlyingDeposit: BigNumber;
+        totalSharesMinted: BigNumber;
+      }
+    >;
 
     transfer(
       _token: string,
@@ -887,6 +965,14 @@ export class VaultStorageV1 extends Contract {
   };
 
   filters: {
+    AllowContract(
+      whitelist: null,
+      status: null
+    ): TypedEventFilter<
+      [string, boolean],
+      { whitelist: string; status: boolean }
+    >;
+
     Approval(
       user: string | null,
       allowed: string | null,
@@ -939,14 +1025,27 @@ export class VaultStorageV1 extends Contract {
     >;
 
     OwnershipAccepted(
+      prevOwner: null,
       newOwner: null,
       timestamp: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { newOwner: string; timestamp: BigNumber }
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
     >;
 
     Paused(account: null): TypedEventFilter<[string], { account: string }>;
+
+    RegisterProtocol(
+      sender: null
+    ): TypedEventFilter<[string], { sender: string }>;
+
+    RescueFunds(
+      token: null,
+      amount: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { token: string; amount: BigNumber }
+    >;
 
     Transfer(
       token: string | null,
@@ -991,6 +1090,16 @@ export class VaultStorageV1 extends Contract {
   };
 
   estimateGas: {
+    allowedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     approveContract(
       _user: string,
       _contract: string,
@@ -1209,6 +1318,16 @@ export class VaultStorageV1 extends Contract {
   };
 
   populateTransaction: {
+    allowedContracts(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "allowedContracts(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     approveContract(
       _user: string,
       _contract: string,

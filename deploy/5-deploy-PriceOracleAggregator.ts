@@ -7,19 +7,12 @@ const deployPriceOracleAggregator: DeployFunction = async function (hre: Hardhat
   const { deployments: { deploy }, getNamedAccounts } = hre;
   const { deployer, blackSmithTeam } = await getNamedAccounts();
   
-  const aggTx = await deploy(ContractId.PriceOracleAggregator, {
+  await deploy(ContractId.PriceOracleAggregator, {
     from: deployer,
     args: [blackSmithTeam],
     log: true,
     deterministicDeployment: true
   });
-
-  if (process.env.WITH_PROXY) {
-    await deployAndInitUUPSProxy(
-      ContractId.PriceOracleAggregatorProxy,
-      aggTx.address
-    )
-    }
 
 };
 

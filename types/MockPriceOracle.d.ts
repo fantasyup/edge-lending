@@ -21,13 +21,13 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockPriceOracleInterface extends ethers.utils.Interface {
   functions: {
-    "getPriceInUSD()": FunctionFragment;
-    "setPrice(uint256)": FunctionFragment;
+    "latestAnswer()": FunctionFragment;
+    "setPrice(int256)": FunctionFragment;
     "viewPriceInUSD()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getPriceInUSD",
+    functionFragment: "latestAnswer",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -40,7 +40,7 @@ interface MockPriceOracleInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getPriceInUSD",
+    functionFragment: "latestAnswer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
@@ -100,16 +100,16 @@ export class MockPriceOracle extends Contract {
   interface: MockPriceOracleInterface;
 
   functions: {
-    getPriceInUSD(overrides?: CallOverrides): Promise<[BigNumber]>;
+    latestAnswer(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     setPrice(
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setPrice(uint256)"(
+    "setPrice(int256)"(
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -119,16 +119,16 @@ export class MockPriceOracle extends Contract {
     "viewPriceInUSD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
-  getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+  latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   setPrice(
     _newPrice: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setPrice(uint256)"(
+  "setPrice(int256)"(
     _newPrice: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -138,13 +138,13 @@ export class MockPriceOracle extends Contract {
   "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     setPrice(_newPrice: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "setPrice(uint256)"(
+    "setPrice(int256)"(
       _newPrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -165,16 +165,16 @@ export class MockPriceOracle extends Contract {
   };
 
   estimateGas: {
-    getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     setPrice(
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setPrice(uint256)"(
+    "setPrice(int256)"(
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -185,16 +185,16 @@ export class MockPriceOracle extends Contract {
   };
 
   populateTransaction: {
-    getPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    latestAnswer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setPrice(
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setPrice(uint256)"(
+    "setPrice(int256)"(
       _newPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

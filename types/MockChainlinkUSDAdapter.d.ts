@@ -20,12 +20,12 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockChainlinkUSDAdapterInterface extends ethers.utils.Interface {
   functions: {
-    "getPriceInUSD()": FunctionFragment;
+    "latestAnswer()": FunctionFragment;
     "viewPriceInUSD()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getPriceInUSD",
+    functionFragment: "latestAnswer",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -34,7 +34,7 @@ interface MockChainlinkUSDAdapterInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getPriceInUSD",
+    functionFragment: "latestAnswer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -93,11 +93,11 @@ export class MockChainlinkUSDAdapter extends Contract {
   interface: MockChainlinkUSDAdapterInterface;
 
   functions: {
-    getPriceInUSD(
+    latestAnswer(
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { price: BigNumber }>;
 
-    "getPriceInUSD()"(
+    "latestAnswer()"(
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { price: BigNumber }>;
 
@@ -110,18 +110,18 @@ export class MockChainlinkUSDAdapter extends Contract {
     ): Promise<[BigNumber] & { price: BigNumber }>;
   };
 
-  getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+  latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
   "viewPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -139,9 +139,9 @@ export class MockChainlinkUSDAdapter extends Contract {
   };
 
   estimateGas: {
-    getPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
+    latestAnswer(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     viewPriceInUSD(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -149,9 +149,9 @@ export class MockChainlinkUSDAdapter extends Contract {
   };
 
   populateTransaction: {
-    getPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    latestAnswer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getPriceInUSD()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "latestAnswer()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     viewPriceInUSD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

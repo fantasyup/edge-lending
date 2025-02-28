@@ -22,8 +22,8 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface IPriceOracleAggregatorInterface extends ethers.utils.Interface {
   functions: {
     "getPriceInUSD(address)": FunctionFragment;
-    "updateOracleForAsset(address,address)": FunctionFragment;
-    "viewPriceInUSD(address)": FunctionFragment;
+    "getPriceInUSDMultiple(address[])": FunctionFragment;
+    "setOracleForAsset(address[],address[])": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -31,12 +31,12 @@ interface IPriceOracleAggregatorInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "updateOracleForAsset",
-    values: [string, string]
+    functionFragment: "getPriceInUSDMultiple",
+    values: [string[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "viewPriceInUSD",
-    values: [string]
+    functionFragment: "setOracleForAsset",
+    values: [string[], string[]]
   ): string;
 
   decodeFunctionResult(
@@ -44,18 +44,24 @@ interface IPriceOracleAggregatorInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "updateOracleForAsset",
+    functionFragment: "getPriceInUSDMultiple",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "viewPriceInUSD",
+    functionFragment: "setOracleForAsset",
     data: BytesLike
   ): Result;
 
   events: {
+    "OwnershipAccepted(address,address,uint256)": EventFragment;
+    "StableTokenAdded(address,uint256)": EventFragment;
+    "TransferControl(address,uint256)": EventFragment;
     "UpdateOracle(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "OwnershipAccepted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "StableTokenAdded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TransferControl"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateOracle"): EventFragment;
 }
 
@@ -105,65 +111,65 @@ export class IPriceOracleAggregator extends Contract {
   functions: {
     getPriceInUSD(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     "getPriceInUSD(address)"(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    updateOracleForAsset(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "updateOracleForAsset(address,address)"(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    viewPriceInUSD(
-      _token: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "viewPriceInUSD(address)"(
-      _token: string,
+    getPriceInUSDMultiple(
+      _tokens: string[],
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[BigNumber[]]>;
+
+    "getPriceInUSDMultiple(address[])"(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
+
+    setOracleForAsset(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setOracleForAsset(address[],address[])"(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
-  getPriceInUSD(
-    _token: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  getPriceInUSD(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "getPriceInUSD(address)"(
     _token: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  updateOracleForAsset(
-    _asset: string,
-    _oracle: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "updateOracleForAsset(address,address)"(
-    _asset: string,
-    _oracle: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  viewPriceInUSD(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  "viewPriceInUSD(address)"(
-    _token: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  getPriceInUSDMultiple(
+    _tokens: string[],
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  "getPriceInUSDMultiple(address[])"(
+    _tokens: string[],
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  setOracleForAsset(
+    _asset: string[],
+    _oracle: string[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setOracleForAsset(address[],address[])"(
+    _asset: string[],
+    _oracle: string[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   callStatic: {
     getPriceInUSD(
@@ -176,30 +182,55 @@ export class IPriceOracleAggregator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    updateOracleForAsset(
-      _asset: string,
-      _oracle: string,
+    getPriceInUSDMultiple(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    "getPriceInUSDMultiple(address[])"(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    setOracleForAsset(
+      _asset: string[],
+      _oracle: string[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "updateOracleForAsset(address,address)"(
-      _asset: string,
-      _oracle: string,
+    "setOracleForAsset(address[],address[])"(
+      _asset: string[],
+      _oracle: string[],
       overrides?: CallOverrides
     ): Promise<void>;
-
-    viewPriceInUSD(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "viewPriceInUSD(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
   };
 
   filters: {
+    OwnershipAccepted(
+      prevOwner: null,
+      newOwner: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { prevOwner: string; newOwner: string; timestamp: BigNumber }
+    >;
+
+    StableTokenAdded(
+      _token: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { _token: string; timestamp: BigNumber }
+    >;
+
+    TransferControl(
+      _newTeam: null,
+      timestamp: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { _newTeam: string; timestamp: BigNumber }
+    >;
+
     UpdateOracle(
       token: null,
       oracle: null
@@ -209,68 +240,68 @@ export class IPriceOracleAggregator extends Contract {
   estimateGas: {
     getPriceInUSD(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "getPriceInUSD(address)"(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    updateOracleForAsset(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "updateOracleForAsset(address,address)"(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    viewPriceInUSD(
-      _token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "viewPriceInUSD(address)"(
-      _token: string,
+    getPriceInUSDMultiple(
+      _tokens: string[],
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getPriceInUSDMultiple(address[])"(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    setOracleForAsset(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setOracleForAsset(address[],address[])"(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     getPriceInUSD(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "getPriceInUSD(address)"(
       _token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    updateOracleForAsset(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "updateOracleForAsset(address,address)"(
-      _asset: string,
-      _oracle: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    viewPriceInUSD(
-      _token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "viewPriceInUSD(address)"(
-      _token: string,
+    getPriceInUSDMultiple(
+      _tokens: string[],
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getPriceInUSDMultiple(address[])"(
+      _tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    setOracleForAsset(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setOracleForAsset(address[],address[])"(
+      _asset: string[],
+      _oracle: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

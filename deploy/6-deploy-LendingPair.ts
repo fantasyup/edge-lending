@@ -11,8 +11,7 @@ const deployLendingPair: DeployFunction = async function (hre: HardhatRuntimeEnv
   const useProxy = !!process.env.WITH_PROXY
 
   const vault = useProxy ? await get(ContractId.VaultProxy): await get(ContractId.Vault)
-  // console.log(vault)
-  const oracle = useProxy ? await get(ContractId.PriceOracleAggregatorProxy): await get(ContractId.PriceOracleAggregator)
+  const oracle = await get(ContractId.PriceOracleAggregator)
   const feeWithdrawalAddr = useProxy ? await get(ContractId.FeeWithdrawalProxy): await get(ContractId.FeeWithdrawal)
   /// fee share of liquidation fees that goes to the protocol
   /// 0.005%

@@ -89,11 +89,11 @@ contract WrapperToken is  IBSWrapperToken, WrapperTokenBase {
         return _owner;
     }
 
-     function _transfer(
+    function _transfer(
         address sender,
         address recipient,
         uint256 amount
-    ) internal override {
+    ) internal virtual override {
         _rewardHook(sender, recipient);
         super._transfer(sender, recipient, amount);
     }
