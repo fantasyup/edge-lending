@@ -40,7 +40,7 @@ abstract contract VaultStorageV1 is ReentrancyGuard, UUPSProxiable, Pausable, IB
 
     /// @notice mapping of asset to total deposit and shares minted
     mapping(IERC20 => TotalBase) public totals;
-
+    
 }
 
 abstract contract VaultBase is VaultStorageV1  {
@@ -75,6 +75,7 @@ abstract contract VaultBase is VaultStorageV1  {
     bytes32 internal immutable _HASHED_NAME;
     bytes32 internal immutable _HASHED_VERSION;
     uint256 private immutable _CACHED_CHAIN_ID;
+
 
     constructor() {
         _HASHED_NAME = keccak256(bytes(name));

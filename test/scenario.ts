@@ -60,6 +60,7 @@ runTestSuite("scenarios", (vars: TestVars) => {
             },
             {...defaultLendingPairInitVars, account: admin }
           )
+
           // set price oracle for assets
           await helper.addPriceOracleForAsset(CollateralAsset, CollateralAssetMockPriceOracle);
           await helper.addPriceOracleForAsset(BorrowTokenWithDecimals, BorrowAssetMockPriceOracle);

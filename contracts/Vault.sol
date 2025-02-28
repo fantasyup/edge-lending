@@ -48,13 +48,13 @@ contract Vault is VaultBase {
         require(flashLoanRate < MAX_FLASHLOAN_RATE, "INVALID_RATE");
 
         __init_ReentrancyGuard();
-
+        
         _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(
             _EIP712_TYPE_HASH,
             _HASHED_NAME,
             _HASHED_VERSION
         );
-
+        
         flashLoanRate = _flashLoanRate;
         owner = _owner;
     }
